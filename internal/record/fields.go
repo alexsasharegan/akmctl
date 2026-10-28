@@ -146,3 +146,124 @@ func AppendToSection(body, name, line, eol string) string {
 	out = append(out, lines[last+1:]...)
 	return strings.Join(out, "\n")
 }
+
+// SetSection replaces the text of the "## name" section of a body, or appends
+// lines to it, and returns the new body. The heading is matched without regard
+// to case, outside code fences. A missing section is created: before the "## Log"
+// section when there is one, otherwise at the end. Blank lines around the
+// section text are kept, and eol is the line ending to write.
+func SetSection(body, name, text string, appendMode bool, eol string) string {
+	cr := ""
+	if eol == "\r\n" {
+		cr = "\r"
+	}
+	name = strings.TrimSpace(name)
+	text = strings.ReplaceAll(text, "\r\n", "\n")
+	if appendMode {
+		text = strings.TrimRight(text, "\n")
+	} else {
+		text = strings.Trim(text, "\n")
+	}
+	var tl []string
+	if text != "" {
+		for _, l := range strings.Split(text, "\n") {
+			tl = append(tl, l+cr)
+		}
+	}
+	if appendMode && tl == nil {
+		return body
+	}
+	var lines []string
+	endsNL := strings.HasSuffix(body, "\n")
+	if body != "" {
+		lines = strings.Split(strings.TrimSuffix(body, "\n"), "\n")
+	}
+	blank := func(l string) bool { return strings.TrimSpace(l) == "" }
+	start, end, logAt := -1, len(lines), -1
+	fence := false
+	for i, l := range lines {
+		t := strings.TrimRight(l, "\r")
+		if strings.HasPrefix(t, "```") || strings.HasPrefix(t, "~~~") {
+			fence = !fence
+		}
+		if fence || !strings.HasPrefix(t, "## ") {
+			continue
+		}
+		h := strings.TrimSpace(t[3:])
+		if start >= 0 {
+			end = i
+			break
+		}
+		if strings.EqualFold(h, name) {
+			start = i
+		} else if strings.EqualFold(h, "log") && logAt < 0 {
+			logAt = i
+		}
+	}
+	var out []string
+	if start < 0 {
+		heading := name
+		if heading == strings.ToLower(heading) {
+			r := []rune(heading)
+			heading = strings.ToUpper(string(r[0])) + string(r[1:])
+		}
+		block := append([]string{"## " + heading + cr}, tl...)
+		if logAt >= 0 {
+			out = append(out, lines[:logAt]...)
+			if logAt > 0 && !blank(lines[logAt-1]) {
+				out = append(out, cr)
+			}
+			out = append(out, block...)
+			out = append(out, cr)
+			out = append(out, lines[logAt:]...)
+		} else {
+			out = append(out, lines...)
+			if len(lines) > 0 && !blank(lines[len(lines)-1]) {
+				out = append(out, cr)
+			}
+			out = append(out, block...)
+			endsNL = true
+		}
+		return strings.Join(out, "\n") + nl(endsNL)
+	}
+	content := lines[start+1 : end]
+	first, last := -1, -1
+	for i, l := range content {
+		if !blank(l) {
+			if first < 0 {
+				first = i
+			}
+			last = i
+		}
+	}
+	var lead, core, trail []string
+	if first < 0 {
+		lead = content
+	} else {
+		lead, core, trail = content[:first], content[first:last+1], content[last+1:]
+	}
+	if appendMode {
+		core = append(append([]string(nil), core...), tl...)
+	} else {
+		core = tl
+	}
+	if len(trail) == 0 && end < len(lines) {
+		trail = []string{cr}
+	}
+	out = append(out, lines[:start+1]...)
+	out = append(out, lead...)
+	out = append(out, core...)
+	out = append(out, trail...)
+	out = append(out, lines[end:]...)
+	if end == len(lines) {
+		endsNL = true
+	}
+	return strings.Join(out, "\n") + nl(endsNL)
+}
+
+func nl(b bool) string {
+	if b {
+		return "\n"
+	}
+	return ""
+}
