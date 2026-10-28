@@ -4,15 +4,15 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/alexsasharegan/akmctl/internal/cli"
 )
 
-const version = "0.0.0-dev"
-
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Println("akmctl", version)
-		return
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "akmctl:", err)
+		os.Exit(2)
 	}
-	fmt.Fprintln(os.Stderr, "akmctl: not implemented yet; see README.md")
-	os.Exit(2)
+	os.Exit(cli.Run(os.Args[1:], os.Stdout, os.Stderr, cwd))
 }

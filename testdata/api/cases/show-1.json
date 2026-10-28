@@ -1,0 +1,47 @@
+{
+  "name": "one section of a work item",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "section": "next"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "show",
+    "request": {
+      "id": "261020-a2b3",
+      "section": "next"
+    },
+    "ok": true,
+    "record": {
+      "id": "261020-a2b3",
+      "type": "work",
+      "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+      "id_date": "2026-10-20",
+      "etag": "b31236f6ee03e09b",
+      "fields": {
+        "id": "261020-a2b3",
+        "title": "Add JSON output to ls",
+        "summary": "Print ls results as JSON.",
+        "status": "active",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 2,
+        "created": "2026-10-20",
+        "updated": "2026-10-27",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "sections": [
+      "goal",
+      "next",
+      "log"
+    ],
+    "section": {
+      "name": "next",
+      "text": "Write the encoder test.\n\nSaved: 2026-10-27 18:00"
+    }
+  }
+}

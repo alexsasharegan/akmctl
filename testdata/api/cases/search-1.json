@@ -1,0 +1,72 @@
+{
+  "name": "title and summary search",
+  "repo": "basic",
+  "request": {
+    "text": "json"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "search",
+    "request": {
+      "text": "json"
+    },
+    "ok": true,
+    "total": 2,
+    "count": 2,
+    "records": [
+      {
+        "id": "261020-a2b3",
+        "type": "work",
+        "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "id_date": "2026-10-20",
+        "etag": "b31236f6ee03e09b",
+        "fields": {
+          "id": "261020-a2b3",
+          "title": "Add JSON output to ls",
+          "summary": "Print ls results as JSON.",
+          "status": "active",
+          "kind": null,
+          "parent": "261015-c4d5",
+          "priority": 2,
+          "updated": "2026-10-27"
+        },
+        "matches": [
+          {
+            "field": "title",
+            "line": 3,
+            "snippet": "title: Add JSON output to ls"
+          },
+          {
+            "field": "summary",
+            "line": 4,
+            "snippet": "summary: Print ls results as JSON."
+          }
+        ]
+      },
+      {
+        "id": "261015-c4d5",
+        "type": "work",
+        "path": "docs/work/261015-c4d5-machine-readable-listings.md",
+        "id_date": "2026-10-15",
+        "etag": "acae08a2f3cf6b27",
+        "fields": {
+          "id": "261015-c4d5",
+          "title": "Machine-readable listings",
+          "summary": "Make listings available as JSON for tools.",
+          "status": "active",
+          "kind": "feature",
+          "parent": null,
+          "priority": 3,
+          "updated": "2026-10-26"
+        },
+        "matches": [
+          {
+            "field": "summary",
+            "line": 4,
+            "snippet": "summary: Make listings available as JSON for tools."
+          }
+        ]
+      }
+    ]
+  }
+}

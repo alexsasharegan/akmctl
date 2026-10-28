@@ -1,0 +1,21 @@
+{
+  "name": "the date of an id",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "when",
+    "request": {
+      "id": "261022-e5f6",
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "id": "261022-e5f6",
+    "date": "2026-10-22",
+    "weekday": "Thursday",
+    "age_days": 6
+  }
+}

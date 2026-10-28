@@ -1,0 +1,26 @@
+{
+  "name": "an unknown status is rejected",
+  "repo": "basic",
+  "request": {
+    "status": [
+      "finished"
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "status": [
+        "finished"
+      ]
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "status: unknown value \"finished\"",
+      "details": {
+        "parameter": "status"
+      }
+    }
+  }
+}

@@ -8,7 +8,20 @@ Status: under construction. The contract is the AKM API spec (`akm-api-spec`), w
 
 - `cmd/akmctl`: the binary.
 - `internal/frontmatter`: the YAML-lite parser and byte-splice editor.
-- `testdata`: conformance fixtures shared with the spec.
+- `internal/record`: loads work items, ADRs, the roadmap and the manifest.
+- `internal/api`: the operations (`version`, `ls`, `search`, `show`, `board`, `find`, `when` so far) and their request checking.
+- `internal/cli`: the command-line binding.
+- `testdata`: conformance fixtures shared with the spec (`yaml-lite.json`, `api/`).
+
+## Use
+
+```sh
+akmctl ls --status ready,active --sort roadmap,-priority,id
+akmctl show 261020-a2b3 --section next
+akmctl board --format json
+```
+
+`--format json` prints one JSON document; the default is a plain table. Errors exit 2.
 
 ## Development
 
