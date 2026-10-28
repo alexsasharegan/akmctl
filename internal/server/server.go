@@ -225,13 +225,14 @@ func (s *Server) run(w http.ResponseWriter, op string, req api.Request) {
 }
 
 // writeOps need an If-Match when they change an existing record.
-var needsIfMatch = map[string]bool{"set": true, "close": true, "claim": true, "release": true}
+// A dry run is exempt: it writes nothing.
+var needsIfMatch = map[string]bool{"set": true, "section": true, "close": true, "claim": true, "release": true}
 
 // route maps a method and path to an operation and its request.
 func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool, *api.Error) {
 	m := r.Method
 	var op string
-	var id string
+	var id, name string
 	switch {
 	case len(seg) == 1 && seg[0] == "version" && m == "GET":
 		op = "version"
@@ -257,6 +258,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op, id = "find", seg[1]
 	case len(seg) == 2 && seg[0] == "when" && m == "GET":
 		op, id = "when", seg[1]
+	case len(seg) == 4 && seg[0] == "records" && seg[2] == "sections" && m == "PUT":
+		op, id, name = "section", seg[1], seg[3]
 	case len(seg) == 3 && seg[0] == "records" && seg[2] == "close" && m == "POST":
 		op, id = "close", seg[1]
 	case len(seg) == 3 && seg[0] == "records" && seg[2] == "claim" && m == "POST":
@@ -293,13 +296,21 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		}
 		req["id"] = id
 	}
+	if name != "" {
+		if got, ok := req["name"]; ok && got != name {
+			return "", nil, false, &api.Error{Code: "invalid_request", Message: "name in the body differs from the name in the path", Details: api.O("parameter", "name")}
+		}
+		req["name"] = name
+	}
 	if needsIfMatch[op] {
 		if _, ok := req["if_match"]; !ok {
 			h := strings.Trim(strings.TrimSpace(r.Header.Get("If-Match")), `"`)
-			if h == "" {
+			if h == "" && req["dry_run"] != true {
 				return "", nil, false, &api.Error{Code: "refused", Message: "a write needs If-Match with the record's etag (read the record first)", Details: api.O("reason", "if_match_required")}
 			}
-			req["if_match"] = h
+			if h != "" {
+				req["if_match"] = h
+			}
 		}
 	}
 	return op, req, true, nil

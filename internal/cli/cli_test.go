@@ -139,3 +139,29 @@ func TestMigrateFlags(t *testing.T) {
 		t.Fatalf("%d %s", code, out.String())
 	}
 }
+
+// The CLI reads the repository directly, so these run against the fixture
+// without writing: dry runs only.
+func TestSectionDryRunPrintsADiff(t *testing.T) {
+	before, _ := os.ReadFile(filepath.Join(repo, "docs/work/261022-e5f6-document-the-exit-codes.md"))
+	code, out, errs := run(t, "section", "261022-e5f6", "goal", "--text", "New goal.", "--dry-run")
+	if code != 0 {
+		t.Fatalf("%d %s", code, errs)
+	}
+	for _, want := range []string{"--- docs/work/261022-e5f6-document-the-exit-codes.md\n", "+++ ", "@@ ", "-Do the thing.\n", "+New goal.\n"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("missing %q in\n%s", want, out)
+		}
+	}
+	after, _ := os.ReadFile(filepath.Join(repo, "docs/work/261022-e5f6-document-the-exit-codes.md"))
+	if string(before) != string(after) {
+		t.Fatal("dry run wrote")
+	}
+	code, out, _ = run(t, "close", "261020-a2b3", "done", "--outcome", "Shipped.", "--dry-run", "--format", "json")
+	if code != 0 || !strings.Contains(out, `"dry_run":true`) || !strings.Contains(out, `"outcome":"Shipped."`) || !strings.Contains(out, `"new_path":"docs/work/done/`) {
+		t.Fatalf("%d %s", code, out)
+	}
+	if code, _, _ := run(t, "section", "261022-e5f6", "--text", "x", "--dry-run"); code != 2 {
+		t.Fatalf("missing name should be invalid_request: %d", code)
+	}
+}
