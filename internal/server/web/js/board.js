@@ -20,7 +20,7 @@ try {
   remembered = null;
 }
 
-function remember(id) {
+export function remember(id) {
   remembered = id;
   try {
     sessionStorage.setItem(FOCUS_KEY, id);
@@ -45,7 +45,7 @@ export function cardNode(r, byId, today) {
   const detail = field(r, "summary");
   return el(
     "a",
-    { class: "card" + (stale ? " is-stale" : ""), href: "#/record/" + encodeURIComponent(r.id), "data-id": r.id, tabindex: "-1" },
+    { class: "card" + (stale ? " is-stale" : ""), draggable: "true", href: "#/record/" + encodeURIComponent(r.id), "data-id": r.id, tabindex: "-1" },
     el(
       "div",
       { class: "card-head" },
@@ -165,6 +165,10 @@ export function mountBoard(host, ctx) {
     focus() {
       focusCard(true);
     },
+    /** The id of the focused card, or null. */
+    current() {
+      return loc ? ls[loc.lane].records[loc.index].id : null;
+    },
     destroy() {
       host.replaceChildren();
     },
@@ -176,6 +180,10 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open"],
+  ["H L", "move card"],
+  ["d x b", "done drop block"],
+  ["c", "capture"],
+  ["u", "undo"],
   ["/", "search"],
   ["?", "help"],
 ];

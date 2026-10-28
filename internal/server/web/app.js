@@ -10,6 +10,7 @@ import { mountTables } from "./js/tables.js";
 import { mountAdrs } from "./js/adrs.js";
 import { mountCheck } from "./js/check.js";
 import { createDrawer } from "./js/detail.js";
+import { initFlow, flowKeys, flowActions, flowHelp } from "./js/flow.js";
 
 initToken();
 
@@ -126,6 +127,7 @@ const NAV_KEYS = { 1: { name: "board" }, 2: { name: "tables" }, 3: { name: "adrs
 function onKey(e) {
   if (drawer.isOpen() && drawer.keys(e)) return true;
   if (!drawer.isOpen() && view && view.keys(e)) return true;
+  if (flowKeys(e, currentId())) return true;
   if (e.key === "r") {
     reload(true);
     return true;
@@ -138,12 +140,16 @@ function onKey(e) {
   return false;
 }
 
+/** The record a move key acts on: the open record, else the focused card of the board. */
+const currentId = () => (drawer.isOpen() ? drawer.id() : view && view.current ? view.current() : null);
+
 const actions = () => [
   { label: "Go to Board", keys: ["1"], run: () => go({ name: "board" }) },
   { label: "Go to Tables", keys: ["2"], run: () => go({ name: "tables" }) },
   ...TABLES.map((t) => ({ label: "Table: " + t.title, keys: [], run: () => go({ name: "tables", table: t.slug }) })),
   { label: "Go to ADRs", keys: ["3"], run: () => go({ name: "adrs" }) },
   { label: "Go to Check", keys: ["4"], run: () => go({ name: "check" }) },
+  ...flowActions(currentId),
   { label: "Reload the records", keys: ["r"], run: () => reload(true) },
   { label: "Switch light and dark", keys: ["t"], run: toggleTheme },
   { label: "Show keyboard shortcuts", keys: ["?"], run: openHelp },
@@ -170,11 +176,13 @@ const help = () => [
       ["Enter", "open the record"],
     ],
   ],
+  flowHelp(),
   [
     "Record",
     [
       ["j k", "scroll"],
       ["Esc", "close"],
+      ["d x b H L", "move it, as on the board"],
     ],
   ],
 ];
@@ -186,6 +194,7 @@ document.querySelector(".skip").addEventListener("click", (e) => {
   else host.focus();
 });
 
+initFlow({ host, reload: () => reload(false), byId: () => byIdCache, records: () => state.records, focusView: () => view && !drawer.isOpen() && view.focus() });
 initUI({ records: () => state.records, actions, onKey, help, openRecord: (id) => go({ name: "record", id }) });
 window.addEventListener("hashchange", () => {
   // a new #token= on an open page (a second akmctl ui, a pasted URL): take it and start again

@@ -16,6 +16,7 @@ const S = {
   page: { mode: "", hints: [], where: "" },
   hooks: { records: () => [], actions: () => [], onKey: () => false, help: () => [], openRecord: () => {} },
   pal: { q: "", sel: 0, items: [], body: [], bodyQ: "", seq: 0 },
+  modal: { mode: "", hints: [], onKey: null }, // a dialog opened by openDialog (the wizard, capture)
 };
 
 /** A key such as "g g" or "Ctrl+K" as <kbd> elements. */
@@ -60,6 +61,7 @@ function renderChrome() {
 function hintState() {
   if (S.overlay === "palette") return ["PALETTE", [["↑ ↓", "select"], ["Enter", "open"], ["Esc", "close"]], ""];
   if (S.overlay === "help") return ["HELP", [["Esc", "close"], ["?", "close"]], ""];
+  if (S.overlay === "modal") return [S.modal.mode, S.modal.hints, ""];
   return [S.page.mode, S.page.hints, S.page.where];
 }
 
@@ -80,13 +82,13 @@ export function setPage(p) {
 
 // ---- toast ----
 
-export function toast(msg, kind) {
+export function toast(msg, kind, ms) {
   const bad = kind === "bad";
   const box = el("div", { class: "toast" + (bad ? " bad" : "") }, bad ? el("strong", { text: "Error: " }) : null, msg);
   const host = $("#toasts");
   host.append(box);
   while (host.children.length > 3) host.firstChild.remove();
-  setTimeout(() => box.remove(), bad ? 9000 : 3500);
+  setTimeout(() => box.remove(), ms || (bad ? 9000 : 3500));
   return box;
 }
 
@@ -110,9 +112,27 @@ function openOverlay(kind, dialog) {
   renderHints();
 }
 
+/**
+ * Show a dialog node that the caller built (the move wizard, capture). hooks:
+ * { mode, hints, onKey(e) } - every key goes to onKey while it is open.
+ */
+export function openDialog(dialog, hooks) {
+  S.modal = { mode: "", hints: [], onKey: null, ...hooks };
+  clear($("#toasts")); // a toast would sit over the dialog's buttons
+  openOverlay("modal", dialog);
+}
+
+/** Change the mode and hints the hint bar shows for the open dialog. */
+export function setDialogHints(mode, hints) {
+  S.modal.mode = mode;
+  S.modal.hints = hints;
+  renderHints();
+}
+
 export function closeOverlay() {
   if (!S.overlay) return;
   S.overlay = null;
+  S.modal = { mode: "", hints: [], onKey: null };
   clear($("#overlay-root"));
   setInert(false);
   const back = S.returnFocus;
@@ -321,6 +341,10 @@ function onKeyDown(e) {
     e.preventDefault();
     if (S.overlay === "palette") closeOverlay();
     else if (!S.overlay) openPalette();
+    return;
+  }
+  if (S.overlay === "modal") {
+    if (S.modal.onKey) S.modal.onKey(e);
     return;
   }
   if (S.overlay === "palette") {

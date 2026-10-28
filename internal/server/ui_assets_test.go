@@ -14,7 +14,7 @@ import (
 
 // The embedded client: every file the page loads is listed here, so a new
 // asset is a deliberate change that is served and tested.
-var clientModules = []string{"adrs.js", "board.js", "boot.js", "check.js", "detail.js", "logic.js", "rows.js", "store.js", "tables.js", "ui.js", "util.js"}
+var clientModules = []string{"adrs.js", "board.js", "boot.js", "capture.js", "check.js", "detail.js", "flow.js", "logic.js", "moves.js", "review.js", "rows.js", "store.js", "tables.js", "ui.js", "util.js", "wizard.js"}
 
 func TestClientAssetList(t *testing.T) {
 	entries, err := fs.ReadDir(web, "web/js")
@@ -207,7 +207,7 @@ func TestPureModulesUnderNode(t *testing.T) {
 		t.Skip("node is not installed")
 	}
 	dir := t.TempDir()
-	for _, n := range []string{"util.js", "logic.js", "store.js"} {
+	for _, n := range []string{"util.js", "logic.js", "store.js", "moves.js", "review.js", "capture.js"} {
 		if err := os.WriteFile(filepath.Join(dir, n), []byte(readWeb(t, "js/"+n)), 0o644); err != nil {
 			t.Fatal(err)
 		}

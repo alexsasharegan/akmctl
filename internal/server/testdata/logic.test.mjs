@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { ageDays, daysBefore, ageText, isoDate } from "./util.js";
 import * as L from "./logic.js";
 import { parseToken, withQuery } from "./store.js";
+import * as M from "./moves.js";
+import { diffRows } from "./review.js";
+import * as C from "./capture.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -104,4 +107,139 @@ const findings = [{ severity: "W", rule: "a" }, { severity: "E", rule: "b" }, { 
 assert.deepEqual(L.orderFindings(findings).map((x) => x.rule), ["b", "d", "a", "c"]);
 assert.equal(L.isId("261020-a2b3"), true);
 assert.equal(L.isId("261020-A2B3"), false);
+
+// ---- moves ----
+assert.equal(M.neighbour("raw", "right"), "ready");
+assert.equal(M.neighbour("blocked", "right"), null);
+assert.equal(M.neighbour("raw", "left"), null);
+assert.equal(M.neighbour("active", "left"), "ready");
+assert.equal(M.neighbour("done", "left"), null);
+
+const body = "\n# T\n\n## Goal\nDo it.\n\n```\n## Not a heading\n```\n\n### Sub\nstill goal\n\n## Next\n\n## Log\n- 2026-10-28: x\n";
+const secs = M.sectionsOf(body);
+assert.deepEqual(Object.keys(secs), ["goal", "next", "log"]);
+assert.match(secs.goal, /^Do it\./);
+assert.match(secs.goal, /still goal$/);
+assert.equal(secs.next, "");
+assert.deepEqual(M.sectionsOf(""), {});
+assert.deepEqual(M.sectionsOf("## A ##\nx\r\n## b\r\ny"), { a: "x", b: "y" });
+
+assert.deepEqual(M.parseEntries(" a \n\n b\r\na\n"), ["a", "b"]);
+
+// the wizard rules: WK5 to WK7
+const base = { from: "raw", to: "ready", claims: false, sections: {}, blockedBy: [] };
+assert.deepEqual(M.planMove(base), { kind: "gated", steps: ["goal"] });
+assert.deepEqual(M.planMove({ ...base, sections: { goal: "x" } }), { kind: "safe", steps: [] });
+assert.deepEqual(M.planMove({ ...base, to: "active", sections: { goal: "x" } }), { kind: "gated", steps: ["next"] });
+assert.deepEqual(M.planMove({ ...base, to: "active", sections: { goal: "x", next: "y" } }), { kind: "safe", steps: [] });
+assert.deepEqual(M.planMove({ ...base, to: "active", sections: { goal: "x", next: "y" }, claims: true }), { kind: "safe", steps: [] });
+assert.deepEqual(M.planMove({ ...base, to: "active", claims: true }), { kind: "gated", steps: ["goal", "next", "identity"] });
+assert.deepEqual(M.planMove({ ...base, to: "blocked" }), { kind: "gated", steps: ["goal", "next", "blocked_by"] });
+assert.deepEqual(M.planMove({ ...base, to: "blocked", sections: { goal: "x", next: "y" }, blockedBy: ["legal"] }), { kind: "gated", steps: [] });
+assert.deepEqual(M.planMove({ ...base, to: "done" }), { kind: "gated", steps: ["goal", "outcome", "decision"] });
+assert.deepEqual(M.planMove({ ...base, to: "done", sections: { goal: "g", outcome: "o" } }), { kind: "gated", steps: ["decision"] });
+assert.deepEqual(M.planMove({ ...base, to: "dropped" }), { kind: "gated", steps: ["outcome"] });
+assert.deepEqual(M.planMove({ ...base, from: "ready", to: "raw" }), { kind: "safe", steps: [] });
+assert.equal(M.planMove({ ...base, to: "raw" }).kind, "noop");
+assert.equal(M.planMove({ ...base, from: "done", to: "ready" }).kind, "noop");
+
+assert.equal(M.validateStep("goal", { goal: "  " }), "Say what done looks like. A ready, active, blocked or done item needs a Goal.");
+assert.equal(M.validateStep("goal", { goal: "x" }), "");
+assert.notEqual(M.validateStep("blocked_by", { blocked_by: "\n \n" }), "");
+assert.equal(M.validateStep("blocked_by", { blocked_by: "261001-aaaa\nlegal review" }), "");
+assert.match(M.validateStep("outcome", { outcome: "" }, "dropped"), /reason/);
+assert.match(M.validateStep("outcome", { outcome: "" }, "done"), /outcome/);
+assert.notEqual(M.validateStep("decision", { decision: { mode: "link", id: "" } }), "");
+assert.equal(M.validateStep("decision", { decision: { mode: "link", id: "261012-p3q4" } }), "");
+assert.equal(M.validateStep("decision", { decision: { mode: "none" } }), "");
+assert.notEqual(M.validateStep("decision", { decision: { mode: "new", title: "x", slug: "" } }), "");
+
+// ops and requests
+const mv = { id: "261022-e5f6", from: "ready", to: "active", claims: false, decisions: [] };
+assert.deepEqual(M.buildOps(mv, {}), [{ kind: "set", changes: { status: "active" } }]);
+assert.deepEqual(M.buildOps({ ...mv, from: "raw", to: "ready" }, { goal: " Done when x " }), [{ kind: "section", name: "Goal", text: "Done when x", mode: "replace" }, { kind: "set", changes: { status: "ready" } }]);
+assert.deepEqual(M.buildOps({ ...mv, claims: true }, { identity: "alex" }), [{ kind: "claim", as: "alex" }]);
+assert.deepEqual(M.buildOps({ ...mv, claims: true, from: "blocked" }, { next: "n", identity: "alex" }), [{ kind: "section", name: "Next", text: "n", mode: "replace" }, { kind: "set", changes: { status: "active" } }, { kind: "claim", as: "alex" }]);
+assert.deepEqual(M.buildOps({ ...mv, to: "blocked" }, { next: "n", blocked_by: "a\nb" }), [{ kind: "section", name: "Next", text: "n", mode: "replace" }, { kind: "set", changes: { status: "blocked", blocked_by: ["a", "b"] } }]);
+assert.deepEqual(M.buildOps({ ...mv, to: "blocked" }, {}), [{ kind: "set", changes: { status: "blocked" } }]);
+assert.deepEqual(M.buildOps({ ...mv, to: "dropped" }, { outcome: " no longer needed " }), [{ kind: "close", status: "dropped", outcome: "no longer needed" }]);
+assert.deepEqual(M.buildOps({ ...mv, to: "done" }, {}), [{ kind: "close", status: "done" }]);
+assert.deepEqual(M.buildOps({ ...mv, to: "done", decisions: ["261012-p3q4"] }, { outcome: "o", decision: { mode: "link", id: "261012-p3q4" } }), [{ kind: "set", changes: { decisions: ["261012-p3q4"] } }, { kind: "close", status: "done", outcome: "o" }]);
+const withNew = M.buildOps({ ...mv, to: "done" }, { outcome: "o", decision: { mode: "new", title: " Pick X ", slug: "pick-x" } });
+assert.deepEqual(withNew.map((o) => o.kind), ["new", "set", "close"]);
+assert.deepEqual(withNew[0], { kind: "new", what: "adr", slug: "pick-x", title: "Pick X" });
+assert.deepEqual(M.resolveOp(withNew[1], "261028-abcd").changes.decisions, ["261028-abcd"]);
+assert.equal(M.previewable(withNew[0], mv), false);
+assert.equal(M.previewable(withNew[1], mv), false);
+assert.equal(M.previewable(withNew[2], mv), true);
+assert.equal(M.previewable({ kind: "claim", as: "a" }, { from: "ready" }), true);
+assert.equal(M.previewable({ kind: "claim", as: "a" }, { from: "raw" }), false);
+
+assert.deepEqual(M.requestFor({ kind: "set", changes: { status: "ready" } }, "261022-e5f6"), { method: "PATCH", path: "records/261022-e5f6", body: { changes: { status: "ready" } } });
+assert.deepEqual(M.requestFor({ kind: "set", changes: { status: "ready" } }, "261022-e5f6", { dry_run: true }).body, { changes: { status: "ready" }, dry_run: true });
+assert.deepEqual(M.requestFor({ kind: "section", name: "Next", text: "t", mode: "replace" }, "i"), { method: "PUT", path: "records/i/sections/Next", body: { text: "t", mode: "replace" } });
+assert.equal(M.requestFor({ kind: "section", name: "A b/c", text: "", mode: "replace" }, "i").path, "records/i/sections/A%20b%2Fc");
+assert.deepEqual(M.requestFor({ kind: "close", status: "done", outcome: "o" }, "i", { dry_run: true }), { method: "POST", path: "records/i/close", body: { status: "done", outcome: "o", dry_run: true } });
+assert.deepEqual(M.requestFor({ kind: "close", status: "dropped" }, "i").body, { status: "dropped" });
+assert.deepEqual(M.requestFor({ kind: "claim", as: "a" }, "i", { takeover: true }), { method: "POST", path: "records/i/claim", body: { as: "a", takeover: true } });
+assert.deepEqual(M.requestFor({ kind: "release" }, "i"), { method: "DELETE", path: "records/i/claim", body: undefined });
+assert.deepEqual(M.requestFor({ kind: "new", what: "adr", slug: "s", title: "T" }, "i"), { method: "POST", path: "records", body: { kind: "adr", slug: "s", title: "T" } });
+assert.throws(() => M.requestFor({ kind: "nope" }, "i"));
+assert.match(M.opLabel({ kind: "close", status: "done", outcome: "x" }, "i"), /Close as done/);
+
+// ---- review rows ----
+const d = diffRows({ path: "docs/work/a.md", new_path: "docs/work/done/a.md", hunks: [{ header: "@@ -1,3 +1,3 @@", lines: [{ op: "ctx", text: "a", old: 1, new: 1 }, { op: "rem", text: "status: ready", old: 2, new: null }, { op: "add", text: "status: done", old: null, new: 2 }, { op: "add", text: "", old: null, new: 3 }] }] });
+assert.deepEqual(d.rows.map((r) => r.kind), ["hunk", "ctx", "rem", "add", "add"]);
+assert.deepEqual(d.rows.map((r) => r.sign), ["", " ", "−", "+", "+"]);
+assert.deepEqual(d.rows.map((r) => r.word), ["hunk header", "unchanged", "removed", "added", "added"]);
+assert.equal(d.added, 2);
+assert.equal(d.removed, 1);
+assert.equal(d.renamed, true);
+assert.equal(d.rows[2].old, 2);
+assert.equal(d.rows[2].new, null);
+assert.equal(diffRows({ path: "p", new_path: "p", hunks: [] }).rows.length, 0);
+assert.equal(diffRows({ path: "p", new_path: "p", hunks: [] }).renamed, false);
+assert.equal(diffRows(null).rows.length, 0);
+
+// ---- slug (vectors from pkm-workbench internal/move/block_test.go) ----
+for (const [input, want] of Object.entries({
+  "Fix the sink, again!": "fix-sink-again",
+  "Café run ☕ for Erin's list of things to buy": "cafe-run-erin-s-list-things",
+  "Crème brûlée à la Zoë": "creme-brulee-la-zoe",
+  "the to of": "the-to-of",
+  "???": "",
+  "Straße and Łódź": "strasse-lodz",
+  "": "",
+  "  Call   the plumber  ": "call-plumber",
+  "Ünïcode ÇÅ": "unicode-ca",
+  "v2.0 release 2026": "v2-0-release-2026",
+  "日本語": "",
+})) {
+  assert.equal(C.slugify(input), want, JSON.stringify(input));
+}
+const long = C.slugify("abcdefgh ".repeat(8));
+assert.ok(long.length <= 48 && !long.endsWith("-"), long);
+assert.equal(long, "abcdefgh-abcdefgh-abcdefgh-abcdefgh-abcdefgh-abc");
+assert.equal(C.slugify("one two three four five six seven eight"), "one-two-three-four-five-six");
+// a typed slug keeps its filler and may run to eight words and 60 characters
+assert.equal(C.cleanSlug("The Plumber Thing!"), "the-plumber-thing");
+assert.equal(C.cleanSlug("a b c d e f g h i j"), "a-b-c-d-e-f-g-h");
+assert.ok(C.cleanSlug("abcdefghij ".repeat(8)).length <= 60);
+assert.equal(C.validSlug("fix-it-2"), true);
+assert.equal(C.validSlug("Fix-it"), false);
+assert.equal(C.validSlug("fix--it"), false);
+assert.equal(C.validSlug("x".repeat(61)), false);
+
+// the capture request
+assert.deepEqual(C.buildCapture({ title: "Call the plumber" }), { body: { kind: "work", slug: "call-plumber", title: "Call the plumber" } });
+assert.deepEqual(C.buildCapture({ title: " Call  the plumber ", slug: "My Own Slug", summary: " s ", kind: "bug", priority: "3", parent: "261015-c4d5" }, ["261015-c4d5"]), { body: { kind: "work", slug: "my-own-slug", title: "Call the plumber", fields: { summary: "s", kind: "bug", priority: 3 , parent: "261015-c4d5" } } });
+assert.equal(C.buildCapture({ title: "  " }).field, "title");
+assert.equal(C.buildCapture({ title: "???" }).field, "slug");
+assert.equal(C.buildCapture({ title: "x", priority: "1.5" }).field, "priority");
+assert.equal(C.buildCapture({ title: "x", priority: "-2" }).body.fields.priority, -2);
+assert.equal(C.buildCapture({ title: "x", priority: "007" }).field, "priority");
+assert.equal(C.buildCapture({ title: "x", kind: "epic" }).field, "kind");
+assert.equal(C.buildCapture({ title: "x", parent: "261099-zzzz" }, []).field, "parent");
+assert.equal(C.buildCapture({ title: "x", summary: "y".repeat(161) }).field, "summary");
+
 console.log("ok");
