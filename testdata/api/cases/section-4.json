@@ -1,0 +1,176 @@
+{
+  "name": "dry run: the replacement as a diff, nothing written",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "name": "Next",
+    "text": "Write the decoder test.",
+    "dry_run": true,
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "section",
+    "request": {
+      "id": "261020-a2b3",
+      "name": "Next",
+      "text": "Write the decoder test.",
+      "dry_run": true,
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261020-a2b3",
+      "type": "work",
+      "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+      "id_date": "2026-10-20",
+      "etag": "b31236f6ee03e09b",
+      "fields": {
+        "id": "261020-a2b3",
+        "title": "Add JSON output to ls",
+        "summary": "Print ls results as JSON.",
+        "status": "active",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 2,
+        "created": "2026-10-20",
+        "updated": "2026-10-28",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "section": {
+      "name": "next",
+      "text": "Write the decoder test."
+    },
+    "changed": true,
+    "diff": {
+      "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+      "new_path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+      "hunks": [
+        {
+          "header": "@@ -6,7 +6,7 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "parent: 261015-c4d5",
+              "old": 6,
+              "new": 6
+            },
+            {
+              "op": "ctx",
+              "text": "priority: 2",
+              "old": 7,
+              "new": 7
+            },
+            {
+              "op": "ctx",
+              "text": "created: 2026-10-20",
+              "old": 8,
+              "new": 8
+            },
+            {
+              "op": "rem",
+              "text": "updated: 2026-10-27",
+              "old": 9,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "updated: 2026-10-28",
+              "old": null,
+              "new": 9
+            },
+            {
+              "op": "ctx",
+              "text": "---",
+              "old": 10,
+              "new": 10
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 11,
+              "new": 11
+            },
+            {
+              "op": "ctx",
+              "text": "# Add JSON output to ls",
+              "old": 12,
+              "new": 12
+            }
+          ]
+        },
+        {
+          "header": "@@ -17,9 +17,7 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "- [ ] It is done.",
+              "old": 17,
+              "new": 17
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 18,
+              "new": 18
+            },
+            {
+              "op": "ctx",
+              "text": "## Next",
+              "old": 19,
+              "new": 19
+            },
+            {
+              "op": "rem",
+              "text": "Write the encoder test.",
+              "old": 20,
+              "new": null
+            },
+            {
+              "op": "rem",
+              "text": "",
+              "old": 21,
+              "new": null
+            },
+            {
+              "op": "rem",
+              "text": "Saved: 2026-10-27 18:00",
+              "old": 22,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "Write the decoder test.",
+              "old": null,
+              "new": 20
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 23,
+              "new": 21
+            },
+            {
+              "op": "ctx",
+              "text": "## Log",
+              "old": 24,
+              "new": 22
+            },
+            {
+              "op": "ctx",
+              "text": "- 2026-10-20: started.",
+              "old": 25,
+              "new": 23
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "would_be": {
+    "docs/work/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: active\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the decoder test.\n\n## Log\n- 2026-10-20: started.\n"
+  }
+}

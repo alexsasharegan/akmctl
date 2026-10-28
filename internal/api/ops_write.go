@@ -58,6 +58,8 @@ type edit struct {
 	text string // body after the frontmatter, editable
 	eol  string
 	old  string // file text when the lock was taken
+	dry  bool   // dry_run: nothing is written and the lock is not taken
+	diff Obj    // the would-be change, set by commit when dry
 }
 
 // openEdit locks the repository, re-reads the record from disk and checks the
@@ -67,9 +69,13 @@ func openEdit(repo *record.Repo, q Request) (*edit, func(), *Error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	unlock, lerr := fsx.LockRepo(repo.Root)
-	if lerr != nil {
-		return nil, nil, unreadable(lerr)
+	dry := q.boolean("dry_run")
+	unlock := func() {}
+	if !dry {
+		var lerr error
+		if unlock, lerr = fsx.LockRepo(repo.Root); lerr != nil {
+			return nil, nil, unreadable(lerr)
+		}
 	}
 	ok := false
 	defer func() {
@@ -96,7 +102,7 @@ func openEdit(repo *record.Repo, q Request) (*edit, func(), *Error) {
 		eol = "\r\n"
 	}
 	ok = true
-	return &edit{repo, rec, doc, string(doc.Body()), eol, string(rec.Text)}, unlock, nil
+	return &edit{repo: repo, rec: rec, doc: doc, text: string(doc.Body()), eol: eol, old: string(rec.Text), dry: dry}, unlock, nil
 }
 
 func (e *edit) bytes() []byte {
@@ -109,6 +115,9 @@ func (e *edit) bytes() []byte {
 // record read back from disk.
 func (e *edit) commit(dest string) (*record.Record, *Error) {
 	data := e.bytes()
+	if e.dry {
+		return e.preview(data, dest)
+	}
 	full := filepath.Join(e.repo.Root, filepath.FromSlash(e.rec.Path))
 	if string(data) != e.old {
 		if err := fsx.WriteAtomic(full, data); err != nil {
@@ -133,6 +142,33 @@ func (e *edit) commit(dest string) (*record.Record, *Error) {
 	}
 	rec, aerr := lookup(e.repo, e.rec.ID)
 	return rec, aerr
+}
+
+// preview is commit for a dry run: the record as it would be after the write
+// (with the current etag) and the diff, with nothing written.
+func (e *edit) preview(data []byte, dest string) (*record.Record, *Error) {
+	rel := e.rec.Path
+	if dest != "" {
+		rel = dest
+	}
+	rec, err := record.FromText(rel, e.rec.Type, e.rec.ID, data)
+	if err != nil {
+		return nil, unreadable(err)
+	}
+	rec.Etag = e.rec.Etag
+	e.diff = Diff(e.rec.Path, rel, e.old, string(data))
+	return rec, nil
+}
+
+// finish adds the diff to the response of a dry run.
+func (e *edit) finish(out Obj) Obj {
+	if !e.dry {
+		return out
+	}
+	if e.diff == nil {
+		e.diff = Diff(e.rec.Path, e.rec.Path, e.old, e.old)
+	}
+	return append(out, KV{"diff", e.diff})
 }
 
 func refString(repo *record.Repo, id string) string {
@@ -435,7 +471,7 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 		changed = append(changed, k)
 	}
 	if len(changed) == 0 {
-		return O("record", recordObj(repo, e.rec, nil, true), "changed", []string{}), nil
+		return e.finish(O("record", recordObj(repo, e.rec, nil, true), "changed", []string{})), nil
 	}
 	// status rules
 	newStatus := oldStatus
@@ -470,7 +506,7 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return O("record", recordObj(repo, rec, nil, true), "changed", changed), nil
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "changed", changed)), nil
 }
 
 // sameValue compares a stored value with a new one, reading references as ids.
@@ -499,6 +535,9 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, refused("already_closed", "%s is already %s", e.rec.ID, st)
 	}
 	status := q.str("status")
+	if o := q.str("outcome"); strings.TrimSpace(o) != "" {
+		e.text = record.SetSection(e.text, "Outcome", o, false, e.eol)
+	}
 	_, text := record.Sections(e.text)
 	if strings.TrimSpace(text["outcome"]) == "" {
 		return nil, refused("empty_outcome", "%s has no ## Outcome; write it before closing", e.rec.ID)
@@ -525,7 +564,7 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return O("record", recordObj(repo, rec, nil, true), "moved_from", from, "moved_to", rec.Path), nil
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "moved_from", from, "moved_to", rec.Path)), nil
 }
 
 // ---- claim and release ----
@@ -537,11 +576,15 @@ func claimsOn(repo *record.Repo) *Error {
 	return nil
 }
 
-func claimStale(repo *record.Repo, claimedAt string, now time.Time) bool {
-	hours := 24
+func claimStaleHours(repo *record.Repo) int {
 	if v, ok := repo.Layout["claim_stale_hours"]; ok && v.Kind == frontmatter.Int && v.Int > 0 {
-		hours = int(v.Int)
+		return int(v.Int)
 	}
+	return 24
+}
+
+func claimStale(repo *record.Repo, claimedAt string, now time.Time) bool {
+	hours := claimStaleHours(repo)
 	t, err := time.Parse("2006-01-02T15:04", claimedAt)
 	if err != nil {
 		return true
@@ -600,7 +643,7 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return O("record", recordObj(repo, rec, nil, true), "previous_holder", previous), nil
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "previous_holder", previous)), nil
 }
 
 func opRelease(repo *record.Repo, q Request) (Obj, *Error) {
@@ -630,5 +673,46 @@ func opRelease(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return O("record", recordObj(repo, rec, nil, true)), nil
+	return e.finish(O("record", recordObj(repo, rec, nil, true))), nil
+}
+
+// ---- section ----
+
+func opSection(repo *record.Repo, q Request) (Obj, *Error) {
+	name := strings.TrimSpace(q.str("name"))
+	if name == "" || strings.ContainsAny(name, "\r\n") || strings.HasPrefix(name, "#") {
+		return nil, invalid("name", "name must be the text of a ## heading: one line, no hashes")
+	}
+	mode := q.str("mode")
+	if mode == "" {
+		mode = "replace"
+	}
+	if mode == "replace" && strings.EqualFold(name, "log") {
+		return nil, invalid("mode", "the Log section is append-only: use mode append")
+	}
+	e, unlock, err := openEdit(repo, q)
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+	if strings.HasPrefix(e.rec.Path, "docs/work/done/") {
+		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
+	}
+	text := record.SetSection(e.text, name, q.str("text"), mode == "append", e.eol)
+	changed := text != e.text
+	rec := e.rec
+	if changed {
+		e.text = text
+		if e.rec.Type == record.Work {
+			if serr := e.doc.Set("updated", frontmatter.NewString(today(clock(q)))); serr != nil {
+				return nil, unreadable(serr)
+			}
+		}
+		var cerr *Error
+		if rec, cerr = e.commit(""); cerr != nil {
+			return nil, cerr
+		}
+	}
+	_, secs := record.Sections(rec.Body)
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "section", O("name", strings.ToLower(name), "text", secs[strings.ToLower(name)]), "changed", changed)), nil
 }

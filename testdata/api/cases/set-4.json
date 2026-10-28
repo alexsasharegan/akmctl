@@ -1,0 +1,126 @@
+{
+  "name": "dry run: the change as a diff, nothing written",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "priority": 4,
+      "summary": "Document them."
+    },
+    "dry_run": true,
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261022-e5f6",
+      "changes": {
+        "priority": 4,
+        "summary": "Document them."
+      },
+      "dry_run": true,
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "1e3e49990ff5d8ed",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": "Document them.",
+        "status": "ready",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 4,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "changed": [
+      "priority",
+      "summary"
+    ],
+    "diff": {
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "new_path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "hunks": [
+        {
+          "header": "@@ -4,7 +4,9 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "status: ready",
+              "old": 4,
+              "new": 4
+            },
+            {
+              "op": "ctx",
+              "text": "parent: 261015-c4d5",
+              "old": 5,
+              "new": 5
+            },
+            {
+              "op": "ctx",
+              "text": "created: 2026-10-22",
+              "old": 6,
+              "new": 6
+            },
+            {
+              "op": "rem",
+              "text": "updated: 2026-10-22",
+              "old": 7,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "updated: 2026-10-28",
+              "old": null,
+              "new": 7
+            },
+            {
+              "op": "add",
+              "text": "priority: 4",
+              "old": null,
+              "new": 8
+            },
+            {
+              "op": "add",
+              "text": "summary: Document them.",
+              "old": null,
+              "new": 9
+            },
+            {
+              "op": "ctx",
+              "text": "---",
+              "old": 8,
+              "new": 10
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 9,
+              "new": 11
+            },
+            {
+              "op": "ctx",
+              "text": "# Document the exit codes",
+              "old": 10,
+              "new": 12
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "would_be": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\npriority: 4\nsummary: Document them.\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+  }
+}

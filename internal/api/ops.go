@@ -1,6 +1,7 @@
 package api
 
 import (
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -29,7 +30,7 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 	var err *Error
 	switch op {
 	case "version":
-		body = opVersion(info)
+		body = opVersion(info, repo)
 	case "ls":
 		body, err = opLs(repo, req)
 	case "search":
@@ -52,6 +53,8 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opNew(repo, req)
 	case "set":
 		body, err = opSet(repo, req)
+	case "section":
+		body, err = opSection(repo, req)
 	case "close":
 		body, err = opClose(repo, req)
 	case "claim":
@@ -90,9 +93,33 @@ func failure(op string, echo Obj, e *Error) Obj {
 	return O("api_version", Version, "operation", op, "request", echo, "ok", false, "error", eo)
 }
 
-func opVersion(info Info) Obj {
+func opVersion(info Info, repo *record.Repo) Obj {
 	return O("tool", O("name", info.Name, "version", info.Version), "api_versions", []string{Version},
-		"layout_versions", []string{check.LayoutVersion}, "extensions", []string{"claims"})
+		"layout_versions", []string{check.LayoutVersion}, "extensions", []string{"claims"}, "repository", repositoryObj(repo))
+}
+
+// repositoryObj describes the repository the call ran against; null when the
+// tool runs outside any repository (the CLI's version command).
+func repositoryObj(repo *record.Repo) any {
+	if repo == nil || repo.Root == "" {
+		return nil
+	}
+	layout := "0.0.0"
+	if v, ok := repo.Layout["layout"]; ok && v.Kind == frontmatter.String {
+		layout = v.Str
+	}
+	exts := []string{}
+	for k := range repo.Layout {
+		if n, ok := strings.CutPrefix(k, "extension."); ok {
+			exts = append(exts, n)
+		}
+	}
+	sort.Strings(exts)
+	style := "id"
+	if v, ok := repo.Layout["reference_style"]; ok && v.Kind == frontmatter.String && v.Str == "wikilink" {
+		style = "wikilink"
+	}
+	return O("name", filepath.Base(repo.Root), "layout", layout, "extensions", exts, "reference_style", style, "claim_stale_hours", claimStaleHours(repo))
 }
 
 // fieldsObj renders the frontmatter of r for the chosen field list. A nil list
