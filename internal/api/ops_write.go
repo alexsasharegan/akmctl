@@ -65,43 +65,53 @@ type edit struct {
 // openEdit locks the repository, re-reads the record from disk and checks the
 // etag. The caller must call the returned release function.
 func openEdit(repo *record.Repo, q Request) (*edit, func(), *Error) {
-	rec, err := lookup(repo, q.str("id"))
-	if err != nil {
-		return nil, nil, err
-	}
 	dry := q.boolean("dry_run")
 	unlock := func() {}
-	if !dry {
+	var rec *record.Record
+	var err *Error
+	if dry {
+		// A dry run takes no lock, so it can read while a writer replaces the file.
+		// Where a replace is not atomic for readers (Windows) the record can be
+		// missing for a moment; read again a few times before saying not_found.
+		for i := 0; ; i++ {
+			if lerr := repo.Reload(); lerr != nil {
+				return nil, nil, unreadable(lerr)
+			}
+			if rec, err = lookup(repo, q.str("id")); err == nil || err.Code != "not_found" || i == 40 {
+				break
+			}
+			time.Sleep(5 * time.Millisecond)
+		}
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
 		var lerr error
 		if unlock, lerr = fsx.LockRepo(repo.Root); lerr != nil {
 			return nil, nil, unreadable(lerr)
 		}
-	}
-	ok := false
-	defer func() {
-		if !ok {
+		if lerr := repo.Reload(); lerr != nil {
 			unlock()
+			return nil, nil, unreadable(lerr)
 		}
-	}()
-	if lerr := repo.Reload(); lerr != nil {
-		return nil, nil, unreadable(lerr)
-	}
-	rec, err = lookup(repo, q.str("id"))
-	if err != nil {
-		return nil, nil, err
+		if rec, err = lookup(repo, q.str("id")); err != nil {
+			unlock()
+			return nil, nil, err
+		}
 	}
 	if want := q.str("if_match"); want != "" && want != rec.Etag {
+		unlock()
 		return nil, nil, &Error{"stale", "the record changed since it was read", O("etag", rec.Etag)}
 	}
 	doc, perr := frontmatter.Parse(rec.Text)
 	if perr != nil {
+		unlock()
 		return nil, nil, unreadable(perr)
 	}
 	eol := "\n"
 	if strings.Contains(string(rec.Text), "\r\n") {
 		eol = "\r\n"
 	}
-	ok = true
 	return &edit{repo: repo, rec: rec, doc: doc, text: string(doc.Body()), eol: eol, old: string(rec.Text), dry: dry}, unlock, nil
 }
 
