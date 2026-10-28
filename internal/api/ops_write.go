@@ -307,7 +307,7 @@ func newRecordText(repo *record.Repo, kind, title string, f map[string]any, now 
 		}
 		set("created", frontmatter.NewString(day))
 		set("updated", frontmatter.NewString(day))
-		return string(fm.Bytes()), "\n# " + title + "\n\n## Goal\n\n## Log\n- " + day + ": filed.\n", nil
+		return string(fm.Bytes()), "\n# " + title + "\n\n## Goal\n\n## Log\n\n- " + day + ": filed.\n", nil
 	}
 	set("status", frontmatter.NewString("proposed"))
 	set("date", frontmatter.NewString(day))

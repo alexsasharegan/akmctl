@@ -397,3 +397,159 @@ func TestSectionRoute(t *testing.T) {
 		t.Fatalf("version: %v", v.body)
 	}
 }
+
+func get(t *testing.T, ts *httptest.Server, path string, hdr map[string]string) (*http.Response, []byte) {
+	t.Helper()
+	req, _ := http.NewRequest("GET", ts.URL+path, nil)
+	for k, v := range hdr {
+		req.Header.Set(k, v)
+	}
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+	b, _ := io.ReadAll(res.Body)
+	return res, b
+}
+
+func TestEmbeddedAssetsNeedNoToken(t *testing.T) {
+	ts, _ := setup(t)
+	cases := map[string]string{
+		"/js/util.js":                        "text/javascript",
+		"/fonts/monaspace-neon-var.woff2":    "font/woff2",
+		"/fonts/monaspace-radon-var.woff2":   "font/woff2",
+		"/fonts/monaspace-argon-var.woff2":   "font/woff2",
+		"/fonts/monaspace-krypton-var.woff2": "font/woff2",
+		"/fonts/monaspace-neon-LICENSE.txt":  "text/plain",
+		"/fonts/NOTICE":                      "text/plain",
+	}
+	for p, ct := range cases {
+		res, b := get(t, ts, p, nil)
+		if res.StatusCode != 200 || !strings.HasPrefix(res.Header.Get("Content-Type"), ct) || len(b) == 0 {
+			t.Fatalf("%s: %d %q", p, res.StatusCode, res.Header.Get("Content-Type"))
+		}
+		if strings.Contains(string(b), token) {
+			t.Fatalf("%s holds the token", p)
+		}
+		csp := res.Header.Get("Content-Security-Policy")
+		if !strings.Contains(csp, "font-src 'self'") || strings.Contains(csp, "unsafe-inline") || strings.Contains(csp, "unsafe-eval") {
+			t.Fatalf("%s csp: %q", p, csp)
+		}
+		if res.Header.Get("Access-Control-Allow-Origin") != "" || res.Header.Get("Cache-Control") != "no-store" {
+			t.Fatalf("%s headers: %v", p, res.Header)
+		}
+	}
+	// the page itself carries the same policy
+	res, _ := get(t, ts, "/", nil)
+	if !strings.Contains(res.Header.Get("Content-Security-Policy"), "font-src 'self'") {
+		t.Fatal("page csp lacks font-src")
+	}
+}
+
+func TestAssetRefusals(t *testing.T) {
+	ts, _ := setup(t)
+	for _, p := range []string{
+		"/js/../../x", "/js/%2e%2e/%2e%2e/x", "/js/..%2fapp.js", "/js/%2E%2E%2Fserver.go", "/fonts/..%5cNOTICE",
+		"/js/", "/fonts/", "/js/nope.js", "/fonts/nope.woff2", "/js/util.js/", "/js/sub/util.js", "/fonts/%00",
+		"/fonts/monaspace-neon-var.woff2.gz", "/js/util.css", "/web/app.js", "/js/.hidden.js",
+	} {
+		res, _ := get(t, ts, p, nil)
+		if res.StatusCode == 200 {
+			t.Fatalf("%s served", p)
+		}
+	}
+	// a name outside the prefixes is not an asset: it needs the token and is then not found
+	if res, _ := get(t, ts, "/other.js", nil); res.StatusCode != 401 {
+		t.Fatalf("/other.js: %d", res.StatusCode)
+	}
+	// assets are GET/HEAD only
+	req, _ := http.NewRequest("POST", ts.URL+"/js/util.js", nil)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res.Body.Close()
+	if res.StatusCode != 401 {
+		t.Fatalf("POST asset: %d", res.StatusCode)
+	}
+}
+
+func TestAssetsKeepHostAndOriginRules(t *testing.T) {
+	ts, _ := setup(t)
+	for _, p := range []string{"/js/util.js", "/fonts/monaspace-neon-var.woff2", "/ui/config"} {
+		if res, _ := get(t, ts, p, map[string]string{"Origin": "http://evil.example", "Authorization": "Bearer " + token}); res.StatusCode != 403 {
+			t.Fatalf("%s foreign origin: %d", p, res.StatusCode)
+		}
+		req, _ := http.NewRequest("GET", ts.URL+p, nil)
+		req.Host = "evil.example"
+		req.Header.Set("Authorization", "Bearer "+token)
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		res.Body.Close()
+		if res.StatusCode != 403 {
+			t.Fatalf("%s foreign host: %d", p, res.StatusCode)
+		}
+	}
+	// no preflight answer and no CORS headers
+	req, _ := http.NewRequest("OPTIONS", ts.URL+"/ui/config", nil)
+	req.Header.Set("Access-Control-Request-Method", "GET")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res.Body.Close()
+	if res.StatusCode == 200 || res.StatusCode == 204 || res.Header.Get("Access-Control-Allow-Origin") != "" {
+		t.Fatalf("preflight: %d %v", res.StatusCode, res.Header)
+	}
+}
+
+func TestUIConfig(t *testing.T) {
+	ts, root := setup(t)
+	if res, _ := get(t, ts, "/ui/config", nil); res.StatusCode != 401 {
+		t.Fatalf("no token: %d", res.StatusCode)
+	}
+	if res, _ := get(t, ts, "/ui/config", map[string]string{"Authorization": "Bearer wrong"}); res.StatusCode != 401 {
+		t.Fatalf("wrong token: %d", res.StatusCode)
+	}
+	res, b := get(t, ts, "/ui/config", map[string]string{"Authorization": "Bearer " + token})
+	if res.StatusCode != 200 || !strings.HasPrefix(res.Header.Get("Content-Type"), "application/json") {
+		t.Fatalf("config: %d %q", res.StatusCode, res.Header.Get("Content-Type"))
+	}
+	if strings.Contains(string(b), token) {
+		t.Fatal("config carries the token")
+	}
+	var cfg map[string]string
+	if err := json.Unmarshal(b, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	if !filepath.IsAbs(cfg["root"]) || cfg["root"] != root {
+		t.Fatalf("root %q, want %q", cfg["root"], root)
+	}
+	if cfg["identity"] == "" {
+		t.Fatal("no identity")
+	}
+	if v, ok := cfg["obsidian_vault"]; !ok || v != "" {
+		t.Fatalf("obsidian_vault %q %v", v, ok)
+	}
+	// other methods are not the config route
+	if r := do(t, ts, "POST", "/ui/config", `{}`, nil); r.status != 404 {
+		t.Fatalf("POST config: %d", r.status)
+	}
+}
+
+func TestUIConfigObsidianVault(t *testing.T) {
+	root := t.TempDir()
+	s := &Server{Root: root, Token: token, ObsidianVault: "Deep Thought", Info: api.Info{Name: "akmctl", Version: "test"}}
+	ts := httptest.NewServer(s.Handler())
+	defer ts.Close()
+	s.Hosts = []string{strings.TrimPrefix(ts.URL, "http://")}
+	_, b := get(t, ts, "/ui/config", map[string]string{"Authorization": "Bearer " + token})
+	var cfg map[string]string
+	json.Unmarshal(b, &cfg)
+	if cfg["obsidian_vault"] != "Deep Thought" {
+		t.Fatalf("%v", cfg)
+	}
+}

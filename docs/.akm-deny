@@ -1,0 +1,2 @@
+# One literal substring per line, or a regular expression after "re:".
+# Strings that must never appear in a record.

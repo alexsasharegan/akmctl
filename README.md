@@ -32,10 +32,15 @@ akmctl ui --open        # the workbench in a browser, on 127.0.0.1 only
 
 `--format json` prints one JSON document; the default is a plain table. Errors exit 2.
 
+## Project records
+
+This repository keeps its own memory the AKM way, as the first test case of the standard: `AGENTS.md` (start here, for agents), `docs/adr/` (the decisions, with a generated index), `docs/work/` (open and closed work), `docs/ROADMAP.md` and `docs/architecture.md`. `akmctl check` must pass on it.
+
 ## Development
 
 ```sh
-go test ./...
+go vet ./... && go test ./...
+go build -o /tmp/akmctl ./cmd/akmctl && /tmp/akmctl check
 ```
 
 Standard library only, apart from `go.yaml.in/yaml/v3` in tests, used as an oracle for the parser.

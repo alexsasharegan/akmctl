@@ -95,7 +95,7 @@ func TestNewWork(t *testing.T) {
 		t.Fatalf("path %v", p)
 	}
 	text := read(t, root, p.(string))
-	for _, want := range []string{"title: Add a thing\n", "summary: One line.\n", "status: raw\n", "parent: " + c4d5 + "\n", "priority: 1\n", "created: 2026-10-28\n", "updated: 2026-10-28\n", "# Add a thing\n"} {
+	for _, want := range []string{"title: Add a thing\n", "summary: One line.\n", "status: raw\n", "parent: " + c4d5 + "\n", "priority: 1\n", "created: 2026-10-28\n", "updated: 2026-10-28\n", "# Add a thing\n", "## Log\n\n- 2026-10-28: filed.\n"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("missing %q in\n%s", want, text)
 		}
