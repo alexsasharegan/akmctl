@@ -1,191 +1,215 @@
-"use strict";
-// The workbench page. Everything from the repository is shown with textContent
-// only, never as HTML.
-(function () {
-  const params = new URLSearchParams(location.hash.slice(1));
-  let token = params.get("token") || sessionStorage.getItem("akm-token") || "";
-  if (params.get("token")) {
-    sessionStorage.setItem("akm-token", token);
-    history.replaceState(null, "", location.pathname);
+// The workbench: reads the token from the URL fragment, loads the records once
+// and draws the view that the hash route names. Everything from the repository
+// is shown as text, never as HTML.
+import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, state, describeError, ApiError } from "./js/store.js";
+import { parseRoute, routeHref, indexById, TABLES } from "./js/logic.js";
+import { el, isoDate } from "./js/util.js";
+import { initUI, setPage, toast, toggleTheme, openHelp } from "./js/ui.js";
+import { mountBoard } from "./js/board.js";
+import { mountTables } from "./js/tables.js";
+import { mountAdrs } from "./js/adrs.js";
+import { mountCheck } from "./js/check.js";
+import { createDrawer } from "./js/detail.js";
+
+initToken();
+
+const host = document.getElementById("view");
+const drawerEl = document.getElementById("drawer");
+
+let byIdCache = new Map();
+let loaded = false;
+let view = null; // the mounted view: { keys, focus, destroy }
+let viewKey = "";
+let base = { name: "board" }; // the last route that was not a record
+
+const go = (route) => {
+  location.hash = routeHref(route);
+};
+
+const drawer = createDrawer(drawerEl, host, {
+  byId: () => byIdCache,
+  records: () => state.records,
+  close: () => go(base),
+});
+
+const viewCtx = {
+  records: () => state.records,
+  byId: () => byIdCache,
+  today: () => isoDate(),
+  setPage,
+  open: (id) => go({ name: "record", id }),
+  go: (slug) => go({ name: "tables", table: slug }),
+  loadClosed: () => loadClosed(),
+  check,
+};
+
+function routeKey(r) {
+  return r.name === "tables" ? "tables:" + r.table : r.name;
+}
+
+const TITLES = { board: "Board", tables: "Tables", adrs: "ADRs", check: "Check" };
+
+function mountBase(r, focus) {
+  if (view) view.destroy();
+  base = r;
+  viewKey = routeKey(r);
+  document.body.dataset.view = r.name;
+  document.title = TITLES[r.name] + " · akmctl workbench";
+  for (const a of document.querySelectorAll("#nav [data-nav]")) {
+    if (a.dataset.nav === r.name) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
   }
-  const OPEN = ["raw", "ready", "active", "blocked"];
-  const CLOSED = ["done", "dropped"];
-  const view = document.getElementById("view");
-  const drawer = document.getElementById("drawer");
-  const toastEl = document.getElementById("toast");
-  const showClosed = document.getElementById("showClosed");
-  let tab = "board";
-
-  function el(tag, props, ...kids) {
-    const n = document.createElement(tag);
-    for (const [k, v] of Object.entries(props || {})) {
-      if (k === "class") n.className = v;
-      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
-      else if (v !== undefined && v !== null) n.setAttribute(k, v);
-    }
-    for (const kid of kids.flat()) if (kid !== null && kid !== undefined) n.append(kid);
-    return n;
+  switch (r.name) {
+    case "tables":
+      view = mountTables(host, viewCtx, r.table);
+      break;
+    case "adrs":
+      view = mountAdrs(host, viewCtx);
+      break;
+    case "check":
+      view = mountCheck(host, viewCtx);
+      break;
+    default:
+      view = mountBoard(host, viewCtx);
   }
+  if (focus) view.focus();
+}
 
-  let toastTimer;
-  function toast(msg, bad) {
-    toastEl.textContent = msg;
-    toastEl.className = bad ? "bad" : "";
-    toastEl.hidden = false;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toastEl.hidden = true; }, bad ? 8000 : 2500);
+function showProblem(title, message) {
+  if (view) {
+    view.destroy();
+    view = null;
+    viewKey = "";
   }
+  setPage({ mode: "ERROR", hints: [["r", "try again"], ["?", "help"]], where: "" });
+  host.replaceChildren(el("div", { class: "state-card err", role: "alert" }, el("p", { class: "eyebrow", text: "Problem" }), el("h2", { text: title }), el("p", { text: message })));
+}
 
-  async function api(method, path, body, etag) {
-    const headers = { Authorization: "Bearer " + token };
-    if (body) headers["Content-Type"] = "application/json";
-    if (etag) headers["If-Match"] = '"' + etag + '"';
-    const res = await fetch("/api/v1/" + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
-    const data = await res.json();
-    if (!data.ok) {
-      const e = data.error || {};
-      const why = e.details && (e.details.reason || e.details.rule) ? " (" + [e.details.reason, e.details.rule].filter(Boolean).join(", ") + ")" : "";
-      throw new Error(e.code + ": " + e.message + why);
-    }
-    return data;
+/** Draw what the hash says. `focus` is true after a key or a click, false for the first draw. */
+function route(focus) {
+  if (!loaded) return;
+  const r = parseRoute(location.hash);
+  if (r.name === "record") {
+    if (!view) mountBase(base, false);
+    setPage({ mode: "RECORD", hints: [["Esc", "close"], ["j k", "scroll"], ["1 2 3 4", "views"], ["?", "help"]], where: r.id });
+    drawer.open(r.id);
+    return;
   }
-
-  const f = (r, k) => (r.fields[k] === null || r.fields[k] === undefined ? "" : r.fields[k]);
-
-  function card(r) {
-    const meta = el("div", { class: "m" }, el("span", {}, r.id));
-    if (f(r, "priority") !== "") meta.append(el("span", { class: "badge" }, "P" + f(r, "priority")));
-    if (f(r, "parent")) meta.append(el("span", {}, "in " + f(r, "parent")));
-    const by = r.fields.blocked_by;
-    if (by && by.length) meta.append(el("span", {}, "waits on " + by.join(", ")));
-    const c = el("div", { class: "card", draggable: "true", "data-id": r.id }, el("div", { class: "t" }, f(r, "title")), meta);
-    if (f(r, "summary")) c.append(el("div", { class: "s" }, f(r, "summary")));
-    c.addEventListener("click", () => openDrawer(r.id));
-    c.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", r.id); });
-    return c;
+  const back = drawer.isOpen() ? drawer.close() : null;
+  if (!view || routeKey(r) !== viewKey) mountBase(r, focus);
+  else if (back) {
+    // closing the drawer: put focus back on the card or row it came from
+    view.focus();
   }
+}
 
-  async function board() {
-    const statuses = OPEN.concat(showClosed.checked ? CLOSED : []);
-    const data = await api("GET", "board?statuses=" + statuses.join(","));
-    const cols = el("div", { class: "cols" });
-    for (const col of data.columns) {
-      const box = el("section", { class: "col", "data-status": col.status }, el("h2", {}, col.status + " (" + col.count + ")"));
-      if (!col.records.length) box.append(el("div", { class: "empty" }, "nothing here"));
-      for (const r of col.records) box.append(card(r));
-      box.addEventListener("dragover", (e) => { e.preventDefault(); box.classList.add("over"); });
-      box.addEventListener("dragleave", () => box.classList.remove("over"));
-      box.addEventListener("drop", (e) => { e.preventDefault(); box.classList.remove("over"); move(e.dataTransfer.getData("text/plain"), col.status); });
-      cols.append(box);
-    }
-    view.replaceChildren(cols);
+async function reload(announce) {
+  try {
+    await loadSnapshot();
+    byIdCache = indexById(state.records);
+    loaded = true;
+    if (view) {
+      viewKey = "";
+      mountBase(base, false);
+    } else route(false);
+    if (drawer.isOpen()) drawer.open(drawer.id());
+    if (announce) toast("Reloaded " + state.records.length + " records.");
+  } catch (e) {
+    if (e instanceof ApiError && e.code === "unauthorized") showProblem("No valid token", "Open the URL that akmctl ui printed; it holds the token in its fragment (#token=...). The token lasts as long as that akmctl ui process.");
+    else if (!loaded) showProblem("The records did not load", describeError(e));
+    else toast(describeError(e), "bad");
   }
+}
 
-  async function move(id, status) {
-    if (CLOSED.includes(status)) { toast("Open the item and close it there: closing needs an Outcome.", true); return; }
-    try {
-      const cur = await api("GET", "records/" + id);
-      if (cur.record.fields.status === status) return;
-      const changes = { status };
-      if (status === "blocked" && !(cur.record.fields.blocked_by || []).length) {
-        const why = prompt("Blocked on what? (a person, a role, or an id)");
-        if (!why) return;
-        changes.blocked_by = why.split(",").map((s) => s.trim()).filter(Boolean);
-      }
-      await api("PATCH", "records/" + id, { changes }, cur.record.etag);
-      toast(id + " is now " + status);
-      await render();
-    } catch (e) { toast(e.message, true); }
+const NAV_KEYS = { 1: { name: "board" }, 2: { name: "tables" }, 3: { name: "adrs" }, 4: { name: "check" } };
+
+function onKey(e) {
+  if (drawer.isOpen() && drawer.keys(e)) return true;
+  if (!drawer.isOpen() && view && view.keys(e)) return true;
+  if (e.key === "r") {
+    reload(true);
+    return true;
   }
-
-  async function adrs() {
-    const data = await api("GET", "records?type=adr&sort=-id");
-    const body = el("tbody");
-    for (const r of data.records) {
-      const row = el("tr", { class: "row" }, el("td", {}, r.id), el("td", {}, f(r, "title")), el("td", {}, f(r, "status")), el("td", {}, f(r, "date")), el("td", {}, f(r, "summary")));
-      row.addEventListener("click", () => openDrawer(r.id));
-      body.append(row);
-    }
-    view.replaceChildren(el("table", {}, el("thead", {}, el("tr", {}, ["id", "title", "status", "date", "summary"].map((h) => el("th", {}, h)))), body));
+  const n = NAV_KEYS[e.key];
+  if (n && !e.shiftKey) {
+    go(n.name === "tables" ? { name: "tables", table: base.name === "tables" ? base.table : TABLES[0].slug } : n);
+    return true;
   }
+  return false;
+}
 
-  async function check() {
-    const data = await api("GET", "check");
-    const body = el("tbody");
-    for (const x of data.findings) {
-      body.append(el("tr", {}, el("td", { class: x.severity }, x.severity + " " + x.rule), el("td", {}, x.file ? x.file + (x.line ? ":" + x.line : "") : ""), el("td", {}, x.message)));
-    }
-    view.replaceChildren(
-      el("p", {}, data.errors + " errors, " + data.warnings + " warnings. Manifest: " + data.reconcile.state + "."),
-      data.findings.length ? el("table", {}, el("thead", {}, el("tr", {}, ["rule", "where", "finding"].map((h) => el("th", {}, h)))), body) : el("div", { class: "empty" }, "No findings."),
-    );
+const actions = () => [
+  { label: "Go to Board", keys: ["1"], run: () => go({ name: "board" }) },
+  { label: "Go to Tables", keys: ["2"], run: () => go({ name: "tables" }) },
+  ...TABLES.map((t) => ({ label: "Table: " + t.title, keys: [], run: () => go({ name: "tables", table: t.slug }) })),
+  { label: "Go to ADRs", keys: ["3"], run: () => go({ name: "adrs" }) },
+  { label: "Go to Check", keys: ["4"], run: () => go({ name: "check" }) },
+  { label: "Reload the records", keys: ["r"], run: () => reload(true) },
+  { label: "Switch light and dark", keys: ["t"], run: toggleTheme },
+  { label: "Show keyboard shortcuts", keys: ["?"], run: openHelp },
+];
+
+const help = () => [
+  [
+    "Board",
+    [
+      ["h l", "lane left, right"],
+      ["j k", "card down, up"],
+      ["g g", "first card in the lane"],
+      ["G", "last card in the lane"],
+      ["Enter", "open the record"],
+    ],
+  ],
+  [
+    "Tables, ADRs, Check",
+    [
+      ["j k", "row down, up"],
+      ["g g", "first row"],
+      ["G", "last row"],
+      ["h l", "previous, next table"],
+      ["Enter", "open the record"],
+    ],
+  ],
+  [
+    "Record",
+    [
+      ["j k", "scroll"],
+      ["Esc", "close"],
+    ],
+  ],
+];
+
+// the skip link must not become a route: move focus into the view instead
+document.querySelector(".skip").addEventListener("click", (e) => {
+  e.preventDefault();
+  if (view) view.focus();
+  else host.focus();
+});
+
+initUI({ records: () => state.records, actions, onKey, help, openRecord: (id) => go({ name: "record", id }) });
+window.addEventListener("hashchange", () => {
+  // a new #token= on an open page (a second akmctl ui, a pasted URL): take it and start again
+  if (parseToken(location.hash)) {
+    initToken();
+    loaded = false;
+    start();
+  } else route(true);
+});
+
+async function start() {
+  if (!hasToken()) {
+    showProblem("No token", "Open the URL that akmctl ui printed; it holds the token in its fragment (#token=...).");
+    return;
   }
-
-  async function openDrawer(id) {
-    try {
-      const data = await api("GET", "records/" + id);
-      const r = data.record;
-      const dl = el("dl");
-      for (const [k, v] of Object.entries(r.fields)) {
-        if (v === null) continue;
-        dl.append(el("dt", {}, k), el("dd", {}, Array.isArray(v) ? v.join(", ") : String(v)));
-      }
-      const bar = el("div", { class: "bar" });
-      if (r.type === "work") {
-        const sel = el("select", {}, ["raw", "ready", "active", "blocked"].map((s) => el("option", { value: s, selected: s === r.fields.status ? "" : null }, s)));
-        sel.addEventListener("change", () => move(r.id, sel.value).then(() => openDrawer(r.id)));
-        bar.append(el("label", {}, "status ", sel));
-        if (!["done", "dropped"].includes(r.fields.status)) {
-          bar.append(
-            el("button", { onclick: () => act("POST", "records/" + r.id + "/claim", { as: prompt("Claim as:", "workbench") }, r) }, "Claim"),
-            el("button", { onclick: () => act("DELETE", "records/" + r.id + "/claim", null, r) }, "Release"),
-            el("button", { onclick: () => act("POST", "records/" + r.id + "/close", { status: "done" }, r) }, "Close as done"),
-            el("button", { onclick: () => act("POST", "records/" + r.id + "/close", { status: "dropped" }, r) }, "Drop"),
-          );
-        }
-      }
-      bar.append(el("button", { onclick: () => { drawer.hidden = true; } }, "Close panel"));
-      const parts = [el("h2", {}, r.fields.title || r.id), el("div", { class: "m" }, r.path), bar, dl];
-      for (const name of data.sections) {
-        if (name === "log" && data.sections.length > 1) continue;
-        const sec = await api("GET", "records/" + id + "?section=" + encodeURIComponent(name));
-        parts.push(el("h3", {}, name), el("pre", {}, sec.section.text));
-      }
-      drawer.replaceChildren(...parts);
-      drawer.hidden = false;
-    } catch (e) { toast(e.message, true); }
-  }
-
-  async function act(method, path, body, r) {
-    if (body && body.as === null) return;
-    try {
-      await api(method, path, body, r.etag);
-      toast("Done");
-      await render();
-      await openDrawer(r.id);
-    } catch (e) { toast(e.message, true); }
-  }
-
-  async function render() {
-    if (!token) {
-      view.replaceChildren(el("div", { class: "empty" }, "No token. Open the URL that akmctl ui printed."));
-      return;
-    }
-    try {
-      if (tab === "board") await board();
-      else if (tab === "adrs") await adrs();
-      else await check();
-    } catch (e) { toast(e.message, true); }
-  }
-
-  document.getElementById("tabs").addEventListener("click", (e) => {
-    const t = e.target.dataset && e.target.dataset.tab;
-    if (!t) return;
-    tab = t;
-    for (const b of document.querySelectorAll("#tabs button")) b.classList.toggle("on", b.dataset.tab === t);
-    render();
+  setPage({ mode: "LOADING", hints: [], where: "" });
+  const cfg = loadConfig().then((c) => {
+    const name = (c.root || "").split(/[\\/]/).filter(Boolean).pop();
+    document.getElementById("repo").textContent = name || "";
+    document.getElementById("repo").title = c.root || "";
   });
-  document.getElementById("reload").addEventListener("click", render);
-  showClosed.addEventListener("change", render);
-  render();
-})();
+  await reload(false);
+  await cfg;
+  if (!location.hash) history.replaceState(null, "", location.pathname + location.search + routeHref(base));
+}
+
+start();

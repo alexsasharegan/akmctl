@@ -3,23 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>akmctl workbench</title>
 <link rel="stylesheet" href="/app.css">
+<script src="/js/boot.js"></script>
 </head>
-<body>
-<header>
-  <h1>akmctl <span>workbench</span></h1>
-  <nav id="tabs">
-    <button data-tab="board" class="on">Board</button>
-    <button data-tab="adrs">ADRs</button>
-    <button data-tab="check">Check</button>
-  </nav>
-  <label class="closed"><input type="checkbox" id="showClosed"> closed</label>
-  <button id="reload" title="Reload">Reload</button>
-</header>
-<main id="view"></main>
-<aside id="drawer" hidden></aside>
-<div id="toast" role="status" hidden></div>
-<script src="/app.js"></script>
+<body data-view="board">
+<a class="skip" href="#view">Skip to the content</a>
+<div class="app">
+  <header class="top">
+    <div class="brand">akmctl <small>workbench</small></div>
+    <span class="repo" id="repo"></span>
+    <nav id="nav" aria-label="Views">
+      <a class="nav-item" href="#/board" data-nav="board">Board <kbd>1</kbd></a>
+      <a class="nav-item" href="#/tables" data-nav="tables">Tables <kbd>2</kbd></a>
+      <a class="nav-item" href="#/adrs" data-nav="adrs">ADRs <kbd>3</kbd></a>
+      <a class="nav-item" href="#/check" data-nav="check">Check <kbd>4</kbd></a>
+    </nav>
+    <div class="top-actions">
+      <button type="button" id="palette-btn" aria-label="Open the command palette"></button>
+      <button type="button" id="theme-btn"></button>
+    </div>
+  </header>
+  <main id="view" tabindex="-1"></main>
+  <footer id="hintbar" aria-label="Keyboard hints"></footer>
+</div>
+<aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Record" hidden></aside>
+<div id="overlay-root"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<script type="module" src="/app.js"></script>
 </body>
 </html>
