@@ -19,7 +19,7 @@ import (
 // runUI starts the HTTP binding and the workbench page on the loopback
 // interface and blocks until interrupted.
 func runUI(args []string, stderr io.Writer, cwd string) int {
-	port, open, repoDir := 0, false, cwd
+	port, open, repoDir, vault := 0, false, cwd, ""
 	for i := 0; i < len(args); i++ {
 		name, val, hasVal := strings.Cut(strings.TrimPrefix(args[i], "--"), "=")
 		next := func() string {
@@ -45,6 +45,8 @@ func runUI(args []string, stderr io.Writer, cwd string) int {
 			port = n
 		case name == "open":
 			open = true
+		case name == "obsidian-vault":
+			vault = next()
 		case name == "repo":
 			repoDir = next()
 		default:
@@ -81,7 +83,7 @@ func runUI(args []string, stderr io.Writer, cwd string) int {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
-	srv := &server.Server{Root: root, Token: token, Info: api.Info{Name: "akmctl", Version: Version}}
+	srv := &server.Server{Root: root, Token: token, ObsidianVault: vault, Info: api.Info{Name: "akmctl", Version: Version}}
 	if err := srv.Serve(ctx, l); err != nil {
 		fmt.Fprintln(stderr, "akmctl ui:", err)
 		return 2

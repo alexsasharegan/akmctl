@@ -23,7 +23,7 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
-//go:embed web/*
+//go:embed web
 var web embed.FS
 
 // Server serves one repository.
@@ -33,6 +33,8 @@ type Server struct {
 	Info  api.Info
 	// Hosts are the Host header values accepted (host:port).
 	Hosts []string
+	// ObsidianVault is the vault name the UI uses for obsidian:// links (may be empty).
+	ObsidianVault string
 }
 
 // NewToken returns 128 bits of randomness as hex.
@@ -112,10 +114,17 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request) {
 			s.asset(w, "web/app.css", "text/css; charset=utf-8")
 			return
 		}
+		if s.serveAsset(w, r) {
+			return
+		}
 	}
 	if !s.tokenOK(r.Header.Get("Authorization")) {
 		w.Header().Set("WWW-Authenticate", "Bearer")
 		s.fail(w, "http", http.StatusUnauthorized, &api.Error{Code: "unauthorized", Message: "missing or wrong token"})
+		return
+	}
+	if r.URL.Path == "/ui/config" && r.Method == http.MethodGet {
+		s.uiConfig(w)
 		return
 	}
 	const base = "/api/v1/"
@@ -168,7 +177,7 @@ func (s *Server) asset(w http.ResponseWriter, name, ctype string) {
 	}
 	h := w.Header()
 	h.Set("Content-Type", ctype)
-	h.Set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+	h.Set("Content-Security-Policy", contentSecurityPolicy)
 	w.Write(b)
 }
 
