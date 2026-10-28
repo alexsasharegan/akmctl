@@ -137,7 +137,7 @@ func (e *edit) commit(dest string) (*record.Record, *Error) {
 	if dest != "" && dest != e.rec.Path {
 		to := filepath.Join(e.repo.Root, filepath.FromSlash(dest))
 		if err := os.MkdirAll(filepath.Dir(to), 0o755); err == nil {
-			err = os.Rename(full, to)
+			err = fsx.Rename(full, to)
 			if err != nil {
 				fsx.WriteAtomic(full, []byte(e.old))
 				return nil, unreadable(err)
