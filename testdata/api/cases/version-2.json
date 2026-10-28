@@ -1,0 +1,35 @@
+{
+  "name": "enabled extensions are listed by name",
+  "repo": "claims",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "version",
+    "request": {},
+    "ok": true,
+    "tool": {
+      "name": "akmctl",
+      "version": "0.1.0"
+    },
+    "api_versions": [
+      "1.0"
+    ],
+    "layout_versions": [
+      "1.0.0"
+    ],
+    "extensions": [
+      "claims"
+    ],
+    "repository": {
+      "name": "claims",
+      "layout": "1.0.0",
+      "extensions": [
+        "adr-index",
+        "claims",
+        "work-items"
+      ],
+      "reference_style": "id",
+      "claim_stale_hours": 24
+    }
+  }
+}

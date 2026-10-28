@@ -107,6 +107,25 @@ func FindRoot(dir string) (string, error) {
 	}
 }
 
+// FromText builds a record from the text of its file: rel is the path relative
+// to the repository root, typ is Work or ADR and id is the leading id of the
+// file name.
+func FromText(rel, typ, id string, text []byte) (*Record, error) {
+	doc, err := frontmatter.Parse(text)
+	if err != nil {
+		return nil, err
+	}
+	rec := &Record{ID: id, Type: typ, Path: rel, Fields: map[string]frontmatter.Value{}, Lines: map[string]int{}, Body: string(doc.Body()), Text: text}
+	sum := sha256.Sum256(text)
+	rec.Etag = hex.EncodeToString(sum[:])[:16]
+	for _, en := range doc.Entries {
+		rec.Keys = append(rec.Keys, en.Key)
+		rec.Fields[en.Key] = en.Value
+		rec.Lines[en.Key] = en.Line
+	}
+	return rec, nil
+}
+
 // Load reads every record of the repository at root. Files that cannot be used
 // are listed in Problems; the rest load.
 func Load(root string) (*Repo, error) {
@@ -130,7 +149,7 @@ func Load(root string) (*Repo, error) {
 				r.Problems = append(r.Problems, Problem{rel, 0, err.Error()})
 				continue
 			}
-			doc, err := frontmatter.Parse(text)
+			rec, err := FromText(rel, d.typ, m[1], text)
 			if err != nil {
 				p := Problem{rel, 0, err.Error()}
 				var fe *frontmatter.Error
@@ -139,14 +158,6 @@ func Load(root string) (*Repo, error) {
 				}
 				r.Problems = append(r.Problems, p)
 				continue
-			}
-			rec := &Record{ID: m[1], Type: d.typ, Path: rel, Fields: map[string]frontmatter.Value{}, Lines: map[string]int{}, Body: string(doc.Body()), Text: text}
-			sum := sha256.Sum256(text)
-			rec.Etag = hex.EncodeToString(sum[:])[:16]
-			for _, en := range doc.Entries {
-				rec.Keys = append(rec.Keys, en.Key)
-				rec.Fields[en.Key] = en.Value
-				rec.Lines[en.Key] = en.Line
 			}
 			r.Records = append(r.Records, rec)
 		}

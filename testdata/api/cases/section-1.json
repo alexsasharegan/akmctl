@@ -1,0 +1,50 @@
+{
+  "name": "replace a section",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "name": "Goal",
+    "text": "List every exit code.\n\n- [ ] The table is written.",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "section",
+    "request": {
+      "id": "261022-e5f6",
+      "name": "Goal",
+      "text": "List every exit code.\n\n- [ ] The table is written.",
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "edca8cc45e2f2008",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": null,
+        "status": "ready",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": null,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "section": {
+      "name": "goal",
+      "text": "List every exit code.\n\n- [ ] The table is written."
+    },
+    "changed": true
+  },
+  "after": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\n---\n\n# Document the exit codes\n\n## Goal\nList every exit code.\n\n- [ ] The table is written.\n"
+  }
+}

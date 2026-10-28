@@ -5,7 +5,21 @@ package fsx
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"time"
 )
+
+// Rename is os.Rename. On Windows a rename over a file that a reader has open
+// fails with "access denied" until the reader closes it, so it is tried again
+// for up to a second; a reader holds a file for the length of one read.
+func Rename(from, to string) error {
+	err := os.Rename(from, to)
+	for i := 0; err != nil && runtime.GOOS == "windows" && i < 100; i++ {
+		time.Sleep(10 * time.Millisecond)
+		err = os.Rename(from, to)
+	}
+	return err
+}
 
 // WriteAtomic writes through a temporary file in the same directory and renames
 // it over the target, so a crash leaves the old file or the new one.
@@ -32,7 +46,7 @@ func WriteAtomic(path string, data []byte) error {
 	} else {
 		os.Chmod(name, 0o644)
 	}
-	if err := os.Rename(name, path); err != nil {
+	if err := Rename(name, path); err != nil {
 		os.Remove(name)
 		return err
 	}

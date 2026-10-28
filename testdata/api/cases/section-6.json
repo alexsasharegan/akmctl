@@ -1,0 +1,26 @@
+{
+  "name": "a closed record is refused",
+  "repo": "basic",
+  "request": {
+    "id": "261010-j9k0",
+    "name": "Notes",
+    "text": "Late note."
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "section",
+    "request": {
+      "id": "261010-j9k0",
+      "name": "Notes",
+      "text": "Late note."
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261010-j9k0 is closed; its sections are not edited",
+      "details": {
+        "reason": "closed"
+      }
+    }
+  }
+}

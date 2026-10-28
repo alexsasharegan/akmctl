@@ -1,0 +1,34 @@
+{
+  "name": "the repository this server or tool is working on",
+  "repo": "basic",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "version",
+    "request": {},
+    "ok": true,
+    "tool": {
+      "name": "akmctl",
+      "version": "0.1.0"
+    },
+    "api_versions": [
+      "1.0"
+    ],
+    "layout_versions": [
+      "1.0.0"
+    ],
+    "extensions": [
+      "claims"
+    ],
+    "repository": {
+      "name": "basic",
+      "layout": "1.0.0",
+      "extensions": [
+        "adr-index",
+        "work-items"
+      ],
+      "reference_style": "id",
+      "claim_stale_hours": 24
+    }
+  }
+}

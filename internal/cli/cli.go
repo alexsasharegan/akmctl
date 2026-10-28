@@ -18,7 +18,7 @@ import (
 var Version = "0.0.0-dev"
 
 // positional names the parameter that takes the positional arguments.
-var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "set": {"id"}}
+var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "set": {"id"}, "section": {"id", "name"}}
 
 // Run executes one command line and returns the exit code.
 func Run(args []string, stdout, stderr io.Writer, cwd string) int {
@@ -139,6 +139,10 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			v, _ := value()
 			if pname == "mode" {
 				v = strings.ReplaceAll(v, "-", "_") // apply-safe on the command line
+			}
+			if pname == "text" && v == "-" {
+				b, _ := io.ReadAll(os.Stdin) // --text - reads standard input
+				v = string(b)
 			}
 			req[pname] = v
 		}
@@ -382,10 +386,13 @@ func text(w io.Writer, op string, resp api.Obj) {
 		ch, _ := resp.Get("changed")
 		wr, _ := resp.Get("written")
 		fmt.Fprintf(w, "%v: changed=%v written=%v\n", p, ch, wr)
-	case "new", "set", "close", "claim", "release":
+	case "new", "set", "section", "close", "claim", "release":
 		v, _ := resp.Get("record")
 		r := v.(api.Obj)
 		row(w, r)
+		if d, ok := resp.Get("diff"); ok {
+			writeDiff(w, d.(api.Obj))
+		}
 		if p, ok := resp.Get("path"); ok {
 			fmt.Fprintln(w, p)
 		}
@@ -408,6 +415,25 @@ func text(w io.Writer, op string, resp api.Obj) {
 		n, _ := t.(api.Obj).Get("name")
 		v, _ := t.(api.Obj).Get("version")
 		fmt.Fprintf(w, "%v %v (API %v)\n", n, v, api.Version)
+	}
+}
+
+// writeDiff prints the diff of a dry run in unified form.
+func writeDiff(w io.Writer, d api.Obj) {
+	p, _ := d.Get("path")
+	np, _ := d.Get("new_path")
+	fmt.Fprintf(w, "--- %v\n+++ %v\n", p, np)
+	hs, _ := d.Get("hunks")
+	for _, h := range hs.([]api.Obj) {
+		hd, _ := h.Get("header")
+		fmt.Fprintln(w, hd)
+		ls, _ := h.Get("lines")
+		for _, l := range ls.([]api.Obj) {
+			op, _ := l.Get("op")
+			t, _ := l.Get("text")
+			mark := map[any]string{"ctx": " ", "add": "+", "rem": "-"}[op]
+			fmt.Fprintf(w, "%s%v\n", mark, t)
+		}
 	}
 }
 

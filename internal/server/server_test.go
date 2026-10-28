@@ -308,6 +308,96 @@ func TestToken(t *testing.T) {
 	}
 }
 
+// A dry run writes nothing, so it needs no If-Match; a real write still does.
+func TestDryRunNeedsNoIfMatch(t *testing.T) {
+	ts, root := setup(t)
+	file := filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md")
+	before, _ := os.ReadFile(file)
+	et := etagOf(t, ts, "261022-e5f6")
+	routes := []struct{ method, path, body string }{
+		{"PATCH", "/api/v1/records/261022-e5f6", `{"changes":{"priority":3},"dry_run":true}`},
+		{"PUT", "/api/v1/records/261022-e5f6/sections/Goal", `{"text":"New.","dry_run":true}`},
+		{"POST", "/api/v1/records/261022-e5f6/close", `{"status":"dropped","outcome":"No.","dry_run":true}`},
+		{"POST", "/api/v1/records/261022-e5f6/claim", `{"as":"a","dry_run":true}`},
+		{"DELETE", "/api/v1/records/261020-a2b3/claim", `{"dry_run":true}`},
+	}
+	for _, rt := range routes {
+		r := do(t, ts, rt.method, rt.path, rt.body, nil)
+		if r.status != 200 {
+			t.Fatalf("%s %s dry run: %d %v", rt.method, rt.path, r.status, r.body)
+		}
+		d, _ := r.body["diff"].(map[string]any)
+		if hs, _ := d["hunks"].([]any); len(hs) == 0 {
+			t.Fatalf("%s %s: no hunks: %v", rt.method, rt.path, r.body)
+		}
+		if got := r.h.Get("ETag"); got != `"`+et+`"` && rt.method != "DELETE" {
+			t.Fatalf("%s: ETag %s, want the current %s", rt.path, got, et)
+		}
+		// without dry_run, or with dry_run false, the same request needs If-Match
+		real := strings.Replace(strings.Replace(rt.body, `,"dry_run":true`, "", 1), `{"dry_run":true}`, "", 1)
+		if r := do(t, ts, rt.method, rt.path, real, nil); r.status != 428 || reason(r) != "if_match_required" {
+			t.Fatalf("%s %s real write without If-Match: %d %v", rt.method, rt.path, r.status, r.body)
+		}
+		off := strings.Replace(rt.body, `"dry_run":true`, `"dry_run":false`, 1)
+		if r := do(t, ts, rt.method, rt.path, off, nil); r.status != 428 {
+			t.Fatalf("%s %s dry_run false without If-Match: %d", rt.method, rt.path, r.status)
+		}
+	}
+	after, _ := os.ReadFile(file)
+	if string(before) != string(after) {
+		t.Fatal("a dry run or a refused write changed the file")
+	}
+	// a stale If-Match still fails a dry run
+	r := do(t, ts, "PATCH", "/api/v1/records/261022-e5f6", `{"changes":{"priority":3},"dry_run":true}`, map[string]string{"If-Match": `"0000000000000000"`})
+	if r.status != 412 {
+		t.Fatalf("stale dry run: %d", r.status)
+	}
+}
+
+func TestSectionRoute(t *testing.T) {
+	ts, root := setup(t)
+	path := "/api/v1/records/261022-e5f6/sections/Goal"
+	et := etagOf(t, ts, "261022-e5f6")
+	if r := do(t, ts, "PUT", path, `{"text":"New goal."}`, nil); r.status != 428 {
+		t.Fatalf("no If-Match: %d", r.status)
+	}
+	if r := do(t, ts, "PUT", path, `{"text":"x","name":"Other"}`, map[string]string{"If-Match": `"` + et + `"`}); r.status != 400 {
+		t.Fatalf("name mismatch: %d", r.status)
+	}
+	if r := do(t, ts, "PUT", path, `{"text":"New goal."}`, map[string]string{"Content-Type": "text/plain", "If-Match": `"` + et + `"`}); r.status != 400 {
+		t.Fatalf("content type: %d", r.status)
+	}
+	r := do(t, ts, "PUT", path, `{"text":"New goal.","as_of":"2026-10-28"}`, map[string]string{"If-Match": `"` + et + `"`})
+	if r.status != 200 || r.body["changed"] != true {
+		t.Fatalf("put: %d %v", r.status, r.body)
+	}
+	if sec, _ := r.body["section"].(map[string]any); sec["name"] != "goal" || sec["text"] != "New goal." {
+		t.Fatalf("section: %v", r.body["section"])
+	}
+	if _, ok := r.body["diff"]; ok {
+		t.Fatal("diff on a real write")
+	}
+	b, _ := os.ReadFile(filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md"))
+	if !strings.Contains(string(b), "## Goal\nNew goal.\n") {
+		t.Fatal(string(b))
+	}
+	if r := do(t, ts, "PUT", path, `{"text":"again"}`, map[string]string{"If-Match": `"` + et + `"`}); r.status != 412 {
+		t.Fatalf("stale: %d", r.status)
+	}
+	if r := do(t, ts, "POST", path, `{"text":"x"}`, nil); r.status != 404 {
+		t.Fatalf("wrong method: %d", r.status)
+	}
+	if r := do(t, ts, "PUT", "/api/v1/records/261010-j9k0/sections/Goal", `{"text":"x","dry_run":true}`, nil); r.status != 409 || reason(r) != "closed" {
+		t.Fatalf("closed: %d %v", r.status, r.body)
+	}
+	// the version route reports the repository
+	v := do(t, ts, "GET", "/api/v1/version", "", nil)
+	repo, _ := v.body["repository"].(map[string]any)
+	if repo["layout"] != "1.0.0" || repo["reference_style"] != "id" {
+		t.Fatalf("version: %v", v.body)
+	}
+}
+
 func get(t *testing.T, ts *httptest.Server, path string, hdr map[string]string) (*http.Response, []byte) {
 	t.Helper()
 	req, _ := http.NewRequest("GET", ts.URL+path, nil)
