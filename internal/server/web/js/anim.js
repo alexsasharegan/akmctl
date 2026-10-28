@@ -39,7 +39,8 @@ function recount(col) {
 
 const play = (card, frames, opts) => {
   if (!card.animate) return Promise.resolve();
-  return card.animate(frames, opts).finished.catch(() => {});
+  // a page that is not being painted (a hidden pane) never finishes an animation: do not wait for it
+  return Promise.race([card.animate(frames, opts).finished.catch(() => {}), wait(opts.duration + 200)]);
 };
 
 // ---- themes ----

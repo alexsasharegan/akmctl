@@ -92,14 +92,14 @@ export async function api(method, path, opts = {}) {
   }
 }
 
-async function call(method, path, { query, body, etag } = {}) {
+async function call(method, path, { query, body, etag, timeout } = {}) {
   const url = path.startsWith("/") ? path : "/api/v1/" + path;
   const headers = { Authorization: "Bearer " + token };
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (etag) headers["If-Match"] = '"' + etag + '"';
   let res;
   try {
-    res = await fetch(withQuery(url, query), { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    res = await fetch(withQuery(url, query), { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: timeout ? AbortSignal.timeout(timeout) : undefined });
   } catch (e) {
     throw new ApiError("cannot reach the server (is akmctl ui still running?)", { code: "unreachable" });
   }
@@ -161,4 +161,4 @@ export const searchBody = (text, limit = 10) => api("GET", "search", { query: { 
 export const check = () => api("GET", "check");
 
 /** The cheap listing the live board polls: id, path and etag of every work item, with its status. */
-export const pollWork = () => api("GET", "records", { query: { type: "work", fields: ["status", "updated"], sort: ["id"] } });
+export const pollWork = () => api("GET", "records", { query: { type: "work", fields: ["status", "updated"], sort: ["id"] }, timeout: 5000 });
