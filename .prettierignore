@@ -1,0 +1,4 @@
+docs/adr/README.md
+testdata/
+dist/
+internal/
