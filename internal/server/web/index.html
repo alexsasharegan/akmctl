@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>akmctl workbench</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header>
+  <h1>akmctl <span>workbench</span></h1>
+  <nav id="tabs">
+    <button data-tab="board" class="on">Board</button>
+    <button data-tab="adrs">ADRs</button>
+    <button data-tab="check">Check</button>
+  </nav>
+  <label class="closed"><input type="checkbox" id="showClosed"> closed</label>
+  <button id="reload" title="Reload">Reload</button>
+</header>
+<main id="view"></main>
+<aside id="drawer" hidden></aside>
+<div id="toast" role="status" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>

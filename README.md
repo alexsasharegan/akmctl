@@ -13,6 +13,7 @@ Status: under construction. The contract is the AKM API spec (`akm-api-spec`), w
 - `internal/check`: the rules (WK, I, A, RM, G, L, S and the claims rules CL).
 - `internal/index`: the ADR index generator, stable under Prettier.
 - `internal/width`: Prettier's string-width rule; tables are generated from the Unicode data in `data/` (`go generate ./internal/width`).
+- `internal/server`: the HTTP binding (loopback only, bearer token) and the workbench page.
 - `internal/cli`: the command-line binding.
 - `testdata`: conformance fixtures shared with the spec (`yaml-lite.json`, `api/`).
 
@@ -24,6 +25,7 @@ akmctl show 261020-a2b3 --section next
 akmctl board --format json
 akmctl check            # exit 1 when a rule finds an error
 akmctl index            # regenerate docs/adr/README.md
+akmctl ui --open        # the workbench in a browser, on 127.0.0.1 only
 ```
 
 `--format json` prints one JSON document; the default is a plain table. Errors exit 2.

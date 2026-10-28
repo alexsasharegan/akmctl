@@ -32,6 +32,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	if op == "--version" {
 		op = "version"
 	}
+	if op == "ui" {
+		return runUI(args[1:], stderr, cwd)
+	}
 	known := api.Params(op)
 	if known == nil || !isOp(op) {
 		fmt.Fprintf(stderr, "akmctl: unknown command %q (try: akmctl help)\n", op)
@@ -378,9 +381,9 @@ func text(w io.Writer, op string, resp api.Obj) {
 }
 
 func usage(w io.Writer) {
-	ops := api.Operations()
+	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout
