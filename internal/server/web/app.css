@@ -243,3 +243,13 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 
 @media (max-width:1200px){:root{--col-min:188px;--top-pad:12px 20px 8px;--view-pad:16px 20px 8px;--hint-pad:8px 20px}.theme-label{display:none}}
 @media (max-width:900px){.top{flex-wrap:wrap;gap:var(--s-2) var(--s-4)}.pb-label,.col-desc,.repo{display:none}.hints li:nth-child(n+5){display:none}}
+
+/* live board: the offline mark, and a card played by the animation queue (js/anim.js) */
+.live-status{font:var(--fs-xs) var(--mono);color:var(--warn-fg);background:var(--warn-bg);border:1px solid var(--warn-fg);border-radius:var(--r-sm);padding:0 .5em;line-height:1.6}
+.card.anim-lift{z-index:3;box-shadow:var(--sh-lg);outline:2px solid var(--accent);outline-offset:1px}
+.card.anim-flying{z-index:3;box-shadow:var(--sh-lg)}
+@media (prefers-reduced-motion:no-preference){
+  .card.anim-lift{transform:scale(1.03) rotate(1deg);transition:transform 220ms var(--ease),box-shadow 220ms var(--ease)}
+  .card.anim-settle,tr.row.anim-settle{animation:settle 900ms var(--ease)}
+  @keyframes settle{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--sh-sm)}}
+}

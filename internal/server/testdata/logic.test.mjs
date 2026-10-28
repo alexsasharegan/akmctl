@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { ageDays, daysBefore, ageText, isoDate } from "./util.js";
 import * as L from "./logic.js";
 import { parseToken, withQuery } from "./store.js";
+import * as V from "./live.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -104,4 +105,91 @@ const findings = [{ severity: "W", rule: "a" }, { severity: "E", rule: "b" }, { 
 assert.deepEqual(L.orderFindings(findings).map((x) => x.rule), ["b", "d", "a", "c"]);
 assert.equal(L.isId("261020-a2b3"), true);
 assert.equal(L.isId("261020-A2B3"), false);
+// live: the snapshot diff
+const rec = (id, status, etag, path) => ({ id, type: "work", path: path || "docs/work/" + id + ".md", etag, fields: { status } });
+const snap = (...r) => V.snapshotOf(r);
+const none = { has: () => false };
+{
+  const a = snap(rec("a", "ready", "e1"), rec("b", "active", "e2"), rec("c", "raw", "e3"), rec("d", "ready", "e4"));
+  assert.deepEqual(V.diffSnapshots(a, a, none), []);
+  assert.equal(V.snapshotOf([{ id: "x", type: "adr", etag: "z", fields: { status: "accepted" } }]).size, 0);
+  // moved, added, removed, edited, closed
+  const b = snap(
+    rec("a", "active", "e1b"),
+    rec("b", "active", "e2b"),
+    rec("d", "done", "e4b", "docs/work/done/d.md"),
+    rec("e", "raw", "e5"),
+  );
+  assert.deepEqual(V.diffSnapshots(a, b, none), [
+    { type: "removed", id: "c", from: "raw", source: "outside" },
+    { type: "moved", id: "a", from: "ready", to: "active", closed: false, source: "outside" },
+    { type: "edited", id: "b", source: "outside" },
+    { type: "moved", id: "d", from: "ready", to: "done", closed: true, source: "outside" },
+    { type: "added", id: "e", to: "raw", source: "outside" },
+  ]);
+  // a file moved into done/ with the same status is a move; a move within done/ is not
+  const closedOnly = V.diffSnapshots(snap(rec("a", "done", "e1")), snap(rec("a", "done", "e1", "docs/work/done/a.md")), none);
+  assert.deepEqual(closedOnly, [{ type: "moved", id: "a", from: "done", to: "done", closed: true, source: "outside" }]);
+  assert.deepEqual(V.diffSnapshots(snap(rec("a", "done", "e1", "docs/work/done/a.md")), snap(rec("a", "done", "e2", "docs/work/done/a.md")), none).map((e) => e.type), ["edited"]);
+  // own writes are "you"; an outside change after one is not
+  const own = V.createOwn();
+  own.note("a", "e1b");
+  assert.equal(V.diffSnapshots(a, b, own).find((e) => e.id === "a").source, "you");
+  assert.equal(V.diffSnapshots(a, b, own).find((e) => e.id === "b").source, "outside");
+  const c = snap(rec("a", "blocked", "e1c"));
+  assert.equal(V.diffSnapshots(snap(rec("a", "active", "e1b")), c, own)[0].source, "outside");
+  own.note("n", "e9");
+  assert.equal(V.diffSnapshots(new Map(), snap(rec("n", "raw", "e9")), own)[0].source, "you");
+  // the words
+  assert.equal(V.describeEvent({ type: "moved", id: "a", from: "ready", to: "active", source: "outside" }, "Title"), "Outside: a Title moved, ready to active.");
+  assert.equal(V.describeEvent({ type: "moved", id: "a", from: "ready", to: "active", source: "you" }, ""), "You moved a: ready to active.");
+  assert.equal(V.describeEvent({ type: "moved", id: "a", from: "done", to: "done", closed: true, source: "outside" }, ""), "Outside: a moved, closed.");
+  assert.equal(V.summarize([{ type: "moved", source: "outside" }, { type: "moved", source: "outside" }, { type: "added", source: "outside" }]), "3 changes outside (2 moved, 1 added).");
+}
+
+// live: the loop (injected fetch, no DOM)
+{
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const seen = [];
+  const states = [];
+  let mode = "same";
+  let calls = 0;
+  const base = [rec("a", "ready", "e1")];
+  const lv = V.createLive({
+    interval: 5,
+    onStatus: (s) => states.push(s),
+    onEvents: (ev) => {
+      if (mode === "reject") {
+        mode = "same2";
+        return Promise.reject(new Error("refresh failed"));
+      }
+      seen.push(ev);
+    },
+    fetchWork: async () => {
+      calls++;
+      if (mode === "down") throw Object.assign(new Error("x"), { code: "unreachable" });
+      return { records: mode === "moved" || mode === "reject" || mode === "same2" ? [rec("a", "active", "e2")] : base };
+    },
+  });
+  lv.start(base);
+  await wait(30);
+  assert.equal(seen.length, 0);
+  mode = "down";
+  await wait(250);
+  assert.ok(states.includes("offline"), "offline after repeated failures: " + states);
+  mode = "same";
+  await wait(250);
+  assert.equal(states[states.length - 1], "ok");
+  assert.equal(seen.length, 0, "no events when nothing changed while offline");
+  mode = "reject";
+  await wait(150);
+  assert.equal(seen.length, 1, "the events are offered again after a failed refresh");
+  assert.equal(seen[0][0].to, "active");
+  await wait(60);
+  assert.equal(seen.length, 1, "and only once after they were taken");
+  lv.stop();
+  const n = calls;
+  await wait(40);
+  assert.equal(calls, n, "stopped");
+}
 console.log("ok");
