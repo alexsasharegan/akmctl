@@ -102,3 +102,47 @@ func (r *Record) NextLine() (string, bool) {
 	}
 	return "", true
 }
+
+// AppendToSection adds a line at the end of the "## name" section of a body and
+// returns the new body; the section is created at the end when it is missing.
+// eol is the line ending to use.
+func AppendToSection(body, name, line, eol string) string {
+	lines := strings.Split(body, "\n")
+	fence := false
+	start, end := -1, len(lines)
+	for i, l := range lines {
+		t := strings.TrimRight(l, "\r")
+		if strings.HasPrefix(t, "```") || strings.HasPrefix(t, "~~~") {
+			fence = !fence
+		}
+		if fence || !strings.HasPrefix(t, "## ") {
+			continue
+		}
+		if start >= 0 {
+			end = i
+			break
+		}
+		if strings.EqualFold(strings.TrimSpace(t[3:]), name) {
+			start = i
+		}
+	}
+	if start < 0 {
+		b := strings.TrimRight(body, "\r\n")
+		heading := strings.ToUpper(name[:1]) + name[1:]
+		return b + eol + eol + "## " + heading + eol + line + eol
+	}
+	last := start
+	for i := start + 1; i < end; i++ {
+		if strings.TrimSpace(lines[i]) != "" {
+			last = i
+		}
+	}
+	out := append([]string(nil), lines[:last+1]...)
+	cr := ""
+	if eol == "\r\n" {
+		cr = "\r"
+	}
+	out = append(out, line+cr)
+	out = append(out, lines[last+1:]...)
+	return strings.Join(out, "\n")
+}

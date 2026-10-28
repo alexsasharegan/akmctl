@@ -46,6 +46,16 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opCheck(repo, req)
 	case "index":
 		body, err = opIndex(repo, req)
+	case "new":
+		body, err = opNew(repo, req)
+	case "set":
+		body, err = opSet(repo, req)
+	case "close":
+		body, err = opClose(repo, req)
+	case "claim":
+		body, err = opClaim(repo, req)
+	case "release":
+		body, err = opRelease(repo, req)
 	}
 	if err != nil {
 		return failure(op, echo, err), err

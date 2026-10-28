@@ -61,6 +61,11 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 	changed := err != nil || string(cur) != want
 	written := false
 	if changed && !q.boolean("dry_run") {
+		unlock, lerr := lockRepo(repo.Root)
+		if lerr != nil {
+			return nil, unreadable(lerr)
+		}
+		defer unlock()
 		if err := writeAtomic(full, []byte(want)); err != nil {
 			return nil, &Error{Code: "unreadable", Message: "cannot write " + index.Path + ": " + err.Error()}
 		}

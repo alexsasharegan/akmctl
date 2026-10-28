@@ -17,7 +17,7 @@ import (
 const Version = "0.0.0-dev"
 
 // positional names the parameter that takes the positional arguments.
-var positional = map[string]string{"search": "text", "show": "id", "find": "id", "when": "id"}
+var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "set": {"id"}}
 
 // Run executes one command line and returns the exit code.
 func Run(args []string, stdout, stderr io.Writer, cwd string) int {
@@ -59,6 +59,20 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			return "", false
 		}
 		switch name {
+		case "field":
+			v, _ := value()
+			k, raw, ok := strings.Cut(v, "=")
+			if !ok || k == "" {
+				fmt.Fprintln(stderr, "akmctl: --field needs key=value")
+				return 2
+			}
+			m, _ := req["fields"].(map[string]any)
+			if m == nil {
+				m = map[string]any{}
+			}
+			m[k] = parseFieldValue(k, raw)
+			req["fields"] = m
+			continue
 		case "format":
 			v, ok := value()
 			if !ok || (v != "json" && v != "table" && v != "ids") {
@@ -118,11 +132,36 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			req[pname] = v
 		}
 	}
-	if pn := positional[op]; pn != "" && len(pos) > 0 {
-		req[pn] = strings.Join(pos, " ")
-	} else if len(pos) > 0 {
-		fmt.Fprintf(stderr, "akmctl %s: unexpected argument %q\n", op, pos[0])
-		return 2
+	names := positional[op]
+	switch {
+	case op == "search":
+		if len(pos) > 0 {
+			req["text"] = strings.Join(pos, " ")
+		}
+	case op == "set":
+		if len(pos) > 0 {
+			req["id"] = pos[0]
+			changes := map[string]any{}
+			for _, kv := range pos[1:] {
+				k, raw, ok := strings.Cut(kv, "=")
+				if !ok || k == "" {
+					fmt.Fprintf(stderr, "akmctl set: %q is not key=value\n", kv)
+					return 2
+				}
+				changes[k] = parseFieldValue(k, raw)
+			}
+			if len(changes) > 0 {
+				req["changes"] = changes
+			}
+		}
+	default:
+		if len(pos) > len(names) {
+			fmt.Fprintf(stderr, "akmctl %s: unexpected argument %q\n", op, pos[len(names)])
+			return 2
+		}
+		for i, v := range pos {
+			req[names[i]] = v
+		}
 	}
 	info := api.Info{Name: "akmctl", Version: Version}
 	root, err := record.FindRoot(repoDir)
@@ -309,6 +348,19 @@ func text(w io.Writer, op string, resp api.Obj) {
 		ch, _ := resp.Get("changed")
 		wr, _ := resp.Get("written")
 		fmt.Fprintf(w, "%v: changed=%v written=%v\n", p, ch, wr)
+	case "new", "set", "close", "claim", "release":
+		v, _ := resp.Get("record")
+		r := v.(api.Obj)
+		row(w, r)
+		if p, ok := resp.Get("path"); ok {
+			fmt.Fprintln(w, p)
+		}
+		if p, ok := resp.Get("moved_to"); ok {
+			fmt.Fprintln(w, "moved to", p)
+		}
+		if c, ok := resp.Get("changed"); ok {
+			fmt.Fprintln(w, "changed:", c)
+		}
 	case "find":
 		p, _ := resp.Get("path")
 		fmt.Fprintln(w, p)
@@ -332,3 +384,27 @@ func usage(w io.Writer) {
 }
 
 var _ = os.Stdout
+
+// parseFieldValue reads the value of key=value on the command line: null for
+// "null" or nothing, a list for the list fields, an integer for priority.
+func parseFieldValue(key, raw string) any {
+	if raw == "" || raw == "null" {
+		return nil
+	}
+	switch key {
+	case "blocked_by", "decisions", "scope":
+		var out []any
+		for _, x := range splitList(raw) {
+			out = append(out, x)
+		}
+		if out == nil {
+			out = []any{}
+		}
+		return out
+	case "priority":
+		if n, err := strconv.Atoi(raw); err == nil {
+			return n
+		}
+	}
+	return raw
+}

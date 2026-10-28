@@ -51,6 +51,7 @@ var (
 	reDateTS  = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$`)
 	reID      = regexp.MustCompile(`^\d{6}-[0-9a-hjkmnp-tv-z]{4}$`)
 	reVersion = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
+	reEtag    = regexp.MustCompile(`^[0-9a-f]{16}$`)
 )
 
 var workStatus = []string{"raw", "ready", "active", "blocked", "done", "dropped"}
@@ -79,12 +80,17 @@ var specs = map[string]map[string]param{
 		"text": s(req), "body": {kind: kBool}, "type": {kind: kString, enum: []string{"work", "adr"}}, "status": {kind: kStrings, enum: anyStatus},
 		"fields": {kind: kStrings}, "limit": {kind: kInt, min: 1}, "offset": {kind: kInt, min: 0},
 	},
-	"show":  {"id": s(req, pat(reID)), "section": s()},
-	"board": {"statuses": {kind: kStrings, enum: workStatus}},
-	"find":  {"id": s(req, pat(reID))},
-	"when":  {"id": s(req, pat(reID)), "as_of": s(pat(reDate))},
-	"check": {"target": s(pat(reVersion)), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS))},
-	"index": {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
+	"show":    {"id": s(req, pat(reID)), "section": s()},
+	"board":   {"statuses": {kind: kStrings, enum: workStatus}},
+	"find":    {"id": s(req, pat(reID))},
+	"when":    {"id": s(req, pat(reID)), "as_of": s(pat(reDate))},
+	"check":   {"target": s(pat(reVersion)), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS))},
+	"new":     {"kind": {kind: kString, enum: []string{"work", "adr"}, required: true}, "slug": s(req), "title": s(), "fields": {kind: kObject}, "as_of": s(pat(reDateTS))},
+	"set":     {"id": s(req, pat(reID)), "changes": {kind: kObject, required: true}, "if_match": s(pat(reEtag)), "as_of": s(pat(reDateTS))},
+	"close":   {"id": s(req, pat(reID)), "status": {kind: kString, enum: []string{"done", "dropped"}, required: true}, "if_match": s(pat(reEtag)), "as_of": s(pat(reDateTS))},
+	"claim":   {"id": s(req, pat(reID)), "as": s(req), "if_match": s(pat(reEtag)), "takeover": {kind: kBool}, "as_of": s(pat(reDateTS))},
+	"release": {"id": s(req, pat(reID)), "if_match": s(pat(reEtag)), "as_of": s(pat(reDateTS))},
+	"index":   {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
 }
 
 // Operations lists the implemented operation names.
@@ -145,6 +151,10 @@ func validate(op string, r Request) *Error {
 			}
 			if n < p.min {
 				return invalid(name, "%s must be at least %d", name, p.min)
+			}
+		case kObject:
+			if _, ok := v.(map[string]any); !ok {
+				return invalid(name, "%s must be an object", name)
 			}
 		case kStrings:
 			l, ok := asStrings(v)

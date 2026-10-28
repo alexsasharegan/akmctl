@@ -3,6 +3,8 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -72,4 +74,50 @@ func TestNoRepository(t *testing.T) {
 	if code != 2 || !strings.Contains(out.String(), `"code":"unreadable"`) {
 		t.Fatalf("%d %s", code, out.String())
 	}
+}
+
+func TestWriteCommands(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/claims", root)
+	do := func(args ...string) (int, string) {
+		var out, errb bytes.Buffer
+		code := Run(append(args, "--repo", root, "--format", "json"), &out, &errb, ".")
+		return code, out.String()
+	}
+	code, out := do("new", "work", "add-a-thing", "--title", "Add a thing", "--field", "priority=2", "--field", "blocked_by=a person,another", "--as-of", "2026-10-28")
+	if code != 0 || !strings.Contains(out, `"priority":2`) || !strings.Contains(out, `"blocked_by":["a person","another"]`) {
+		t.Fatalf("new: %d %s", code, out)
+	}
+	code, out = do("set", "261022-e5f6", "priority=5", "summary=Short.", "parent=null", "--as-of", "2026-10-28")
+	if code != 0 || !strings.Contains(out, `"changed":["parent","priority","summary"]`) {
+		t.Fatalf("set: %d %s", code, out)
+	}
+	code, out = do("claim", "261022-e5f6", "--as", "agent-1", "--as-of", "2026-10-28T09:30")
+	if code != 0 || !strings.Contains(out, `"claimed_by":"agent-1"`) {
+		t.Fatalf("claim: %d %s", code, out)
+	}
+	code, out = do("release", "261022-e5f6", "--as-of", "2026-10-28")
+	if code != 0 {
+		t.Fatalf("release: %d %s", code, out)
+	}
+	code, out = do("close", "261022-e5f6", "done")
+	if code != 2 || !strings.Contains(out, `"reason":"empty_outcome"`) {
+		t.Fatalf("close: %d %s", code, out)
+	}
+	code, _ = do("check")
+	if code == 2 {
+		t.Fatal("check could not run")
+	}
+}
+
+func copyDir(t *testing.T, src, dst string) {
+	t.Helper()
+	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
+		rel, _ := filepath.Rel(src, p)
+		if d.IsDir() {
+			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
+		}
+		b, _ := os.ReadFile(p)
+		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
+	})
 }

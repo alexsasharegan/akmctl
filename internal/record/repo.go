@@ -228,3 +228,13 @@ func (r *Repo) ByID(id string) []*Record {
 	}
 	return out
 }
+
+// Reload reads the repository again from disk into r.
+func (r *Repo) Reload() error {
+	n, err := Load(r.Root)
+	if err != nil {
+		return err
+	}
+	*r = *n
+	return nil
+}
