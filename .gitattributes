@@ -1,0 +1,4 @@
+# Fixtures hold exact bytes (etags depend on them): never convert line endings.
+testdata/** -text
+# Everything else is LF on every platform, so gofmt and the tests agree on Windows.
+* text=auto eol=lf
