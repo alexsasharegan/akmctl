@@ -13,8 +13,9 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
-// Version of the tool.
-const Version = "0.0.0-dev"
+// Version of the tool. Releases set it at link time:
+// -ldflags "-X github.com/alexsasharegan/akmctl/internal/cli.Version=0.1.0".
+var Version = "0.0.0-dev"
 
 // positional names the parameter that takes the positional arguments.
 var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "set": {"id"}}
