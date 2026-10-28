@@ -21,6 +21,9 @@ jobs:
         if: runner.os == 'Linux'
         run: test -z "$(gofmt -l .)"
       - run: go vet ./...
+      - name: records
+        if: runner.os == 'Linux'
+        run: go build -o "$RUNNER_TEMP/akmctl" ./cmd/akmctl && "$RUNNER_TEMP/akmctl" check
       - run: go test ./...
       - name: race
         if: runner.os == 'Linux'

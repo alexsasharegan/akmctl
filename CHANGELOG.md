@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `new work` leaves a blank line after the `## Log` heading, so the file passes `prettier --check` as created.
+
 ## 0.1.0
 
 First release. Everything in the AKM API 1.0 draft is built.
