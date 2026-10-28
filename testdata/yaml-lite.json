@@ -1,0 +1,328 @@
+[
+ {
+  "name": "string",
+  "input": "status: active",
+  "accept": true,
+  "key": "status",
+  "value": "active"
+ },
+ {
+  "name": "integer",
+  "input": "priority: 2",
+  "accept": true,
+  "key": "priority",
+  "value": 2
+ },
+ {
+  "name": "leading zero",
+  "input": "priority: 02",
+  "accept": false
+ },
+ {
+  "name": "plus sign",
+  "input": "priority: +2",
+  "accept": false
+ },
+ {
+  "name": "date plain",
+  "input": "created: 2026-10-28",
+  "accept": true,
+  "key": "created",
+  "value": "2026-10-28"
+ },
+ {
+  "name": "date quoted",
+  "input": "created: \"2026-10-28\"",
+  "accept": true,
+  "key": "created",
+  "value": "2026-10-28"
+ },
+ {
+  "name": "timestamp",
+  "input": "claimed_at: 2026-10-28T14:30",
+  "accept": true,
+  "key": "claimed_at",
+  "value": "2026-10-28T14:30"
+ },
+ {
+  "name": "version string",
+  "input": "layout: 1.0.0",
+  "accept": true,
+  "key": "layout",
+  "value": "1.0.0"
+ },
+ {
+  "name": "float",
+  "input": "layout: 1.2",
+  "accept": false
+ },
+ {
+  "name": "base 60 reads as string",
+  "input": "time: 12:30",
+  "accept": true,
+  "key": "time",
+  "value": "12:30"
+ },
+ {
+  "name": "yes is a string",
+  "input": "done: yes",
+  "accept": true,
+  "key": "done",
+  "value": "yes"
+ },
+ {
+  "name": "true",
+  "input": "flag: true",
+  "accept": true,
+  "key": "flag",
+  "value": true
+ },
+ {
+  "name": "capital True",
+  "input": "flag: True",
+  "accept": false
+ },
+ {
+  "name": "tilde is null",
+  "input": "gone: ~",
+  "accept": true,
+  "key": "gone",
+  "value": null
+ },
+ {
+  "name": "capital Null",
+  "input": "gone: Null",
+  "accept": false
+ },
+ {
+  "name": "id",
+  "input": "id: 261027-m3qz",
+  "accept": true,
+  "key": "id",
+  "value": "261027-m3qz"
+ },
+ {
+  "name": "escaped quotes",
+  "input": "summary: \"Fix the \\\"x\\\" case\"",
+  "accept": true,
+  "key": "summary",
+  "value": "Fix the \"x\" case"
+ },
+ {
+  "name": "single quote doubling",
+  "input": "summary: 'it''s fine'",
+  "accept": true,
+  "key": "summary",
+  "value": "it's fine"
+ },
+ {
+  "name": "colon space in plain",
+  "input": "title: Add: a thing",
+  "accept": false
+ },
+ {
+  "name": "wikilink reference",
+  "input": "parent: \"[[261027-m3qz-fix-login|261027-m3qz]]\"",
+  "accept": true,
+  "key": "parent",
+  "value": "[[261027-m3qz-fix-login|261027-m3qz]]"
+ },
+ {
+  "name": "unquoted wikilink",
+  "input": "parent: [[261027-m3qz-fix-login]]",
+  "accept": false
+ },
+ {
+  "name": "inline list",
+  "input": "blocked_by: [261015-k7f2, \"a person\"]",
+  "accept": true,
+  "key": "blocked_by",
+  "value": [
+   "261015-k7f2",
+   "a person"
+  ]
+ },
+ {
+  "name": "nested list",
+  "input": "blocked_by: [a, [b]]",
+  "accept": false
+ },
+ {
+  "name": "empty list item",
+  "input": "blocked_by: [a,,b]",
+  "accept": false
+ },
+ {
+  "name": "block list",
+  "input": "tags:\n- a\n- b",
+  "accept": true,
+  "key": "tags",
+  "value": [
+   "a",
+   "b"
+  ]
+ },
+ {
+  "name": "block list indented",
+  "input": "tags:\n  - a\n  - b",
+  "accept": true,
+  "key": "tags",
+  "value": [
+   "a",
+   "b"
+  ]
+ },
+ {
+  "name": "uneven block list",
+  "input": "tags:\n- a\n   - b",
+  "accept": false
+ },
+ {
+  "name": "duplicate key",
+  "input": "owner: x\nowner: y",
+  "accept": false
+ },
+ {
+  "name": "indented line",
+  "input": "a: 1\n  nested: 1",
+  "accept": false
+ },
+ {
+  "name": "anchor",
+  "input": "note: &x value",
+  "accept": false
+ },
+ {
+  "name": "block scalar",
+  "input": "text: |",
+  "accept": false
+ },
+ {
+  "name": "trailing comment",
+  "input": "key: value # why",
+  "accept": true,
+  "key": "key",
+  "value": "value"
+ },
+ {
+  "name": "url",
+  "input": "url: http://example.com",
+  "accept": true,
+  "key": "url",
+  "value": "http://example.com"
+ },
+ {
+  "name": "flow indicator start",
+  "input": "x: ]a",
+  "accept": false
+ },
+ {
+  "name": "on is a string key",
+  "input": "on: x",
+  "accept": true,
+  "key": "on",
+  "value": "x"
+ },
+ {
+  "name": "true key",
+  "input": "true: x",
+  "accept": false
+ },
+ {
+  "name": "hex",
+  "input": "n: 0x1F",
+  "accept": false
+ },
+ {
+  "name": "exponent",
+  "input": "n: 1e3",
+  "accept": false
+ },
+ {
+  "name": "underscore",
+  "input": "n: 1_000",
+  "accept": false
+ },
+ {
+  "name": "inf",
+  "input": "n: .inf",
+  "accept": false
+ },
+ {
+  "name": "negative int",
+  "input": "n: -5",
+  "accept": true,
+  "key": "n",
+  "value": -5
+ },
+ {
+  "name": "empty value is null",
+  "input": "n:",
+  "accept": true,
+  "key": "n",
+  "value": null
+ },
+ {
+  "name": "empty list",
+  "input": "l: []",
+  "accept": true,
+  "key": "l",
+  "value": []
+ },
+ {
+  "name": "trailing comma",
+  "input": "l: [a, b,]",
+  "accept": true,
+  "key": "l",
+  "value": [
+   "a",
+   "b"
+  ]
+ },
+ {
+  "name": "alias",
+  "input": "a: *x",
+  "accept": false
+ },
+ {
+  "name": "tag",
+  "input": "a: !!str x",
+  "accept": false
+ },
+ {
+  "name": "quoted backslash escape",
+  "input": "a: \"\\t\"",
+  "accept": false
+ },
+ {
+  "name": "comment line",
+  "input": "# note\na: 1",
+  "accept": true,
+  "key": "a",
+  "value": 1
+ },
+ {
+  "name": "single quoted with hash",
+  "input": "a: 'x # y'",
+  "accept": true,
+  "key": "a",
+  "value": "x # y"
+ },
+ {
+  "name": "hash without space",
+  "input": "a: x#y",
+  "accept": true,
+  "key": "a",
+  "value": "x#y"
+ },
+ {
+  "name": "flow mapping",
+  "input": "a: {b: 1}",
+  "accept": false
+ },
+ {
+  "name": "multi-line quoted",
+  "input": "a: \"x\n  y\"",
+  "accept": false
+ }
+]
