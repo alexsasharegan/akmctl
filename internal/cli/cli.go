@@ -40,7 +40,7 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		fmt.Fprintf(stderr, "akmctl: unknown command %q (try: akmctl help)\n", op)
 		return 2
 	}
-	format, repoDir := "table", cwd
+	format, repoDir, outFile := "table", cwd, ""
 	req := api.Request{}
 	var pos []string
 	rest := args[1:]
@@ -75,6 +75,10 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			}
 			m[k] = parseFieldValue(k, raw)
 			req["fields"] = m
+			continue
+		case "out":
+			v, _ := value()
+			outFile = v
 			continue
 		case "format":
 			v, ok := value()
@@ -132,6 +136,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			req[pname] = append(prev, splitList(v)...)
 		default:
 			v, _ := value()
+			if pname == "mode" {
+				v = strings.ReplaceAll(v, "-", "_") // apply-safe on the command line
+			}
 			req[pname] = v
 		}
 	}
@@ -187,6 +194,13 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		}
 	}
 	resp, aerr := api.Run(repo, info, op, req)
+	if h, ok := resp.Get("handoff"); ok && outFile != "" {
+		if err := os.WriteFile(outFile, []byte(fmt.Sprint(h)), 0o644); err != nil {
+			fmt.Fprintln(stderr, "akmctl:", err)
+			return 2
+		}
+		fmt.Fprintln(stderr, "akmctl: handoff written to", outFile)
+	}
 	print(stdout, stderr, format, op, resp, aerr == nil)
 	if aerr != nil {
 		return 2
@@ -325,6 +339,22 @@ func text(w io.Writer, op string, resp api.Obj) {
 			t, _ := s.(api.Obj).Get("text")
 			fmt.Fprintf(w, "\n%v\n", t)
 		}
+	case "migrate":
+		st, _ := resp.Get("state")
+		from, _ := resp.Get("from")
+		to, _ := resp.Get("to")
+		fmt.Fprintf(w, "layout %v -> %v: %v\n", from, to, st)
+		ss, _ := resp.Get("steps")
+		for _, x := range ss.([]api.Obj) {
+			id, _ := x.Get("id")
+			cl, _ := x.Get("class")
+			status, _ := x.Get("status")
+			files, _ := x.Get("files")
+			fmt.Fprintf(w, "  %v [%v] %v %v\n", id, cl, status, files)
+		}
+		if h, ok := resp.Get("handoff"); ok {
+			fmt.Fprintf(w, "\n%v", h)
+		}
 	case "check":
 		fs, _ := resp.Get("findings")
 		for _, f := range fs.([]api.Obj) {
@@ -383,7 +413,7 @@ func text(w io.Writer, op string, resp api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --out <file>\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

@@ -9,10 +9,12 @@ Status: under construction. The contract is the AKM API spec (`akm-api-spec`), w
 - `cmd/akmctl`: the binary.
 - `internal/frontmatter`: the YAML-lite parser and byte-splice editor.
 - `internal/record`: loads work items, ADRs, the roadmap and the manifest.
-- `internal/api`: the operations (`version`, `ls`, `search`, `show`, `board`, `find`, `when`, `check`, `index` so far) and their request checking.
-- `internal/check`: the rules (WK, I, A, RM, G, L, S and the claims rules CL).
+- `internal/api`: the operations (`version`, `ls`, `search`, `show`, `board`, `find`, `when`, `check`, `index`, `new`, `set`, `close`, `claim`, `release`, `migrate`) and their request checking.
+- `internal/check`: the rules (WK, I, A, RM, G, L, S, the claims rules CL and the safety rules SF).
 - `internal/index`: the ADR index generator, stable under Prettier.
 - `internal/width`: Prettier's string-width rule; tables are generated from the Unicode data in `data/` (`go generate ./internal/width`).
+- `internal/migrate`: layout migrations (embedded steps, safe application, handoff).
+- `internal/fsx`: the repository lock and atomic writes.
 - `internal/server`: the HTTP binding (loopback only, bearer token) and the workbench page.
 - `internal/cli`: the command-line binding.
 - `testdata`: conformance fixtures shared with the spec (`yaml-lite.json`, `api/`).

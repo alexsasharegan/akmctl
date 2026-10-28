@@ -338,3 +338,8 @@ func TestNoTempFilesLeft(t *testing.T) {
 		}
 	}
 }
+
+func loadRepo(t *testing.T, root string) (*record.Repo, error) {
+	t.Helper()
+	return record.Load(root)
+}

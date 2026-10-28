@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/check"
+	"github.com/alexsasharegan/akmctl/internal/fsx"
 	"github.com/alexsasharegan/akmctl/internal/index"
+	"github.com/alexsasharegan/akmctl/internal/migrate"
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
@@ -27,6 +29,11 @@ func opCheck(repo *record.Repo, q Request) (Obj, *Error) {
 		opt.AsOf = t
 	}
 	res := check.Run(repo, opt)
+	var steps []migrate.Step
+	if t := q.str("target"); t != "" {
+		chain, _ := migrate.Chain(repoLayout(repo), t)
+		steps = migrate.Steps(chain)
+	}
 	errs, warns := 0, 0
 	findings := make([]Obj, 0, len(res.Findings))
 	for _, f := range res.Findings {
@@ -35,17 +42,11 @@ func opCheck(repo *record.Repo, q Request) (Obj, *Error) {
 		} else {
 			warns++
 		}
-		var file, id, line any
-		if f.File != "" {
-			file = f.File
+		var class any
+		if q.str("target") != "" {
+			class = classify(f, steps)
 		}
-		if f.ID != "" {
-			id = f.ID
-		}
-		if f.Line > 0 {
-			line = f.Line
-		}
-		findings = append(findings, O("rule", f.Rule, "severity", f.Severity, "file", file, "line", line, "id", id, "message", f.Message, "class", nil))
+		findings = append(findings, findingObj(f, class))
 	}
 	rec := O("state", res.State)
 	if len(res.Steps) > 0 {
@@ -61,12 +62,12 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 	changed := err != nil || string(cur) != want
 	written := false
 	if changed && !q.boolean("dry_run") {
-		unlock, lerr := lockRepo(repo.Root)
+		unlock, lerr := fsx.LockRepo(repo.Root)
 		if lerr != nil {
 			return nil, unreadable(lerr)
 		}
 		defer unlock()
-		if err := writeAtomic(full, []byte(want)); err != nil {
+		if err := fsx.WriteAtomic(full, []byte(want)); err != nil {
 			return nil, &Error{Code: "unreadable", Message: "cannot write " + index.Path + ": " + err.Error()}
 		}
 		written = true
@@ -76,36 +77,4 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 		out = append(out, KV{"content", want})
 	}
 	return out, nil
-}
-
-// writeAtomic writes through a temporary file in the same directory and renames
-// it over the target, so a crash leaves the old file or the new one.
-func writeAtomic(path string, data []byte) error {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return err
-	}
-	tmp, err := os.CreateTemp(filepath.Dir(path), ".akm-*.tmp")
-	if err != nil {
-		return err
-	}
-	name := tmp.Name()
-	if _, err := tmp.Write(data); err != nil {
-		tmp.Close()
-		os.Remove(name)
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		os.Remove(name)
-		return err
-	}
-	if st, err := os.Stat(path); err == nil {
-		os.Chmod(name, st.Mode().Perm())
-	} else {
-		os.Chmod(name, 0o644)
-	}
-	if err := os.Rename(name, path); err != nil {
-		os.Remove(name)
-		return err
-	}
-	return nil
 }

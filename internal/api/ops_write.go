@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
+	"github.com/alexsasharegan/akmctl/internal/fsx"
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
@@ -66,7 +67,7 @@ func openEdit(repo *record.Repo, q Request) (*edit, func(), *Error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	unlock, lerr := lockRepo(repo.Root)
+	unlock, lerr := fsx.LockRepo(repo.Root)
 	if lerr != nil {
 		return nil, nil, unreadable(lerr)
 	}
@@ -110,7 +111,7 @@ func (e *edit) commit(dest string) (*record.Record, *Error) {
 	data := e.bytes()
 	full := filepath.Join(e.repo.Root, filepath.FromSlash(e.rec.Path))
 	if string(data) != e.old {
-		if err := writeAtomic(full, data); err != nil {
+		if err := fsx.WriteAtomic(full, data); err != nil {
 			return nil, unreadable(err)
 		}
 	}
@@ -119,11 +120,11 @@ func (e *edit) commit(dest string) (*record.Record, *Error) {
 		if err := os.MkdirAll(filepath.Dir(to), 0o755); err == nil {
 			err = os.Rename(full, to)
 			if err != nil {
-				writeAtomic(full, []byte(e.old))
+				fsx.WriteAtomic(full, []byte(e.old))
 				return nil, unreadable(err)
 			}
 		} else {
-			writeAtomic(full, []byte(e.old))
+			fsx.WriteAtomic(full, []byte(e.old))
 			return nil, unreadable(err)
 		}
 	}
@@ -165,7 +166,7 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if aerr != nil {
 		return nil, aerr
 	}
-	unlock, err := lockRepo(repo.Root)
+	unlock, err := fsx.LockRepo(repo.Root)
 	if err != nil {
 		return nil, unreadable(err)
 	}
@@ -182,7 +183,7 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 		rel = "docs/adr/" + id + "-" + slug + ".md"
 	}
 	text := strings.Replace(doc, "{{id}}", id, 1) + body
-	if err := writeAtomic(filepath.Join(repo.Root, filepath.FromSlash(rel)), []byte(text)); err != nil {
+	if err := fsx.WriteAtomic(filepath.Join(repo.Root, filepath.FromSlash(rel)), []byte(text)); err != nil {
 		return nil, unreadable(err)
 	}
 	if err := repo.Reload(); err != nil {

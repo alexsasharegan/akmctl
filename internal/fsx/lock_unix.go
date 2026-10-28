@@ -1,6 +1,6 @@
 //go:build !windows
 
-package api
+package fsx
 
 import (
 	"os"
@@ -8,9 +8,9 @@ import (
 	"syscall"
 )
 
-// lockRepo takes the exclusive advisory lock docs/.akm.lock for one write and
+// LockRepo takes the exclusive advisory lock docs/.akm.lock for one write and
 // returns the function that releases it.
-func lockRepo(root string) (func(), error) {
+func LockRepo(root string) (func(), error) {
 	dir := filepath.Join(root, "docs")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err

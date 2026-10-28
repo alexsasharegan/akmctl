@@ -12,6 +12,7 @@ import (
 
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/index"
+	"github.com/alexsasharegan/akmctl/internal/migrate"
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
@@ -90,6 +91,9 @@ func Run(repo *record.Repo, opt Options) Result {
 	c.skills()
 	if repo.Extension("claims") {
 		c.claims()
+	}
+	if repo.Extension("safety") {
+		c.safety()
 	}
 	state, steps := c.manifest()
 	sort.SliceStable(c.out, func(i, j int) bool {
@@ -591,7 +595,15 @@ func (c *checker) manifest() (string, []string) {
 		c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s, newer than this tool (%s): upgrade the tool", repoV, LayoutVersion)
 		return "ahead", nil
 	default:
-		c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path yet", repoV, LayoutVersion)
+		if chain, ok := migrate.Chain(repoV, LayoutVersion); ok {
+			var steps []string
+			for _, st := range migrate.Steps(chain) {
+				steps = append(steps, st.ID+": "+st.Description)
+			}
+			c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s; run akmctl migrate to reach %s (%d steps)", repoV, LayoutVersion, len(steps))
+			return "behind", steps
+		}
+		c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path from it", repoV, LayoutVersion)
 		return "unsupported", nil
 	}
 }

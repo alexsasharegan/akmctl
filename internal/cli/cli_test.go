@@ -121,3 +121,21 @@ func copyDir(t *testing.T, src, dst string) {
 		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
 	})
 }
+
+func TestMigrateFlags(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	var out, errb bytes.Buffer
+	code := Run([]string{"migrate", "--mode", "handoff", "--target", "1.0.0", "--out", filepath.Join(root, "handoff.md"), "--repo", root, "--format", "json"}, &out, &errb, ".")
+	if code != 0 || !strings.Contains(out.String(), `"state":"current"`) {
+		t.Fatalf("%d %s %s", code, out.String(), errb.String())
+	}
+	if b, err := os.ReadFile(filepath.Join(root, "handoff.md")); err != nil || !strings.Contains(string(b), "Finish the migration") {
+		t.Fatalf("handoff file: %v %s", err, b)
+	}
+	out.Reset()
+	code = Run([]string{"migrate", "--mode", "apply-safe", "--repo", root, "--format", "json"}, &out, &errb, ".")
+	if code != 2 || !strings.Contains(out.String(), `"reason":"no_backup_ack"`) {
+		t.Fatalf("%d %s", code, out.String())
+	}
+}

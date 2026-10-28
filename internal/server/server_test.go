@@ -252,6 +252,12 @@ func TestWriteRoutes(t *testing.T) {
 	if r := do(t, ts, "DELETE", "/api/v1/records/"+id+"/claim", "", nil); r.status != 428 {
 		t.Fatalf("release without If-Match: %d", r.status)
 	}
+	if r := do(t, ts, "POST", "/api/v1/migrate", `{"mode":"report"}`, nil); r.status != 200 || r.body["state"] != "current" {
+		t.Fatalf("migrate: %d %v", r.status, r.body)
+	}
+	if r := do(t, ts, "POST", "/api/v1/migrate", `{"mode":"apply_safe"}`, nil); r.status != 409 || reason(r) != "no_backup_ack" {
+		t.Fatalf("migrate apply: %d %v", r.status, r.body)
+	}
 	if r := do(t, ts, "POST", "/api/v1/index", `{"dry_run":true}`, nil); r.status != 200 {
 		t.Fatalf("index: %d %v", r.status, r.body)
 	}

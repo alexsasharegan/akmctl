@@ -1,0 +1,18 @@
+{
+  "name": "a repository on the current layout has nothing to migrate",
+  "repo": "basic",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "migrate",
+    "request": {},
+    "ok": true,
+    "mode": "report",
+    "from": "1.0.0",
+    "to": "1.0.0",
+    "state": "current",
+    "steps": [],
+    "findings": [],
+    "clean": true
+  }
+}
