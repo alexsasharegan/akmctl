@@ -2,8 +2,6 @@
 
 ## Now
 
-- [261028-ehv6] Adopt the AKM layout in this repository
-
 ## Next
 
 - [261028-8dd4] Build the mint_ids migration step: the vault migration needs it
