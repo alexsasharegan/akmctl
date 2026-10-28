@@ -9,7 +9,10 @@ Status: under construction. The contract is the AKM API spec (`akm-api-spec`), w
 - `cmd/akmctl`: the binary.
 - `internal/frontmatter`: the YAML-lite parser and byte-splice editor.
 - `internal/record`: loads work items, ADRs, the roadmap and the manifest.
-- `internal/api`: the operations (`version`, `ls`, `search`, `show`, `board`, `find`, `when` so far) and their request checking.
+- `internal/api`: the operations (`version`, `ls`, `search`, `show`, `board`, `find`, `when`, `check`, `index` so far) and their request checking.
+- `internal/check`: the rules (WK, I, A, RM, G, L, S and the claims rules CL).
+- `internal/index`: the ADR index generator, stable under Prettier.
+- `internal/width`: Prettier's string-width rule; tables are generated from the Unicode data in `data/` (`go generate ./internal/width`).
 - `internal/cli`: the command-line binding.
 - `testdata`: conformance fixtures shared with the spec (`yaml-lite.json`, `api/`).
 
@@ -19,6 +22,8 @@ Status: under construction. The contract is the AKM API spec (`akm-api-spec`), w
 akmctl ls --status ready,active --sort roadmap,-priority,id
 akmctl show 261020-a2b3 --section next
 akmctl board --format json
+akmctl check            # exit 1 when a rule finds an error
+akmctl index            # regenerate docs/adr/README.md
 ```
 
 `--format json` prints one JSON document; the default is a plain table. Errors exit 2.
@@ -30,3 +35,7 @@ go test ./...
 ```
 
 Standard library only, apart from `go.yaml.in/yaml/v3` in tests, used as an oracle for the parser.
+
+## Licence
+
+MIT; see `LICENSE`. The Unicode data files in `internal/width/data` are under the Unicode licence.

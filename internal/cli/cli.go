@@ -149,6 +149,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	if aerr != nil {
 		return 2
 	}
+	if clean, ok := resp.Get("clean"); ok && clean == false {
+		return 1
+	}
 	return 0
 }
 
@@ -280,6 +283,32 @@ func text(w io.Writer, op string, resp api.Obj) {
 			t, _ := s.(api.Obj).Get("text")
 			fmt.Fprintf(w, "\n%v\n", t)
 		}
+	case "check":
+		fs, _ := resp.Get("findings")
+		for _, f := range fs.([]api.Obj) {
+			file, _ := f.Get("file")
+			line, _ := f.Get("line")
+			rule, _ := f.Get("rule")
+			sev, _ := f.Get("severity")
+			msg, _ := f.Get("message")
+			loc := ""
+			if file != nil {
+				loc = fmt.Sprint(file)
+				if line != nil {
+					loc += fmt.Sprintf(":%v", line)
+				}
+				loc += ": "
+			}
+			fmt.Fprintf(w, "%s[%v] %v %v\n", loc, sev, rule, msg)
+		}
+		e, _ := resp.Get("errors")
+		wn, _ := resp.Get("warnings")
+		fmt.Fprintf(w, "%v errors, %v warnings\n", e, wn)
+	case "index":
+		p, _ := resp.Get("path")
+		ch, _ := resp.Get("changed")
+		wr, _ := resp.Get("written")
+		fmt.Fprintf(w, "%v: changed=%v written=%v\n", p, ch, wr)
 	case "find":
 		p, _ := resp.Get("path")
 		fmt.Fprintln(w, p)

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexsasharegan/akmctl/internal/check"
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
@@ -41,6 +42,10 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opFind(repo, req)
 	case "when":
 		body, err = opWhen(req)
+	case "check":
+		body, err = opCheck(repo, req)
+	case "index":
+		body, err = opIndex(repo, req)
 	}
 	if err != nil {
 		return failure(op, echo, err), err
@@ -75,7 +80,7 @@ func failure(op string, echo Obj, e *Error) Obj {
 
 func opVersion(info Info) Obj {
 	return O("tool", O("name", info.Name, "version", info.Version), "api_versions", []string{Version},
-		"layout_versions", []string{"1.0.0"}, "extensions", []string{"claims"})
+		"layout_versions", []string{check.LayoutVersion}, "extensions", []string{"claims"})
 }
 
 // fieldsObj renders the frontmatter of r for the chosen field list. A nil list

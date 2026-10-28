@@ -83,6 +83,8 @@ var specs = map[string]map[string]param{
 	"board": {"statuses": {kind: kStrings, enum: workStatus}},
 	"find":  {"id": s(req, pat(reID))},
 	"when":  {"id": s(req, pat(reID)), "as_of": s(pat(reDate))},
+	"check": {"target": s(pat(reVersion)), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS))},
+	"index": {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
 }
 
 // Operations lists the implemented operation names.
