@@ -179,7 +179,7 @@ export function previewable(op, i) {
 }
 
 /** A line for the review: what an op does. */
-export function opLabel(op, id) {
+export function opLabel(op, id, folders = { work_dir: "docs/work" }) {
   switch (op.kind) {
     case "section":
       return "Write the ## " + op.name + " section";
@@ -188,7 +188,7 @@ export function opLabel(op, id) {
       return "Change " + bits.join(", ");
     }
     case "close":
-      return "Close as " + op.status + (op.outcome ? " with an outcome" : "") + " and move the file to docs/work/done/";
+      return "Close as " + op.status + (op.outcome ? " with an outcome" : "") + " and move the file to " + folders.work_dir + "/done/";
     case "claim":
       return "Claim for " + op.as;
     case "release":

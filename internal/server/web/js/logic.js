@@ -2,6 +2,16 @@
 // a date is passed in, so each can be read and checked on its own.
 import { ageDays } from "./util.js";
 
+/** The folders of a repository that keeps the defaults; `version.repository` names others. */
+export const DEFAULT_FOLDERS = { work_dir: "docs/work", adr_dir: "docs/adr" };
+
+/** The work and ADR folders from a `version` response (the manifest's work_dir and adr_dir), else the defaults. */
+export function foldersFrom(version) {
+  const r = (version && version.repository) || {};
+  const ok = (v) => typeof v === "string" && v !== "";
+  return { work_dir: ok(r.work_dir) ? r.work_dir : DEFAULT_FOLDERS.work_dir, adr_dir: ok(r.adr_dir) ? r.adr_dir : DEFAULT_FOLDERS.adr_dir };
+}
+
 export const LANES = ["raw", "ready", "active", "blocked"];
 export const CLOSED = ["done", "dropped"];
 export const STALE_DAYS = 30; // the default of rule WK10

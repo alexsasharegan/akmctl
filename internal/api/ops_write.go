@@ -224,9 +224,9 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if err != nil {
 		return nil, unreadable(err)
 	}
-	rel := "docs/work/" + id + "-" + slug + ".md"
+	rel := repo.WorkDir() + "/" + id + "-" + slug + ".md"
 	if kind == record.ADR {
-		rel = "docs/adr/" + id + "-" + slug + ".md"
+		rel = repo.ADRDir() + "/" + id + "-" + slug + ".md"
 	}
 	text := strings.Replace(doc, "{{id}}", id, 1) + body
 	if err := fsx.WriteAtomic(filepath.Join(repo.Root, filepath.FromSlash(rel)), []byte(text)); err != nil {
@@ -493,9 +493,9 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 		if newStatus == "blocked" && len(by.Items) == 0 {
 			return nil, refusedRule("WK5", "status blocked needs a non-empty blocked_by")
 		}
-		finished := strings.HasPrefix(e.rec.Path, "docs/work/done/")
+		finished := repo.IsDone(e.rec.Path)
 		if finished && newStatus != "done" && newStatus != "dropped" {
-			return nil, refusedRule("WK9", "a closed item stays in docs/work/done/ with status done or dropped")
+			return nil, refusedRule("WK9", "a closed item stays in %s/ with status done or dropped", repo.DoneDir())
 		}
 	} else if newStatus == "superseded" {
 		if v, ok := e.doc.Get("superseded_by"); !ok || v.Kind != frontmatter.String {
@@ -569,7 +569,7 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, unreadable(serr)
 	}
 	from := e.rec.Path
-	to := "docs/work/done/" + path.Base(from)
+	to := repo.DoneDir() + "/" + path.Base(from)
 	rec, cerr := e.commit(to)
 	if cerr != nil {
 		return nil, cerr
@@ -581,7 +581,7 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 
 func claimsOn(repo *record.Repo) *Error {
 	if !repo.Extension("claims") {
-		return refused("extension_off", "the claims extension is not enabled in docs/.layout")
+		return refused("extension_off", "the claims extension is not enabled in %s", record.ManifestPath)
 	}
 	return nil
 }
@@ -705,7 +705,7 @@ func opSection(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, err
 	}
 	defer unlock()
-	if strings.HasPrefix(e.rec.Path, "docs/work/done/") {
+	if repo.IsDone(e.rec.Path) {
 		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
 	}
 	text := record.SetSection(e.text, name, q.str("text"), mode == "append", e.eol)

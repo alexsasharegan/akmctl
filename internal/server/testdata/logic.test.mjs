@@ -361,3 +361,13 @@ assert.equal(L.obsidianUrl({ root: "" }, "a.md"), "");
   assert.equal(k({ key: "a" }), "");
 }
 console.log("ok");
+
+// the repository's folders come from version.repository, with the defaults when it names none
+assert.deepEqual(L.foldersFrom({ repository: { work_dir: "Deep Thought/9 pkm/tasks", adr_dir: "Deep Thought/9 pkm/adr" } }), { work_dir: "Deep Thought/9 pkm/tasks", adr_dir: "Deep Thought/9 pkm/adr" });
+assert.deepEqual(L.foldersFrom({ repository: null }), L.DEFAULT_FOLDERS);
+assert.deepEqual(L.foldersFrom(undefined), { work_dir: "docs/work", adr_dir: "docs/adr" });
+assert.deepEqual(L.foldersFrom({ repository: { work_dir: "", adr_dir: 5 } }), L.DEFAULT_FOLDERS);
+assert.equal(C.fileNote("Deep Thought/9 pkm/tasks", "call-plumber"), "File: Deep Thought/9 pkm/tasks/<id>-call-plumber.md");
+assert.equal(C.fileNote("docs/work", ""), "");
+assert.match(M.opLabel({ kind: "close", status: "done", outcome: "x" }, "i", { work_dir: "Deep Thought/9 pkm/tasks" }), /move the file to Deep Thought\/9 pkm\/tasks\/done\/$/);
+assert.match(M.opLabel({ kind: "close", status: "dropped" }, "i"), /move the file to docs\/work\/done\/$/);

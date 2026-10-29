@@ -180,3 +180,75 @@ func TestRuleFilter(t *testing.T) {
 		t.Fatalf("%v", got)
 	}
 }
+
+func vaultRepo(t *testing.T, edits map[string]func(string) string) *record.Repo {
+	t.Helper()
+	src := "../../testdata/api/repos/vault"
+	dst := t.TempDir()
+	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
+		rel, _ := filepath.Rel(src, p)
+		if d.IsDir() {
+			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
+		}
+		b, _ := os.ReadFile(p)
+		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
+	})
+	for p, f := range edits {
+		full := filepath.Join(dst, filepath.FromSlash(p))
+		b, _ := os.ReadFile(full)
+		os.MkdirAll(filepath.Dir(full), 0o755)
+		if err := os.WriteFile(full, []byte(f(string(b))), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	r, err := record.Load(dst)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+func TestCustomFolders(t *testing.T) {
+	const w = "Deep Thought/9 pkm/tasks/"
+	if res := Run(vaultRepo(t, nil), Options{AsOf: asOf}); len(res.Findings) != 0 || res.State != "current" {
+		t.Fatalf("%+v", res)
+	}
+	cases := []struct {
+		name, rule string
+		edits      map[string]func(string) string
+		msg        string
+	}{
+		{"WK9 names the done folder", "WK9", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": sub("status: ready", "status: dropped")}, "belongs in Deep Thought/9 pkm/tasks/done/"},
+		{"WK1 for an unreadable task", "WK1", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": sub("status: ready", "status: ready\nstatus: raw")}, ""},
+		{"A1 for an unreadable ADR", "A1", map[string]func(string) string{"Deep Thought/9 pkm/adr/261012-p3q4-store-records-as-markdown-files.md": sub("status: accepted", "status: accepted\nstatus: proposed")}, ""},
+		{"A4 index in the ADR folder", "A4", map[string]func(string) string{"Deep Thought/9 pkm/adr/README.md": func(s string) string { return s + "x\n" }}, ""},
+		{"RM1 in the roadmap file", "RM1", map[string]func(string) string{"Deep Thought/9 pkm/ROADMAP.md": sub("## Later\n", "## Later\n- [261099-bbbb] Ghost\n")}, ""},
+		{"L1 reaches the work folder", "L1", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": func(s string) string { return s + "\n[gone](missing.md)\n" }}, ""},
+		{"S3 for a bad folder", "S3", map[string]func(string) string{"docs/.layout": sub("work_dir: Deep Thought/9 pkm/tasks", "work_dir: ../tasks")}, `".."`},
+	}
+	for _, c := range cases {
+		res := Run(vaultRepo(t, c.edits), Options{AsOf: asOf})
+		found := false
+		for _, f := range res.Findings {
+			if f.Rule == c.rule && strings.Contains(f.Message, c.msg) {
+				found = true
+				if f.File == "" || strings.HasPrefix(f.File, "docs/work") || strings.HasPrefix(f.File, "docs/adr") {
+					t.Errorf("%s: file %q", c.name, f.File)
+				}
+			}
+		}
+		if !found {
+			t.Errorf("%s: no %s finding in %+v", c.name, c.rule, res.Findings)
+		}
+	}
+}
+
+func TestBadManifestPathIsAnError(t *testing.T) {
+	res := Run(repoWith(t, map[string]func(string) string{"docs/.layout": func(s string) string { return s + "adr_dir: /abs\n" }}), Options{AsOf: asOf})
+	for _, f := range res.Findings {
+		if f.Rule == "S3" && f.Severity == "E" && f.File == "docs/.layout" && f.Line > 0 {
+			return
+		}
+	}
+	t.Fatalf("no S3 error: %+v", res.Findings)
+}

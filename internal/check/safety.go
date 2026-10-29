@@ -47,7 +47,7 @@ type denyEntry struct {
 
 func (c *checker) safety() {
 	deny := c.denyList()
-	files := []string{"AGENTS.md", "docs/ROADMAP.md"}
+	files := []string{"AGENTS.md", c.repo.RoadmapPath()}
 	for _, r := range c.repo.Records {
 		files = append(files, r.Path)
 	}

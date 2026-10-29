@@ -2,6 +2,8 @@
 
 ## Now
 
+- [261029-9aa2] Vault migration: manifest paths and migration steps
+
 ## Next
 
 - [261028-a2wd] Let check --target accept layouts other than the tool's own

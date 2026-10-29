@@ -28,6 +28,11 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 	}
 	var body Obj
 	var err *Error
+	if writesRecords[op] {
+		if e := manifestPathError(repo); e != nil {
+			return failure(op, echo, e), e
+		}
+	}
 	switch op {
 	case "version":
 		body = opVersion(info, repo)
@@ -67,6 +72,20 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 	}
 	out := O("api_version", Version, "operation", op, "request", echo, "ok", true)
 	return append(out, body...), nil
+}
+
+// writesRecords lists the operations that write under the manifest's folders.
+var writesRecords = map[string]bool{"new": true, "set": true, "section": true, "close": true, "claim": true, "release": true, "index": true}
+
+// manifestPathError refuses a write while the manifest names a bad folder
+// (rule S3): the defaults would be used, and a write would land in the wrong place.
+func manifestPathError(repo *record.Repo) *Error {
+	for _, p := range repo.Problems {
+		if p.Rule == "S3" {
+			return refusedRule("S3", "%s: %s", p.Path, p.Msg)
+		}
+	}
+	return nil
 }
 
 func echoRequest(r Request) Obj {
@@ -119,7 +138,8 @@ func repositoryObj(repo *record.Repo) any {
 	if v, ok := repo.Layout["reference_style"]; ok && v.Kind == frontmatter.String && v.Str == "wikilink" {
 		style = "wikilink"
 	}
-	return O("name", filepath.Base(repo.Root), "layout", layout, "extensions", exts, "reference_style", style, "claim_stale_hours", claimStaleHours(repo))
+	return O("name", filepath.Base(repo.Root), "layout", layout, "extensions", exts, "reference_style", style, "claim_stale_hours", claimStaleHours(repo),
+		"work_dir", repo.WorkDir(), "adr_dir", repo.ADRDir())
 }
 
 // fieldsObj renders the frontmatter of r for the chosen field list. A nil list

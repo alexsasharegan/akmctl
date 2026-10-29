@@ -199,6 +199,7 @@ export function capture() {
   const parents = H.records().filter(isOpenWork).map((r) => ({ id: r.id, title: titleOf(r) }));
   openCapture(deps, {
     parents,
+    workDir: state.folders.work_dir,
     onDone: (rec) => {
       last = { kind: "capture", id: rec.id };
       refresh(rec.id).then(() => undoToast("Captured " + titleOf(rec) + " as raw.", "Drop it"));

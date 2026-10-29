@@ -153,11 +153,13 @@ func (c *checker) ref(s string) *record.Record {
 func (c *checker) problems() {
 	for _, p := range c.repo.Problems {
 		switch {
-		case strings.HasPrefix(p.Path, "docs/work/"):
+		case p.Rule != "":
+			c.add(p.Rule, "E", p.Path, p.Line, "", "manifest: %s", p.Msg)
+		case c.repo.InWork(p.Path):
 			c.add("WK1", "E", p.Path, p.Line, "", "%s", p.Msg)
-		case strings.HasPrefix(p.Path, "docs/adr/"):
+		case c.repo.InADR(p.Path):
 			c.add("A1", "E", p.Path, p.Line, "", "%s", p.Msg)
-		case p.Path == "docs/.layout":
+		case p.Path == record.ManifestPath:
 			c.add("S1", "W", p.Path, p.Line, "", "manifest: %s", p.Msg)
 		}
 	}
@@ -176,7 +178,7 @@ func (c *checker) work() {
 
 func (c *checker) workRecord(r *record.Record) {
 	st := r.Status()
-	done := strings.HasPrefix(r.Path, "docs/work/done/")
+	done := c.repo.IsDone(r.Path)
 	// WK1: id field
 	if v, ok := r.Fields["id"]; !ok || v.Kind != frontmatter.String || v.Str != r.ID {
 		c.add("WK1", "E", r.Path, c.line(r, "id"), r.ID, "id field must equal the filename's id %s", r.ID)
@@ -250,9 +252,9 @@ func (c *checker) workRecord(r *record.Record) {
 		finished := st == "done" || st == "dropped"
 		switch {
 		case done && !finished:
-			c.add("WK9", "E", r.Path, c.line(r, "status"), r.ID, "an item in docs/work/done/ must be done or dropped, not %s", st)
+			c.add("WK9", "E", r.Path, c.line(r, "status"), r.ID, "an item in %s/ must be done or dropped, not %s", c.repo.DoneDir(), st)
 		case !done && finished:
-			c.add("WK9", "E", r.Path, c.line(r, "status"), r.ID, "a %s item belongs in docs/work/done/", st)
+			c.add("WK9", "E", r.Path, c.line(r, "status"), r.ID, "a %s item belongs in %s/", st, c.repo.DoneDir())
 		}
 	}
 	// WK10
@@ -285,25 +287,12 @@ func (c *checker) workRecord(r *record.Record) {
 		c.add("WK11", "E", r.Path, c.line(r, "summary"), r.ID, "summary is %d characters; the limit is 160", n)
 	}
 	// WK12
-	if h := firstHeading(r.Body); h != "" && r.Str("title") != "" && h != r.Str("title") {
+	if h := record.FirstHeading(r.Body); h != "" && r.Str("title") != "" && h != r.Str("title") {
 		c.add("WK12", "W", r.Path, 0, r.ID, "title differs from the first heading %q", h)
 	}
 }
 
 func hasSection(names []string, n string) bool { return in(names, n) }
-
-func firstHeading(body string) string {
-	fence := false
-	for _, l := range strings.Split(body, "\n") {
-		if strings.HasPrefix(l, "```") || strings.HasPrefix(l, "~~~") {
-			fence = !fence
-		}
-		if !fence && strings.HasPrefix(l, "# ") {
-			return strings.TrimSpace(l[2:])
-		}
-	}
-	return ""
-}
 
 func (c *checker) cycle(r *record.Record) bool {
 	seen := map[string]bool{r.ID: true}
@@ -347,7 +336,8 @@ func (c *checker) adrs() {
 	}
 	// A4
 	want := index.Generate(c.repo)
-	got, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(index.Path)))
+	indexPath := c.repo.ADRIndexPath()
+	got, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(indexPath)))
 	hasADR := false
 	for _, r := range c.repo.Records {
 		if r.Type == record.ADR {
@@ -356,9 +346,9 @@ func (c *checker) adrs() {
 	}
 	switch {
 	case err != nil && hasADR:
-		c.add("A4", "E", index.Path, 0, "", "the ADR index is missing; run akmctl index")
+		c.add("A4", "E", indexPath, 0, "", "the ADR index is missing; run akmctl index")
 	case err == nil && string(got) != want:
-		c.add("A4", "E", index.Path, firstDiffLine(string(got), want), "", "the ADR index differs from what akmctl index generates; run akmctl index")
+		c.add("A4", "E", indexPath, firstDiffLine(string(got), want), "", "the ADR index differs from what akmctl index generates; run akmctl index")
 	}
 }
 
@@ -419,8 +409,8 @@ func (c *checker) ids() {
 var roadmapEntry = regexp.MustCompile(`^- \[([^\]]*)\]`)
 
 func (c *checker) roadmap() {
-	path := "docs/ROADMAP.md"
-	b, err := os.ReadFile(filepath.Join(c.repo.Root, "docs", "ROADMAP.md"))
+	path := c.repo.RoadmapPath()
+	b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(path)))
 	if err != nil {
 		return
 	}
@@ -580,10 +570,10 @@ func (c *checker) skills() {
 func (c *checker) manifest() (string, []string) {
 	v, ok := c.repo.Layout["layout"]
 	if !ok {
-		if _, err := os.Stat(filepath.Join(c.repo.Root, "docs", ".layout")); err != nil {
-			c.add("S1", "W", "docs/.layout", 0, "", "the manifest docs/.layout is missing")
+		if _, err := os.Stat(filepath.Join(c.repo.Root, filepath.FromSlash(record.ManifestPath))); err != nil {
+			c.add("S1", "W", record.ManifestPath, 0, "", "the manifest %s is missing", record.ManifestPath)
 		} else {
-			c.add("S1", "W", "docs/.layout", 0, "", "the manifest has no layout key")
+			c.add("S1", "W", record.ManifestPath, 0, "", "the manifest has no layout key")
 		}
 		return "absent", nil
 	}
@@ -592,7 +582,7 @@ func (c *checker) manifest() (string, []string) {
 	case cmp == 0:
 		return "current", nil
 	case cmp > 0:
-		c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s, newer than this tool (%s): upgrade the tool", repoV, LayoutVersion)
+		c.add("S1", "W", record.ManifestPath, c.manifestLine("layout"), "", "the repository is on layout %s, newer than this tool (%s): upgrade the tool", repoV, LayoutVersion)
 		return "ahead", nil
 	default:
 		if chain, ok := migrate.Chain(repoV, LayoutVersion); ok {
@@ -600,16 +590,16 @@ func (c *checker) manifest() (string, []string) {
 			for _, st := range migrate.Steps(chain) {
 				steps = append(steps, st.ID+": "+st.Description)
 			}
-			c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s; run akmctl migrate to reach %s (%d steps)", repoV, LayoutVersion, len(steps))
+			c.add("S1", "W", record.ManifestPath, c.manifestLine("layout"), "", "the repository is on layout %s; run akmctl migrate to reach %s (%d steps)", repoV, LayoutVersion, len(steps))
 			return "behind", steps
 		}
-		c.add("S1", "W", "docs/.layout", c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path from it", repoV, LayoutVersion)
+		c.add("S1", "W", record.ManifestPath, c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path from it", repoV, LayoutVersion)
 		return "unsupported", nil
 	}
 }
 
 func (c *checker) manifestLine(key string) int {
-	b, err := os.ReadFile(filepath.Join(c.repo.Root, "docs", ".layout"))
+	b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(record.ManifestPath)))
 	if err != nil {
 		return 0
 	}

@@ -28,7 +28,9 @@
         "work-items"
       ],
       "reference_style": "id",
-      "claim_stale_hours": 24
+      "claim_stale_hours": 24,
+      "work_dir": "docs/work",
+      "adr_dir": "docs/adr"
     }
   }
 }

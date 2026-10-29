@@ -17,19 +17,32 @@ var (
 )
 
 // links is rules L1 (relative Markdown links) and L2 (wikilinks) over AGENTS.md
-// and every Markdown file under docs/.
+// and every Markdown file under docs/, the work folder and the ADR folder (they
+// differ from docs/ when the manifest moves them), and the roadmap file.
 func (c *checker) links() {
 	var files []string
 	if _, err := os.Stat(filepath.Join(c.repo.Root, "AGENTS.md")); err == nil {
 		files = append(files, "AGENTS.md")
 	}
-	filepath.WalkDir(filepath.Join(c.repo.Root, "docs"), func(p string, d fs.DirEntry, err error) error {
-		if err == nil && !d.IsDir() && strings.HasSuffix(d.Name(), ".md") {
-			rel, _ := filepath.Rel(c.repo.Root, p)
-			files = append(files, filepath.ToSlash(rel))
+	seen := map[string]bool{"AGENTS.md": true}
+	for _, dir := range c.linkRoots() {
+		filepath.WalkDir(filepath.Join(c.repo.Root, filepath.FromSlash(dir)), func(p string, d fs.DirEntry, err error) error {
+			if err == nil && !d.IsDir() && strings.HasSuffix(d.Name(), ".md") {
+				rel, _ := filepath.Rel(c.repo.Root, p)
+				rel = filepath.ToSlash(rel)
+				if !seen[rel] {
+					seen[rel] = true
+					files = append(files, rel)
+				}
+			}
+			return nil
+		})
+	}
+	if rm := c.repo.RoadmapPath(); !seen[rm] {
+		if _, err := os.Stat(filepath.Join(c.repo.Root, filepath.FromSlash(rm))); err == nil {
+			files = append(files, rm)
 		}
-		return nil
-	})
+	}
 	var byName map[string][]string // wikilink index, built on first use
 	for _, f := range files {
 		b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(f)))
@@ -155,6 +168,25 @@ func resolveWiki(idx map[string][]string, name string) []string {
 			if strings.TrimSuffix(p, ".md") == name || strings.HasSuffix(strings.TrimSuffix(p, ".md"), "/"+name) {
 				out = append(out, p)
 			}
+		}
+	}
+	return out
+}
+
+// linkRoots are the folders whose Markdown the link rules read: docs/ and the
+// work and ADR folders when they are outside it.
+func (c *checker) linkRoots() []string {
+	roots := []string{"docs", c.repo.WorkDir(), c.repo.ADRDir()}
+	var out []string
+	for _, r := range roots {
+		covered := false
+		for _, o := range out {
+			if r == o || strings.HasPrefix(r, o+"/") {
+				covered = true
+			}
+		}
+		if !covered {
+			out = append(out, r)
 		}
 	}
 	return out

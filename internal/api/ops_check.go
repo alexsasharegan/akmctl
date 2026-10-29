@@ -57,7 +57,7 @@ func opCheck(repo *record.Repo, q Request) (Obj, *Error) {
 
 func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 	want := index.Generate(repo)
-	full := filepath.Join(repo.Root, filepath.FromSlash(index.Path))
+	full := filepath.Join(repo.Root, filepath.FromSlash(repo.ADRIndexPath()))
 	cur, err := os.ReadFile(full)
 	changed := err != nil || string(cur) != want
 	written := false
@@ -68,11 +68,11 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 		defer unlock()
 		if err := fsx.WriteAtomic(full, []byte(want)); err != nil {
-			return nil, &Error{Code: "unreadable", Message: "cannot write " + index.Path + ": " + err.Error()}
+			return nil, &Error{Code: "unreadable", Message: "cannot write " + repo.ADRIndexPath() + ": " + err.Error()}
 		}
 		written = true
 	}
-	out := O("path", index.Path, "changed", changed, "written", written)
+	out := O("path", repo.ADRIndexPath(), "changed", changed, "written", written)
 	if q.boolean("include_content") {
 		out = append(out, KV{"content", want})
 	}

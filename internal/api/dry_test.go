@@ -183,12 +183,12 @@ func TestSection(t *testing.T) {
 	// missing section is created before Log
 	mustOK(t, root, "section", Request{"id": a2b3, "name": "Notes", "text": "n"})
 	a := read(t, root, "docs/work/261020-a2b3-add-json-output-to-ls.md")
-	if !strings.Contains(a, "## Notes\nn\n\n## Log\n") {
+	if !strings.Contains(a, "## Notes\n\nn\n\n## Log\n") {
 		t.Fatal(a)
 	}
 	// and at the end when there is no Log
 	mustOK(t, root, "section", Request{"id": e5f6, "name": "Notes", "text": "n"})
-	if !strings.HasSuffix(read(t, root, e5f6File), "\n\n## Notes\nn\n") {
+	if !strings.HasSuffix(read(t, root, e5f6File), "\n\n## Notes\n\nn\n") {
 		t.Fatal(read(t, root, e5f6File))
 	}
 	// the response carries the section as show gives it
@@ -234,7 +234,7 @@ func TestCloseWithOutcome(t *testing.T) {
 	resp := mustOK(t, root, "close", Request{"id": a2b3, "status": "done", "outcome": "Shipped in 0.2.", "as_of": "2026-10-28"})
 	to, _ := resp.Get("moved_to")
 	text := read(t, root, to.(string))
-	if !strings.Contains(text, "## Outcome\nShipped in 0.2.\n\n## Log\n") || !strings.Contains(text, "status: done\n") {
+	if !strings.Contains(text, "## Outcome\n\nShipped in 0.2.\n\n## Log\n") || !strings.Contains(text, "status: done\n") {
 		t.Fatal(text)
 	}
 	if _, err := os.Stat(filepath.Join(root, "docs/work/261020-a2b3-add-json-output-to-ls.md")); err == nil {
@@ -270,7 +270,7 @@ func TestVersionRepository(t *testing.T) {
 		t.Fatalf("repository: %#v", r)
 	}
 	b, _ := Marshal(ro)
-	want := `{"name":"` + filepath.Base(root) + `","layout":"1.0.0","extensions":["adr-index","claims","work-items"],"reference_style":"wikilink","claim_stale_hours":6}`
+	want := `{"name":"` + filepath.Base(root) + `","layout":"1.0.0","extensions":["adr-index","claims","work-items"],"reference_style":"wikilink","claim_stale_hours":6,"work_dir":"docs/work","adr_dir":"docs/adr"}`
 	if string(b) != want {
 		t.Fatalf("got  %s\nwant %s", b, want)
 	}

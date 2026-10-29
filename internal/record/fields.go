@@ -88,6 +88,22 @@ func Sections(body string) (names []string, text map[string]string) {
 	return names, text
 }
 
+// FirstHeading is the text of the first "# " heading of a body outside fenced
+// code blocks, or "".
+func FirstHeading(body string) string {
+	fence := false
+	for _, l := range strings.Split(body, "\n") {
+		l = strings.TrimRight(l, "\r")
+		if strings.HasPrefix(l, "```") || strings.HasPrefix(l, "~~~") {
+			fence = !fence
+		}
+		if !fence && strings.HasPrefix(l, "# ") {
+			return strings.TrimSpace(l[2:])
+		}
+	}
+	return ""
+}
+
 // NextLine is the first line of the Next section, or "".
 func (r *Record) NextLine() (string, bool) {
 	_, text := Sections(r.Body)
@@ -207,7 +223,11 @@ func SetSection(body, name, text string, appendMode bool, eol string) string {
 			r := []rune(heading)
 			heading = strings.ToUpper(string(r[0])) + string(r[1:])
 		}
-		block := append([]string{"## " + heading + cr}, tl...)
+		block := []string{"## " + heading + cr}
+		if tl != nil {
+			block = append(block, cr) // a blank line after the heading, as Prettier writes it
+		}
+		block = append(block, tl...)
 		if logAt >= 0 {
 			out = append(out, lines[:logAt]...)
 			if logAt > 0 && !blank(lines[logAt-1]) {

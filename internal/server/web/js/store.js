@@ -1,6 +1,7 @@
 // The token, the API client and the snapshot of the repository's records.
 // Nothing here builds HTML.
 import { isoDate, daysBefore } from "./util.js";
+import { DEFAULT_FOLDERS, foldersFrom } from "./logic.js";
 
 const TOKEN_KEY = "akm-token";
 
@@ -125,6 +126,7 @@ export const state = {
   records: [], // work and ADRs, work in roadmap order
   loadedAt: null,
   config: { root: "", identity: "" },
+  folders: { ...DEFAULT_FOLDERS }, // work_dir and adr_dir of the repository (from `version`)
   closed: null, // recently closed work, loaded when the table is first shown
 };
 
@@ -142,6 +144,11 @@ export async function loadConfig() {
     state.config = { ...state.config, ...(await api("GET", "/ui/config")) };
   } catch (e) {
     /* the page works without it */
+  }
+  try {
+    state.folders = foldersFrom(await api("GET", "version"));
+  } catch (e) {
+    /* the defaults stay */
   }
   return state.config;
 }

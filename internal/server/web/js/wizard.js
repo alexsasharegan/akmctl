@@ -2,7 +2,7 @@
 // lacks, then a review of the exact diff of every write before any is made.
 // A write that finds the record changed shows the conflict and writes nothing more.
 import { el } from "./util.js";
-import { api, ApiError, describeError } from "./store.js";
+import { api, ApiError, describeError, state } from "./store.js";
 import { buildOps, requestFor, resolveOp, previewable, opLabel, validateStep, wizardKey } from "./moves.js";
 import { slugify } from "./capture.js";
 import { renderDiff } from "./review.js";
@@ -185,7 +185,7 @@ export function openWizard(deps, spec) {
     }
     const parts = [el("p", { class: "muted", text: "This is exactly what each write will change. Nothing is written until you confirm." + (W.previews.length > 1 ? " Each diff is against the file as it is now; the writes are made in this order, so a later one builds on the earlier." : "") })];
     W.previews.forEach((p, n) => {
-      parts.push(el("h3", { class: "sec-h" }, "Write " + (n + 1) + " of " + W.previews.length + ": " + opLabel(p.op, rec.id)));
+      parts.push(el("h3", { class: "sec-h" }, "Write " + (n + 1) + " of " + W.previews.length + ": " + opLabel(p.op, rec.id, state.folders)));
       if (p.diff) parts.push(renderDiff(p.diff));
       else parts.push(el("p", { class: "note-card", text: p.note }));
     });

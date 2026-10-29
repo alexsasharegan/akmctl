@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -39,11 +40,14 @@ func RefID(s string) string {
 	return s
 }
 
-// Problem is a file the loader could not use.
+// Problem is a file the loader could not use. Rule is set when the problem has
+// its own check rule (S3, a bad path in the manifest); otherwise the check
+// classifies it by Path.
 type Problem struct {
 	Path string
 	Line int
 	Msg  string
+	Rule string
 }
 
 // Record is one ADR or work item.
@@ -85,6 +89,90 @@ type Repo struct {
 	Dropped  []string
 	Layout   map[string]frontmatter.Value
 	Problems []Problem
+
+	workDir, adrDir, roadmap string // from the manifest; "" means the default
+}
+
+// Default locations, relative to the repository root.
+const (
+	DefaultWorkDir = "docs/work"
+	DefaultADRDir  = "docs/adr"
+	DefaultRoadmap = "docs/ROADMAP.md"
+	// ManifestPath is where the manifest lives; it does not move.
+	ManifestPath = "docs/.layout"
+)
+
+// WorkDir is the folder of work items (manifest key work_dir), with /.
+func (r *Repo) WorkDir() string {
+	if r.workDir != "" {
+		return r.workDir
+	}
+	return DefaultWorkDir
+}
+
+// DoneDir is the folder of closed work items: done/ inside WorkDir.
+func (r *Repo) DoneDir() string { return r.WorkDir() + "/done" }
+
+// ADRDir is the folder of decision records (manifest key adr_dir).
+func (r *Repo) ADRDir() string {
+	if r.adrDir != "" {
+		return r.adrDir
+	}
+	return DefaultADRDir
+}
+
+// ADRIndexPath is where the generated ADR index lives.
+func (r *Repo) ADRIndexPath() string { return r.ADRDir() + "/README.md" }
+
+// RoadmapPath is the roadmap file (manifest key roadmap).
+func (r *Repo) RoadmapPath() string {
+	if r.roadmap != "" {
+		return r.roadmap
+	}
+	return DefaultRoadmap
+}
+
+// IsDone reports whether a record path is inside the done folder.
+func (r *Repo) IsDone(p string) bool { return strings.HasPrefix(p, r.DoneDir()+"/") }
+
+// InWork reports whether a path is inside the work folder (done/ included).
+func (r *Repo) InWork(p string) bool { return strings.HasPrefix(p, r.WorkDir()+"/") }
+
+// InADR reports whether a path is inside the ADR folder.
+func (r *Repo) InADR(p string) bool { return strings.HasPrefix(p, r.ADRDir()+"/") }
+
+// CheckRelPath validates a repository-relative folder or file path from the
+// manifest: forward slashes, no empty or "." or ".." segment, not absolute, no
+// drive letter or backslash, no control characters.
+func CheckRelPath(p string) error {
+	switch {
+	case p == "":
+		return errors.New("is empty")
+	case strings.ContainsAny(p, "\\:"):
+		return errors.New("must use forward slashes and no drive letter")
+	case strings.HasPrefix(p, "/"):
+		return errors.New("must be relative to the repository root, not absolute")
+	}
+	for _, c := range p {
+		if c < 0x20 || c == 0x7f {
+			return errors.New("has a control character")
+		}
+	}
+	for _, seg := range strings.Split(p, "/") {
+		switch seg {
+		case "":
+			return errors.New("has an empty segment (a doubled or trailing slash)")
+		case ".":
+			return errors.New("has a \".\" segment")
+		case "..":
+			return errors.New("must not contain \"..\"")
+		}
+	}
+	return nil
+}
+
+func nested(a, b string) bool {
+	return a == b || strings.HasPrefix(a, b+"/") || strings.HasPrefix(b, a+"/")
 }
 
 // FindRoot returns the nearest ancestor of dir that has docs/.layout or AGENTS.md.
@@ -94,7 +182,7 @@ func FindRoot(dir string) (string, error) {
 		return "", err
 	}
 	for {
-		for _, m := range []string{"docs/.layout", "AGENTS.md"} {
+		for _, m := range []string{ManifestPath, "AGENTS.md"} {
 			if _, err := os.Stat(filepath.Join(d, filepath.FromSlash(m))); err == nil {
 				return d, nil
 			}
@@ -133,7 +221,8 @@ func Load(root string) (*Repo, error) {
 		return nil, errors.New("cannot read repository at " + root)
 	}
 	r := &Repo{Root: root, Layout: map[string]frontmatter.Value{}}
-	for _, d := range []struct{ dir, typ string }{{"docs/work", Work}, {"docs/work/done", Work}, {"docs/adr", ADR}} {
+	r.loadLayout()
+	for _, d := range []struct{ dir, typ string }{{r.WorkDir(), Work}, {r.DoneDir(), Work}, {r.ADRDir(), ADR}} {
 		ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(d.dir)))
 		if err != nil {
 			continue
@@ -146,12 +235,12 @@ func Load(root string) (*Repo, error) {
 			rel := d.dir + "/" + e.Name()
 			text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
 			if err != nil {
-				r.Problems = append(r.Problems, Problem{rel, 0, err.Error()})
+				r.Problems = append(r.Problems, Problem{rel, 0, err.Error(), ""})
 				continue
 			}
 			rec, err := FromText(rel, d.typ, m[1], text)
 			if err != nil {
-				p := Problem{rel, 0, err.Error()}
+				p := Problem{rel, 0, err.Error(), ""}
 				var fe *frontmatter.Error
 				if errors.As(err, &fe) {
 					p.Line, p.Msg = fe.Line, fe.Msg
@@ -169,22 +258,54 @@ func Load(root string) (*Repo, error) {
 		return r.Records[i].Path < r.Records[j].Path
 	})
 	r.loadRoadmap()
-	r.loadLayout()
 	return r, nil
 }
 
 func (r *Repo) loadLayout() {
-	b, err := os.ReadFile(filepath.Join(r.Root, "docs", ".layout"))
+	b, err := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(ManifestPath)))
 	if err != nil {
 		return
 	}
 	doc, err := frontmatter.ParseBare(b)
 	if err != nil {
-		r.Problems = append(r.Problems, Problem{"docs/.layout", 0, err.Error()})
+		r.Problems = append(r.Problems, Problem{ManifestPath, 0, err.Error(), ""})
 		return
 	}
 	for _, e := range doc.Entries {
 		r.Layout[e.Key] = e.Value
+	}
+	bad := func(key, format string, a ...any) {
+		r.Problems = append(r.Problems, Problem{ManifestPath, doc.Line(key), fmt.Sprintf(format, a...) + "; the default is used", "S3"})
+	}
+	get := func(key string, dst *string) bool {
+		v, ok := r.Layout[key]
+		if !ok {
+			return false
+		}
+		if v.Kind != frontmatter.String {
+			bad(key, "%s must be a path string", key)
+			return false
+		}
+		if err := CheckRelPath(v.Str); err != nil {
+			bad(key, "%s %q %v", key, v.Str, err)
+			return false
+		}
+		*dst = v.Str
+		return true
+	}
+	get("work_dir", &r.workDir)
+	get("adr_dir", &r.adrDir)
+	if get("roadmap", &r.roadmap) && !strings.HasSuffix(r.roadmap, ".md") {
+		bad("roadmap", "roadmap %q must be a Markdown file (.md)", r.roadmap)
+		r.roadmap = ""
+	}
+	if nested(r.WorkDir(), r.ADRDir()) {
+		bad("adr_dir", "work_dir %q and adr_dir %q must not be the same folder or inside one another", r.WorkDir(), r.ADRDir())
+		r.workDir, r.adrDir = "", ""
+	}
+	if r.roadmap != "" && (r.InWork(r.roadmap) || r.InADR(r.roadmap)) {
+		bad("roadmap", "roadmap %q must not be inside work_dir or adr_dir", r.roadmap)
+		r.roadmap = ""
 	}
 }
 
@@ -197,7 +318,7 @@ func (r *Repo) Extension(name string) bool {
 var roadmapLine = regexp.MustCompile(`^- \[(\d{6}-[0-9a-hjkmnp-tv-z]{4})\]`)
 
 func (r *Repo) loadRoadmap() {
-	b, err := os.ReadFile(filepath.Join(r.Root, "docs", "ROADMAP.md"))
+	b, err := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(r.RoadmapPath())))
 	if err != nil {
 		return
 	}

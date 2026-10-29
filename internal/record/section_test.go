@@ -14,8 +14,8 @@ func TestSetSection(t *testing.T) {
 		{"empty text clears the section", "goal", "", false, "\n", "\n# T\n\n## Goal\n\n## Log\n- one\n"},
 		{"append after the last line", "log", "- two", true, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Log\n- one\n- two\n"},
 		{"append nothing changes nothing", "log", "\n", true, "\n", body},
-		{"create before Log", "Notes", "n", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Notes\nn\n\n## Log\n- one\n"},
-		{"lowercase name is capitalised", "outcome", "done", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Outcome\ndone\n\n## Log\n- one\n"},
+		{"create before Log", "Notes", "n", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Notes\n\nn\n\n## Log\n- one\n"},
+		{"lowercase name is capitalised", "outcome", "done", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Outcome\n\ndone\n\n## Log\n- one\n"},
 		{"crlf", "goal", "a\nb", false, "\r\n", "\r\n# T\r\n\r\n## Goal\r\na\r\nb\r\n\r\n## Log\r\n- one\r\n"},
 	}
 	for _, c := range cases {
@@ -29,7 +29,7 @@ func TestSetSection(t *testing.T) {
 	}
 	// no Log: the section goes to the end; the last section can be replaced and
 	// a missing final newline is added
-	if got := SetSection("# T\n\n## Goal\nx", "Notes", "n", false, "\n"); got != "# T\n\n## Goal\nx\n\n## Notes\nn\n" {
+	if got := SetSection("# T\n\n## Goal\nx", "Notes", "n", false, "\n"); got != "# T\n\n## Goal\nx\n\n## Notes\n\nn\n" {
 		t.Errorf("end: %q", got)
 	}
 	if got := SetSection("# T\n\n## Goal\nx", "goal", "y", false, "\n"); got != "# T\n\n## Goal\ny\n" {
@@ -37,7 +37,7 @@ func TestSetSection(t *testing.T) {
 	}
 	// a heading inside a code fence is not a heading
 	fenced := "## A\n```\n## Notes\n```\n"
-	if got := SetSection(fenced, "Notes", "n", false, "\n"); got != fenced+"\n## Notes\nn\n" {
+	if got := SetSection(fenced, "Notes", "n", false, "\n"); got != fenced+"\n## Notes\n\nn\n" {
 		t.Errorf("fence: %q", got)
 	}
 	// sibling sections are untouched

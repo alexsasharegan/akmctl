@@ -74,6 +74,11 @@ export function cleanSlug(text) {
 
 export const validSlug = (s) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(s) && s.length <= MAX_SLUG;
 
+/** The line under the slug field: where the new file will be. */
+export function fileNote(workDir, typed) {
+  return typed ? "File: " + workDir + "/<id>-" + typed + ".md" : "";
+}
+
 /**
  * The `new` request for the capture form, or the first problem.
  * f: { title, slug (typed, "" if not edited), summary, kind, priority, parent };
@@ -133,7 +138,7 @@ export function openCapture(deps, spec) {
     const made = slugify(title.value);
     if (!dirty) slug.value = made;
     const typed = dirty ? cleanSlug(slug.value) : made;
-    note.textContent = !typed ? "" : "File: docs/work/<id>-" + typed + ".md" + (dirty && typed !== slug.value.trim() ? " (cleaned from what you typed)" : "");
+    note.textContent = fileNote(spec.workDir || "docs/work", typed) + (!typed ? "" : dirty && typed !== slug.value.trim() ? " (cleaned from what you typed)" : "");
   }
   title.addEventListener("input", preview);
   slug.addEventListener("input", () => {
