@@ -332,4 +332,7 @@ const none = { has: () => false };
   await wait(40);
   assert.equal(calls, n, "stopped");
 }
+assert.equal(L.obsidianUrl({ root: "/Users/a b/repo", obsidian_vault: "" }, "docs/work/x.md"), "obsidian://open?path=%2FUsers%2Fa%20b%2Frepo%2Fdocs%2Fwork%2Fx.md");
+assert.equal(L.obsidianUrl({ root: "/r/", obsidian_vault: "My Vault" }, "docs/é ü.md"), "obsidian://open?vault=My%20Vault&file=docs%2F%C3%A9%20%C3%BC.md");
+assert.equal(L.obsidianUrl({ root: "", obsidian_vault: "v" }, "a.md"), "");
 console.log("ok");

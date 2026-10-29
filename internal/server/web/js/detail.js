@@ -1,8 +1,8 @@
 // The record drawer: the fields of one record, what points at it, and its
 // sections read from the API one at a time. Body text is shown as text.
 import { el, text } from "./util.js";
-import { field, isId, childrenOf } from "./logic.js";
-import { show, describeError } from "./store.js";
+import { field, isId, childrenOf, obsidianUrl } from "./logic.js";
+import { show, describeError, state } from "./store.js";
 
 // Sections that start collapsed (everything else starts open).
 const COLLAPSED = new Set(["log"]);
@@ -76,6 +76,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
           el("h2", { id: "drawer-t", tabindex: "-1", text: text(field(r, "title")) || r.id }),
           el("p", { class: "sub mono", text: r.path }),
         ),
+        obsidianUrl(state.config, r.path) ? el("a", { class: "btn quiet", id: "drawer-obsidian", href: obsidianUrl(state.config, r.path) }, "Open in Obsidian ", el("kbd", { text: "o" })) : null,
         el("button", { type: "button", class: "btn quiet", id: "drawer-close", onclick: () => ctx.close() }, "Close ", el("kbd", { text: "Esc" })),
       ),
       el("div", { class: "dlg-body" }, dl),

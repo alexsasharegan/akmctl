@@ -3,7 +3,7 @@
 // wizard and the review (wizard.js). Nothing here builds HTML.
 import { el } from "./util.js";
 import { api, ApiError, state, show, describeError } from "./store.js";
-import { field, blockedBy, CLOSED, isOpenWork } from "./logic.js";
+import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl } from "./logic.js";
 import { neighbour, sectionsOf, planMove, buildOps, requestFor, validateStep } from "./moves.js";
 import { openWizard } from "./wizard.js";
 import { openCapture } from "./capture.js";
@@ -212,6 +212,15 @@ export function capture() {
  * A key on the board or in the record drawer. `id` is the focused or open
  * record. Returns true when the key was used.
  */
+/** Open a record in Obsidian; false when the root is unknown (nothing to do). */
+export function openInObsidian(id) {
+  const r = H.byId().get(id);
+  const url = r ? obsidianUrl(state.config, r.path) : "";
+  if (!url) return false;
+  window.location.href = url;
+  return true;
+}
+
 export function flowKeys(e, id) {
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   switch (e.key) {
@@ -225,6 +234,8 @@ export function flowKeys(e, id) {
   if (!id) return false;
   const rec = workRecord(id);
   switch (e.key) {
+    case "o":
+      return openInObsidian(id);
     case "H":
     case "L": {
       const to = rec && neighbour(field(rec, "status"), e.key === "H" ? "left" : "right");
