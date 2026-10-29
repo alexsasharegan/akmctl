@@ -17,6 +17,7 @@
 
 ## Later
 
+- [261029-z4gk] Rule L2: understand escaped pipes in wikilinks inside tables
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
