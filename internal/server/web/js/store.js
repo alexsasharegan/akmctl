@@ -66,15 +66,40 @@ export function withQuery(path, query) {
   return s ? path + "?" + s : path;
 }
 
+// Live board hooks: the writes this page makes are reported, so a change it
+// made itself is told apart from one made outside (see live.js).
+const writeHooks = [];
+let writesPending = 0;
+
+/** Call fn(record) with the record of every successful write this page makes (a dry run is not one). */
+export const onWrite = (fn) => writeHooks.push(fn);
+
+/** How many writes of this page have not finished. */
+export const writesInFlight = () => writesPending;
+
 /** One call to /api/v1 (or another path starting with "/"). Resolves to the response object; rejects with ApiError. */
-export async function api(method, path, { query, body, etag } = {}) {
+export async function api(method, path, opts = {}) {
+  const writing = method !== "GET";
+  if (writing) writesPending++;
+  try {
+    const data = await call(method, path, opts);
+    if (writing && data.record && data.record.id && data.record.etag && !(opts.body && opts.body.dry_run)) {
+      for (const fn of writeHooks) fn(data.record);
+    }
+    return data;
+  } finally {
+    if (writing) writesPending--;
+  }
+}
+
+async function call(method, path, { query, body, etag, timeout } = {}) {
   const url = path.startsWith("/") ? path : "/api/v1/" + path;
   const headers = { Authorization: "Bearer " + token };
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (etag) headers["If-Match"] = '"' + etag + '"';
   let res;
   try {
-    res = await fetch(withQuery(url, query), { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    res = await fetch(withQuery(url, query), { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: timeout ? AbortSignal.timeout(timeout) : undefined });
   } catch (e) {
     throw new ApiError("cannot reach the server (is akmctl ui still running?)", { code: "unreachable" });
   }
@@ -134,3 +159,6 @@ export const show = (id, section) => api("GET", "records/" + encodeURIComponent(
 export const searchBody = (text, limit = 10) => api("GET", "search", { query: { text, body: true, limit, fields: ["id", "title", "status", "kind"] } });
 
 export const check = () => api("GET", "check");
+
+/** The cheap listing the live board polls: id, path and etag of every work item, with its status. */
+export const pollWork = () => api("GET", "records", { query: { type: "work", fields: ["status", "updated"], sort: ["id"] }, timeout: 5000 });

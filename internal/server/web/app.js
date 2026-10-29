@@ -2,9 +2,11 @@
 // and draws the view that the hash route names. Everything from the repository
 // is shown as text, never as HTML.
 import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, state, describeError, ApiError } from "./js/store.js";
+import { createLive, mountIndicator } from "./js/live.js";
+import { createAnimator, keepSteady } from "./js/anim.js";
 import { parseRoute, routeHref, indexById, TABLES } from "./js/logic.js";
 import { el, isoDate } from "./js/util.js";
-import { initUI, setPage, toast, toggleTheme, openHelp } from "./js/ui.js";
+import { initUI, setPage, toast, toggleTheme, openHelp, overlayOpen, typing } from "./js/ui.js";
 import { mountBoard } from "./js/board.js";
 import { mountTables } from "./js/tables.js";
 import { mountAdrs } from "./js/adrs.js";
@@ -109,6 +111,7 @@ async function reload(announce) {
     await loadSnapshot();
     byIdCache = indexById(state.records);
     loaded = true;
+    live.rebase(state.records);
     if (view) {
       viewKey = "";
       mountBase(base, false);
@@ -121,6 +124,47 @@ async function reload(announce) {
     else toast(describeError(e), "bad");
   }
 }
+
+// ---- live board: poll, animate, draw again in place ----
+
+const titleOfNow = (id) => {
+  const r = byIdCache.get(id);
+  return r && r.fields && r.fields.title ? String(r.fields.title) : "";
+};
+let titleMemory = new Map(); // titles from before the last refresh, for records that are gone
+
+function redrawInPlace() {
+  if (!loaded || !view) return;
+  byIdCache = indexById(state.records);
+  keepSteady(
+    host,
+    () => {
+      viewKey = "";
+      mountBase(base, false);
+    },
+    () => view && view.focus(),
+  );
+  if (drawer.isOpen()) drawer.refresh();
+}
+
+const anim = createAnimator({
+  toast,
+  titleOf: (id) => titleOfNow(id) || titleMemory.get(id) || "",
+  records: () => state.records,
+  rerender: redrawInPlace,
+  busy: () => overlayOpen() || typing(document.activeElement),
+});
+
+const setLiveStatus = mountIndicator(document.querySelector(".top-actions"));
+const live = createLive({
+  onStatus: setLiveStatus,
+  async onEvents(events) {
+    titleMemory = new Map(state.records.map((r) => [r.id, r.fields && r.fields.title ? String(r.fields.title) : ""]));
+    await loadSnapshot(); // throws on a hiccup: live.js then offers the same events again
+    byIdCache = indexById(state.records);
+    anim.push(events);
+  },
+});
 
 const NAV_KEYS = { 1: { name: "board" }, 2: { name: "tables" }, 3: { name: "adrs" }, 4: { name: "check" } };
 
@@ -217,6 +261,7 @@ async function start() {
     document.getElementById("repo").title = c.root || "";
   });
   await reload(false);
+  if (loaded) live.start(state.records);
   await cfg;
   if (!location.hash) history.replaceState(null, "", location.pathname + location.search + routeHref(base));
 }

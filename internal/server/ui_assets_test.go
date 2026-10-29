@@ -14,7 +14,7 @@ import (
 
 // The embedded client: every file the page loads is listed here, so a new
 // asset is a deliberate change that is served and tested.
-var clientModules = []string{"adrs.js", "board.js", "boot.js", "capture.js", "check.js", "detail.js", "flow.js", "logic.js", "moves.js", "review.js", "rows.js", "store.js", "tables.js", "ui.js", "util.js", "wizard.js"}
+var clientModules = []string{"adrs.js", "anim.js", "board.js", "boot.js", "capture.js", "check.js", "detail.js", "flow.js", "live.js", "logic.js", "moves.js", "review.js", "rows.js", "store.js", "tables.js", "ui.js", "util.js", "wizard.js"}
 
 func TestClientAssetList(t *testing.T) {
 	entries, err := fs.ReadDir(web, "web/js")
@@ -129,20 +129,27 @@ func TestFontsInCSSAreServed(t *testing.T) {
 func TestCSSMotionOnlyWhenAllowed(t *testing.T) {
 	css := readWeb(t, "app.css")
 	const open = "@media (prefers-reduced-motion:no-preference){"
-	i := strings.Index(css, open)
-	if i < 0 {
+	if !strings.Contains(css, open) {
 		t.Fatal("no reduced-motion block")
 	}
-	depth, j := 1, i+len(open)
-	for ; j < len(css) && depth > 0; j++ {
-		switch css[j] {
-		case '{':
-			depth++
-		case '}':
-			depth--
+	// every such block is taken out; what is left must hold no motion
+	rest := css
+	for {
+		i := strings.Index(rest, open)
+		if i < 0 {
+			break
 		}
+		depth, j := 1, i+len(open)
+		for ; j < len(rest) && depth > 0; j++ {
+			switch rest[j] {
+			case '{':
+				depth++
+			case '}':
+				depth--
+			}
+		}
+		rest = rest[:i] + rest[j:]
 	}
-	rest := css[:i] + css[j:]
 	if regexp.MustCompile(`(animation|transition)\s*:|(^|[;{\s])scroll-behavior\s*:`).MatchString(rest) {
 		t.Fatal("motion is declared outside the prefers-reduced-motion:no-preference block")
 	}
@@ -207,7 +214,7 @@ func TestPureModulesUnderNode(t *testing.T) {
 		t.Skip("node is not installed")
 	}
 	dir := t.TempDir()
-	for _, n := range []string{"util.js", "logic.js", "store.js", "moves.js", "review.js", "capture.js"} {
+	for _, n := range []string{"util.js", "logic.js", "store.js", "live.js", "moves.js", "review.js", "capture.js"} {
 		if err := os.WriteFile(filepath.Join(dir, n), []byte(readWeb(t, "js/"+n)), 0o644); err != nil {
 			t.Fatal(err)
 		}

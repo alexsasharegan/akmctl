@@ -27,7 +27,7 @@ export function kbd(keys) {
     .map((k) => el("kbd", { text: k }));
 }
 
-const typing = (t) => !!t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable || (t.tagName === "INPUT" && !["checkbox", "radio", "button"].includes(t.type)));
+export const typing = (t) => !!t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable || (t.tagName === "INPUT" && !["checkbox", "radio", "button"].includes(t.type)));
 
 // ---- theme ----
 
