@@ -4,6 +4,9 @@
 
 ## Next
 
+- [261029-rmrk] Fix the card border that shows on only three sides
+- [261029-ctzc] Make wikilinks in drawer fields clickable and open them in Obsidian
+- [261029-paw7] Show a record's frontmatter as a typed table in the drawer
 - [261029-f5vn] Date new ids with the local day, not UTC
 - [261029-nf6h] mint_ids: build the slug from the title
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
