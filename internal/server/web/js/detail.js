@@ -7,6 +7,10 @@ import { show, describeError } from "./store.js";
 // Sections that start collapsed (everything else starts open).
 const COLLAPSED = new Set(["log"]);
 
+// While refresh() draws the drawer again: what the reader had, by section name
+// ({ open: Map name to bool, text: Map name to shown text }), so nothing jumps.
+let keep = null;
+
 /** A value as nodes: ids that are in the repository become links. */
 export function valueNodes(v, byId) {
   const one = (x) => {
@@ -31,11 +35,12 @@ export function createDrawer(drawerEl, viewEl, ctx) {
   function sectionBlock(id, name, mySeq) {
     const body = el("pre", { class: "body" });
     const box = el("details", { class: "sec" }, el("summary", { text: name }), body);
+    const shown = keep && keep.text.get(name);
     let loaded = false;
     const load = async () => {
       if (loaded) return;
       loaded = true;
-      body.textContent = "Loading…";
+      body.textContent = shown || "Loading…";
       try {
         const data = await show(id, name);
         if (mySeq === seq) body.textContent = data.section.text.replace(/^\n+|\s+$/g, "") || "(empty)";
@@ -45,7 +50,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       }
     };
     box.addEventListener("toggle", () => box.open && load());
-    if (!COLLAPSED.has(name)) {
+    if (keep && keep.open.has(name) ? keep.open.get(name) : !COLLAPSED.has(name)) {
       box.open = true;
       load();
     }
@@ -122,6 +127,33 @@ export function createDrawer(drawerEl, viewEl, ctx) {
         );
         drawerEl.querySelector("#drawer-t").focus({ preventScroll: true });
       }
+    },
+    /** Draw the open record again from the file, keeping scroll, open sections and focus. For the live board. */
+    async refresh() {
+      if (current === null) return;
+      const id = current;
+      const mySeq = ++seq;
+      const top = drawerEl.scrollTop;
+      const secs = [...drawerEl.querySelectorAll("details.sec")];
+      const name = (d) => d.querySelector("summary").textContent;
+      const a = document.activeElement;
+      const focusKey = a && drawerEl.contains(a) ? (a.matches("summary") ? "sec:" + name(a.parentNode) : a.id) : "";
+      let data;
+      try {
+        data = await show(id);
+      } catch (e) {
+        return; // keep what is shown; the next change tries again
+      }
+      if (mySeq !== seq || current !== id) return;
+      keep = { open: new Map(secs.map((d) => [name(d), d.open])), text: new Map(secs.map((d) => [name(d), d.querySelector(".body").textContent])) };
+      try {
+        render(data.record, data.sections || [], mySeq);
+      } finally {
+        keep = null;
+      }
+      drawerEl.scrollTop = top;
+      const target = focusKey.startsWith("sec:") ? [...drawerEl.querySelectorAll("details.sec")].find((d) => "sec:" + name(d) === focusKey)?.querySelector("summary") : focusKey && drawerEl.querySelector("#" + CSS.escape(focusKey));
+      if (target) target.focus({ preventScroll: true });
     },
     /** Hide the drawer and give focus back to where it came from. */
     close() {
