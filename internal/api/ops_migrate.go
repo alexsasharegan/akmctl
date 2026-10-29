@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"io"
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/check"
@@ -115,8 +116,16 @@ func stepObj(r migrate.Result) Obj {
 	if files == nil {
 		files = []string{}
 	}
-	return O("id", r.Step.ID, "kind", r.Step.Kind, "class", r.Step.Class, "files", files, "status", r.Status)
+	o := O("id", r.Step.ID, "kind", r.Step.Kind, "class", r.Step.Class, "files", files, "status", r.Status)
+	if len(r.Notes) > 0 {
+		o = append(o, KV{"notes", r.Notes})
+	}
+	return o
 }
+
+// migrateRand is the random source for ids a migration step mints; nil reads the
+// system source. Tests set it.
+var migrateRand io.Reader
 
 func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 	mode := q.str("mode")
@@ -128,6 +137,7 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 		to = check.LayoutVersion
 	}
 	from := repoLayout(repo)
+	env := migrate.Env{Rand: migrateRand, Now: clock(q)}
 	chain, found := migrate.Chain(from, to)
 	steps := migrate.Steps(chain)
 	state := "current"
@@ -172,9 +182,9 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 		return finish(res, state), nil
 	case "plan":
-		return finish(migrate.Plan(repo, steps), state), nil
+		return finish(migrate.PlanEnv(repo, steps, env), state), nil
 	case "handoff":
-		res := migrate.Plan(repo, steps)
+		res := migrate.PlanEnv(repo, steps, env)
 		var msgs []string
 		for _, f := range findings {
 			if f.Severity == "E" {
@@ -212,7 +222,7 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 	if err := repo.Reload(); err != nil {
 		return nil, unreadable(err)
 	}
-	results, err := migrate.Apply(repo, steps)
+	results, err := migrate.ApplyEnv(repo, steps, env)
 	if err != nil {
 		return nil, &Error{"unreadable", err.Error() + " (the backup tag " + tag + " holds the state before the migration)", O("tag", tag, "branch", branch)}
 	}

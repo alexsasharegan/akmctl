@@ -24,7 +24,7 @@ import (
 var embedded embed.FS
 
 // Step is one declarative step. Kind is one of the primitives (rename_field,
-// set_default, rename_heading, move_file, add_file) or "manual".
+// set_default, rename_heading, move_file, add_file, mint_ids) or "manual".
 type Step struct {
 	ID          string   `json:"id"`
 	Kind        string   `json:"kind"`
@@ -38,6 +38,9 @@ type Step struct {
 	Value       any      `json:"value,omitempty"`
 	Path        string   `json:"path,omitempty"`
 	Content     string   `json:"content,omitempty"`
+	Dir         string   `json:"dir,omitempty"`        // mint_ids: the directory, repository-relative
+	DateField   string   `json:"date_field,omitempty"` // mint_ids: the field the id date comes from, default created
+	Recursive   bool     `json:"recursive,omitempty"`  // mint_ids: also the subdirectories
 }
 
 // Migration is the steps from one layout version to the next.
@@ -110,18 +113,22 @@ func Steps(ms []Migration) []Step {
 type Result struct {
 	Step   Step
 	Files  []string
-	Status string // pending, applied or skipped
+	Notes  []string // what the step decided or could not do (mint_ids: old name, new name, id, references)
+	Status string   // pending, applied or skipped
 }
 
 // Plan lists what each step would change, without writing.
-func Plan(repo *record.Repo, steps []Step) []Result {
+func Plan(repo *record.Repo, steps []Step) []Result { return PlanEnv(repo, steps, Env{}) }
+
+// PlanEnv is Plan with the random source and the clock given.
+func PlanEnv(repo *record.Repo, steps []Step, env Env) []Result {
 	out := make([]Result, 0, len(steps))
 	for _, s := range steps {
-		files := []string{}
+		files, notes := []string{}, []string(nil)
 		if s.Class == "auto" {
-			files, _ = run(repo, s, true)
+			files, notes, _ = run(repo, s, true, env)
 		}
-		out = append(out, Result{s, files, "pending"})
+		out = append(out, Result{Step: s, Files: files, Notes: notes, Status: "pending"})
 	}
 	return out
 }
@@ -129,13 +136,18 @@ func Plan(repo *record.Repo, steps []Step) []Result {
 // Apply runs the auto steps in order. Each step is idempotent: when there is
 // nothing to change it is "skipped". Manual and info steps stay "pending".
 func Apply(repo *record.Repo, steps []Step) ([]Result, error) {
+	return ApplyEnv(repo, steps, Env{})
+}
+
+// ApplyEnv is Apply with the random source and the clock given.
+func ApplyEnv(repo *record.Repo, steps []Step, env Env) ([]Result, error) {
 	var out []Result
 	for _, s := range steps {
 		if s.Class != "auto" {
-			out = append(out, Result{s, []string{}, "pending"})
+			out = append(out, Result{Step: s, Files: []string{}, Status: "pending"})
 			continue
 		}
-		files, err := run(repo, s, false)
+		files, notes, err := run(repo, s, false, env)
 		if err != nil {
 			return out, fmt.Errorf("step %s: %w", s.ID, err)
 		}
@@ -143,7 +155,7 @@ func Apply(repo *record.Repo, steps []Step) ([]Result, error) {
 		if len(files) > 0 {
 			st = "applied"
 		}
-		out = append(out, Result{s, files, st})
+		out = append(out, Result{Step: s, Files: files, Notes: notes, Status: st})
 		if err := repo.Reload(); err != nil {
 			return out, err
 		}
@@ -152,8 +164,16 @@ func Apply(repo *record.Repo, steps []Step) ([]Result, error) {
 }
 
 // run applies (or, with dry, only lists) one step and returns the files it
-// changes, as repository-relative paths.
-func run(repo *record.Repo, s Step, dry bool) ([]string, error) {
+// changes, as repository-relative paths, and the notes it has to report.
+func run(repo *record.Repo, s Step, dry bool, env Env) ([]string, []string, error) {
+	if s.Kind == "mint_ids" {
+		return mintIDs(repo.Root, s, dry, env)
+	}
+	files, err := runBasic(repo, s, dry)
+	return files, nil, err
+}
+
+func runBasic(repo *record.Repo, s Step, dry bool) ([]string, error) {
 	files := []string{}
 	write := func(rel string, data []byte) error {
 		files = append(files, rel)

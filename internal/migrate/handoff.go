@@ -23,6 +23,9 @@ func Handoff(from, to string, results []Result, findings []string) string {
 		for _, f := range r.Files {
 			fmt.Fprintf(&b, "   - %s\n", f)
 		}
+		for _, f := range r.Notes {
+			fmt.Fprintf(&b, "   - note: %s\n", f)
+		}
 	}
 	if n == 0 {
 		b.WriteString("No steps are left. Run the check below.\n")

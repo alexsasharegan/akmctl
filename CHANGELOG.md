@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- `migrate`: the declarative step `mint_ids` (`dir`, `date_field`, `recursive`) gives a record with no `id` a minted id (date from a field, unique in the batch and the repository), renames the file to `<id>-<slug>.md`, writes `id` first, and reports references to the old name without rewriting them. A migrate step object may carry `notes`.
 - API 1.0 (edited in place): `section` writes one `##` section; `close` takes `outcome`; `dry_run` returns a `diff` for `set`, `section`, `close`, `claim` and `release`; `version` carries a `repository` object; `details.etag` is documented.
 - `ui`: the workbench is a client of the API: board with vim keys, tables, command palette, record drawer, moves with undo, a wizard and a review diff for gated moves, capture, live updates by polling, claim controls, open in Obsidian (by absolute path), the Quiet paper theme and bundled Monaspace fonts. `GET /ui/config` gives the root and the identity.
 - `new work` leaves a blank line after the `## Log` heading, so the file passes `prettier --check` as created.
