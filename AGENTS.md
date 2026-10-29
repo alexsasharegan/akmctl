@@ -37,6 +37,5 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 
 - Push a tag, create a release, change repository visibility or settings, or publish: releases and going public are the maintainer's call.
 - Add a dependency to the tool (a test-only dependency is fine with a reason in an ADR).
-- Change `internal/server` while the UI port is being planned against it.
 - Put credentials, tokens or private material in any file: the `safety` extension checks known patterns only.
 - Edit the body of an accepted ADR, or hand-edit `docs/adr/README.md`.
