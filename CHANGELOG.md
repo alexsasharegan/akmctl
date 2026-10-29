@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- API 1.0 (edited in place): `section` writes one `##` section; `close` takes `outcome`; `dry_run` returns a `diff` for `set`, `section`, `close`, `claim` and `release`; `version` carries a `repository` object; `details.etag` is documented.
+- `ui`: the workbench is a client of the API: board with vim keys, tables, command palette, record drawer, moves with undo, a wizard and a review diff for gated moves, capture, live updates by polling, claim controls, open in Obsidian (`--obsidian-vault`), the Quiet paper theme and bundled Monaspace fonts. `GET /ui/config` gives the root, the identity and the vault name.
 - `new work` leaves a blank line after the `## Log` heading, so the file passes `prettier --check` as created.
 
 ## 0.1.0
