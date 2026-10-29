@@ -4,6 +4,8 @@
 
 ## Next
 
+- [261029-f5vn] Date new ids with the local day, not UTC
+- [261029-nf6h] mint_ids: build the slug from the title
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
 
 ## Later
@@ -25,5 +27,10 @@
 - [261029-sjyg] Prettier is not run by CI
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback
 - [261029-7zcp] Unblocking a claimed item to active logs a second claim
+- [261029-47m0] migrate plan: simulate move_file steps
+- [261029-wpak] Rule S2: accept block scalars in SKILL.md frontmatter
+- [261029-yj59] Move closed records to done/ by status in one step
+- [261029-m0vm] move_file: report the inbound links it leaves broken
+- [261029-ap3y] Keep docs/.akm.lock out of commits
 
 ## Dropped
