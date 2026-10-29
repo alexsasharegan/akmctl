@@ -235,15 +235,14 @@ export function routeHref(route) {
 
 /**
  * The obsidian:// URL that opens a record, or "" when the root is unknown.
- * `cfg` is GET /ui/config ({ root, obsidian_vault }); `path` the record's path
- * relative to the root. A configured vault name means the root is the vault
- * root, so the vault form is used; otherwise the absolute `path=` form.
+ * `cfg` is GET /ui/config ({ root }); `path` the record's path relative to the
+ * root. Always the absolute `path=` form: Obsidian finds the vault that holds
+ * the file, so the repository root need not be the vault root.
  */
 export function obsidianUrl(cfg, path) {
   const root = cfg && cfg.root ? String(cfg.root) : "";
   if (!root || !path) return "";
   const rel = String(path).replace(/^\/+/, "");
-  if (cfg.obsidian_vault) return "obsidian://open?vault=" + encodeURIComponent(cfg.obsidian_vault) + "&file=" + encodeURIComponent(rel);
   const sep = root.includes("\\") && !root.includes("/") ? "\\" : "/";
   const abs = root.replace(/[\\/]+$/, "") + sep + rel.split("/").join(sep);
   return "obsidian://open?path=" + encodeURIComponent(abs);
