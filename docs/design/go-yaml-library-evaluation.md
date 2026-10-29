@@ -3,12 +3,10 @@ type: design
 status: draft
 created_at: 2026-10-28
 updated_at: 2026-10-28
-tags:
-    - pkm/rails
 ---
 # Go YAML library evaluation for `akmctl` (draft for review)
 
-Evaluation for [[261027-wkxv-go-yaml-library-evaluation]], serving [[agent-ready-repo-spec]] (H5, section 0) and [[261027-ensf-akm-an-agent-knowledge-management]]. It answers one question: how should the Go tool read and edit frontmatter? Criteria, in Alexander's order: (1) baseline requirements, (2) performance, (3) security, (4) popularity and support as a tiebreaker. Run on 2026-10-28; machine and toolchain in the benchmark section.
+Evaluation for [261027-wkxv-go-yaml-library-evaluation](../work/done/261027-wkxv-go-yaml-library-evaluation.md), serving [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md) (H5, section 0) and [261027-ensf-akm-an-agent-knowledge-management](../adr/261027-ensf-akm-an-agent-knowledge-management.md). It answers one question: how should the Go tool read and edit frontmatter? Criteria, in Alexander's order: (1) baseline requirements, (2) performance, (3) security, (4) popularity and support as a tiebreaker. Run on 2026-10-28; machine and toolchain in the benchmark section.
 
 ## Summary
 
@@ -23,7 +21,7 @@ Evaluation for [[261027-wkxv-go-yaml-library-evaluation]], serving [[agent-ready
 
 **A cheap mix that costs nothing at runtime:** use `go.yaml.in/yaml/v3` in the test suite only, as a differential oracle. Every fixture that the hand parser accepts must also be valid YAML and give the same keys and strings in the library. That keeps the hand parser from drifting into a private dialect, and that is the real risk of this choice (see open risks).
 
-This is a recommendation for Alexander to confirm. It changes nothing in [[261027-ensf-akm-an-agent-knowledge-management]] or the spec; the spec already says (H5, X8) that a tool with no YAML library can parse the subset.
+This is a recommendation for Alexander to confirm. It changes nothing in [261027-ensf-akm-an-agent-knowledge-management](../adr/261027-ensf-akm-an-agent-knowledge-management.md) or the spec; the spec already says (H5, X8) that a tool with no YAML library can parse the subset.
 
 ## Candidates
 

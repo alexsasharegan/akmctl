@@ -3,14 +3,12 @@ type: design
 status: active
 created_at: 2026-10-28
 updated_at: 2026-10-28
-tags:
-    - pkm/rails
 ---
 # AKM guide: a repository that remembers and runs on rails
 
 Version 1.0.0.
 
-AKM (agent knowledge management) is an opinionated standard that gives a repository a memory and rails, so any agent can pick up where work stopped. This guide is for a maintainer, solo or on a team, who works with AI coding agents and wants to adopt it. It explains what AKM is, why it exists, how it works day to day, how to adopt it, and what is not proven. The rules themselves are in the specification ([[agent-ready-repo-spec]]); the tool's operations are in the API spec ([[akm-api-spec]]).
+AKM (agent knowledge management) is an opinionated standard that gives a repository a memory and rails, so any agent can pick up where work stopped. This guide is for a maintainer, solo or on a team, who works with AI coding agents and wants to adopt it. It explains what AKM is, why it exists, how it works day to day, how to adopt it, and what is not proven. The rules themselves are in the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)); the tool's operations are in the API spec ([akm-api-spec](akm-api-spec.md)).
 
 Everything here works by hand, using plain files, the id recipe and the fallbacks in section 7. Regenerating the ADR index and running the full checks need the tool, `akmctl`.
 
@@ -185,7 +183,7 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 
 ### An existing repo
 
-A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 1.0.0, because 1.0.0 is the first layout: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([[agent-ready-repo-spec]]) and the repo, and ask it for a plan. Before anything is changed:
+A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 1.0.0, because 1.0.0 is the first layout: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
 
 - Make sure the working tree is clean and tag a backup.
 - Work on a branch and review every diff.
@@ -252,8 +250,8 @@ This is slower and uses more tokens, but it must stay correct.
 
 | What | Where |
 |---|---|
-| The rules: layout, formats, checks, versions | [[agent-ready-repo-spec]] |
-| The tool's operations, JSON, bindings and fixtures | [[akm-api-spec]] |
+| The rules: layout, formats, checks, versions | [agent-ready-repo-spec](agent-ready-repo-spec.md) |
+| The tool's operations, JSON, bindings and fixtures | [akm-api-spec](akm-api-spec.md) |
 | The tool | the `akmctl` repository: prebuilt binaries, its README and changelog |
 
 ## Glossary

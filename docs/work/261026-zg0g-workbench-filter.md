@@ -2,8 +2,8 @@
 id: 261026-zg0g
 type: task
 status: ready
-project: "[[Vault Views]]"
-origin: "[[261025-g68j-build-pkm-workbench]]"
+project: Vault Views
+origin: 261025-g68j
 created: 2026-10-26
 updated: 2026-10-26
 authored_by: agent
@@ -13,7 +13,7 @@ title: "pkm-workbench: filters"
 
 ## Goal
 
-The board and tables show every open task. Alexander wants to narrow them, with sorting as the higher priority ([[261026-mrdr-workbench-sort]]). It also depends on [[261026-400a-task-timestamps-datetime]] if a filter uses dates.
+The board and tables show every open task. Alexander wants to narrow them, with sorting as the higher priority ([261026-mrdr-workbench-sort](261026-mrdr-workbench-sort.md)). It also depends on 261026-400a-task-timestamps-datetime if a filter uses dates.
 
 Done when:
 
@@ -37,4 +37,4 @@ Filters by the agreed fields work from the keyboard on the board and tables, act
 ## Log
 
 - 2026-10-26: filed by Claude Code on the Mac at Alexander's direction. `inbox`, not claimed; waits on the timestamp task and, preferably, on sorting.
-- 2026-10-26: status inbox to ready (vocabulary change, [[261026-p5cz-task-status-vocabulary]]).
+- 2026-10-26: status inbox to ready (vocabulary change, 261026-p5cz-task-status-vocabulary).

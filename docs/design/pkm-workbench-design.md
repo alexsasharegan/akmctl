@@ -4,21 +4,19 @@ status: active
 created_at: 2026-10-25
 updated_at: 2026-10-25
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # pkm-workbench: design for a local PKM server
 
-Result of the design spike [[261024-k2rc-local-views-server-design]], under [[Vault Views]]. Questions 2 to 9 were worked through with Alexander on 2026-10-25 (Plan mode); question 1 (the Bases baseline) was answered the same day.
+Result of the design spike 261024-k2rc-local-views-server-design, under Vault Views. Questions 2 to 9 were worked through with Alexander on 2026-10-25 (Plan mode); question 1 (the Bases baseline) was answered the same day.
 
 **Recommendation: build it.** A small Go program, `pkm-workbench` (short forms `pkm-wb`, `pkmwb`), serves the task views from the vault's files and writes changes back to the YAML frontmatter. The files stay the source of truth. Whether to build is Alexander's call; this note is the case for it.
 
 ## Purpose
 
-- The views in [[Tasks]] (`Tasks.base`) live only inside Obsidian. The wish: the same views in other forms with different styling, and the ability to move things (drag a task across a board, close it) with the change written back to the file.
+- The views in Tasks (`Tasks.base`) live only inside Obsidian. The wish: the same views in other forms with different styling, and the ability to move things (drag a task across a board, close it) with the change written back to the file.
 - The name is chosen for growth. Version 1 is the task board; later it can serve other record types and views of the PKM. "Workbench" names where Alexander works, not what it shows.
 
-Direction, Alexander 2026-10-25, after the Kanban test: the [[Tasks]] hub dashboard now leads with the native Kanban board, and he still wants the server. Reasons: it should be prettier and more pleasant to use, and a page left open lets him watch an agent work.
+Direction, Alexander 2026-10-25, after the Kanban test: the Tasks hub dashboard now leads with the native Kanban board, and he still wants the server. Reasons: it should be prettier and more pleasant to use, and a page left open lets him watch an agent work.
 - **Watch mode (wanted, after the MVP):** the server loads the board state; when an agent changes a task, the page animates the move (this task went from this column to that one) when he returns to the page, so changes do not pass unseen. Needs change tracking between visits, which the read-per-request design does not have yet, and probably the file watcher that was left out of version 1.
 - **Lifecycle enforcement (the main value):** when he moves tasks himself, for example with no tokens or credits left, the server enforces the bookkeeping an agent would do: an outcome on close, log lines, `updated_at`, the ADR check. He will not remember every step of the task-lifecycle skill; the application should refuse the move until the steps are done. This makes the close prompt and the pinned close cascade and ADR dialog core features, not extras.
 
@@ -54,7 +52,7 @@ Direction, Alexander 2026-10-25, after the Kanban test: the [[Tasks]] hub dashbo
 
 ## View spec (authoritative)
 
-The two implementations, `Tasks.base` and the server, both implement this table. Change the spec first, then both. Version 0 lives here; move it into the [[Tasks]] hub when the repo exists, so one place defines scope, statuses and views.
+The two implementations, `Tasks.base` and the server, both implement this table. Change the spec first, then both. Version 0 lives here; move it into the Tasks hub when the repo exists, so one place defines scope, statuses and views.
 
 Shared definitions:
 - **open**: `status` is not `done` and not `dropped`.
@@ -89,7 +87,7 @@ The server adds one view `Bases` lacks: **Raw**, the notes with `status: raw`.
 - Capture: a text box on the Raw lane creates a stub note in `9 pkm/tasks/` with `status: raw`.
 - Refine (an agent or Alexander): write a done-when line (required) and `project` and `origin` (asked, may be skipped), then set `ready`.
 - Raw notes stay out of every other view, so they do not pollute the queue.
-- Updated 2026-10-26: the statuses are now `raw`, `ready`, `active`, `blocked`, `done`, `dropped` (definitions in [[Tasks]], which is the single source for the wording). `inbox` and `next` are gone; the Raw lane is always shown. See [[261026-p5cz-task-status-vocabulary]].
+- Updated 2026-10-26: the statuses are now `raw`, `ready`, `active`, `blocked`, `done`, `dropped` (definitions in Tasks, which is the single source for the wording). `inbox` and `next` are gone; the Raw lane is always shown. See 261026-p5cz-task-status-vocabulary.
 
 ## UI approach
 

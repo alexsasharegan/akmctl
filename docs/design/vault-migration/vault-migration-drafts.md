@@ -4,12 +4,10 @@ status: draft
 created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # Vault migration: drafts for Alexander's review
 
-Drafted by Claude Code during the dry run ([[vault-migration-runbook]]). Nothing here is applied to the real vault. The scripts that apply them are in `Deep Thought/9 scripts/akm-migration/`; the dry-run copy is `/private/tmp/claude-501/-Users-deepthought-obsidian-vaults/dfafa885-dc8d-435b-9a5a-ca08fd51f7df/scratchpad/copy` (branch `migrate-0.0.0-to-1.0.0`).
+Drafted by Claude Code during the dry run ([vault-migration-runbook](vault-migration-runbook.md)). Nothing here is applied to the real vault. The scripts that apply them are in `Deep Thought/9 scripts/akm-migration/`; the dry-run copy is `/private/tmp/claude-501/-Users-deepthought-obsidian-vaults/dfafa885-dc8d-435b-9a5a-ca08fd51f7df/scratchpad/copy` (branch `migrate-0.0.0-to-1.0.0`).
 
 ## 1. ADR summaries (21)
 
@@ -41,7 +39,7 @@ One sentence each, at most 160 characters, from each ADR's Decision section. The
 
 ## 2. `## Next` for the three active tasks
 
-Only one of the three lacked a `## Next`: [[261025-sja2-reader-tag-to-summary-cards]] and [[261025-yx6c-daily-scripture-spike]] already have one, and `akmctl check` (WK6) passes on them. Draft for the third, [[261022-sbv7-aei-comp-dataset]]:
+Only one of the three lacked a `## Next`: 261025-sja2-reader-tag-to-summary-cards and 261025-yx6c-daily-scripture-spike already have one, and `akmctl check` (WK6) passes on them. Draft for the third, 261022-sbv7-aei-comp-dataset:
 
 > Fill the open cells in the comps dataset: the contact form for every row (needs page HTML, so it waits for the archivist script, work item 261022-pd5y), L&T's URL count, and the RFQ form for L&T, Guzman and PMF. Leave Precision Advanced Manufacturing as "blocks automated fetches" unless a manual check is wanted. Then write the steps that regenerate the table and log them. Suggested mode: Plan first (decide whether to check the three RFQ forms by hand while the script is unbuilt), then Build.
 

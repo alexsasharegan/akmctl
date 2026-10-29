@@ -14,7 +14,7 @@ summary: "AKM is adopted as the standard for repository records: flat frontmatte
 
 ## Context
 
-Alexander's repositories keep their own history: decisions, a roadmap, work in flight. The practice grew by hand across several agentic tools and drifted: the core workflow skill lives outside every repo and exists in three variants; ADR status words, numbering and fields differ; entry points are uneven; only one repo has CI. A cold agent, or Alexander after months away, cannot rely on the records. The spike [[261026-m74k-agent-ready-repo-layout-spike]] compared Alexander's practice (Option A), an independent design built from the web by an isolated agent (Option B), and a mix (Option C), against a twelve-clause contract (orientation, rationale, direction, current state, boundaries, procedures, trust, cost, authority and ownership, verification, content safety and provenance, portability and handoff). The evidence is in [[agent-ready-repo-discovery]] and [[agent-ready-repo-comparison]]; the specification is [[agent-ready-repo-spec]]. The layout is meant for any maintainer or team, not only for Alexander.
+Alexander's repositories keep their own history: decisions, a roadmap, work in flight. The practice grew by hand across several agentic tools and drifted: the core workflow skill lives outside every repo and exists in three variants; ADR status words, numbering and fields differ; entry points are uneven; only one repo has CI. A cold agent, or Alexander after months away, cannot rely on the records. The spike [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md) compared Alexander's practice (Option A), an independent design built from the web by an isolated agent (Option B), and a mix (Option C), against a twelve-clause contract (orientation, rationale, direction, current state, boundaries, procedures, trust, cost, authority and ownership, verification, content safety and provenance, portability and handoff). The evidence is in [agent-ready-repo-discovery](../design/agent-ready-repo-discovery.md) and [agent-ready-repo-comparison](../design/agent-ready-repo-comparison.md); the specification is [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md). The layout is meant for any maintainer or team, not only for Alexander.
 
 **Lineage.** Alexander practises personal knowledge management (PKM): externalising memory into notes so the mind need not hold it, with capture, organisation and review. This standard is the same discipline moved inside a repository and addressed to agents. It is **agent knowledge management (AKM)**: PKM's idea, applied to the operational memory of a codebase. That lineage is the main reason for the name below.
 
@@ -42,7 +42,7 @@ Alexander's repositories keep their own history: decisions, a roadmap, work in f
 1. **Memory, not only orientation.** A good `AGENTS.md` tells an agent how to work in a repo. AKM does that and also keeps the repo's history: decisions and their reasons, direction, and work in flight.
 2. **Rails for the work.** Work follows a simple Kanban-style flow (raw, ready, active, blocked, done, dropped) with one active item and a stated next step, and no ceremonies. Agents have a path to follow and people get a board that keeps itself current. The paperwork is the agent's; the decisions stay the maintainer's.
 
-**Supporting principles.** What else the standard commits to. The mechanisms are in [[agent-ready-repo-spec]], not here.
+**Supporting principles.** What else the standard commits to. The mechanisms are in [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md), not here.
 
 3. **Conducive to parallel work.** Many agents and people can start work and record decisions at once with little to reconcile. Not a guarantee: shared files such as the roadmap can still conflict.
 4. **Token-efficient by design.** A reader finds the right record by reading a little and loading detail on demand, instead of reading everything.
@@ -55,7 +55,7 @@ Alexander's repositories keep their own history: decisions, a roadmap, work in f
 
 ## Decision
 
-Adopt Option C as the standard **AKM (agent knowledge management) repository layout**, specified in [[agent-ready-repo-spec]]. In summary:
+Adopt Option C as the standard **AKM (agent knowledge management) repository layout**, specified in [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md). In summary:
 
 - **Records.** Work items and ADRs are Markdown files with simple flat frontmatter (the header layer), in one id space, in `docs/work/` (closed items in `docs/work/done/`) and `docs/adr/`.
 - **Ids.** `YYMMDD-xxxx`: the UTC creation date plus four random characters. No shared counter, because counters cause merge conflicts. The id alone is the reference; the slug lives only in the filename. The tool mints ids.
@@ -70,27 +70,28 @@ Rejected: keeping Option A as it is (the drift, and the skill outside version co
 
 ## Consequences
 
-- Existing repos (`alexregan.com`, `poetic-overtones`, `shavian2tengwar`, `mysqlbak`) and the vault each need a migration note; none is forced. The vault's task notes differ in field names, naming and ids ([[261027-nrwf-vault-agent-ready-migration]]).
-- The Go tool, the API spec and the YAML library choice are separate tasks: [[261027-r3hh-repo-records-go-tool]], [[261027-xkd4-repo-records-api-spec]], [[261027-wkxv-go-yaml-library-evaluation]]. Until the tool exists, the plain-file fallbacks are the only interface, and the layout is usable by hand.
+- Existing repos (`alexregan.com`, `poetic-overtones`, `shavian2tengwar`, `mysqlbak`) and the vault each need a migration note; none is forced. The vault's task notes differ in field names, naming and ids ([261027-nrwf-vault-agent-ready-migration](../work/done/261027-nrwf-vault-agent-ready-migration.md)).
+- The Go tool, the API spec and the YAML library choice are separate tasks: [261027-r3hh-repo-records-go-tool](../work/done/261027-r3hh-repo-records-go-tool.md), [261027-xkd4-repo-records-api-spec](../work/done/261027-xkd4-repo-records-api-spec.md), [261027-wkxv-go-yaml-library-evaluation](../work/done/261027-wkxv-go-yaml-library-evaluation.md). Until the tool exists, the plain-file fallbacks are the only interface, and the layout is usable by hand.
 - Trust still rests on agent discipline, because no hook or CI forces the check to run. A well-formed but wrong record passes every check.
-- `pkm-workbench` ([[261025-r0ye-pkm-workbench-a-local-server]]) is expected to fold into, or be coupled to, the new tool. That will need a follow-up ADR; this one does not supersede [[261025-r0ye-pkm-workbench-a-local-server]].
+- `pkm-workbench` ([261025-r0ye-pkm-workbench-a-local-server](261025-r0ye-pkm-workbench-a-local-server.md)) is expected to fold into, or be coupled to, the new tool. That will need a follow-up ADR; this one does not supersede [261025-r0ye-pkm-workbench-a-local-server](261025-r0ye-pkm-workbench-a-local-server.md).
 - The formatter question (leaning to Prettier), whether `renumber` ships in the first version, and several naming choices are still open in the spec.
 
 ## Evidence
 
-- Spike: [[261026-m74k-agent-ready-repo-layout-spike]]. Discovery: [[agent-ready-repo-discovery]]. Comparison and decisions D1 to D8, O1 to O4: [[agent-ready-repo-comparison]]. Specification: [[agent-ready-repo-spec]].
+- Spike: [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md). Discovery: [agent-ready-repo-discovery](../design/agent-ready-repo-discovery.md). Comparison and decisions D1 to D8, O1 to O4: [agent-ready-repo-comparison](../design/agent-ready-repo-comparison.md). Specification: [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md).
 - Accepted by Alexander on 2026-10-28 (acceptance commit `dd814ce`, the rename from the drafts folder). The name is a working title.
 - Commits: `fd2233d` (comparison), `7c6802a` (D1 to D8), `d2d6df2` (O1 to O4), `19c6ed1` (ids and requirements), `7c838d4` (Go tool direction), `982d28c` (fallback and sections 6, 7), `f31dc0d` (version manifest and migrate), `e3593db` (working title and value proposition).
 
 ## Relations
 
 - Related to:
-  - [[261023-f7rd-task-queue-and-the-task-lifecycle-skill]] (task queue and the task-lifecycle skill: the work-item model follows its `## Next` and close rules)
-  - [[261023-mtpt-frontmatter-field-registry]] (frontmatter field registry: the layout adds fields that will need registering)
-  - [[261025-r0ye-pkm-workbench-a-local-server]] (pkm-workbench: expected to merge with the new tool)
+  - 261023-f7rd-task-queue-and-the-task-lifecycle-skill (task queue and the task-lifecycle skill: the work-item model follows its `## Next` and close rules)
+  - 261023-mtpt-frontmatter-field-registry (frontmatter field registry: the layout adds fields that will need registering)
+  - [261025-r0ye-pkm-workbench-a-local-server](261025-r0ye-pkm-workbench-a-local-server.md) (pkm-workbench: expected to merge with the new tool)
 
 ## Errata
 
-- 2026-10-28: three corrections, from [[akm-spec-review]]: `dropped` added to the flow of statuses; the acceptance commit hash added to Evidence; an unsourced star count for `itlackey/akm` removed. The decision is unchanged.
-- 2026-10-28: decisions made since acceptance, in [[agent-ready-repo-decision-log]] (Y1 to Y20): Prettier is required (pinned, embedded formatting off); `renumber` is not in v1; the UI is `akmctl ui`; a small dependency is allowed for display width (an exception to "standard library only"); optional `claims` and `safety` extensions exist. They refine the spec, not this decision. The `authored_by` marker was removed.
-- 2026-10-28: the display-width dependency mentioned above was dropped; the tool implements Prettier's width rule itself (Y28). Obsidian compatibility, which the decisions above rely on, is recorded in [[261028-zh0w-obsidian-compatibility-is-a-stated-goal]].
+- 2026-10-28: three corrections, from [akm-spec-review](../design/akm-spec-review.md): `dropped` added to the flow of statuses; the acceptance commit hash added to Evidence; an unsourced star count for `itlackey/akm` removed. The decision is unchanged.
+- 2026-10-28: decisions made since acceptance, in [agent-ready-repo-decision-log](../design/agent-ready-repo-decision-log.md) (Y1 to Y20): Prettier is required (pinned, embedded formatting off); `renumber` is not in v1; the UI is `akmctl ui`; a small dependency is allowed for display width (an exception to "standard library only"); optional `claims` and `safety` extensions exist. They refine the spec, not this decision. The `authored_by` marker was removed.
+- 2026-10-28: the display-width dependency mentioned above was dropped; the tool implements Prettier's width rule itself (Y28). Obsidian compatibility, which the decisions above rely on, is recorded in [261028-zh0w-obsidian-compatibility-is-a-stated-goal](261028-zh0w-obsidian-compatibility-is-a-stated-goal.md).
+- 2026-10-29: copied from the maintainer's notes into this repository. Wikilinks to records copied with it became relative links; wikilinks to notes that stayed behind became plain text. The decision is unchanged.

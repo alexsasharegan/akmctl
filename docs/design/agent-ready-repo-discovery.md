@@ -4,12 +4,10 @@ status: draft
 created_at: 2026-10-26
 updated_at: 2026-10-26
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # Agent-ready repository: discovery reports (Option A and Option B)
 
-Output of the discovery pass in [[261026-m74k-agent-ready-repo-layout-spike]]. Two read-only agents worked in isolation from the contract draft in the task note: the A agent read Alexander's repos and the vault; the B agent had no local file access and used the web only. Both reports are condensed here from the agents' final messages. Web sources are as the B agent reported them; none was re-checked by the main thread. Inputs from the earlier pass: [[agent-ready-repo-layout]]. This note decides nothing.
+Output of the discovery pass in [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md). Two read-only agents worked in isolation from the contract draft in the task note: the A agent read Alexander's repos and the vault; the B agent had no local file access and used the web only. Both reports are condensed here from the agents' final messages. Web sources are as the B agent reported them; none was re-checked by the main thread. Inputs from the earlier pass: [agent-ready-repo-layout](agent-ready-repo-layout.md). This note decides nothing.
 
 Out of scope: `parametricstudios.com` (excluded) and any work or employer repo (confidential; agents never ask).
 

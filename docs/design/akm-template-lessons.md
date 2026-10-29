@@ -4,16 +4,14 @@ status: active
 created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # AKM template repository: what the dogfood taught
 
-Written by Claude Code on 2026-10-28 after stamping the AKM layout onto the `akmctl` repository ([[261028-eqwq-akmctl-dogfood-akm-layout]]). The repository is the first one outside the vault to carry the layout; the branch is `dogfood-layout` in `~/github.com/alexsasharegan/akmctl`. This note is the input for building the template repository (specification, section 7, [[agent-ready-repo-spec]]). There is no template repository yet, so the layout was copied by hand and each file below is one the template must ship.
+Written by Claude Code on 2026-10-28 after stamping the AKM layout onto the `akmctl` repository ([261028-eqwq-akmctl-dogfood-akm-layout](../work/done/261028-eqwq-akmctl-dogfood-akm-layout.md)). The repository is the first one outside the vault to carry the layout; the branch is `dogfood-layout` in `~/github.com/alexsasharegan/akmctl`. This note is the input for building the template repository (specification, section 7, [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md)). There is no template repository yet, so the layout was copied by hand and each file below is one the template must ship.
 
 ## How it was applied
 
-- **Copy, not `akmctl migrate`.** A repository with no manifest reads as layout `0.0.0`, and 1.0.0 is the first layout, so no migration exists ([[akm-guide]], section 7). Confirmed with the tool: a directory with an `AGENTS.md` and no manifest reports `layout 0.0.0 -> 1.0.0: unsupported`; a directory with neither `AGENTS.md` nor `docs/.layout` makes `check` and `migrate` stop with exit 2, "no repository root". Adoption is a one-time conversion, as the guide says.
+- **Copy, not `akmctl migrate`.** A repository with no manifest reads as layout `0.0.0`, and 1.0.0 is the first layout, so no migration exists ([akm-guide](../spec/akm-guide.md), section 7). Confirmed with the tool: a directory with an `AGENTS.md` and no manifest reports `layout 0.0.0 -> 1.0.0: unsupported`; a directory with neither `AGENTS.md` nor `docs/.layout` makes `check` and `migrate` stop with exit 2, "no repository root". Adoption is a one-time conversion, as the guide says.
 - **Order that worked:** manifest and `AGENTS.md` first (the tool then finds the root and `check` runs clean on an empty repository), then the roadmap and the ADR index (run `akmctl index` once so rule A4 has a file to compare), then records.
 - **`README.md` and `CHANGELOG.md` stay at the repository root.** The layout already lists `README.md` at the root; a changelog is release notes for the product, not a work record, and the release process reads it. The records live under `docs/`. Nothing was absorbed.
 

@@ -4,14 +4,12 @@ status: active
 created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # AKM API specification
 
 Version 1.0.
 
-A transport-neutral contract for reading, checking and changing the records of an AKM repository (ADRs, work items, the roadmap), so that more than one implementation can be written against it. The records and rules are defined in the specification ([[agent-ready-repo-spec]]); this document defines the operations over them, the JSON that comes back, and two bindings (CLI and HTTP). The reference implementation is `akmctl`. The schemas are in `akm-api/schemas/` and the conformance fixtures in `akm-api/.fixtures/`.
+A transport-neutral contract for reading, checking and changing the records of an AKM repository (ADRs, work items, the roadmap), so that more than one implementation can be written against it. The records and rules are defined in the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)); this document defines the operations over them, the JSON that comes back, and two bindings (CLI and HTTP). The reference implementation is `akmctl`. The schemas are in `akm-api/schemas/` and the conformance fixtures in `akm-api/.fixtures/`.
 
 The words MUST, SHOULD and MAY are used as in RFC 2119.
 

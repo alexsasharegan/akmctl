@@ -2,8 +2,8 @@
 id: 261026-mrdr
 type: task
 status: ready
-project: "[[Vault Views]]"
-origin: "[[261025-g68j-build-pkm-workbench]]"
+project: Vault Views
+origin: 261025-g68j
 created: 2026-10-26
 updated: 2026-10-26
 authored_by: agent
@@ -13,7 +13,7 @@ title: "pkm-workbench: sort options"
 
 ## Goal
 
-The board and tables have a fixed order. Alexander wants to choose how they sort. This comes after [[261026-400a-task-timestamps-datetime]], so that date sorts have a stable order within a day.
+The board and tables have a fixed order. Alexander wants to choose how they sort. This comes after 261026-400a-task-timestamps-datetime, so that date sorts have a stable order within a day.
 
 Done when:
 
@@ -25,7 +25,7 @@ The board and each table can be sorted by the agreed keys in both directions fro
 - Sort **chronologically**: by created, by updated.
 - Sort **lexicographically**: by name.
 - **Group by project**, which may be a grouping and not a sort.
-- Keep it modest. He is more interested in sorting than in filtering, but the two go together ([[261026-zg0g-workbench-filter]]).
+- Keep it modest. He is more interested in sorting than in filtering, but the two go together ([261026-zg0g-workbench-filter](261026-zg0g-workbench-filter.md)).
 
 ## To settle
 
@@ -39,4 +39,4 @@ The board and each table can be sorted by the agreed keys in both directions fro
 ## Log
 
 - 2026-10-26: filed by Claude Code on the Mac at Alexander's direction. `inbox`, not claimed; waits on the timestamp task.
-- 2026-10-26: status inbox to ready (vocabulary change, [[261026-p5cz-task-status-vocabulary]]).
+- 2026-10-26: status inbox to ready (vocabulary change, 261026-p5cz-task-status-vocabulary).

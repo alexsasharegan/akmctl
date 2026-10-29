@@ -4,12 +4,10 @@ status: draft
 created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # Vault migration: dry-run findings and runbook
 
-Dry run of [[261027-nrwf-vault-agent-ready-migration]] by Claude Code on a copy of the vault. The real vault was not modified. Drafts for review: [[vault-migration-drafts]]. Scripts: `Deep Thought/9 scripts/akm-migration/`.
+Dry run of [261027-nrwf-vault-agent-ready-migration](../../work/done/261027-nrwf-vault-agent-ready-migration.md) by Claude Code on a copy of the vault. The real vault was not modified. Drafts for review: [vault-migration-drafts](vault-migration-drafts.md). Scripts: `Deep Thought/9 scripts/akm-migration/`.
 
 **Resume point.** The copy is `/private/tmp/claude-501/-Users-deepthought-obsidian-vaults/dfafa885-dc8d-435b-9a5a-ca08fd51f7df/scratchpad/copy` (branch `migrate-0.0.0-to-1.0.0`, tag `pre-migrate-0.0.0-to-1.0.0`); `scratchpad/rehearsal` is a second copy from `rehearse.sh` with only the scripted steps. All steps below were run on the copy except the Obsidian rename loop (emulated by `link_repair.py`).
 

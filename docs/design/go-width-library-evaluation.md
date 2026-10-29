@@ -3,13 +3,11 @@ type: design
 status: draft
 created_at: 2026-10-28
 updated_at: 2026-10-28
-tags:
-    - pkm/rails
 authored_by: agent
 ---
 # Go display-width library evaluation for `akmctl` (draft for review)
 
-Evaluation for [[261028-0snt-go-width-library-evaluation]], serving [[agent-ready-repo-spec]] (section 4, "The generated index") and decision Y16 in [[agent-ready-repo-decision-log]]. It answers one question: how should the Go tool compute the display width of table cells, so that the generated ADR index is padded the way Prettier pads it? Criteria, in Alexander's order: (1) baseline: output matches Prettier, (2) performance, (3) security and supply chain, (4) popularity and support as a tiebreaker. Run on 2026-10-28; machine and toolchain in the performance section. The method and layout follow [[go-yaml-library-evaluation]]; the Prettier test it extends is in [[akm-spec-review]], section 3.
+Evaluation for [261028-0snt-go-width-library-evaluation](../work/done/261028-0snt-go-width-library-evaluation.md), serving [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md) (section 4, "The generated index") and decision Y16 in [agent-ready-repo-decision-log](agent-ready-repo-decision-log.md). It answers one question: how should the Go tool compute the display width of table cells, so that the generated ADR index is padded the way Prettier pads it? Criteria, in Alexander's order: (1) baseline: output matches Prettier, (2) performance, (3) security and supply chain, (4) popularity and support as a tiebreaker. Run on 2026-10-28; machine and toolchain in the performance section. The method and layout follow [go-yaml-library-evaluation](go-yaml-library-evaluation.md); the Prettier test it extends is in [akm-spec-review](akm-spec-review.md), section 3.
 
 ## Summary
 
@@ -35,7 +33,7 @@ Evaluation for [[261028-0snt-go-width-library-evaluation]], serving [[agent-read
 - **Popularity (4):** the weak point of the recommendation. `displaywidth` is young (repository created 2025-10-08), has one maintainer, 19 stars and 94 importing packages, against 5,958 for `go-runewidth` and 1,405 for `uniseg`. It breaks no tie here; criterion (1) decided. Its author also contributes to `go-runewidth`, which now depends on the same `uax29` module, so the tables under it are in wide use.
 - **Runner-up:** `github.com/rivo/uniseg` (zero dependencies, 3 of 129 common-text cells wrong) if `displaywidth` is judged too young. It has had no release since 2024-02-08 and its tables are Unicode 15.0, so four newer emoji (Unicode 16 and 17) measure 1 column instead of 2. Not recommended: `go-runewidth` (locale dependence; 13 of 19 emoji-with-U+FE0F cells wrong; two open issues or pull requests about exactly that) and `golang.org/x/text/width` (per-rune only: it has no zero-width concept, so every combining sequence is wrong, 8 of 8 decomposed-Latin cells; and its tables are Unicode 17.0.0 on Go 1.27 and later but 15.0.0 on older Go).
 
-This is a recommendation for Alexander to confirm. It changes nothing in the spec, [[261027-ensf-akm-an-agent-knowledge-management]] or the decision log. If Alexander confirms, Y16 can name the module and version.
+This is a recommendation for Alexander to confirm. It changes nothing in the spec, [261027-ensf-akm-an-agent-knowledge-management](../adr/261027-ensf-akm-an-agent-knowledge-management.md) or the decision log. If Alexander confirms, Y16 can name the module and version.
 
 ## What Prettier does
 

@@ -3,14 +3,12 @@ type: design
 status: active
 created_at: 2026-10-27
 updated_at: 2026-10-28
-tags:
-    - pkm/rails
 ---
 # AKM specification
 
 Version 1.0.0.
 
-AKM (agent knowledge management) is a standard for a repository that keeps its own memory: its decisions, its direction and its work in flight, as Markdown records with frontmatter, so that any person or agent can pick up where work stopped. This document specifies the files, the work-item schema, the ADR and roadmap formats, and the rules of the checks. It is written for any maintainer or team, solo or not. The tool that implements it is `akmctl`; its operations and JSON are in the API spec ([[akm-api-spec]]), and a guide for adopting the standard is in [[akm-guide]].
+AKM (agent knowledge management) is a standard for a repository that keeps its own memory: its decisions, its direction and its work in flight, as Markdown records with frontmatter, so that any person or agent can pick up where work stopped. This document specifies the files, the work-item schema, the ADR and roadmap formats, and the rules of the checks. It is written for any maintainer or team, solo or not. The tool that implements it is `akmctl`; its operations and JSON are in the API spec ([akm-api-spec](akm-api-spec.md)), and a guide for adopting the standard is in [akm-guide](akm-guide.md).
 
 Every rule here traces to a requirement in section 0 or to a clause of the contract in section 9, so a maintainer who wants to change one can see what it was for.
 
@@ -383,7 +381,7 @@ The open-work listing is the work equivalent. It is not committed: work records 
 
 ## 6. The tool: checks and queries
 
-The tool is `akmctl`: one Go binary with subcommands, with a stable JSON output and an API (the API spec, [[akm-api-spec]]). It reads the repo's files and git history, writes nothing unless a subcommand says so, and needs no network. It uses the Go standard library only: its own display-width code and its own frontmatter parser, with no YAML library. It is run by the agent, and it is an accelerator, not a dependency (H6). The rules in "Rules" below are its checks.
+The tool is `akmctl`: one Go binary with subcommands, with a stable JSON output and an API (the API spec, [akm-api-spec](akm-api-spec.md)). It reads the repo's files and git history, writes nothing unless a subcommand says so, and needs no network. It uses the Go standard library only: its own display-width code and its own frontmatter parser, with no YAML library. It is run by the agent, and it is an accelerator, not a dependency (H6). The rules in "Rules" below are its checks.
 
 ### Subcommands
 
@@ -407,7 +405,7 @@ Exit codes: `0` clean or warnings only; `1` at least one error; `2` the command 
 ### Output contract
 
 - `--format json` is the stable output: a versioned envelope with `api_version`, the request echoed, `records` or `findings`, and `count`. Field names are the frontmatter names; fields absent on a record type are `null`.
-- The CLI is one binding of a transport-neutral operation set. An HTTP binding returns the same JSON. The operations, request and response schemas, the CLI and HTTP bindings and the conformance fixtures are in [[akm-api-spec]].
+- The CLI is one binding of a transport-neutral operation set. An HTTP binding returns the same JSON. The operations, request and response schemas, the CLI and HTTP bindings and the conformance fixtures are in [akm-api-spec](akm-api-spec.md).
 
 ### Open-work listing (`akmctl ls --status ready,active,blocked`)
 

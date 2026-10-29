@@ -4,12 +4,10 @@ status: draft
 created_at: 2026-10-26
 updated_at: 2026-10-26
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # Agent-ready repository layout: inputs for the spike
 
-Inputs for [[261026-m74k-agent-ready-repo-layout-spike]]. This note records what was said and found on 2026-10-26 so a fresh thread can weigh the options without starting cold. It decides nothing.
+Inputs for [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md). This note records what was said and found on 2026-10-26 so a fresh thread can weigh the options without starting cold. It decides nothing.
 
 ## What Alexander wants
 
@@ -124,10 +122,10 @@ Problems noticed in A:
 - ADR status words differ (Active in two repos, Accepted in the vault).
 - Roadmap prose can drift from the project folders; nothing checks it.
 
-The vault as a case: it uses task notes (`type: task`, `## Next`, `## Log`) instead of project folders; see [[Tasks]] and the `task-lifecycle` skill.
+The vault as a case: it uses task notes (`type: task`, `## Next`, `## Log`) instead of project folders; see Tasks and the `task-lifecycle` skill.
 
 First-pass leanings of the agent (inputs, not decisions): use A's folder convention for `pkm-workbench` (`docs/ROADMAP.md`, `docs/adr/`, `docs/projects/`) rather than B's root-level roadmap and `plans/`; add `## Next` to the project README; move the canonical skill into version control (the `dotfiles` repo is a candidate); the repo owns the project folder and the vault task links to it. Treat these as one side of the comparison.
 
 ## What the spike still has to do
 
-See [[261026-m74k-agent-ready-repo-layout-spike]].
+See [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md).

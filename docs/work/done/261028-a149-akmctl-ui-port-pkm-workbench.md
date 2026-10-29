@@ -2,7 +2,7 @@
 id: 261028-a149
 type: task
 status: done
-origin: "[[261027-r3hh-repo-records-go-tool]]"
+origin: 261027-r3hh
 created: 2026-10-28
 updated: 2026-10-28
 authored_by: agent
@@ -12,14 +12,14 @@ title: Port the pkm-workbench UI onto the akmctl API
 
 ## Goal
 
-`akmctl ui` serves a thin Kanban page (milestone 6 of [[261027-r3hh-repo-records-go-tool]]). The vault's `pkm-workbench` (`~/github.com/alexsasharegan/pkm-workbench`, binary `pkm-wb`) has a much better UI: keyboard-driven board with vim keys, transactional moves with undo, a wizard for gated moves and a review page that shows the exact diff, capture with a live slug preview, a command palette with task search, a Tables view, watch mode that streams outside changes to open boards with animation, open-in-Obsidian, and the "Quiet paper" theme (tokens in `theme.css`, light and dark, Monaspace fonts). Its limit is the data model: it reads only the vault's `9 pkm/tasks/` with the vault's own fields and has no ids, parents, lists, priorities or JSON API.
+`akmctl ui` serves a thin Kanban page (milestone 6 of [261027-r3hh-repo-records-go-tool](261027-r3hh-repo-records-go-tool.md)). The vault's `pkm-workbench` (`~/github.com/alexsasharegan/pkm-workbench`, binary `pkm-wb`) has a much better UI: keyboard-driven board with vim keys, transactional moves with undo, a wizard for gated moves and a review page that shows the exact diff, capture with a live slug preview, a command palette with task search, a Tables view, watch mode that streams outside changes to open boards with animation, open-in-Obsidian, and the "Quiet paper" theme (tokens in `theme.css`, light and dark, Monaspace fonts). Its limit is the data model: it reads only the vault's `9 pkm/tasks/` with the vault's own fields and has no ids, parents, lists, priorities or JSON API.
 
-Bring that UI over to the `akmctl` API (the specification of the operations is [[akm-api-spec]]) and retire the `pkm-wb` server, so one workbench serves every AKM repository. The decision to fold `pkm-workbench` into this project is recorded in [[261027-r3hh-repo-records-go-tool]] and [[261025-r0ye-pkm-workbench-a-local-server]].
+Bring that UI over to the `akmctl` API (the specification of the operations is [akm-api-spec](../../spec/akm-api-spec.md)) and retire the `pkm-wb` server, so one workbench serves every AKM repository. The decision to fold `pkm-workbench` into this project is recorded in [261027-r3hh-repo-records-go-tool](261027-r3hh-repo-records-go-tool.md) and [261025-r0ye-pkm-workbench-a-local-server](../../adr/261025-r0ye-pkm-workbench-a-local-server.md).
 
 Done when:
 
 - `akmctl ui` shows the board and tables for an AKM repository with the interaction, style, moves, capture and live updates listed above.
-- The same flows work on the dogfood layout of the `akmctl` repository ([[261028-eqwq-akmctl-dogfood-akm-layout]]) and on the API fixtures.
+- The same flows work on the dogfood layout of the `akmctl` repository ([261028-eqwq-akmctl-dogfood-akm-layout](261028-eqwq-akmctl-dogfood-akm-layout.md)) and on the API fixtures.
 - Tests: the existing server tests, plus tests for the new routes; the page is exercised in the browser by an agent and the findings are in the Log.
 - The `pkm-workbench` repository has a note saying the UI moved, and its server is retired or reduced to what is vault-specific, with the decision logged.
 
@@ -58,4 +58,4 @@ Done when:
 - 2026-10-28: step 4 resumed: `ui-moves` merged with main (step 5; conflicts only in `app.css`, `ui_assets_test.go`, `logic.test.mjs`, kept both sides). Writes go through `api()`, so `live.js` labels them as the page's own; after a write `reload()` rebases the poll. Driven again in the built-in browser: wizard write, safe move, `u`, capture, drag; the toast list held one toast per action, no duplicate from the poll.
 - 2026-10-28: step 6 partly done by an agent on `ui-finish` (see Next). Y40 logged. `pkm-workbench` README note committed and pushed.
 - 2026-10-28: final pass by a Claude Code agent on branch `ui-final` of `akmctl` (worktree `akmctl-wt/ui-final`, 3 commits on main's tip 387aaea, pushed, not merged). (1) Wizard keys: Enter did nothing on the steps without a textarea (the unblock checkbox, identity); only Mod+Enter advanced, and the hints said so. Fix: the pure `wizardKey` in `moves.js` (Enter advances except in a textarea, select or button; Mod+Enter advances anywhere and never writes on the review; Enter writes on the review; Esc backs), tested in `logic.test.mjs`; hints show Enter or Mod+Enter by step. (2) `--obsidian-vault`, `Server.ObsidianVault` and the `obsidian_vault` config field removed; `/ui/config` has `root` and `identity`. (3) Dogfood pass in the built-in browser on a scratch copy of the akmctl checkout (`akmctl ui`): capture with live slug; raw to ready (Goal); claim by wizard; block with an id and free text in `blocked_by`; unblock by Enter on the checkbox step; close with Outcome and an ADR link and the review diff; a live update from `akmctl set` (title and priority) within 3 s; drag of a card onto Blocked and onto Active; Release and Claim from the drawer; file contents checked after every write; `akmctl check` 0 errors. Closed `nkzy` and `cq7r` in `docs/work/done/`, ROADMAP updated. Found: unblocking a claimed item to active logs a second claim line (filed `261029-7zcp`). Not driven: opening Obsidian (href only), takeover of another holder's claim, reduced-motion paths.
-- 2026-10-28: closed. Done-when met except the `pkm-workbench` server, which stays frozen (not retired) until the vault migrates, per Y39; that belongs to [[261027-nrwf-vault-agent-ready-migration]]. ADR check: none (Y39 and Y40 are logged, and the tool's own decisions are in its ADRs).
+- 2026-10-28: closed. Done-when met except the `pkm-workbench` server, which stays frozen (not retired) until the vault migrates, per Y39; that belongs to [261027-nrwf-vault-agent-ready-migration](261027-nrwf-vault-agent-ready-migration.md). ADR check: none (Y39 and Y40 are logged, and the tool's own decisions are in its ADRs).

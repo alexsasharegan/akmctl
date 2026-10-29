@@ -4,14 +4,12 @@ status: draft
 created_at: 2026-10-26
 updated_at: 2026-10-26
 authored_by: agent
-tags:
-    - pkm/rails
 ---
 # Agent-ready repository: contract and A/B/C comparison
 
-> **Historical (2026-10-28).** This note records the comparison and the decisions as they stood when they were made. [[agent-ready-repo-spec]] supersedes it where they differ: names such as `docs-check`, `NNNN` ids and the Python script were replaced by `akmctl`, `YYMMDD-xxxx` ids and a Go tool, and later decisions are only in the spec and [[261027-ensf-akm-an-agent-knowledge-management]].
+> **Historical (2026-10-28).** This note records the comparison and the decisions as they stood when they were made. [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md) supersedes it where they differ: names such as `docs-check`, `NNNN` ids and the Python script were replaced by `akmctl`, `YYMMDD-xxxx` ids and a Go tool, and later decisions are only in the spec and [261027-ensf-akm-an-agent-knowledge-management](../adr/261027-ensf-akm-an-agent-knowledge-management.md).
 
-Step 3 of [[261026-m74k-agent-ready-repo-layout-spike]]. Evidence: [[agent-ready-repo-discovery]]. This note compares; it decides nothing. Decision points are marked **D1** to **D8**; Alexander's answers (2026-10-27) are in the next section.
+Step 3 of [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md). Evidence: [agent-ready-repo-discovery](agent-ready-repo-discovery.md). This note compares; it decides nothing. Decision points are marked **D1** to **D8**; Alexander's answers (2026-10-27) are in the next section.
 
 ## Decisions (2026-10-27)
 

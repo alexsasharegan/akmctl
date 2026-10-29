@@ -2,8 +2,8 @@
 id: 261026-np3c
 type: task
 status: ready
-project: "[[Vault Views]]"
-origin: "[[261025-g68j-build-pkm-workbench]]"
+project: Vault Views
+origin: 261025-g68j
 created: 2026-10-26
 updated: 2026-10-26
 authored_by: agent
@@ -43,4 +43,4 @@ Delete route, confirmation dialog listing the backlinks, a key (palette action a
 ## Log
 
 - 2026-10-26: filed by Claude Code on the Mac at Alexander's direction. `inbox`, not claimed.
-- 2026-10-26: status inbox to ready (vocabulary change, [[261026-p5cz-task-status-vocabulary]]).
+- 2026-10-26: status inbox to ready (vocabulary change, 261026-p5cz-task-status-vocabulary).
