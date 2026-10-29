@@ -165,3 +165,48 @@ func TestSectionDryRunPrintsADiff(t *testing.T) {
 		t.Fatalf("missing name should be invalid_request: %d", code)
 	}
 }
+
+func TestMigrationFileFlag(t *testing.T) {
+	root := t.TempDir()
+	for p, text := range map[string]string{
+		"docs/.layout":             "work_dir: Vault Notes/tasks\n",
+		"Vault Notes/tasks/a b.md": "---\ncreated_at: 2026-10-20\n---\n# A\n",
+	} {
+		full := filepath.Join(root, filepath.FromSlash(p))
+		os.MkdirAll(filepath.Dir(full), 0o755)
+		os.WriteFile(full, []byte(text), 0o644)
+	}
+	one := `{"from":"0.0.0","to":"1.0.0","steps":[{"id":"c","kind":"rename_field","class":"auto","description":"d","dir":"Vault Notes/tasks","from":"created_at","to":"created"}]}`
+	file := filepath.Join(t.TempDir(), "one-off.json")
+	os.WriteFile(file, []byte(one), 0o644)
+	var out, errb bytes.Buffer
+	code := Run([]string{"migrate", "--mode", "plan", "--migration", file, "--repo", root, "--format", "json"}, &out, &errb, ".")
+	if code != 1 || !strings.Contains(out.String(), `"state":"behind"`) || !strings.Contains(out.String(), `"files":["Vault Notes/tasks/a b.md"]`) {
+		t.Fatalf("code %d out %s err %s", code, out.String(), errb.String())
+	}
+	// a list of migrations is accepted too
+	os.WriteFile(file, []byte("["+one+"]"), 0o644)
+	out.Reset()
+	if code := Run([]string{"migrate", "--migration", file, "--repo", root, "--format", "json"}, &out, &errb, "."); code != 1 || !strings.Contains(out.String(), `"state":"behind"`) {
+		t.Fatalf("list: code %d out %s", code, out.String())
+	}
+	// errors: a missing file, bad JSON, a bad migration, another command
+	os.WriteFile(file, []byte("{nope"), 0o644)
+	for _, args := range [][]string{
+		{"migrate", "--migration", filepath.Join(t.TempDir(), "missing.json")},
+		{"migrate", "--migration", file},
+		{"ls", "--migration", file},
+		{"migrate", "--migration"},
+	} {
+		out.Reset()
+		errb.Reset()
+		if code := Run(append(args, "--repo", root), &out, &errb, "."); code != 2 {
+			t.Errorf("%v: code %d", args, code)
+		}
+	}
+	os.WriteFile(file, []byte(`{"from":"0.0.0","to":"1.0.0","steps":[{"id":"x","kind":"shell","class":"auto"}]}`), 0o644)
+	out.Reset()
+	if code := Run([]string{"migrate", "--migration", file, "--repo", root, "--format", "json"}, &out, &errb, "."); code != 2 || !strings.Contains(out.String(), "invalid_request") {
+		t.Fatalf("bad migration: code %d out %s", code, out.String())
+	}
+}

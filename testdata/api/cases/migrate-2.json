@@ -1,0 +1,261 @@
+{
+  "name": "a one-off migration file plans steps for a repository with no layout history",
+  "repo": "legacy",
+  "request": {
+    "mode": "plan",
+    "migrations": [
+      {
+        "from": "0.0.0",
+        "to": "1.0.0",
+        "steps": [
+          {
+            "id": "created",
+            "kind": "rename_field",
+            "class": "auto",
+            "description": "created_at becomes created",
+            "dir": "Deep Thought/9 pkm/tasks",
+            "from": "created_at",
+            "to": "created"
+          },
+          {
+            "id": "updated",
+            "kind": "rename_field",
+            "class": "auto",
+            "description": "updated_at becomes updated",
+            "dir": "Deep Thought/9 pkm/tasks",
+            "from": "updated_at",
+            "to": "updated"
+          },
+          {
+            "id": "title",
+            "kind": "title_from_h1",
+            "class": "auto",
+            "description": "title from the first heading",
+            "dir": "Deep Thought/9 pkm/tasks"
+          },
+          {
+            "id": "goal",
+            "kind": "goal_scaffold",
+            "class": "auto",
+            "description": "add a Goal section",
+            "dir": "Deep Thought/9 pkm/tasks",
+            "statuses": [
+              "ready",
+              "active"
+            ]
+          },
+          {
+            "id": "adr-number",
+            "kind": "rename_field",
+            "class": "auto",
+            "description": "the legacy id becomes adr_number",
+            "dir": "Deep Thought/9 pkm/adr",
+            "from": "id",
+            "to": "adr_number"
+          },
+          {
+            "id": "ids-tasks",
+            "kind": "mint_ids",
+            "class": "auto",
+            "description": "ids for tasks",
+            "dir": "Deep Thought/9 pkm/tasks",
+            "rename": false,
+            "seed": "vault-tasks"
+          },
+          {
+            "id": "ids-adrs",
+            "kind": "mint_ids",
+            "class": "auto",
+            "description": "ids for ADRs",
+            "dir": "Deep Thought/9 pkm/adr",
+            "date_field": "date",
+            "rename": false,
+            "seed": "vault-adrs"
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "migrate",
+    "request": {
+      "mode": "plan",
+      "migrations": [
+        {
+          "from": "0.0.0",
+          "to": "1.0.0",
+          "steps": [
+            {
+              "id": "created",
+              "kind": "rename_field",
+              "class": "auto",
+              "description": "created_at becomes created",
+              "dir": "Deep Thought/9 pkm/tasks",
+              "from": "created_at",
+              "to": "created"
+            },
+            {
+              "id": "updated",
+              "kind": "rename_field",
+              "class": "auto",
+              "description": "updated_at becomes updated",
+              "dir": "Deep Thought/9 pkm/tasks",
+              "from": "updated_at",
+              "to": "updated"
+            },
+            {
+              "id": "title",
+              "kind": "title_from_h1",
+              "class": "auto",
+              "description": "title from the first heading",
+              "dir": "Deep Thought/9 pkm/tasks"
+            },
+            {
+              "id": "goal",
+              "kind": "goal_scaffold",
+              "class": "auto",
+              "description": "add a Goal section",
+              "dir": "Deep Thought/9 pkm/tasks",
+              "statuses": [
+                "ready",
+                "active"
+              ]
+            },
+            {
+              "id": "adr-number",
+              "kind": "rename_field",
+              "class": "auto",
+              "description": "the legacy id becomes adr_number",
+              "dir": "Deep Thought/9 pkm/adr",
+              "from": "id",
+              "to": "adr_number"
+            },
+            {
+              "id": "ids-tasks",
+              "kind": "mint_ids",
+              "class": "auto",
+              "description": "ids for tasks",
+              "dir": "Deep Thought/9 pkm/tasks",
+              "rename": false,
+              "seed": "vault-tasks"
+            },
+            {
+              "id": "ids-adrs",
+              "kind": "mint_ids",
+              "class": "auto",
+              "description": "ids for ADRs",
+              "dir": "Deep Thought/9 pkm/adr",
+              "date_field": "date",
+              "rename": false,
+              "seed": "vault-adrs"
+            }
+          ]
+        }
+      ]
+    },
+    "ok": true,
+    "mode": "plan",
+    "from": "0.0.0",
+    "to": "1.0.0",
+    "state": "behind",
+    "steps": [
+      {
+        "id": "created",
+        "kind": "rename_field",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md"
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "updated",
+        "kind": "rename_field",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md"
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "title",
+        "kind": "title_from_h1",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md"
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "goal",
+        "kind": "goal_scaffold",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md"
+        ],
+        "status": "pending",
+        "notes": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md: added ## Goal (introduction moved under it, Done when kept as a list); review the text"
+        ]
+      },
+      {
+        "id": "adr-number",
+        "kind": "rename_field",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/adr/ADR-001 Use SQLite.md"
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "ids-tasks",
+        "kind": "mint_ids",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md"
+        ],
+        "status": "pending",
+        "notes": [
+          "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md -> Deep Thought/9 pkm/tasks/261020-aamj-write-the-docs.md (id 261020-aamj, date from created); not renamed: rename the file as listed in renames"
+        ],
+        "renames": [
+          {
+            "from": "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md",
+            "to": "Deep Thought/9 pkm/tasks/261020-aamj-write-the-docs.md"
+          }
+        ]
+      },
+      {
+        "id": "ids-adrs",
+        "kind": "mint_ids",
+        "class": "auto",
+        "files": [
+          "Deep Thought/9 pkm/adr/ADR-001 Use SQLite.md"
+        ],
+        "status": "pending",
+        "notes": [
+          "Deep Thought/9 pkm/adr/ADR-001 Use SQLite.md -> Deep Thought/9 pkm/adr/261001-x9r5-adr-001-use-sqlite.md (id 261001-x9r5, date from date); not renamed: rename the file as listed in renames"
+        ],
+        "renames": [
+          {
+            "from": "Deep Thought/9 pkm/adr/ADR-001 Use SQLite.md",
+            "to": "Deep Thought/9 pkm/adr/261001-x9r5-adr-001-use-sqlite.md"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "rule": "S1",
+        "severity": "W",
+        "file": "docs/.layout",
+        "line": null,
+        "id": null,
+        "message": "the manifest has no layout key",
+        "class": "info"
+      }
+    ],
+    "clean": false
+  }
+}

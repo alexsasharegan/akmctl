@@ -25,10 +25,11 @@ Done when:
 
 ## Next
 
-Manifest keys are done; build and test the migrate steps, `mint_ids` options and `--migration`, then spec text.
+Code and fixtures are done. Update the spec, guide and API spec in the vault, run the checks, close this item, push the branch.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: claimed (claude).
 - 2026-10-29: built the manifest keys `work_dir`, `adr_dir`, `roadmap` (`record.Repo` accessors, rule S3 for bad values, writes refused while S3 holds), `version.repository.work_dir`/`adr_dir`, the workbench taking the folders from `version`, fixture repo `vault` with cases, and the blank line after a created `## Outcome` (`SetSection`).
+- 2026-10-29: built the steps `title_from_h1`, `goal_scaffold`, `remove_field`, `copy_field`, `dir` on the field steps, `mint_ids` `rename: false` and `seed`, `migrate --migration` and the `migrations` parameter; `plan` runs the steps on a scratch copy so dependent steps plan as they will run. Fixtures: repos `vault` and `legacy`, cases ls-6, check-5, index-2, version-3, close-5, migrate-2 to 4; schemas updated.

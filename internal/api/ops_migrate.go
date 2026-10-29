@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"io"
 	"time"
@@ -120,6 +122,13 @@ func stepObj(r migrate.Result) Obj {
 	if len(r.Notes) > 0 {
 		o = append(o, KV{"notes", r.Notes})
 	}
+	if len(r.Renames) > 0 {
+		rs := make([]Obj, 0, len(r.Renames))
+		for _, x := range r.Renames {
+			rs = append(rs, O("from", x.From, "to", x.To))
+		}
+		o = append(o, KV{"renames", rs})
+	}
 	return o
 }
 
@@ -138,7 +147,11 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 	}
 	from := repoLayout(repo)
 	env := migrate.Env{Rand: migrateRand, Now: clock(q)}
-	chain, found := migrate.Chain(from, to)
+	extra, merr := parseMigrations(q)
+	if merr != nil {
+		return nil, merr
+	}
+	chain, found := migrate.ChainIn(append(append([]migrate.Migration(nil), migrate.Registry...), extra...), from, to)
 	steps := migrate.Steps(chain)
 	state := "current"
 	switch {
@@ -250,3 +263,29 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 }
 
 var _ = time.Now
+
+// parseMigrations reads the one-off migrations of the request: objects of the
+// form {from, to, steps}, checked as the embedded ones are (unknown members and
+// step kinds are errors).
+func parseMigrations(q Request) ([]migrate.Migration, *Error) {
+	raw, ok := q["migrations"]
+	if !ok {
+		return nil, nil
+	}
+	b, err := json.Marshal(raw)
+	if err != nil {
+		return nil, invalid("migrations", "migrations cannot be read: %v", err)
+	}
+	dec := json.NewDecoder(bytes.NewReader(b))
+	dec.DisallowUnknownFields()
+	var ms []migrate.Migration
+	if err := dec.Decode(&ms); err != nil {
+		return nil, invalid("migrations", "migrations: %v", err)
+	}
+	for i, m := range ms {
+		if err := migrate.Validate(m); err != nil {
+			return nil, invalid("migrations", "migrations[%d]: %v", i, err)
+		}
+	}
+	return ms, nil
+}

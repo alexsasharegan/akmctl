@@ -2,6 +2,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -80,6 +81,20 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		case "out":
 			v, _ := value()
 			outFile = v
+			continue
+		case "migration":
+			v, ok := value()
+			if !ok || op != "migrate" {
+				fmt.Fprintln(stderr, "akmctl: --migration <file> belongs to migrate")
+				return 2
+			}
+			ms, err := readMigrationFile(v)
+			if err != nil {
+				fmt.Fprintln(stderr, "akmctl:", err)
+				return 2
+			}
+			prev, _ := req["migrations"].([]any)
+			req["migrations"] = append(prev, ms...)
 			continue
 		case "format":
 			v, ok := value()
@@ -214,6 +229,26 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		return 1
 	}
 	return 0
+}
+
+// readMigrationFile reads a migration file: one migration object, or a list of
+// them. The API checks the content.
+func readMigrationFile(p string) ([]any, error) {
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+	var v any
+	if err := json.Unmarshal(b, &v); err != nil {
+		return nil, fmt.Errorf("%s: not JSON: %v", p, err)
+	}
+	switch x := v.(type) {
+	case map[string]any:
+		return []any{x}, nil
+	case []any:
+		return x, nil
+	}
+	return nil, fmt.Errorf("%s: a migration file holds an object or a list of objects", p)
 }
 
 func flagGiven(args []string, name string) bool {
@@ -440,7 +475,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --out <file>\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

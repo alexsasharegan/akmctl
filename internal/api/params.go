@@ -36,6 +36,7 @@ const (
 	kInt     = "int"
 	kStrings = "strings"
 	kObject  = "object"
+	kObjects = "objects" // a list of objects
 )
 
 type param struct {
@@ -93,7 +94,7 @@ var specs = map[string]map[string]param{
 	"close":   {"id": s(req, pat(reID)), "status": {kind: kString, enum: []string{"done", "dropped"}, required: true}, "outcome": s(), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"claim":   {"id": s(req, pat(reID)), "as": s(req), "if_match": s(pat(reEtag)), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"release": {"id": s(req, pat(reID)), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"migrate": {"mode": {kind: kString, enum: []string{"report", "plan", "apply_safe", "handoff"}}, "target": s(pat(reVersion)), "acknowledge_backup": {kind: kBool}, "as_of": s(pat(reDateTS))},
+	"migrate": {"mode": {kind: kString, enum: []string{"report", "plan", "apply_safe", "handoff"}}, "target": s(pat(reVersion)), "acknowledge_backup": {kind: kBool}, "migrations": {kind: kObjects}, "as_of": s(pat(reDateTS))},
 	"index":   {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
 }
 
@@ -159,6 +160,24 @@ func validate(op string, r Request) *Error {
 		case kObject:
 			if _, ok := v.(map[string]any); !ok {
 				return invalid(name, "%s must be an object", name)
+			}
+		case kObjects:
+			l, ok := v.([]any)
+			if !ok {
+				if ms, isMaps := v.([]map[string]any); isMaps {
+					for _, m := range ms {
+						l = append(l, m)
+					}
+					ok = true
+				}
+			}
+			if !ok {
+				return invalid(name, "%s must be a list of objects", name)
+			}
+			for _, x := range l {
+				if _, ok := x.(map[string]any); !ok {
+					return invalid(name, "%s must be a list of objects", name)
+				}
 			}
 		case kStrings:
 			l, ok := asStrings(v)

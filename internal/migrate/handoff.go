@@ -11,7 +11,7 @@ func Handoff(from, to string, results []Result, findings []string) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Finish the migration from layout %s to %s\n\n", from, to)
 	b.WriteString("You are finishing a migration of this repository's AKM records. The tool has applied the steps it can do safely. The rest needs judgement.\n\n")
-	b.WriteString("## Read first\n\n- `AGENTS.md` and the layout spec the repository points to (docs/ROADMAP.md, docs/adr/, docs/work/).\n- `docs/.layout`, the manifest, and `docs/.migrate-log` if it exists: the steps already applied.\n\n")
+	b.WriteString("## Read first\n\n- `AGENTS.md` and the layout spec the repository points to (the roadmap, ADR and work folders are named in the manifest, `docs/.layout`, or default to docs/ROADMAP.md, docs/adr/ and docs/work/).\n- `docs/.layout`, the manifest, and `docs/.migrate-log` if it exists: the steps already applied.\n\n")
 	b.WriteString("## What is left\n\n")
 	n := 0
 	for _, r := range results {

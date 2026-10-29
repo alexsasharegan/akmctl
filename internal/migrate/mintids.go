@@ -2,6 +2,7 @@ package migrate
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
@@ -10,11 +11,13 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/fsx"
+	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
 // IDAlphabet is the alphabet of the four-character id suffix.
@@ -94,15 +97,23 @@ func idDate(v string) (string, bool) {
 }
 
 type mintCtx struct {
+	repo *record.Repo
 	root string
 	used map[string]bool
 	env  Env
+	seed string // when set, the suffix comes from a hash of seed and file, not the random source
 }
 
-func (m *mintCtx) mint(date string) (string, error) {
+// mint draws an id for date. With a seed, the suffix is the first four
+// characters of sha256(seed, name, try): the same seed and name give the same
+// id on every run, and the try counter redraws on a collision.
+func (m *mintCtx) mint(date, name string) (string, error) {
 	for i := 0; i < 200; i++ {
 		var b [4]byte
-		if _, err := io.ReadFull(m.env.rand(), b[:]); err != nil {
+		if m.seed != "" {
+			sum := sha256.Sum256([]byte(m.seed + "\x00" + name + "\x00" + strconv.Itoa(i)))
+			copy(b[:], sum[:4])
+		} else if _, err := io.ReadFull(m.env.rand(), b[:]); err != nil {
 			return "", err
 		}
 		suffix := make([]byte, 4)
@@ -148,7 +159,7 @@ func (m *mintCtx) collectUsed(dir string, recursive bool) {
 			return nil
 		})
 	}
-	for _, d := range []string{"docs/adr", "docs/work", "docs/work/done"} {
+	for _, d := range []string{m.repo.ADRDir(), m.repo.WorkDir(), m.repo.DoneDir()} {
 		scan(filepath.Join(m.root, filepath.FromSlash(d)), false)
 	}
 	scan(filepath.Join(m.root, filepath.FromSlash(dir)), recursive)
@@ -159,26 +170,29 @@ type mintItem struct {
 	id             string
 	text           []byte // the new file text
 	renamed        bool
+	planned        string // with rename false, the name the caller should give the file
 	note           string
 }
 
 // mintIDs plans (and unless dry applies) the mint_ids step. files are the new
 // repository-relative paths; notes say what the tool decided or could not do.
-func mintIDs(root string, s Step, dry bool, env Env) (files, notes []string, err error) {
+func mintIDs(repo *record.Repo, s Step, dry bool, env Env) (files, notes []string, renames []Rename, err error) {
+	root := repo.Root
 	files, notes = []string{}, []string{}
 	if s.Dir == "" || !safeRel(s.Dir) {
-		return files, notes, fmt.Errorf("mint_ids: dir %q must be a repository-relative path", s.Dir)
+		return files, notes, nil, fmt.Errorf("mint_ids: dir %q must be a repository-relative path", s.Dir)
 	}
+	doRename := s.Rename == nil || *s.Rename
 	dir := path.Clean(s.Dir)
 	absDir := filepath.Join(root, filepath.FromSlash(dir))
 	if st, e := os.Stat(absDir); e != nil || !st.IsDir() {
-		return files, []string{"directory " + dir + " does not exist; nothing to do"}, nil
+		return files, []string{"directory " + dir + " does not exist; nothing to do"}, nil, nil
 	}
 	field := s.DateField
 	if field == "" {
 		field = "created"
 	}
-	m := &mintCtx{root: root, used: map[string]bool{}, env: env}
+	m := &mintCtx{repo: repo, root: root, used: map[string]bool{}, env: env, seed: s.Seed}
 	m.collectUsed(dir, s.Recursive)
 
 	// the candidates, in path order so a seeded run is repeatable
@@ -208,9 +222,9 @@ func mintIDs(root string, s Step, dry bool, env Env) (files, notes []string, err
 		rel = filepath.ToSlash(rel)
 		b, e := os.ReadFile(p)
 		if e != nil {
-			return files, notes, e
+			return files, notes, nil, e
 		}
-		it, note, skip := planOne(m, rel, b, field)
+		it, note, skip := planOne(m, rel, b, field, doRename)
 		if note != "" {
 			notes = append(notes, note)
 		}
@@ -220,40 +234,46 @@ func mintIDs(root string, s Step, dry bool, env Env) (files, notes []string, err
 		items = append(items, *it)
 	}
 	if len(items) == 0 {
-		return files, notes, nil
+		return files, notes, nil, nil
 	}
 
 	refs := findReferences(root, items)
 	for _, it := range items {
 		files = append(files, it.newRel)
 		notes = append(notes, it.note)
+		switch {
+		case it.renamed:
+			renames = append(renames, Rename{it.oldRel, it.newRel})
+		case it.planned != "":
+			renames = append(renames, Rename{it.oldRel, it.planned})
+		}
 	}
 	notes = append(notes, refs...)
 	if dry {
 		sort.Strings(files)
-		return files, notes, nil
+		return files, notes, renames, nil
 	}
 	for _, it := range items {
 		from, to := filepath.Join(root, filepath.FromSlash(it.oldRel)), filepath.Join(root, filepath.FromSlash(it.newRel))
 		if it.renamed {
 			if _, e := os.Stat(to); e == nil {
-				return files, notes, fmt.Errorf("mint_ids: %s already exists", it.newRel)
+				return files, notes, renames, fmt.Errorf("mint_ids: %s already exists", it.newRel)
 			}
 			if e := fsx.Rename(from, to); e != nil {
-				return files, notes, e
+				return files, notes, renames, e
 			}
 		}
 		if e := fsx.WriteAtomic(to, it.text); e != nil {
-			return files, notes, e
+			return files, notes, renames, e
 		}
 	}
 	sort.Strings(files)
-	return files, notes, nil
+	return files, notes, renames, nil
 }
 
 // planOne decides one file. skip is true when the file stays as it is; note is
 // then a report line or empty.
-func planOne(m *mintCtx, rel string, b []byte, field string) (it *mintItem, note string, skip bool) {
+func planOne(m *mintCtx, rel string, b []byte, field string, doRename bool) (it *mintItem, note string, skip bool) {
 	name := path.Base(rel)
 	dirRel := path.Dir(rel)
 	doc, err := frontmatter.Parse(b)
@@ -313,7 +333,7 @@ func planOne(m *mintCtx, rel string, b []byte, field string) (it *mintItem, note
 		date = m.env.now().Format("060102")
 		src = "today (" + field + " absent or not a date)"
 	}
-	id, e := m.mint(date)
+	id, e := m.mint(date, rel)
 	if e != nil {
 		return nil, rel + ": skipped, " + e.Error(), true
 	}
@@ -330,6 +350,14 @@ func planOne(m *mintCtx, rel string, b []byte, field string) (it *mintItem, note
 		extra = append(extra, "the file had no frontmatter, created it")
 	}
 	note = fmt.Sprintf("%s -> %s (id %s, date %s)", rel, newRel, id, src)
+	if !doRename {
+		// the id is written; the caller renames the file (Obsidian rewrites links)
+		extra = append(extra, "not renamed: rename the file as listed in renames")
+		if len(extra) > 0 {
+			note += "; " + strings.Join(extra, "; ")
+		}
+		return &mintItem{oldRel: rel, newRel: rel, planned: newRel, id: id, text: text, note: note}, "", false
+	}
 	if len(extra) > 0 {
 		note += "; " + strings.Join(extra, "; ")
 	}
