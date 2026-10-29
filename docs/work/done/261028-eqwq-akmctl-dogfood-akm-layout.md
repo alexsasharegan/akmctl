@@ -8,6 +8,7 @@ updated: 2026-10-28
 authored_by: agent
 title: Make the akmctl repository a dogfood candidate of the AKM repo kit
 ---
+
 # Make the akmctl repository a dogfood candidate of the AKM repo kit
 
 ## Goal

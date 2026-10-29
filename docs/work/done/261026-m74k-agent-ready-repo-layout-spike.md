@@ -9,6 +9,7 @@ authored_by: agent
 adr: recorded
 title: "Spike: an agent-ready repository layout"
 ---
+
 # Spike: an agent-ready repository layout
 
 ## Goal
@@ -23,7 +24,7 @@ The contract is settled; Option A, Option B and the chosen layout are each descr
 
 ## Contract
 
-Before comparing layouts, state what a repo's memory is *for*. Each mechanism (a docs folder, ADRs, a roadmap, a skill) has to earn its place by serving a clause here. C1 to C8 are a draft from Alexander's words; C9 to C12 were added after the discovery pass (2026-10-26, grouping accepted by Alexander). The spike settles the whole.
+Before comparing layouts, state what a repo's memory is _for_. Each mechanism (a docs folder, ADRs, a roadmap, a skill) has to earn its place by serving a clause here. C1 to C8 are a draft from Alexander's words; C9 to C12 were added after the discovery pass (2026-10-26, grouping accepted by Alexander). The spike settles the whole.
 
 An agent-ready repo lets a cold reader:
 
@@ -51,9 +52,9 @@ Each option, and the chosen mix, is described by how it meets each clause (C1 to
 ## Steps
 
 1. **Discovery, in isolation.** Two read-only agents with controlled context, so B is not coloured by A.
-    - Option A agent: reads `alexregan.com`, `poetic-overtones`, `shavian2tengwar`, `mysqlbak` (under `~/github.com/alexsasharegan/`), the user-level `project-docs` skill and templates, the vault as a repo case, and `pkm-workbench` as the pilot target. Describes, does not advocate. Records files, procedures, skills, hooks, CI, purpose, inconsistencies and real drift, then maps them to C1 to C8.
-    - Option B agent: no access to local files. Researches ADR practice, roadmaps, plans directories, agent skills, `AGENTS.md` evidence and critiques. Proposes one full design: layout, memory layers, issues, `AGENTS.md` text, draft skills, mechanical checks, lifecycle, small and large tiers, and a C1 to C8 mapping.
-    - Out of scope: `parametricstudios.com` (excluded), and any work or employer repo, which Alexander cannot share and agents never request.
+   - Option A agent: reads `alexregan.com`, `poetic-overtones`, `shavian2tengwar`, `mysqlbak` (under `~/github.com/alexsasharegan/`), the user-level `project-docs` skill and templates, the vault as a repo case, and `pkm-workbench` as the pilot target. Describes, does not advocate. Records files, procedures, skills, hooks, CI, purpose, inconsistencies and real drift, then maps them to C1 to C8.
+   - Option B agent: no access to local files. Researches ADR practice, roadmaps, plans directories, agent skills, `AGENTS.md` evidence and critiques. Proposes one full design: layout, memory layers, issues, `AGENTS.md` text, draft skills, mechanical checks, lifecycle, small and large tiers, and a C1 to C8 mapping.
+   - Out of scope: `parametricstudios.com` (excluded), and any work or employer repo, which Alexander cannot share and agents never request.
 2. **Review the contract** with Alexander against both reports, including purposes either agent found that the draft misses.
 3. **Compare** A, B and a mix C against the settled contract, plus cold-start cost, enforcement, upkeep cost, drift, fit for small and large repos, and fit with the vault's task notes. Show the options; do not decide for him.
 4. **Decide** with Alexander, and record it as an ADR if it changes how repos are set up.

@@ -8,6 +8,7 @@ updated: 2026-10-28
 authored_by: agent
 title: Prepare a clean v1.0 spec
 ---
+
 # Prepare a clean v1.0 spec
 
 ## Goal

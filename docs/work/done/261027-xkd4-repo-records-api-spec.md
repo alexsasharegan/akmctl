@@ -9,6 +9,7 @@ authored_by: agent
 adr: candidate
 title: Write the API spec for repo records
 ---
+
 # Write the API spec for repo records
 
 ## Goal

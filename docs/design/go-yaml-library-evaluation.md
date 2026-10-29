@@ -4,6 +4,7 @@ status: draft
 created_at: 2026-10-28
 updated_at: 2026-10-28
 ---
+
 # Go YAML library evaluation for `akmctl` (draft for review)
 
 Evaluation for [261027-wkxv-go-yaml-library-evaluation](../work/done/261027-wkxv-go-yaml-library-evaluation.md), serving [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md) (H5, section 0) and [261027-ensf-akm-an-agent-knowledge-management](../adr/261027-ensf-akm-an-agent-knowledge-management.md). It answers one question: how should the Go tool read and edit frontmatter? Criteria, in Alexander's order: (1) baseline requirements, (2) performance, (3) security, (4) popularity and support as a tiebreaker. Run on 2026-10-28; machine and toolchain in the benchmark section.
@@ -25,13 +26,13 @@ This is a recommendation for Alexander to confirm. It changes nothing in [261027
 
 ## Candidates
 
-| # | Candidate | Role |
-|---|---|---|
-| 1 | Hand-written subset parser (this note, appendix) | baseline and recommendation |
-| 2 | `go.yaml.in/yaml/v3` v3.0.5 | maintained successor of go-yaml v3, same API |
-| 3 | `go.yaml.in/yaml/v4` v4.0.0-rc.6 | next major in the same repository, not released yet |
-| 4 | `github.com/goccy/go-yaml` v1.19.2 | independent pure-Go implementation with its own AST |
-| 5 | `gopkg.in/yaml.v3` v3.0.1 | the original, archived; kept as a reference point only |
+| #   | Candidate                                        | Role                                                   |
+| --- | ------------------------------------------------ | ------------------------------------------------------ |
+| 1   | Hand-written subset parser (this note, appendix) | baseline and recommendation                            |
+| 2   | `go.yaml.in/yaml/v3` v3.0.5                      | maintained successor of go-yaml v3, same API           |
+| 3   | `go.yaml.in/yaml/v4` v4.0.0-rc.6                 | next major in the same repository, not released yet    |
+| 4   | `github.com/goccy/go-yaml` v1.19.2               | independent pure-Go implementation with its own AST    |
+| 5   | `gopkg.in/yaml.v3` v3.0.1                        | the original, archived; kept as a reference point only |
 
 Left out on purpose: `sigs.k8s.io/yaml` (a JSON-oriented wrapper over a go-yaml fork; no node tree, so no ordered fields or comments) and `go.yaml.in/yaml/v2` (older, frozen, no advantage over v3).
 
@@ -39,22 +40,23 @@ Left out on purpose: `sigs.k8s.io/yaml` (a JSON-oriented wrapper over a go-yaml 
 
 Facts as of 2026-10-28, from the GitHub API (`gh api repos/...`), the Go module proxy (`proxy.golang.org`), pkg.go.dev, and osv.dev.
 
-| | Hand-written | `go.yaml.in/yaml/v3` | `go.yaml.in/yaml/v4` | `goccy/go-yaml` | `gopkg.in/yaml.v3` |
-|---|---|---|---|---|---|
-| Version / last release | n/a | v3.0.5, 2026-07-26 | v4.0.0-rc.6, 2026-06-17 (no GA yet) | v1.19.2, 2026-01-08 | v3.0.1, 2022-05-27 |
-| Licence | n/a | Apache-2.0 (repo licence; not checked for per-file notices) | Apache-2.0 | MIT | Apache-2.0 (as the original; not re-checked) |
-| Maintainers | n/a | `yaml` GitHub org; top contributors ingydotnet, niemeyer, ccoVeille | same repository | one dominant author (goccy: 605 commits; next contributor 22) | archived 2025-04-01; original author states it is unmaintained |
-| Activity | n/a | repo pushed 2026-10-27 (v3 branch: security fixes only) | active development on `main` | last push 2026-04-11 | none |
-| Open issues | n/a | 80 (whole repo) | 80 (whole repo) | 260 | 422 (frozen) |
-| Runtime dependencies | 0 | 0 | 0 | 0 | 0 |
-| Stars / importers | n/a | 544 stars (repo) / 555 importers | same repo / 376 importers | 2,243 / 2,983 | 7,014 / 44,731 |
-| Known vulnerabilities (osv.dev, GitHub advisories) | none | none for the module | none | none listed | CVE-2022-28948 (panic on malformed input), fixed in v3.0.1 |
-| **(1) Baseline** | all met; edits byte-identical (4 of 4) | parses the subset; edits **not** byte-identical (0 of 4); accepts out-of-subset input; retypes dates | same as v3 | same, and a value edit loses the trailing comment; key rename failed | same as v3 |
-| **(2) Performance** (us/file, allocs/file) | **2.8, 28** | 17.9, 216 | 17.4, 237 | 22.7, 599 | 17.8, 216 |
-| **(3) Security** | linear, no recursion, rejects aliases | max depth 10,000; alias-ratio check; slow decode on 1M keys | same as v3 | **unbounded** memory on deep flow nesting; 3 GB for 100 MB scalar | same as v3 (no fix for slow decode) |
-| **(4) Popularity** | n/a | modest, growing (migration path of the original) | low (pre-release) | good | highest, but archived |
+|                                                    | Hand-written                           | `go.yaml.in/yaml/v3`                                                                                 | `go.yaml.in/yaml/v4`                | `goccy/go-yaml`                                                      | `gopkg.in/yaml.v3`                                             |
+| -------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Version / last release                             | n/a                                    | v3.0.5, 2026-07-26                                                                                   | v4.0.0-rc.6, 2026-06-17 (no GA yet) | v1.19.2, 2026-01-08                                                  | v3.0.1, 2022-05-27                                             |
+| Licence                                            | n/a                                    | Apache-2.0 (repo licence; not checked for per-file notices)                                          | Apache-2.0                          | MIT                                                                  | Apache-2.0 (as the original; not re-checked)                   |
+| Maintainers                                        | n/a                                    | `yaml` GitHub org; top contributors ingydotnet, niemeyer, ccoVeille                                  | same repository                     | one dominant author (goccy: 605 commits; next contributor 22)        | archived 2025-04-01; original author states it is unmaintained |
+| Activity                                           | n/a                                    | repo pushed 2026-10-27 (v3 branch: security fixes only)                                              | active development on `main`        | last push 2026-04-11                                                 | none                                                           |
+| Open issues                                        | n/a                                    | 80 (whole repo)                                                                                      | 80 (whole repo)                     | 260                                                                  | 422 (frozen)                                                   |
+| Runtime dependencies                               | 0                                      | 0                                                                                                    | 0                                   | 0                                                                    | 0                                                              |
+| Stars / importers                                  | n/a                                    | 544 stars (repo) / 555 importers                                                                     | same repo / 376 importers           | 2,243 / 2,983                                                        | 7,014 / 44,731                                                 |
+| Known vulnerabilities (osv.dev, GitHub advisories) | none                                   | none for the module                                                                                  | none                                | none listed                                                          | CVE-2022-28948 (panic on malformed input), fixed in v3.0.1     |
+| **(1) Baseline**                                   | all met; edits byte-identical (4 of 4) | parses the subset; edits **not** byte-identical (0 of 4); accepts out-of-subset input; retypes dates | same as v3                          | same, and a value edit loses the trailing comment; key rename failed | same as v3                                                     |
+| **(2) Performance** (us/file, allocs/file)         | **2.8, 28**                            | 17.9, 216                                                                                            | 17.4, 237                           | 22.7, 599                                                            | 17.8, 216                                                      |
+| **(3) Security**                                   | linear, no recursion, rejects aliases  | max depth 10,000; alias-ratio check; slow decode on 1M keys                                          | same as v3                          | **unbounded** memory on deep flow nesting; 3 GB for 100 MB scalar    | same as v3 (no fix for slow decode)                            |
+| **(4) Popularity**                                 | n/a                                    | modest, growing (migration path of the original)                                                     | low (pre-release)                   | good                                                                 | highest, but archived                                          |
 
 Sources:
+
 - Repository state: `gh api repos/{yaml/go-yaml, go-yaml/yaml, goccy/go-yaml}` (archived flag, pushed_at, stars, issues, licence), contributors endpoint, `yaml/go-yaml` README (version table, v4 release plan).
 - Versions and dates: `https://proxy.golang.org/<module>/@latest` and `@v/list`. Note `yaml/go-yaml` publishes tags, not GitHub releases.
 - Importers: pkg.go.dev "Imported by" count for each module path.
@@ -79,14 +81,14 @@ Method: one program per candidate (appendix) reads each fixture's frontmatter bl
 
 Fixtures with a known bad line. "OK" means the reported line is the offending line (file line, after adding 1).
 
-| Fault | Hand | `go.yaml.in/yaml/v3` / `gopkg.in/yaml.v3` | `go.yaml.in/yaml/v4` | `goccy/go-yaml` |
-|---|---|---|---|---|
-| Unterminated `"` (file line 3) | OK, line 3 | OK (`yaml: line 2` + 1) | `L2.C10` + 1: OK | `[2:10]` + 1: OK |
-| Unterminated `[a, b` (file line 4) | OK, line 4 | **wrong**: `line 2` (+1 = 3) | `L3.C7` + 1: OK | `[4:1]` + 1 = 5: points at the next line |
-| `summary: a: b` (file line 3) | OK | OK | OK | OK |
-| Duplicate key (file line 4) | OK | **no error** in node mode | **no error** in node mode | OK (`[3:1]` + 1) |
-| Tab indent (file line 4) | OK | OK | OK | OK |
-| Stray indented line (file line 3) | OK | OK | OK | `[1:8]` + 1 = 2: points at the previous line |
+| Fault                              | Hand       | `go.yaml.in/yaml/v3` / `gopkg.in/yaml.v3` | `go.yaml.in/yaml/v4`      | `goccy/go-yaml`                              |
+| ---------------------------------- | ---------- | ----------------------------------------- | ------------------------- | -------------------------------------------- |
+| Unterminated `"` (file line 3)     | OK, line 3 | OK (`yaml: line 2` + 1)                   | `L2.C10` + 1: OK          | `[2:10]` + 1: OK                             |
+| Unterminated `[a, b` (file line 4) | OK, line 4 | **wrong**: `line 2` (+1 = 3)              | `L3.C7` + 1: OK           | `[4:1]` + 1 = 5: points at the next line     |
+| `summary: a: b` (file line 3)      | OK         | OK                                        | OK                        | OK                                           |
+| Duplicate key (file line 4)        | OK         | **no error** in node mode                 | **no error** in node mode | OK (`[3:1]` + 1)                             |
+| Tab indent (file line 4)           | OK         | OK                                        | OK                        | OK                                           |
+| Stray indented line (file line 3)  | OK         | OK                                        | OK                        | `[1:8]` + 1 = 2: points at the previous line |
 
 All four libraries report the line relative to the block they were given, so the tool must add the offset itself, same as it must for a hand parser fed only the block. `goccy/go-yaml` and the v3 family sometimes name a neighbouring line. v4 changed the error format (`L2.C10`, "go-yaml load error in scanner ...") and has an open issue titled "BC break: odd line/column notation in errors".
 
@@ -94,12 +96,12 @@ All four libraries report the line relative to the block they were given, so the
 
 Edit fixture (in the appendix) has odd spacing after colons, trailing comments, a blank line, a loose inline list, a four-space block list and mixed quoting. Four edits: no-op, set `status`, rename `updated` to `updated_at`, add a default. The expected output is the naive text edit.
 
-| Edit | Hand | `go.yaml.in/yaml/v3` | `go.yaml.in/yaml/v4` | `goccy/go-yaml` | `gopkg.in/yaml.v3` |
-|---|---|---|---|---|---|
-| no-op | identical | differs | differs | differs | differs |
-| set `status` | identical | differs | differs | differs, **trailing comment lost** | differs |
-| rename key | identical | differs | differs | differs, **key not renamed** | differs |
-| add default | identical | differs | differs | not attempted via AST | differs |
+| Edit         | Hand      | `go.yaml.in/yaml/v3` | `go.yaml.in/yaml/v4` | `goccy/go-yaml`                    | `gopkg.in/yaml.v3` |
+| ------------ | --------- | -------------------- | -------------------- | ---------------------------------- | ------------------ |
+| no-op        | identical | differs              | differs              | differs                            | differs            |
+| set `status` | identical | differs              | differs              | differs, **trailing comment lost** | differs            |
+| rename key   | identical | differs              | differs              | differs, **key not renamed**       | differs            |
+| add default  | identical | differs              | differs              | not attempted via AST              | differs            |
 
 What "differs" means for the go-yaml family: `title:   "x"   # c` becomes `title: "x" # c`; the blank line is removed; `[ a,b ,'c' ]` becomes `[a, b, 'c']`; the four-space list indent becomes two (with `SetIndent(2)`; the default is four). `goccy/go-yaml` keeps the blank line and the four-space indent but also normalizes spacing and the flow list. Comments survive in the go-yaml family, which is the best result any library gives, but "comments survive" is not "bytes survive". The task's baseline says an option that cannot do this must say so: **none of the four libraries can.** The hand parser does it by construction, because it never regenerates text.
 
@@ -109,16 +111,16 @@ Limits of the hand parser's edit: `set` handles scalar values only (list edits w
 
 5,000 generated files, each 1,375 bytes with a 407-byte, 15-line frontmatter block (one 120-character `summary`, an inline list, a two-item block list, quoted values, a comment) and a 960-byte body that is not parsed. Machine: Apple M1 Max, 10 CPUs, 64 GB; `go1.27.2 darwin/arm64`; Go `testing.Benchmark`, three runs each. Times are for the whole batch of 5,000 (median of three), plus per file.
 
-| Candidate | Mode | ms / 5,000 files | us / file | allocs / file | bytes / file |
-|---|---|---|---|---|---|
-| Hand-written | fields | 14.2 | 2.8 | 28 | 7,000 |
-| `go.yaml.in/yaml/v3` | node, fields | 89.4 | 17.9 | 216 | 17,100 |
-| `go.yaml.in/yaml/v3` | decode `map[string]any` | 107.7 | 21.5 | 282 | 18,100 |
-| `go.yaml.in/yaml/v4` | node, fields | 86.8 | 17.4 | 237 | 17,500 |
-| `go.yaml.in/yaml/v4` | decode `map[string]any` | 109.9 | 22.0 | 303 | 18,400 |
-| `goccy/go-yaml` | node, fields | 113.4 | 22.7 | 599 | 32,400 |
-| `goccy/go-yaml` | decode `map[string]any` | 153.2 | 30.6 | 740 | 35,100 |
-| `gopkg.in/yaml.v3` | node, fields | 89.8 | 17.8 | 216 | 17,100 |
+| Candidate            | Mode                    | ms / 5,000 files | us / file | allocs / file | bytes / file |
+| -------------------- | ----------------------- | ---------------- | --------- | ------------- | ------------ |
+| Hand-written         | fields                  | 14.2             | 2.8       | 28            | 7,000        |
+| `go.yaml.in/yaml/v3` | node, fields            | 89.4             | 17.9      | 216           | 17,100       |
+| `go.yaml.in/yaml/v3` | decode `map[string]any` | 107.7            | 21.5      | 282           | 18,100       |
+| `go.yaml.in/yaml/v4` | node, fields            | 86.8             | 17.4      | 237           | 17,500       |
+| `go.yaml.in/yaml/v4` | decode `map[string]any` | 109.9            | 22.0      | 303           | 18,400       |
+| `goccy/go-yaml`      | node, fields            | 113.4            | 22.7      | 599           | 32,400       |
+| `goccy/go-yaml`      | decode `map[string]any` | 153.2            | 30.6      | 740           | 35,100       |
+| `gopkg.in/yaml.v3`   | node, fields            | 89.8             | 17.8      | 216           | 17,100       |
 
 Reading the files from disk and parsing each (best of 5): hand 120 ms, go-yaml family 207 to 211 ms, goccy 245 ms. Most of the hand parser's 120 ms is file system time, which every candidate pays; parse cost is the difference.
 
@@ -128,17 +130,18 @@ Every candidate handles thousands of small files in well under a second. The han
 
 Each case ran in a child process of the benchmark binary, with the parent polling resident memory every 50 ms and killing at 6 GB or 30 s. "node" means parse to the tree without expanding aliases; "decode" means `Unmarshal` into `map[string]any`. Machine as above.
 
-| Hostile input | Hand | `go.yaml.in/yaml/v3` (and `gopkg.in/yaml.v3`, same) | `go.yaml.in/yaml/v4` | `goccy/go-yaml` |
-|---|---|---|---|---|
-| Alias bomb, 9 levels of 9 (387 million leaves if expanded) | rejected at the first `&` | node: ok (not expanded); decode: error "excessive aliasing", 10 ms | same | node and decode: ok in 10 ms, 6 MB (aliases not expanded) |
-| 100,000 nested `[` | rejected, 6 MB | error "exceeded max depth of 10000", 10 ms | same | **killed at 6.5 GB after 1 s** |
-| Block nesting, 5,000 levels | rejected | ok, 45 to 68 MB, about 100 ms | same | node ok (144 MB); decode error "exceeded max depth" |
-| 100,000 `- ` on one line | rejected | error, 6 MB | error | error after 1.6 s, 189 MB |
-| One 100 MB scalar (plain or quoted) | ok, 207 to 407 MB, 140 ms | ok, 460 to 560 MB, 1.1 s | same | ok, **3.2 to 3.6 GB**, about 2 s |
-| 1,000,000 keys (about 20 MB) | ok, 543 MB, 0.55 s | node ok in 1.0 s; **decode over 30 s (killed)** | same as v3 | **node and decode both over 30 s (killed)**, 3.3 GB |
-| 1,000,000 list items | ok, 71 MB | ok, 250 to 300 MB | same | ok, 850 to 920 MB |
+| Hostile input                                              | Hand                      | `go.yaml.in/yaml/v3` (and `gopkg.in/yaml.v3`, same)                | `go.yaml.in/yaml/v4` | `goccy/go-yaml`                                           |
+| ---------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------ | -------------------- | --------------------------------------------------------- |
+| Alias bomb, 9 levels of 9 (387 million leaves if expanded) | rejected at the first `&` | node: ok (not expanded); decode: error "excessive aliasing", 10 ms | same                 | node and decode: ok in 10 ms, 6 MB (aliases not expanded) |
+| 100,000 nested `[`                                         | rejected, 6 MB            | error "exceeded max depth of 10000", 10 ms                         | same                 | **killed at 6.5 GB after 1 s**                            |
+| Block nesting, 5,000 levels                                | rejected                  | ok, 45 to 68 MB, about 100 ms                                      | same                 | node ok (144 MB); decode error "exceeded max depth"       |
+| 100,000 `- ` on one line                                   | rejected                  | error, 6 MB                                                        | error                | error after 1.6 s, 189 MB                                 |
+| One 100 MB scalar (plain or quoted)                        | ok, 207 to 407 MB, 140 ms | ok, 460 to 560 MB, 1.1 s                                           | same                 | ok, **3.2 to 3.6 GB**, about 2 s                          |
+| 1,000,000 keys (about 20 MB)                               | ok, 543 MB, 0.55 s        | node ok in 1.0 s; **decode over 30 s (killed)**                    | same as v3           | **node and decode both over 30 s (killed)**, 3.3 GB       |
+| 1,000,000 list items                                       | ok, 71 MB                 | ok, 250 to 300 MB                                                  | same                 | ok, 850 to 920 MB                                         |
 
 Reading it:
+
 - The hand parser holds no state beyond the current line, so time and memory grow linearly with input, and nothing it accepts can expand. It does have no size limit of its own; the tool should cap file size (for example refuse frontmatter above 64 KB, the `summary` limit of 160 characters being far lower) before parsing. That cap is a one-line check and is also needed with any library.
 - The go-yaml family limits depth (10,000) and alias expansion, which is real protection. Decoding a map of a million keys is slow (not completed in 30 s); I did not isolate why and did not check whether the duplicate-key check is the cause. Irrelevant for the subset's file sizes, but it shows that "bounded" depends on the mode.
 - `goccy/go-yaml` has no depth limit in flow style and a high constant memory factor (about 30 times input size for one scalar). A hostile file in a cloned repo could exhaust memory of any tool that parses it. I did not report this upstream.
@@ -1311,8 +1314,8 @@ github.com/goccy/go-yaml     deep-flow-100k             node   6505 MB        1.
 github.com/goccy/go-yaml     deep-flow-100k             decode 6559 MB        910ms     KILLED: RSS over 6 GB
 github.com/goccy/go-yaml     deep-block-5k              node   144 MB         240ms     ok
 github.com/goccy/go-yaml     deep-block-5k              decode 156 MB         240ms     error: exceeded max depth
-github.com/goccy/go-yaml     deep-seq-100k              node   189 MB         1.63s     error: [1:4] block sequence entries are not allowed in this context / >  1 
-github.com/goccy/go-yaml     deep-seq-100k              decode 104 MB         1.64s     error: [1:4] block sequence entries are not allowed in this context / >  1 
+github.com/goccy/go-yaml     deep-seq-100k              node   189 MB         1.63s     error: [1:4] block sequence entries are not allowed in this context / >  1
+github.com/goccy/go-yaml     deep-seq-100k              decode 104 MB         1.64s     error: [1:4] block sequence entries are not allowed in this context / >  1
 github.com/goccy/go-yaml     scalar-100MB-plain         node   3288 MB        2.02s     ok
 github.com/goccy/go-yaml     scalar-100MB-plain         decode 3332 MB        2s        ok
 github.com/goccy/go-yaml     scalar-100MB-dquote        node   3209 MB        1.82s     ok

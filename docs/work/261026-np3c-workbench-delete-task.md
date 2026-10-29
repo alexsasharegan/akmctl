@@ -9,6 +9,7 @@ updated: 2026-10-26
 authored_by: agent
 title: "pkm-workbench: delete a task, with its backlinks listed"
 ---
+
 # pkm-workbench: delete a task, with its backlinks listed
 
 ## Goal

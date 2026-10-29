@@ -9,6 +9,7 @@ authored_by: agent
 adr: candidate
 title: Settle the open questions in the AKM spec
 ---
+
 # Settle the open questions in the AKM spec
 
 ## Goal

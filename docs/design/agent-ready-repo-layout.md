@@ -5,6 +5,7 @@ created_at: 2026-10-26
 updated_at: 2026-10-26
 authored_by: agent
 ---
+
 # Agent-ready repository layout: inputs for the spike
 
 Inputs for [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md). This note records what was said and found on 2026-10-26 so a fresh thread can weigh the options without starting cold. It decides nothing.

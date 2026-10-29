@@ -5,6 +5,7 @@ created_at: 2026-10-26
 updated_at: 2026-10-26
 authored_by: agent
 ---
+
 # Agent-ready repository: discovery reports (Option A and Option B)
 
 Output of the discovery pass in [261026-m74k-agent-ready-repo-layout-spike](../work/done/261026-m74k-agent-ready-repo-layout-spike.md). Two read-only agents worked in isolation from the contract draft in the task note: the A agent read Alexander's repos and the vault; the B agent had no local file access and used the web only. Both reports are condensed here from the agents' final messages. Web sources are as the B agent reported them; none was re-checked by the main thread. Inputs from the earlier pass: [agent-ready-repo-layout](agent-ready-repo-layout.md). This note decides nothing.
@@ -19,7 +20,7 @@ See the task note for the wording: C1 Orientation, C2 Rationale, C3 Direction, C
 
 Found independently by both agents (strong signal):
 
-- **Verification evidence:** how a reader knows a change is correct; a record says what was and was not verified; an item is never "done" because code exists. A: LOG records what was *not* verified. B: C9; the long-running-agents post names declaring victory early as a core failure.
+- **Verification evidence:** how a reader knows a change is correct; a record says what was and was not verified; an item is never "done" because code exists. A: LOG records what was _not_ verified. B: C9; the long-running-agents post names declaring victory early as a core failure.
 - **Provenance:** which records an agent wrote and which a human has reviewed (`authored_by: agent`).
 - **Portability:** the layout and skills work across tools and machines; a cold agent on another machine may not have `~/.claude`.
 - **Sensitive content:** what a record may never contain (credentials, employer material, private writing, copyrighted text). C5 covers actions, not content.
@@ -43,14 +44,14 @@ Method: file reads plus mechanical checks (link and index resolution, status com
 
 ### Inventory
 
-| Case | AGENTS.md | CLAUDE.md | Roadmap | Projects | ADRs | Repo skill | CI | Other |
-|---|---|---|---|---|---|---|---|---|
-| alexregan.com | 123 lines | none | yes | 20 | 14 | `.agents/skills/documentation` (115 lines, not symlinked into `.claude/skills`) | none | `pii-inspector` agent, `editorial/` disclosure policy and ledger, `scripts/editorial-check.sh`, `docs/{architecture,deployment,dns}.md` |
-| poetic-overtones | 142 | 1 line `@AGENTS.md` | yes (board, stable task IDs) | 3 | 18 | none (relies on user-level skill) | none | `spec/` as authority, `docs/HISTORY.md`, `docs/reviews/<date>.md` decision ledgers; no git remote |
-| shavian2tengwar | 125 | 1 line import | yes | 4 | 13 | `documentation` (70 lines; `.claude/skills` symlink) | `.github/workflows/test.yml` | `spec/` with rule IDs, `corpus/` as test suite, guard tests, generated-files table |
-| mysqlbak | 14 | none | none | none (`docs/tasks/task-NN-*.md`, no status) | 3, no index | none | none | `docs/spec.md`, `build.sh` |
-| pkm-workbench | none | none | `ROADMAP.md` at root | none | none | none | none | README; design and ADR 261025-r0ye live in the vault; no remote |
-| Vault | `AGENTS.md` | `@AGENTS.md` | none (task queue and `Tasks.base`) | none (task notes) | 19 plus index | 8 skills in `.agents/skills/`, no `.claude/skills` | none; 4 Claude Code hooks | 6 runbooks, 12 design docs, `skills-map.md`, `Repos.md`, `me.md` |
+| Case             | AGENTS.md   | CLAUDE.md           | Roadmap                            | Projects                                    | ADRs          | Repo skill                                                                      | CI                           | Other                                                                                                                                   |
+| ---------------- | ----------- | ------------------- | ---------------------------------- | ------------------------------------------- | ------------- | ------------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| alexregan.com    | 123 lines   | none                | yes                                | 20                                          | 14            | `.agents/skills/documentation` (115 lines, not symlinked into `.claude/skills`) | none                         | `pii-inspector` agent, `editorial/` disclosure policy and ledger, `scripts/editorial-check.sh`, `docs/{architecture,deployment,dns}.md` |
+| poetic-overtones | 142         | 1 line `@AGENTS.md` | yes (board, stable task IDs)       | 3                                           | 18            | none (relies on user-level skill)                                               | none                         | `spec/` as authority, `docs/HISTORY.md`, `docs/reviews/<date>.md` decision ledgers; no git remote                                       |
+| shavian2tengwar  | 125         | 1 line import       | yes                                | 4                                           | 13            | `documentation` (70 lines; `.claude/skills` symlink)                            | `.github/workflows/test.yml` | `spec/` with rule IDs, `corpus/` as test suite, guard tests, generated-files table                                                      |
+| mysqlbak         | 14          | none                | none                               | none (`docs/tasks/task-NN-*.md`, no status) | 3, no index   | none                                                                            | none                         | `docs/spec.md`, `build.sh`                                                                                                              |
+| pkm-workbench    | none        | none                | `ROADMAP.md` at root               | none                                        | none          | none                                                                            | none                         | README; design and ADR 261025-r0ye live in the vault; no remote                                                                         |
+| Vault            | `AGENTS.md` | `@AGENTS.md`        | none (task queue and `Tasks.base`) | none (task notes)                           | 19 plus index | 8 skills in `.agents/skills/`, no `.claude/skills`                              | none; 4 Claude Code hooks    | 6 runbooks, 12 design docs, `skills-map.md`, `Repos.md`, `me.md`                                                                        |
 
 The user-level `project-docs` skill (`~/.claude/skills/project-docs`, 5 templates) prescribes numbered project folders, a Now/Next/Done roadmap, an append-only LOG with a per-entry session summary, Nygard ADRs accepted by merging the PR, `Review` and `Revert` fields on each ADR, squash merges, and `.wip/` and `.tmp/` scratch. It says the repo's `AGENTS.md` wins.
 
@@ -80,7 +81,7 @@ Notable mechanisms:
 
 1. The core workflow is in no repo, and repos disagree about it. Only `shavian2tengwar` names the dependency and gives a fallback; `poetic-overtones` says "load the skill" with none; `alexregan.com` points at its own older skill and never mentions `project-docs`.
 2. Three variants of one skill: the `alexregan.com` copy lacks PR-based acceptance and Review/Revert; the `shavian2tengwar` copy is a delta on top of the global one.
-3. LOG heading style is mixed (`: ` versus ` — `), frozen in old append-only entries.
+3. LOG heading style is mixed (`: ` versus `—`), frozen in old append-only entries.
 4. ADR status vocabulary differs: Accepted / Active / `ACCEPTED`; `alexregan.com` uses "Proposed" and "Proposed (on hold)" that its own legend lacks; the vault allows both `active` and `accepted`.
 5. Review/Revert fields: 0 of 14 in `alexregan.com`, all in `poetic-overtones` (18) and `shavian2tengwar` (13). `poetic-overtones` uses them with no remote, so no PR number exists.
 6. Numbering styles differ (4-digit, vault 3-digit with `id:`, `mysqlbak` `# 2.`). `alexregan.com` has two independent 4-digit spaces (project and ADR) that look like collisions.
@@ -97,16 +98,16 @@ Notable mechanisms:
 
 ### Contract mapping
 
-| Clause | Mechanism | Strength |
-|---|---|---|
-| C1 Orientation | `AGENTS.md` plus README; ordered reading list; Commands blocks; `Repos.md` | Strong in `shavian2tengwar`, `poetic-overtones`; partial in `alexregan.com`, vault; weak in `mysqlbak`, `pkm-workbench` |
-| C2 Rationale | Nygard ADRs with alternatives, Review, Revert; ADR check and sweep; review notes | Strong in two repos; partial elsewhere |
-| C3 Direction | Roadmap sections, project statuses, `Tasks.base`, ADR Rejected/Superseded | Strong in `poetic-overtones` and vault; "Dropped" explicit only in vault task statuses |
-| C4 Current state | Vault `## Next` plus hooks; repos use LOG session summary, roadmap "Now", README status | Strong in vault; partial in repos (convention, no single next-step field) |
-| C5 Boundaries | `AGENTS.md` rules, mode gates | Strong in prose; mechanical only in `alexregan.com` (PII gate) and `shavian2tengwar` (guard tests) |
-| C6 Procedures | `project-docs`, `docs/deployment.md`, vault runbooks, Commands blocks | Partial; the skill is external and copies diverge |
-| C7 Trust | CI and guard tests in one repo; `pkm-wb check`; append-only LOG; Stop hook | Partial and uneven |
-| C8 Cost | Thin `CLAUDE.md`; hub-and-skill progressive disclosure; capped `SessionStart` injection | Partial to strong in vault; `AGENTS.md` files of 123 to 142 lines carry structure trees that can drift; upkeep is high for small fixes |
+| Clause           | Mechanism                                                                               | Strength                                                                                                                               |
+| ---------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| C1 Orientation   | `AGENTS.md` plus README; ordered reading list; Commands blocks; `Repos.md`              | Strong in `shavian2tengwar`, `poetic-overtones`; partial in `alexregan.com`, vault; weak in `mysqlbak`, `pkm-workbench`                |
+| C2 Rationale     | Nygard ADRs with alternatives, Review, Revert; ADR check and sweep; review notes        | Strong in two repos; partial elsewhere                                                                                                 |
+| C3 Direction     | Roadmap sections, project statuses, `Tasks.base`, ADR Rejected/Superseded               | Strong in `poetic-overtones` and vault; "Dropped" explicit only in vault task statuses                                                 |
+| C4 Current state | Vault `## Next` plus hooks; repos use LOG session summary, roadmap "Now", README status | Strong in vault; partial in repos (convention, no single next-step field)                                                              |
+| C5 Boundaries    | `AGENTS.md` rules, mode gates                                                           | Strong in prose; mechanical only in `alexregan.com` (PII gate) and `shavian2tengwar` (guard tests)                                     |
+| C6 Procedures    | `project-docs`, `docs/deployment.md`, vault runbooks, Commands blocks                   | Partial; the skill is external and copies diverge                                                                                      |
+| C7 Trust         | CI and guard tests in one repo; `pkm-wb check`; append-only LOG; Stop hook              | Partial and uneven                                                                                                                     |
+| C8 Cost          | Thin `CLAUDE.md`; hub-and-skill progressive disclosure; capped `SessionStart` injection | Partial to strong in vault; `AGENTS.md` files of 123 to 142 lines carry structure trees that can drift; upkeep is high for small fixes |
 
 ## Option B: independent design
 
@@ -141,14 +142,14 @@ No hand-kept state file: current state is derived by `scripts/docs-check --open`
 
 ### Memory layers
 
-| Layer | Files | Writer | Rule |
-|---|---|---|---|
-| L0 Orientation and boundaries | `AGENTS.md`, `ARCHITECTURE.md` | Owner; agent proposes | Mutable; each line must prevent a mistake |
-| L1 Rationale | `decisions/*.md` | Agent drafts as proposed; owner accepts | Accepted body immutable except status, superseded-by, typos; numbers never reused |
-| L2 Direction | `ROADMAP.md` | Owner orders; agent proposes | Items leave only to Dropped with reason and date |
-| L3 In flight | `work/NNNN-*.md` | Agent and owner | Frontmatter and `## Next` overwritten; Log append-only |
-| L4 Procedure | `.agents/skills/` | Owner-approved | Agent suggests, does not self-edit mid-task |
-| L5 Reality | code, tests, git log | n/a | Wins any conflict with prose |
+| Layer                         | Files                          | Writer                                  | Rule                                                                              |
+| ----------------------------- | ------------------------------ | --------------------------------------- | --------------------------------------------------------------------------------- |
+| L0 Orientation and boundaries | `AGENTS.md`, `ARCHITECTURE.md` | Owner; agent proposes                   | Mutable; each line must prevent a mistake                                         |
+| L1 Rationale                  | `decisions/*.md`               | Agent drafts as proposed; owner accepts | Accepted body immutable except status, superseded-by, typos; numbers never reused |
+| L2 Direction                  | `ROADMAP.md`                   | Owner orders; agent proposes            | Items leave only to Dropped with reason and date                                  |
+| L3 In flight                  | `work/NNNN-*.md`               | Agent and owner                         | Frontmatter and `## Next` overwritten; Log append-only                            |
+| L4 Procedure                  | `.agents/skills/`              | Owner-approved                          | Agent suggests, does not self-edit mid-task                                       |
+| L5 Reality                    | code, tests, git log           | n/a                                     | Wins any conflict with prose                                                      |
 
 ### Work items
 
@@ -184,16 +185,16 @@ ADR numbers unique and contiguous, status in the allowed set; supersession symme
 
 ### Contract mapping and failure modes
 
-| Clause | Mechanism | Strength |
-|---|---|---|
-| C1 | `AGENTS.md`, `ARCHITECTURE.md`, command-exists check | Strong for commands; medium for the map |
-| C2 | ADRs with rejected options, immutability check | Medium; depends on writing discipline |
-| C3 | Roadmap, work items, Dropped with reasons | Medium |
-| C4 | Next/Log, `docs-check --open`, `start-session`, staleness check | Medium to strong; staleness detected, not prevented |
-| C5 | `AGENTS.md` Do-not plus hooks or permissions | Weak as text alone; strong with hooks |
-| C6 | Validated skills | Medium; skills may not trigger |
-| C7 | Schema, link and immutability checks; code wins | Structure strong; truth weak |
-| C8 | Tiny always-loaded file; on-demand layers; per-item files | Strong by design |
+| Clause | Mechanism                                                       | Strength                                            |
+| ------ | --------------------------------------------------------------- | --------------------------------------------------- |
+| C1     | `AGENTS.md`, `ARCHITECTURE.md`, command-exists check            | Strong for commands; medium for the map             |
+| C2     | ADRs with rejected options, immutability check                  | Medium; depends on writing discipline               |
+| C3     | Roadmap, work items, Dropped with reasons                       | Medium                                              |
+| C4     | Next/Log, `docs-check --open`, `start-session`, staleness check | Medium to strong; staleness detected, not prevented |
+| C5     | `AGENTS.md` Do-not plus hooks or permissions                    | Weak as text alone; strong with hooks               |
+| C6     | Validated skills                                                | Medium; skills may not trigger                      |
+| C7     | Schema, link and immutability checks; code wins                 | Structure strong; truth weak                        |
+| C8     | Tiny always-loaded file; on-demand layers; per-item files       | Strong by design                                    |
 
 Failure modes the agent names: silent staleness (well-formed but wrong); the agent forgets the log; the skill does not load (duplicate critical triggers in `AGENTS.md`); over-documentation hurting task success; ADR inflation by agents; a fiddly immutability hash; context loss mid-session (write Next at checkpoints); over-engineering tiny repos.
 

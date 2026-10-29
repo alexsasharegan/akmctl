@@ -8,6 +8,7 @@ updated: 2026-10-28
 authored_by: agent
 title: Choose a display-width library for the ADR index table
 ---
+
 # Choose a display-width library for the ADR index table
 
 ## Goal

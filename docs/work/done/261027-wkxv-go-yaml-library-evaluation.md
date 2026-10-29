@@ -8,6 +8,7 @@ updated: 2026-10-28
 authored_by: agent
 title: Choose a YAML library for the Go tool
 ---
+
 # Choose a YAML library for the Go tool
 
 ## Goal
@@ -29,7 +30,7 @@ Recommendation, awaiting Alexander's confirmation: keep a hand-written parser fo
 
 ## Log
 
-- 2026-10-27: filed by Claude Code on the Mac at Alexander's direction, split out of [261026-m74k-agent-ready-repo-layout-spike](261026-m74k-agent-ready-repo-layout-spike.md). 
+- 2026-10-27: filed by Claude Code on the Mac at Alexander's direction, split out of [261026-m74k-agent-ready-repo-layout-spike](261026-m74k-agent-ready-repo-layout-spike.md).
 - 2026-10-28: [261026-m74k-agent-ready-repo-layout-spike](261026-m74k-agent-ready-repo-layout-spike.md) closed. The frontmatter subset it must parse is in section 0 of [agent-ready-repo-spec](../../spec/agent-ready-repo-spec.md) (H5), and [261027-ensf-akm-an-agent-knowledge-management](../../adr/261027-ensf-akm-an-agent-knowledge-management.md) is accepted.
 - 2026-10-28: claimed (Claude Code side session on the Mac, started by the AKM spec session; Build, scoped to this note and the design note).
 - 2026-10-28: candidates `go.yaml.in/yaml/v3` v3.0.5, `/v4` v4.0.0-rc.6, `goccy/go-yaml` v1.19.2, `gopkg.in/yaml.v3` v3.0.1 (archived) and a hand-written parser tested for behaviour, edit round trip, speed and hostile input. Original `go-yaml/yaml` is archived; `yaml/go-yaml` is the maintained successor.

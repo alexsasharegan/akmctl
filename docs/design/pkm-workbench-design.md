@@ -5,6 +5,7 @@ created_at: 2026-10-25
 updated_at: 2026-10-25
 authored_by: agent
 ---
+
 # pkm-workbench: design for a local PKM server
 
 Result of the design spike 261024-k2rc-local-views-server-design, under Vault Views. Questions 2 to 9 were worked through with Alexander on 2026-10-25 (Plan mode); question 1 (the Bases baseline) was answered the same day.
@@ -17,6 +18,7 @@ Result of the design spike 261024-k2rc-local-views-server-design, under Vault Vi
 - The name is chosen for growth. Version 1 is the task board; later it can serve other record types and views of the PKM. "Workbench" names where Alexander works, not what it shows.
 
 Direction, Alexander 2026-10-25, after the Kanban test: the Tasks hub dashboard now leads with the native Kanban board, and he still wants the server. Reasons: it should be prettier and more pleasant to use, and a page left open lets him watch an agent work.
+
 - **Watch mode (wanted, after the MVP):** the server loads the board state; when an agent changes a task, the page animates the move (this task went from this column to that one) when he returns to the page, so changes do not pass unseen. Needs change tracking between visits, which the read-per-request design does not have yet, and probably the file watcher that was left out of version 1.
 - **Lifecycle enforcement (the main value):** when he moves tasks himself, for example with no tokens or credits left, the server enforces the bookkeeping an agent would do: an outcome on close, log lines, `updated_at`, the ADR check. He will not remember every step of the task-lifecycle skill; the application should refuse the move until the steps are done. This makes the close prompt and the pinned close cascade and ADR dialog core features, not extras.
 
@@ -30,18 +32,18 @@ Direction, Alexander 2026-10-25, after the Kanban test: the Tasks hub dashboard 
 
 ## Decisions ledger
 
-| Q | Decision | Options considered | Why |
-| --- | --- | --- | --- |
-| 2 Watch scope | Tasks only: notes with `type: task` in `9 pkm/tasks/`. Read the folder on every request. No file watcher in version 1. | Watch the whole vault; watch with FSEvents and push live | The task schema is the only one with a stable status vocabulary. About 100 files read in milliseconds. A watcher is added if live push is wanted. |
-| 3 Reading views | The server defines its own views from the spec below. `Tasks.base` stays for Obsidian. Both implement the same spec. | Parse `.base` files; reuse the Bases expression language | Re-implementing Bases formulas (`today() - updated_at`, `file.inFolder`) is a trap. The cost is two implementations, kept honest by the spec. |
-| 4 Write-back | Edit the one frontmatter line in place. Compare a SHA-256 of the file (SHA-1 is fine: change detection only) against the hash the page was rendered from, and refuse on a mismatch. Write a temp file in the same folder and rename it over the original. | Parse and re-serialise YAML | A YAML library reorders keys, changes quoting such as `"[[Vault Views]]"` and drops comments. Task frontmatter is flat, so a line edit is safe. |
-| 5 Write path | Direct file writes. One write path for the whole system. | `obsidian property:set` | The CLI needs Obsidian running. The server should work with Obsidian closed. |
-| 6 Security | Bind `127.0.0.1` only. A per-run random token in a header on reads and writes. Check the `Origin` and `Host` headers. Phone access is out of scope. | LAN or Tailscale bind with real auth | A page in a browser can send requests to localhost, so Origin and token checks are required. Notes can hold private detail. |
-| 7 Rendering | The server has its own templating layer (`html/template`, embedded CSS and JS) and shares no code or CSS with Vault Views. The UI is designed from scratch by an agent with no context on the kit. | Reuse the kit and the Vault Views build | A board needs live JS for dragging and the close prompt. The kit's pages are static documents. Alexander does not like the kit's design. This supersedes the task's original question 7, "reuse whatever html-views-poc produces". |
-| 8 Stack | Go, standard library only (`net/http` with the 1.22+ `ServeMux` path patterns, `html/template`, `embed.FS`). Vanilla JS for drag and drop. A dependency comes in only when it earns its place, with the reason logged. | Node, Python, Rust | A single static binary suits a local daemon under `launchd`, and `git-autosave` is already a Go binary. |
-| 9 Inbox lane | A new status `raw` for unrefined captures, shown as its own lane. Refining writes `project`, `origin` and a done-when line, then moves the note to `inbox` or a later status. | Keep raw notes as `inbox` notes missing the refine fields | Explicit, and the filter is trivial. `inbox` keeps its meaning: filed, not claimed. |
-| Closing | A drag to `done` or `dropped` opens a prompt that requires an outcome. The server sets `status` and `updated_at`. | Allow any status change with no outcome | A card must not leave the board without an outcome. |
-| Repo | One new repo of Alexander's own: `~/github.com/alexsasharegan/pkm-workbench`, Go module `github.com/alexsasharegan/pkm-workbench`. Separate from the vault and from the Vault Views fork. | One repo with the fork; the vault's `9 scripts/` | Real code with tests and versions. The server draws ideas from the kit but copies nothing. |
+| Q               | Decision                                                                                                                                                                                                                                                  | Options considered                                        | Why                                                                                                                                                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2 Watch scope   | Tasks only: notes with `type: task` in `9 pkm/tasks/`. Read the folder on every request. No file watcher in version 1.                                                                                                                                    | Watch the whole vault; watch with FSEvents and push live  | The task schema is the only one with a stable status vocabulary. About 100 files read in milliseconds. A watcher is added if live push is wanted.                                                                                  |
+| 3 Reading views | The server defines its own views from the spec below. `Tasks.base` stays for Obsidian. Both implement the same spec.                                                                                                                                      | Parse `.base` files; reuse the Bases expression language  | Re-implementing Bases formulas (`today() - updated_at`, `file.inFolder`) is a trap. The cost is two implementations, kept honest by the spec.                                                                                      |
+| 4 Write-back    | Edit the one frontmatter line in place. Compare a SHA-256 of the file (SHA-1 is fine: change detection only) against the hash the page was rendered from, and refuse on a mismatch. Write a temp file in the same folder and rename it over the original. | Parse and re-serialise YAML                               | A YAML library reorders keys, changes quoting such as `"[[Vault Views]]"` and drops comments. Task frontmatter is flat, so a line edit is safe.                                                                                    |
+| 5 Write path    | Direct file writes. One write path for the whole system.                                                                                                                                                                                                  | `obsidian property:set`                                   | The CLI needs Obsidian running. The server should work with Obsidian closed.                                                                                                                                                       |
+| 6 Security      | Bind `127.0.0.1` only. A per-run random token in a header on reads and writes. Check the `Origin` and `Host` headers. Phone access is out of scope.                                                                                                       | LAN or Tailscale bind with real auth                      | A page in a browser can send requests to localhost, so Origin and token checks are required. Notes can hold private detail.                                                                                                        |
+| 7 Rendering     | The server has its own templating layer (`html/template`, embedded CSS and JS) and shares no code or CSS with Vault Views. The UI is designed from scratch by an agent with no context on the kit.                                                        | Reuse the kit and the Vault Views build                   | A board needs live JS for dragging and the close prompt. The kit's pages are static documents. Alexander does not like the kit's design. This supersedes the task's original question 7, "reuse whatever html-views-poc produces". |
+| 8 Stack         | Go, standard library only (`net/http` with the 1.22+ `ServeMux` path patterns, `html/template`, `embed.FS`). Vanilla JS for drag and drop. A dependency comes in only when it earns its place, with the reason logged.                                    | Node, Python, Rust                                        | A single static binary suits a local daemon under `launchd`, and `git-autosave` is already a Go binary.                                                                                                                            |
+| 9 Inbox lane    | A new status `raw` for unrefined captures, shown as its own lane. Refining writes `project`, `origin` and a done-when line, then moves the note to `inbox` or a later status.                                                                             | Keep raw notes as `inbox` notes missing the refine fields | Explicit, and the filter is trivial. `inbox` keeps its meaning: filed, not claimed.                                                                                                                                                |
+| Closing         | A drag to `done` or `dropped` opens a prompt that requires an outcome. The server sets `status` and `updated_at`.                                                                                                                                         | Allow any status change with no outcome                   | A card must not leave the board without an outcome.                                                                                                                                                                                |
+| Repo            | One new repo of Alexander's own: `~/github.com/alexsasharegan/pkm-workbench`, Go module `github.com/alexsasharegan/pkm-workbench`. Separate from the vault and from the Vault Views fork.                                                                 | One repo with the fork; the vault's `9 scripts/`          | Real code with tests and versions. The server draws ideas from the kit but copies nothing.                                                                                                                                         |
 
 ## Architecture
 
@@ -55,21 +57,22 @@ Direction, Alexander 2026-10-25, after the Kanban test: the Tasks hub dashboard 
 The two implementations, `Tasks.base` and the server, both implement this table. Change the spec first, then both. Version 0 lives here; move it into the Tasks hub when the repo exists, so one place defines scope, statuses and views.
 
 Shared definitions:
+
 - **open**: `status` is not `done` and not `dropped`.
 - **age_days**: today minus `updated_at`, in days.
 - **stale**: open, and `age_days` greater than 30 (or no `updated_at`).
 - Base filter: `type == "task"` and the note is in `9 pkm/tasks/`.
 
-| View | Filter | Group | Sort | Columns |
-| --- | --- | --- | --- | --- |
-| Open by project | open | none | `project` ascending, `status` ascending | project, name, status, age_days |
-| Ready and active | `status` is `ready` or `active` | none | none | name, status, project, `updated_at` |
-| Blocked | `status` is `blocked` | none | none | name, project, `updated_at` |
-| Stale | stale | none | none | name, status, project, age_days |
-| Recently closed | `status` is `done` or `dropped`, and age_days is 14 or less | none | none | name, status, project, `adr`, `updated_at` |
-| Cards by status | open | `status` | `updated_at` descending | name, project, age_days |
-| Cards by project | open | `project` | `status` ascending | name, status, age_days |
-| List ready and active | `status` is `ready` or `active` | `project` | none | name, status |
+| View                  | Filter                                                      | Group     | Sort                                    | Columns                                    |
+| --------------------- | ----------------------------------------------------------- | --------- | --------------------------------------- | ------------------------------------------ |
+| Open by project       | open                                                        | none      | `project` ascending, `status` ascending | project, name, status, age_days            |
+| Ready and active      | `status` is `ready` or `active`                             | none      | none                                    | name, status, project, `updated_at`        |
+| Blocked               | `status` is `blocked`                                       | none      | none                                    | name, project, `updated_at`                |
+| Stale                 | stale                                                       | none      | none                                    | name, status, project, age_days            |
+| Recently closed       | `status` is `done` or `dropped`, and age_days is 14 or less | none      | none                                    | name, status, project, `adr`, `updated_at` |
+| Cards by status       | open                                                        | `status`  | `updated_at` descending                 | name, project, age_days                    |
+| Cards by project      | open                                                        | `project` | `status` ascending                      | name, status, age_days                     |
+| List ready and active | `status` is `ready` or `active`                             | `project` | none                                    | name, status                               |
 
 The server adds one view `Bases` lacks: **Raw**, the notes with `status: raw`.
 
@@ -107,14 +110,14 @@ A move between columns is a transaction, not an edit. Dragging a card opens it; 
 
 Rules table (gated moves approved by Alexander; this is part of the view spec):
 
-| Move to | Required (steps shown only if unmet) |
-| --- | --- |
-| `active` (claim) | Nothing typed. One confirm, with a prefilled "claimed" log line and a `## Next` stub. Not gated. |
-| `blocked` | Reason; who or what it waits on. Gated. |
-| `done` | Outcome (1 to 3 lines); the ADR check (five toggles under one "None of these" button; any toggle adds a `Why:` step); only if open tasks link to this one, the cascade step. Gated. |
-| `dropped` | Reason. Gated. |
-| `raw` to `ready` | Done-when line (required); project and origin (asked, may be skipped); each skipped if present. Gated for `raw` only. |
-| any other move | No gate. |
+| Move to          | Required (steps shown only if unmet)                                                                                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `active` (claim) | Nothing typed. One confirm, with a prefilled "claimed" log line and a `## Next` stub. Not gated.                                                                                    |
+| `blocked`        | Reason; who or what it waits on. Gated.                                                                                                                                             |
+| `done`           | Outcome (1 to 3 lines); the ADR check (five toggles under one "None of these" button; any toggle adds a `Why:` step); only if open tasks link to this one, the cascade step. Gated. |
+| `dropped`        | Reason. Gated.                                                                                                                                                                      |
+| `raw` to `ready` | Done-when line (required); project and origin (asked, may be skipped); each skipped if present. Gated for `raw` only.                                                               |
+| any other move   | No gate.                                                                                                                                                                            |
 
 Diff view: implement it in the Go standard library (a small line diff and an HTML renderer), not a library, in keeping with the stdlib-only rule. Revisit if it proves poor.
 
@@ -167,6 +170,7 @@ Not in the MVP, but expected to be high value: the page you leave open and watch
 Build. The Bases baseline shows the native views are a useful mobile view but not the workbench Alexander wants, and the design above is small: one binary, no dependencies, one write path.
 
 First milestone, in the new repo:
+
 1. Read the tasks folder and render the Next and active view, read-only.
 2. Add the other views from the spec, and the check that compares the server's lists with `Tasks.base` on the same files.
 3. Add the status change by drag, with the hash check and atomic write.

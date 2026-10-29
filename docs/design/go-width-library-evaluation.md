@@ -5,6 +5,7 @@ created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
 ---
+
 # Go display-width library evaluation for `akmctl` (draft for review)
 
 Evaluation for [261028-0snt-go-width-library-evaluation](../work/done/261028-0snt-go-width-library-evaluation.md), serving [agent-ready-repo-spec](../spec/agent-ready-repo-spec.md) (section 4, "The generated index") and decision Y16 in [agent-ready-repo-decision-log](agent-ready-repo-decision-log.md). It answers one question: how should the Go tool compute the display width of table cells, so that the generated ADR index is padded the way Prettier pads it? Criteria, in Alexander's order: (1) baseline: output matches Prettier, (2) performance, (3) security and supply chain, (4) popularity and support as a tiebreaker. Run on 2026-10-28; machine and toolchain in the performance section. The method and layout follow [go-yaml-library-evaluation](go-yaml-library-evaluation.md); the Prettier test it extends is in [akm-spec-review](akm-spec-review.md), section 3.
@@ -15,17 +16,18 @@ Evaluation for [261028-0snt-go-width-library-evaluation](../work/done/261028-0sn
 
 - **Baseline (1), the deciding criterion.** Ground truth is Prettier 3.9.10 itself (published 2026-10-10, 18 days old): one-column tables, one per cell, formatted by Prettier, with the width it chose read back from the padding. 208 fixture cells; 2 are not scored because Prettier rewrites the cell text (runs of spaces, a tab), so **206 are scored**. Cells where the width differs from Prettier:
 
-    | Candidate | Wrong, of 206 | Wrong, of the 129 common-text cells |
-    |---|---|---|
-    | `github.com/clipperhouse/displaywidth` v0.11.0 | **32** | **3** |
-    | `github.com/rivo/uniseg` v0.4.7 | 38 | 3 |
-    | `golang.org/x/text/width` v0.43.0 (per-rune use) | 40 | 15 |
-    | `github.com/mattn/go-runewidth` v0.0.31 | 42 (71 under a Japanese locale) | 15 |
-    | Baseline: embedded table, wide ranges only | 29 | 13 |
-    | Baseline: embedded table plus emoji rules, tuned to Prettier's algorithm | 5 | 0 |
-    | Baseline: rune count | 84 | 51 |
+  | Candidate                                                                | Wrong, of 206                   | Wrong, of the 129 common-text cells |
+  | ------------------------------------------------------------------------ | ------------------------------- | ----------------------------------- |
+  | `github.com/clipperhouse/displaywidth` v0.11.0                           | **32**                          | **3**                               |
+  | `github.com/rivo/uniseg` v0.4.7                                          | 38                              | 3                                   |
+  | `golang.org/x/text/width` v0.43.0 (per-rune use)                         | 40                              | 15                                  |
+  | `github.com/mattn/go-runewidth` v0.0.31                                  | 42 (71 under a Japanese locale) | 15                                  |
+  | Baseline: embedded table, wide ranges only                               | 29                              | 13                                  |
+  | Baseline: embedded table plus emoji rules, tuned to Prettier's algorithm | 5                               | 0                                   |
+  | Baseline: rune count                                                     | 84                              | 51                                  |
 
-    "Common text" is ASCII, accented Latin (precomposed and combining), Greek and Cyrillic, CJK, kana, hangul, fullwidth forms, ambiguous-width symbols, single emoji and emoji with a variation selector. **No library reproduces Prettier.** The reason is that Prettier's rule is not Unicode's. It counts code points: control characters, U+0300 to U+036F and variation selectors count 0; everything else counts 1, or 2 for wide and fullwidth characters; an emoji sequence found by a regular expression counts 2 (1 if it is a single text-style emoji). So Prettier counts a zero-width space, a zero-width joiner, and Thai, Arabic and Devanagari combining marks as 1 column each, while the three libraries that implement Unicode grapheme rules count them as 0. See "What Prettier does".
+  "Common text" is ASCII, accented Latin (precomposed and combining), Greek and Cyrillic, CJK, kana, hangul, fullwidth forms, ambiguous-width symbols, single emoji and emoji with a variation selector. **No library reproduces Prettier.** The reason is that Prettier's rule is not Unicode's. It counts code points: control characters, U+0300 to U+036F and variation selectors count 0; everything else counts 1, or 2 for wide and fullwidth characters; an emoji sequence found by a regular expression counts 2 (1 if it is a single text-style emoji). So Prettier counts a zero-width space, a zero-width joiner, and Thai, Arabic and Devanagari combining marks as 1 column each, while the three libraries that implement Unicode grapheme rules count them as 0. See "What Prettier does".
+
 - **Which cells the recommended library gets wrong (32 of 206):** 10 format characters (zero-width space, joiners, soft hyphen, word joiner, BOM, direction marks), 8 combining marks of Thai, Arabic, Devanagari, Khmer and Tibetan, 2 conjoining hangul jamo, 2 keycap sequences, 2 regional-indicator (flag) edge cases, 2 skin-tone edge cases, 2 control characters, 1 odd ZWJ pair, 1 letter followed by U+FE0F, 2 invalid UTF-8 cells. All are text an ADR title is unlikely to contain; the one realistic risk is an invisible character pasted into a title (zero-width space, soft hyphen).
 - **Is the no-dependency baseline good enough?** Rune count: no (CJK and every emoji wrong; 51 of 129 common-text cells). A table of wide ranges alone: no (13 of 129; it misses every emoji with U+FE0F, such as the check mark and the warning sign). **A table plus emoji rules mirroring Prettier's algorithm: yes, and it is the closest of all** (5 of 206, 0 of 129). But I wrote it after seeing the Prettier results, so its score is optimistic; it costs about 110 lines and a table regenerated from the Unicode data files at each Unicode release; and that is the maintenance Y16 chose to avoid. On criterion (1) alone it wins; I recommend the dependency anyway because the penalty for a mismatch is small (the generated file is also listed in `.prettierignore`, and rule A4 compares the generator's own bytes), and the maintainer asked for a dependency. If fidelity to Prettier outranks maintenance, take the baseline. That is Alexander's call.
 - **Performance (2):** not a differentiator. 26.7 ns per cell on an ASCII title, 66 ns on mixed text for `displaywidth`; the slowest candidate, `uniseg`, takes 0.55 to 0.63 us per cell. 5,000 cells cost 0.13 to 3 ms in total.
@@ -47,15 +49,15 @@ Two consequences matter for the generator. Prettier does not use grapheme cluste
 
 ## Candidates
 
-| # | Candidate | Role |
-|---|---|---|
-| 1 | `golang.org/x/text/width` v0.43.0 | the standard-adjacent option; used per rune: Wide and Fullwidth count 2, anything else 1 |
-| 2 | `github.com/mattn/go-runewidth` v0.0.31 | the most used; `StringWidth` with the default condition |
-| 3 | `github.com/rivo/uniseg` v0.4.7 | grapheme-aware; `StringWidth` |
-| 4 | `github.com/clipperhouse/displaywidth` v0.11.0 | not in the brief; added because `go-runewidth` v0.0.31 now builds on the same author's `uax29` module and this is that author's width library; `String` |
-| 5 | Baseline: rune count | `utf8.RuneCountInString`, with the file in `.prettierignore` |
-| 6 | Baseline: embedded table, wide ranges only | East Asian Wide and Fullwidth ranges from Unicode 17.0.0 `EastAsianWidth.txt`, generated by `gen_table.py`, plus Prettier's zero-width rules |
-| 7 | Baseline: embedded table plus emoji rules | as 6, plus a small recogniser for emoji sequences (variation selector, skin tone, ZWJ chain, tag sequence, flag pair, keycap) built from `emoji-data.txt` |
+| #   | Candidate                                      | Role                                                                                                                                                      |
+| --- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `golang.org/x/text/width` v0.43.0              | the standard-adjacent option; used per rune: Wide and Fullwidth count 2, anything else 1                                                                  |
+| 2   | `github.com/mattn/go-runewidth` v0.0.31        | the most used; `StringWidth` with the default condition                                                                                                   |
+| 3   | `github.com/rivo/uniseg` v0.4.7                | grapheme-aware; `StringWidth`                                                                                                                             |
+| 4   | `github.com/clipperhouse/displaywidth` v0.11.0 | not in the brief; added because `go-runewidth` v0.0.31 now builds on the same author's `uax29` module and this is that author's width library; `String`   |
+| 5   | Baseline: rune count                           | `utf8.RuneCountInString`, with the file in `.prettierignore`                                                                                              |
+| 6   | Baseline: embedded table, wide ranges only     | East Asian Wide and Fullwidth ranges from Unicode 17.0.0 `EastAsianWidth.txt`, generated by `gen_table.py`, plus Prettier's zero-width rules              |
+| 7   | Baseline: embedded table plus emoji rules      | as 6, plus a small recogniser for emoji sequences (variation selector, skin tone, ZWJ chain, tag sequence, flag pair, keycap) built from `emoji-data.txt` |
 
 Candidates 6 and 7 are my own code, written to mimic Prettier's rules, because the contract is "same as Prettier", not "same as Unicode". Candidates 1 to 4 are used as their authors document them, with no wrapper, so they are not tuned. That asymmetry is the main caveat on the comparison, and why row 7's score is flattering.
 
@@ -63,26 +65,27 @@ Candidates 6 and 7 are my own code, written to mimic Prettier's rules, because t
 
 Facts as of 2026-10-28.
 
-| | `x/text/width` | `go-runewidth` | `uniseg` | `displaywidth` |
-|---|---|---|---|---|
-| Version / date | v0.43.0, 2026-10-09 | v0.0.31, 2026-10-08 | v0.4.7, 2024-02-08 | v0.11.0, 2026-02-17 |
-| Licence | BSD-3-Clause | MIT | MIT | MIT |
-| Maintainers (contributors endpoint) | Go team: mpvl 517 commits, nigeltao 45, gopherbot 29 | mattn 186, next 11 | rivo 50, next 14 | clipperhouse 104, sole contributor |
-| Last push | 2026-10-21 (whole `x/text` repo) | 2026-10-08 | 2024-05-31 | 2026-05-17 |
-| Open issues (GitHub count, includes PRs) | 30 (whole `x/text` repo) | 6 | 12 | 3 |
-| Issues about width | not examined | open: "Honor VS16 emoji presentation in grapheme widths", "Count an emoji presentation sequence as 2 cells", "Update the tables to Unicode 18.0.0" | "Improve emoji consistency with older terminals" | not examined |
-| Dependencies as seen from a consumer | none in the build (module graph lists `x/tools`, `x/mod`, `x/sync`; `go.sum` gets 2 lines) | 1 module: `clipperhouse/uax29/v2` (2 packages built; minimum v2.2.0) | none | 1 module: `clipperhouse/uax29/v2` v2.7.0 |
-| Unicode version | 17.0.0 on Go 1.27+, 15.0.0 on older Go (build tag) | 17.0.0 (generator URLs) | 15.0.0 | not stated in the docs I read; correct on the Unicode 16 and 17 emoji tested |
-| Environment dependence | none | reads `LC_ALL`/`LC_CTYPE`/`LANG` and `RUNEWIDTH_EASTASIAN` at start-up | none | none in the built packages |
-| Importing packages (pkg.go.dev) | 883 | 5,958 | 1,405 | 94 |
-| Stars (repository) | 810 (`golang/text`) | 725 | 738 | 19 |
-| Advisories (osv.dev) | 8 entries for `x/text`, none for `width`: affected packages are `unicode/norm` (fixed 0.39.0), `secure/precis` (fixed 0.41.0), `language`, and one from 2021 (fixed 0.3.3) | 0 | 0 | 0 (and 0 for `uax29/v2`) |
-| **(1) Baseline**: wrong of 206 / of 129 common | 40 / 15 | 42 / 15 | 38 / 3 | **32 / 3** |
-| **(2) Performance**, ns per cell (ASCII / mixed) | 153 / 174 | 38 / 126 | 546 / 631 | **27 / 66** |
-| **(3) Security** | linear; no panic | linear; no panic; locale-dependent output | linear, slowest on 100 MB invalid bytes (4.9 s); no panic | linear; no panic |
-| **(4) Popularity** | high trust, mid use | highest | mid, unmaintained since 2024 | lowest, young |
+|                                                  | `x/text/width`                                                                                                                                                             | `go-runewidth`                                                                                                                                     | `uniseg`                                                  | `displaywidth`                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Version / date                                   | v0.43.0, 2026-10-09                                                                                                                                                        | v0.0.31, 2026-10-08                                                                                                                                | v0.4.7, 2024-02-08                                        | v0.11.0, 2026-02-17                                                          |
+| Licence                                          | BSD-3-Clause                                                                                                                                                               | MIT                                                                                                                                                | MIT                                                       | MIT                                                                          |
+| Maintainers (contributors endpoint)              | Go team: mpvl 517 commits, nigeltao 45, gopherbot 29                                                                                                                       | mattn 186, next 11                                                                                                                                 | rivo 50, next 14                                          | clipperhouse 104, sole contributor                                           |
+| Last push                                        | 2026-10-21 (whole `x/text` repo)                                                                                                                                           | 2026-10-08                                                                                                                                         | 2024-05-31                                                | 2026-05-17                                                                   |
+| Open issues (GitHub count, includes PRs)         | 30 (whole `x/text` repo)                                                                                                                                                   | 6                                                                                                                                                  | 12                                                        | 3                                                                            |
+| Issues about width                               | not examined                                                                                                                                                               | open: "Honor VS16 emoji presentation in grapheme widths", "Count an emoji presentation sequence as 2 cells", "Update the tables to Unicode 18.0.0" | "Improve emoji consistency with older terminals"          | not examined                                                                 |
+| Dependencies as seen from a consumer             | none in the build (module graph lists `x/tools`, `x/mod`, `x/sync`; `go.sum` gets 2 lines)                                                                                 | 1 module: `clipperhouse/uax29/v2` (2 packages built; minimum v2.2.0)                                                                               | none                                                      | 1 module: `clipperhouse/uax29/v2` v2.7.0                                     |
+| Unicode version                                  | 17.0.0 on Go 1.27+, 15.0.0 on older Go (build tag)                                                                                                                         | 17.0.0 (generator URLs)                                                                                                                            | 15.0.0                                                    | not stated in the docs I read; correct on the Unicode 16 and 17 emoji tested |
+| Environment dependence                           | none                                                                                                                                                                       | reads `LC_ALL`/`LC_CTYPE`/`LANG` and `RUNEWIDTH_EASTASIAN` at start-up                                                                             | none                                                      | none in the built packages                                                   |
+| Importing packages (pkg.go.dev)                  | 883                                                                                                                                                                        | 5,958                                                                                                                                              | 1,405                                                     | 94                                                                           |
+| Stars (repository)                               | 810 (`golang/text`)                                                                                                                                                        | 725                                                                                                                                                | 738                                                       | 19                                                                           |
+| Advisories (osv.dev)                             | 8 entries for `x/text`, none for `width`: affected packages are `unicode/norm` (fixed 0.39.0), `secure/precis` (fixed 0.41.0), `language`, and one from 2021 (fixed 0.3.3) | 0                                                                                                                                                  | 0                                                         | 0 (and 0 for `uax29/v2`)                                                     |
+| **(1) Baseline**: wrong of 206 / of 129 common   | 40 / 15                                                                                                                                                                    | 42 / 15                                                                                                                                            | 38 / 3                                                    | **32 / 3**                                                                   |
+| **(2) Performance**, ns per cell (ASCII / mixed) | 153 / 174                                                                                                                                                                  | 38 / 126                                                                                                                                           | 546 / 631                                                 | **27 / 66**                                                                  |
+| **(3) Security**                                 | linear; no panic                                                                                                                                                           | linear; no panic; locale-dependent output                                                                                                          | linear, slowest on 100 MB invalid bytes (4.9 s); no panic | linear; no panic                                                             |
+| **(4) Popularity**                               | high trust, mid use                                                                                                                                                        | highest                                                                                                                                            | mid, unmaintained since 2024                              | lowest, young                                                                |
 
 Sources:
+
 - Versions and dates: `https://proxy.golang.org/<module>/@latest`; `go.mod` files from the same proxy.
 - Repository state, licence, contributors, open issue titles: `gh api repos/...` (GitHub API).
 - Importers: pkg.go.dev "Imported By" tab, count of packages including internal ones (not modules).
@@ -95,32 +98,33 @@ Sources:
 
 206 scored cells; the figure is the number of cells in the class where the width differs from Prettier. Class sizes are in the second column. The first five candidates are the libraries and baselines; columns follow the order of the run.
 
-| Class | Cells | rune count | table (wide only) | table + emoji | `displaywidth` | `go-runewidth` | `uniseg` | `x/text/width` |
-|---|---|---|---|---|---|---|---|---|
-| ASCII | 10 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Latin, precomposed | 10 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Latin, combining marks | 8 | 8 | 0 | 0 | 0 | 0 | 0 | 8 |
-| Greek, Cyrillic | 7 | 1 | 0 | 0 | 0 | 0 | 0 | 1 |
-| CJK ideographs | 9 | 9 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Kana | 6 | 5 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Hangul | 6 | 6 | 0 | 0 | 2 | 2 | 2 | 0 |
-| Fullwidth forms | 8 | 6 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Ambiguous width | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Emoji, single | 26 | 14 | 0 | 0 | 0 | 0 | 1 | 0 |
-| Emoji with U+FE0F | 19 | 2 | 13 | 0 | 1 | 13 | 0 | 6 |
-| Emoji, keycap | 5 | 3 | 0 | 0 | 2 | 5 | 5 | 3 |
-| Emoji, skin tone | 6 | 2 | 5 | 1 | 2 | 1 | 3 | 4 |
-| Emoji, ZWJ | 8 | 8 | 7 | 1 | 1 | 1 | 1 | 7 |
-| Emoji, flags and tags | 6 | 2 | 1 | 0 | 2 | 0 | 2 | 1 |
-| New in Unicode 15.1 to 17 | 6 | 6 | 0 | 0 | 0 | 0 | 4 | 0 |
-| Zero-width and format characters | 11 | 1 | 0 | 0 | 10 | 10 | 10 | 1 |
-| Other scripts (Thai, Arabic, Hebrew, Devanagari, Tibetan, Khmer) | 10 | 0 | 0 | 0 | 8 | 6 | 6 | 0 |
-| Control characters | 11 | 6 | 1 | 1 | 2 | 2 | 2 | 6 |
-| Long strings (200 to 100,000 characters) | 6 | 3 | 0 | 0 | 0 | 0 | 0 | 1 |
-| Invalid UTF-8 | 8 | 2 | 2 | 2 | 2 | 2 | 2 | 2 |
-| **Total** | **206** | **84** | **29** | **5** | **32** | **42** | **38** | **40** |
+| Class                                                            | Cells   | rune count | table (wide only) | table + emoji | `displaywidth` | `go-runewidth` | `uniseg` | `x/text/width` |
+| ---------------------------------------------------------------- | ------- | ---------- | ----------------- | ------------- | -------------- | -------------- | -------- | -------------- |
+| ASCII                                                            | 10      | 0          | 0                 | 0             | 0              | 0              | 0        | 0              |
+| Latin, precomposed                                               | 10      | 0          | 0                 | 0             | 0              | 0              | 0        | 0              |
+| Latin, combining marks                                           | 8       | 8          | 0                 | 0             | 0              | 0              | 0        | 8              |
+| Greek, Cyrillic                                                  | 7       | 1          | 0                 | 0             | 0              | 0              | 0        | 1              |
+| CJK ideographs                                                   | 9       | 9          | 0                 | 0             | 0              | 0              | 0        | 0              |
+| Kana                                                             | 6       | 5          | 0                 | 0             | 0              | 0              | 0        | 0              |
+| Hangul                                                           | 6       | 6          | 0                 | 0             | 2              | 2              | 2        | 0              |
+| Fullwidth forms                                                  | 8       | 6          | 0                 | 0             | 0              | 0              | 0        | 0              |
+| Ambiguous width                                                  | 20      | 0          | 0                 | 0             | 0              | 0              | 0        | 0              |
+| Emoji, single                                                    | 26      | 14         | 0                 | 0             | 0              | 0              | 1        | 0              |
+| Emoji with U+FE0F                                                | 19      | 2          | 13                | 0             | 1              | 13             | 0        | 6              |
+| Emoji, keycap                                                    | 5       | 3          | 0                 | 0             | 2              | 5              | 5        | 3              |
+| Emoji, skin tone                                                 | 6       | 2          | 5                 | 1             | 2              | 1              | 3        | 4              |
+| Emoji, ZWJ                                                       | 8       | 8          | 7                 | 1             | 1              | 1              | 1        | 7              |
+| Emoji, flags and tags                                            | 6       | 2          | 1                 | 0             | 2              | 0              | 2        | 1              |
+| New in Unicode 15.1 to 17                                        | 6       | 6          | 0                 | 0             | 0              | 0              | 4        | 0              |
+| Zero-width and format characters                                 | 11      | 1          | 0                 | 0             | 10             | 10             | 10       | 1              |
+| Other scripts (Thai, Arabic, Hebrew, Devanagari, Tibetan, Khmer) | 10      | 0          | 0                 | 0             | 8              | 6              | 6        | 0              |
+| Control characters                                               | 11      | 6          | 1                 | 1             | 2              | 2              | 2        | 6              |
+| Long strings (200 to 100,000 characters)                         | 6       | 3          | 0                 | 0             | 0              | 0              | 0        | 1              |
+| Invalid UTF-8                                                    | 8       | 2          | 2                 | 2             | 2              | 2              | 2        | 2              |
+| **Total**                                                        | **206** | **84**     | **29**            | **5**         | **32**         | **42**         | **38**   | **40**         |
 
 What causes the differences:
+
 - **Rune count** is wrong wherever a character is not one column: every wide character and every emoji, and in the other direction every combining mark.
 - **`x/text/width`** has a width per rune and no notion of zero width or sequences. Every combining mark counts 1 (8 of 8 decomposed-Latin cells wrong), and so do U+FE0F and U+200D, so emoji with a variation selector and every ZWJ sequence come out too wide (U+2705 followed by U+FE0F gives 3, not 2). Its answers on single characters are right, including the Unicode 17 additions, but only on Go 1.27 or later; on older Go it uses Unicode 15 tables.
 - **`go-runewidth`** (default condition) counts an emoji with U+FE0F as 1 when the base character is text-style (13 of 19 wrong; the open issues listed above are about this). Its keycap sequences are 1. The same code gives 71 wrong in a Japanese locale, where ambiguous-width characters (Greek and Cyrillic letters, arrows, box drawing) count 2.
@@ -134,15 +138,15 @@ What causes the differences:
 
 Go `testing.Benchmark`, best of 5 runs, two deterministic corpora of 5,000 cells each: "ascii" (ADR-style titles, 44 bytes on average) and "mixed" (70% ASCII, 10% accented Latin, 10% Japanese text, 10% with emoji, 50 bytes on average). Machine: Apple M1 Max, 64 GB; `go1.27.2 darwin/arm64`. The library numbers do not include any wrapper.
 
-| Candidate | ASCII: ns per cell | mixed: ns per cell | allocations per cell |
-|---|---|---|---|
-| rune count | 22 | 28 | 0 |
-| `displaywidth` | **27** | **66** | 0 |
-| `go-runewidth` | 38 | 126 | 0 |
-| `x/text/width` | 153 | 174 | 0 |
-| table (wide only) | 196 | 227 | 0.7 (the `[]rune` copy) |
-| table + emoji | 534 | 585 | 0.7 |
-| `uniseg` | 546 | 631 | 0 |
+| Candidate         | ASCII: ns per cell | mixed: ns per cell | allocations per cell    |
+| ----------------- | ------------------ | ------------------ | ----------------------- |
+| rune count        | 22                 | 28                 | 0                       |
+| `displaywidth`    | **27**             | **66**             | 0                       |
+| `go-runewidth`    | 38                 | 126                | 0                       |
+| `x/text/width`    | 153                | 174                | 0                       |
+| table (wide only) | 196                | 227                | 0.7 (the `[]rune` copy) |
+| table + emoji     | 534                | 585                | 0.7                     |
+| `uniseg`          | 546                | 631                | 0                       |
 
 An index of 5,000 rows with 6 columns is 30,000 cells; even the slowest candidate measures it in under 20 ms. The criterion is met by all, and none of the differences affects the choice. My table code is unoptimised (it copies the string to runes and binary-searches the ranges).
 
@@ -150,14 +154,14 @@ An index of 5,000 rows with 6 columns is 30,000 cells; even the slowest candidat
 
 Each case ran in a child process of the evaluation binary; the parent polled resident memory every 40 ms and would kill at 6 GB or 30 s. Neither limit was reached. Peak memory is of the whole process including the 100 MB input string. Full numbers are in the appendix.
 
-| Input | `displaywidth` | `go-runewidth` | `uniseg` | `x/text/width` | table + emoji |
-|---|---|---|---|---|---|
-| 100 MB ASCII | 50 ms, 106 MB | 67 ms, 105 MB | 1.26 s, 105 MB | 340 ms, 106 MB | 1.18 s, 506 MB |
-| 100 MB ideographs | 535 ms, 106 MB | 182 ms, 108 MB | 1.60 s, 106 MB | 255 ms, 105 MB | 838 ms, 239 MB |
-| 100 MB invalid bytes (0xFF) | 1.12 s, 106 MB | 1.33 s, 108 MB | 4.89 s, 106 MB | 744 ms, 106 MB | 2.47 s, 506 MB |
-| 100 MB emoji | 523 ms, 105 MB | 303 ms, 108 MB | 1.10 s, 106 MB | 225 ms, 105 MB | 599 ms, 206 MB |
-| One base letter plus 10 million combining marks (one grapheme cluster) | 43 ms, 44 MB | 83 ms, 46 MB | 210 ms, 44 MB | 59 ms, 44 MB | 135 ms, 82 MB |
-| 5 million emoji joined by ZWJ | 61 ms, 72 MB | 104 ms, 74 MB | 242 ms, 72 MB | 125 ms, 72 MB | 106 ms, 111 MB |
+| Input                                                                  | `displaywidth` | `go-runewidth` | `uniseg`       | `x/text/width` | table + emoji  |
+| ---------------------------------------------------------------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
+| 100 MB ASCII                                                           | 50 ms, 106 MB  | 67 ms, 105 MB  | 1.26 s, 105 MB | 340 ms, 106 MB | 1.18 s, 506 MB |
+| 100 MB ideographs                                                      | 535 ms, 106 MB | 182 ms, 108 MB | 1.60 s, 106 MB | 255 ms, 105 MB | 838 ms, 239 MB |
+| 100 MB invalid bytes (0xFF)                                            | 1.12 s, 106 MB | 1.33 s, 108 MB | 4.89 s, 106 MB | 744 ms, 106 MB | 2.47 s, 506 MB |
+| 100 MB emoji                                                           | 523 ms, 105 MB | 303 ms, 108 MB | 1.10 s, 106 MB | 225 ms, 105 MB | 599 ms, 206 MB |
+| One base letter plus 10 million combining marks (one grapheme cluster) | 43 ms, 44 MB   | 83 ms, 46 MB   | 210 ms, 44 MB  | 59 ms, 44 MB   | 135 ms, 82 MB  |
+| 5 million emoji joined by ZWJ                                          | 61 ms, 72 MB   | 104 ms, 74 MB  | 242 ms, 72 MB  | 125 ms, 72 MB  | 106 ms, 111 MB |
 
 - **No panics, no quadratic behaviour, no unbounded allocation:** the libraries allocate nothing; my table code allocates 4 bytes per input byte (the rune slice), which is why it peaks at 506 MB on 100 MB. Clusters that grow without bound (combining marks, ZWJ chains, regional indicators, tag characters, variation selector and skin-tone chains, all 5 to 10 million elements) cost milliseconds.
 - **A size cap is still needed:** an ADR title or summary is at most a few hundred characters (the spec limits `summary` to 160), so `akmctl` should refuse a cell above, say, 4 KB before it measures. That is one line and applies to any candidate.
@@ -959,33 +963,33 @@ id   class              cell                                           PRET rune
 33   greek-cyrillic     "\u041f\u0440\u0438\u0432\u0435\u0442 \u0...     10   10    10    10    10    10    10    10    (all agree)
 34   greek-cyrillic     "\u0401"                                          1    1     1     1     1     1     1     1    (all agree)
 35   greek-cyrillic     "\u0402\u0409"                                    2    2     2     2     2     2     2     2    (all agree)
-36   cjk                "\u6f22\u5b57"                                    4    2*    4     4     4     4     4     4 
-37   cjk                "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30...     16    8*   16    16    16    16    16    16 
-38   cjk                "\u4e2d\u6587"                                    4    2*    4     4     4     4     4     4 
-39   cjk                "\U00020000"                                      2    1*    2     2     2     2     2     2 
-40   cjk                "\u3007"                                          2    1*    2     2     2     2     2     2 
-41   cjk                "\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e...     20   10*   20    20    20    20    20    20 
-42   cjk                "\u6c49\u8bed\u62fc\u97f3 pinyin"                15   11*   15    15    15    15    15    15 
-43   cjk                "\u3000a"                                         3    2*    3     3     3     3     3     3 
-44   cjk                "a\u3000b"                                        4    3*    4     4     4     4     4     4 
-45   kana               "\u3072\u3089\u304c\u306a"                        8    4*    8     8     8     8     8     8 
-46   kana               "\u30ab\u30bf\u30ab\u30ca"                        8    4*    8     8     8     8     8     8 
+36   cjk                "\u6f22\u5b57"                                    4    2*    4     4     4     4     4     4
+37   cjk                "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30...     16    8*   16    16    16    16    16    16
+38   cjk                "\u4e2d\u6587"                                    4    2*    4     4     4     4     4     4
+39   cjk                "\U00020000"                                      2    1*    2     2     2     2     2     2
+40   cjk                "\u3007"                                          2    1*    2     2     2     2     2     2
+41   cjk                "\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e...     20   10*   20    20    20    20    20    20
+42   cjk                "\u6c49\u8bed\u62fc\u97f3 pinyin"                15   11*   15    15    15    15    15    15
+43   cjk                "\u3000a"                                         3    2*    3     3     3     3     3     3
+44   cjk                "a\u3000b"                                        4    3*    4     4     4     4     4     4
+45   kana               "\u3072\u3089\u304c\u306a"                        8    4*    8     8     8     8     8     8
+46   kana               "\u30ab\u30bf\u30ab\u30ca"                        8    4*    8     8     8     8     8     8
 47   kana               "\uff76\uff80\uff76\uff85"                        4    4     4     4     4     4     4     4    (all agree)
-48   kana               "\u30fc"                                          2    1*    2     2     2     2     2     2 
-49   kana               "\u3094"                                          2    1*    2     2     2     2     2     2 
-50   kana               "\u30a2\u30a4\u30a6\u30a8\u30aa"                 10    5*   10    10    10    10    10    10 
-51   hangul             "\ud55c\uae00"                                    4    2*    4     4     4     4     4     4 
-52   hangul             "\uc548\ub155\ud558\uc138\uc694"                 10    5*   10    10    10    10    10    10 
-53   hangul             "\u1100\u1161"                                    3    2*    3     3     2*    2*    2*    3 
-54   hangul             "\u1100\u1161\u11a8"                              4    3*    4     4     2*    2*    2*    4 
-55   hangul             "\u3131\u314f"                                    4    2*    4     4     4     4     4     4 
-56   hangul             "\ud55c\u1161"                                    3    2*    3     3     3     3     3     3 
-57   fullwidth          "\uff21\uff22\uff23"                              6    3*    6     6     6     6     6     6 
-58   fullwidth          "\uff11\uff12\uff13"                              6    3*    6     6     6     6     6     6 
-59   fullwidth          "\uff01"                                          2    1*    2     2     2     2     2     2 
-60   fullwidth          "\uff20"                                          2    1*    2     2     2     2     2     2 
-61   fullwidth          "\uff08\u62ec\u5f27\uff09"                        8    4*    8     8     8     8     8     8 
-62   fullwidth          "\uffe5"                                          2    1*    2     2     2     2     2     2 
+48   kana               "\u30fc"                                          2    1*    2     2     2     2     2     2
+49   kana               "\u3094"                                          2    1*    2     2     2     2     2     2
+50   kana               "\u30a2\u30a4\u30a6\u30a8\u30aa"                 10    5*   10    10    10    10    10    10
+51   hangul             "\ud55c\uae00"                                    4    2*    4     4     4     4     4     4
+52   hangul             "\uc548\ub155\ud558\uc138\uc694"                 10    5*   10    10    10    10    10    10
+53   hangul             "\u1100\u1161"                                    3    2*    3     3     2*    2*    2*    3
+54   hangul             "\u1100\u1161\u11a8"                              4    3*    4     4     2*    2*    2*    4
+55   hangul             "\u3131\u314f"                                    4    2*    4     4     4     4     4     4
+56   hangul             "\ud55c\u1161"                                    3    2*    3     3     3     3     3     3
+57   fullwidth          "\uff21\uff22\uff23"                              6    3*    6     6     6     6     6     6
+58   fullwidth          "\uff11\uff12\uff13"                              6    3*    6     6     6     6     6     6
+59   fullwidth          "\uff01"                                          2    1*    2     2     2     2     2     2
+60   fullwidth          "\uff20"                                          2    1*    2     2     2     2     2     2
+61   fullwidth          "\uff08\u62ec\u5f27\uff09"                        8    4*    8     8     8     8     8     8
+62   fullwidth          "\uffe5"                                          2    1*    2     2     2     2     2     2
 63   fullwidth          "\uff61\uff62\uff63"                              3    3     3     3     3     3     3     3    (all agree)
 64   fullwidth          "\uffe9\uffea"                                    2    2     2     2     2     2     2     2    (all agree)
 65   ambiguous          "\u00b1"                                          1    1     1     1     1     1     1     1    (all agree)
@@ -1008,46 +1012,46 @@ id   class              cell                                           PRET rune
 82   ambiguous          "\u2103"                                          1    1     1     1     1     1     1     1    (all agree)
 83   ambiguous          "\u2122"                                          1    1     1     1     1     1     1     1    (all agree)
 84   ambiguous          "\u00a1\u00bf"                                    2    2     2     2     2     2     2     2    (all agree)
-85   emoji-single       "\U0001f600"                                      2    1*    2     2     2     2     2     2 
-86   emoji-single       "\U0001f680"                                      2    1*    2     2     2     2     2     2 
-87   emoji-single       "\u2705"                                          2    1*    2     2     2     2     2     2 
-88   emoji-single       "\u274c"                                          2    1*    2     2     2     2     2     2 
+85   emoji-single       "\U0001f600"                                      2    1*    2     2     2     2     2     2
+86   emoji-single       "\U0001f680"                                      2    1*    2     2     2     2     2     2
+87   emoji-single       "\u2705"                                          2    1*    2     2     2     2     2     2
+88   emoji-single       "\u274c"                                          2    1*    2     2     2     2     2     2
 89   emoji-single       "\u2714"                                          1    1     1     1     1     1     1     1    (all agree)
 90   emoji-single       "\u2764"                                          1    1     1     1     1     1     1     1    (all agree)
 91   emoji-single       "\u263a"                                          1    1     1     1     1     1     1     1    (all agree)
-92   emoji-single       "\u2b50"                                          2    1*    2     2     2     2     2     2 
+92   emoji-single       "\u2b50"                                          2    1*    2     2     2     2     2     2
 93   emoji-single       "\u26a0"                                          1    1     1     1     1     1     1     1    (all agree)
 94   emoji-single       "\u00a9"                                          1    1     1     1     1     1     1     1    (all agree)
-95   emoji-single       "\U0001f525"                                      2    1*    2     2     2     2     2     2 
-96   emoji-single       "\U0001f44d"                                      2    1*    2     2     2     2     2     2 
-97   emoji-single       "\u231a"                                          2    1*    2     2     2     2     2     2 
-98   emoji-single       "\u23f0"                                          2    1*    2     2     2     2     2     2 
-99   emoji-single       "\u2615"                                          2    1*    2     2     2     2     2     2 
+95   emoji-single       "\U0001f525"                                      2    1*    2     2     2     2     2     2
+96   emoji-single       "\U0001f44d"                                      2    1*    2     2     2     2     2     2
+97   emoji-single       "\u231a"                                          2    1*    2     2     2     2     2     2
+98   emoji-single       "\u23f0"                                          2    1*    2     2     2     2     2     2
+99   emoji-single       "\u2615"                                          2    1*    2     2     2     2     2     2
 100  emoji-single       "\u267b"                                          1    1     1     1     1     1     1     1    (all agree)
 101  emoji-single       "\u25b6"                                          1    1     1     1     1     1     1     1    (all agree)
 102  emoji-single       "\U0001f170"                                      1    1     1     1     1     1     1     1    (all agree)
 103  emoji-single       "\u2139"                                          1    1     1     1     1     1     1     1    (all agree)
 104  emoji-single       "\u24c2"                                          1    1     1     1     1     1     1     1    (all agree)
-105  emoji-single       "\U0001f201"                                      2    1*    2     2     2     2     2     2 
-106  emoji-single       "\u3297"                                          2    1*    2     2     2     2     1*    2 
+105  emoji-single       "\U0001f201"                                      2    1*    2     2     2     2     2     2
+106  emoji-single       "\u3297"                                          2    1*    2     2     2     2     1*    2
 107  emoji-single       "\u203c"                                          1    1     1     1     1     1     1     1    (all agree)
 108  emoji-single       "\u2194"                                          1    1     1     1     1     1     1     1    (all agree)
-109  emoji-single       "\U0001f4a1 idea"                                 7    6*    7     7     7     7     7     7 
-110  emoji-single       "ok \u2705 done"                                 10    9*   10    10    10    10    10    10 
-111  emoji-vs16         "\u2714\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-112  emoji-vs16         "\u2764\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-113  emoji-vs16         "\u263a\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-114  emoji-vs16         "\u26a0\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-115  emoji-vs16         "\u00a9\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-116  emoji-vs16         "\u2122\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-117  emoji-vs16         "\u267b\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-118  emoji-vs16         "\u25b6\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-119  emoji-vs16         "\U0001f170\ufe0f"                                2    2     1*    2     2     1*    2     2 
-120  emoji-vs16         "\u2139\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-121  emoji-vs16         "\u24c2\ufe0f"                                    2    2     1*    2     2     1*    2     2 
+109  emoji-single       "\U0001f4a1 idea"                                 7    6*    7     7     7     7     7     7
+110  emoji-single       "ok \u2705 done"                                 10    9*   10    10    10    10    10    10
+111  emoji-vs16         "\u2714\ufe0f"                                    2    2     1*    2     2     1*    2     2
+112  emoji-vs16         "\u2764\ufe0f"                                    2    2     1*    2     2     1*    2     2
+113  emoji-vs16         "\u263a\ufe0f"                                    2    2     1*    2     2     1*    2     2
+114  emoji-vs16         "\u26a0\ufe0f"                                    2    2     1*    2     2     1*    2     2
+115  emoji-vs16         "\u00a9\ufe0f"                                    2    2     1*    2     2     1*    2     2
+116  emoji-vs16         "\u2122\ufe0f"                                    2    2     1*    2     2     1*    2     2
+117  emoji-vs16         "\u267b\ufe0f"                                    2    2     1*    2     2     1*    2     2
+118  emoji-vs16         "\u25b6\ufe0f"                                    2    2     1*    2     2     1*    2     2
+119  emoji-vs16         "\U0001f170\ufe0f"                                2    2     1*    2     2     1*    2     2
+120  emoji-vs16         "\u2139\ufe0f"                                    2    2     1*    2     2     1*    2     2
+121  emoji-vs16         "\u24c2\ufe0f"                                    2    2     1*    2     2     1*    2     2
 122  emoji-vs16         "\u3297\ufe0f"                                    2    2     2     2     2     2     2     3*
-123  emoji-vs16         "\u203c\ufe0f"                                    2    2     1*    2     2     1*    2     2 
-124  emoji-vs16         "\u2194\ufe0f"                                    2    2     1*    2     2     1*    2     2 
+123  emoji-vs16         "\u203c\ufe0f"                                    2    2     1*    2     2     1*    2     2
+124  emoji-vs16         "\u2194\ufe0f"                                    2    2     1*    2     2     1*    2     2
 125  emoji-vs16         "\u2705\ufe0f"                                    2    2     2     2     2     2     2     3*
 126  emoji-vs16         "a\ufe0f"                                         1    2*    1     1     2*    1     1     2*
 127  emoji-vs16         "\u6f22\ufe0f"                                    2    2     2     2     2     2     2     3*
@@ -1056,13 +1060,13 @@ id   class              cell                                           PRET rune
 130  emoji-keycap       "1\ufe0f\u20e3"                                   2    3*    2     2     2     1*    1*    3*
 131  emoji-keycap       "#\ufe0f\u20e3"                                   2    3*    2     2     2     1*    1*    3*
 132  emoji-keycap       "0\ufe0f\u20e3"                                   2    3*    2     2     2     1*    1*    3*
-133  emoji-keycap       "1\u20e3"                                         2    2     2     2     1*    1*    1*    2 
-134  emoji-keycap       "a\u20e3"                                         2    2     2     2     1*    1*    1*    2 
+133  emoji-keycap       "1\u20e3"                                         2    2     2     2     1*    1*    1*    2
+134  emoji-keycap       "a\u20e3"                                         2    2     2     2     1*    1*    1*    2
 135  emoji-skin         "\U0001f44d\U0001f3fd"                            2    2     4*    2     2     2     2     4*
 136  emoji-skin         "\U0001f44d\U0001f3fb\U0001f44d\U0001f3ff"        4    4     8*    4     4     4     4     8*
-137  emoji-skin         "\U0001f3fd"                                      2    1*    2     2     2     2     0*    2 
+137  emoji-skin         "\U0001f3fd"                                      2    1*    2     2     2     2     0*    2
 138  emoji-skin         "\u261d\U0001f3fd"                                2    2     3*    2     1*    2     1*    3*
-139  emoji-skin         "\u261d\ufe0f\U0001f3fd"                          4    3*    3*    2*    2*    2*    2*    4 
+139  emoji-skin         "\u261d\ufe0f\U0001f3fd"                          4    3*    3*    2*    2*    2*    2*    4
 140  emoji-skin         "\U0001f9d1\U0001f3fe"                            2    2     4*    2     2     2     2     4*
 141  emoji-zwj          "\U0001f9d1\U0001f3fd\u200d\U0001f4bb"            2    4*    7*    2     2     2     2     7*
 142  emoji-zwj          "\U0001f468\u200d\U0001f469\u200d\U0001f4...      2    7*   11*    2     2     2     2    11*
@@ -1071,37 +1075,37 @@ id   class              cell                                           PRET rune
 145  emoji-zwj          "\u2764\ufe0f\u200d\U0001f525"                    2    4*    4*    2     2     2     2     5*
 146  emoji-zwj          "\U0001f9d1\u200d\U0001f91d\u200d\U0001f9d1"      2    5*    8*    2     2     2     2     8*
 147  emoji-zwj          "\U0001f469\u200d\u2764\ufe0f\u200d\U0001...      2    8*   10*    2     2     2     2    11*
-148  emoji-zwj          "\U0001f600\u200d\U0001f600"                      5    3*    5     2*    2*    2*    2*    5 
+148  emoji-zwj          "\U0001f600\u200d\U0001f600"                      5    3*    5     2*    2*    2*    2*    5
 149  emoji-flag         "\U0001f1fa\U0001f1f8"                            2    2     2     2     2     2     2     2    (all agree)
 150  emoji-flag         "\U0001f1ef\U0001f1f5\U0001f1e9\U0001f1ea"        4    4     4     4     4     4     4     4    (all agree)
-151  emoji-flag         "\U0001f1fa"                                      1    1     1     1     2*    1     2*    1 
-152  emoji-flag         "\U0001f1fa\U0001f1f8\U0001f1ef"                  3    3     3     3     4*    3     4*    3 
+151  emoji-flag         "\U0001f1fa"                                      1    1     1     1     2*    1     2*    1
+152  emoji-flag         "\U0001f1fa\U0001f1f8\U0001f1ef"                  3    3     3     3     4*    3     4*    3
 153  emoji-flag         "\U0001f3f4\U000e0067\U000e0062\U000e0065...      2    7*    8*    2     2     2     2     8*
-154  emoji-flag         "\U0001f3c1"                                      2    1*    2     2     2     2     2     2 
-155  zero-width         "a\u200db"                                        3    3     3     3     2*    2*    2*    3 
-156  zero-width         "a\u200bb"                                        3    3     3     3     2*    2*    2*    3 
-157  zero-width         "a\u200cb"                                        3    3     3     3     2*    2*    2*    3 
-158  zero-width         "a\u2060b"                                        3    3     3     3     2*    2*    2*    3 
-159  zero-width         "a\ufeffb"                                        3    3     3     3     2*    2*    2*    3 
-160  zero-width         "a\u00adb"                                        3    3     3     3     2*    2*    2*    3 
-161  zero-width         "\u200d"                                          1    1     1     1     0*    0*    0*    1 
+154  emoji-flag         "\U0001f3c1"                                      2    1*    2     2     2     2     2     2
+155  zero-width         "a\u200db"                                        3    3     3     3     2*    2*    2*    3
+156  zero-width         "a\u200bb"                                        3    3     3     3     2*    2*    2*    3
+157  zero-width         "a\u200cb"                                        3    3     3     3     2*    2*    2*    3
+158  zero-width         "a\u2060b"                                        3    3     3     3     2*    2*    2*    3
+159  zero-width         "a\ufeffb"                                        3    3     3     3     2*    2*    2*    3
+160  zero-width         "a\u00adb"                                        3    3     3     3     2*    2*    2*    3
+161  zero-width         "\u200d"                                          1    1     1     1     0*    0*    0*    1
 162  zero-width         "a\u034fb"                                        2    3*    2     2     2     2     2     3*
-163  zero-width         "a\u180eb"                                        3    3     3     3     2*    2*    2*    3 
-164  zero-width         "a\u200eb"                                        3    3     3     3     2*    2*    2*    3 
-165  zero-width         "a\u202ab\u202c"                                  4    4     4     4     2*    2*    2*    4 
-166  other-scripts      "\u0e01\u0e33"                                    2    2     2     2     1*    2     2     2 
-167  other-scripts      "\u0e01\u0e47"                                    2    2     2     2     1*    1*    1*    2 
-168  other-scripts      "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35"            6    6     6     6     4*    4*    4*    6 
+163  zero-width         "a\u180eb"                                        3    3     3     3     2*    2*    2*    3
+164  zero-width         "a\u200eb"                                        3    3     3     3     2*    2*    2*    3
+165  zero-width         "a\u202ab\u202c"                                  4    4     4     4     2*    2*    2*    4
+166  other-scripts      "\u0e01\u0e33"                                    2    2     2     2     1*    2     2     2
+167  other-scripts      "\u0e01\u0e47"                                    2    2     2     2     1*    1*    1*    2
+168  other-scripts      "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35"            6    6     6     6     4*    4*    4*    6
 169  other-scripts      "\u0645\u0631\u062d\u0628\u0627"                  5    5     5     5     5     5     5     5    (all agree)
-170  other-scripts      "\u0645\u064f\u0631\u0652"                        4    4     4     4     2*    2*    2*    4 
+170  other-scripts      "\u0645\u064f\u0631\u0652"                        4    4     4     4     2*    2*    2*    4
 171  other-scripts      "\u05e9\u05dc\u05d5\u05dd"                        4    4     4     4     4     4     4     4    (all agree)
-172  other-scripts      "\u0928\u092e\u0938\u094d\u0924\u0947"            6    6     6     6     3*    4*    4*    6 
-173  other-scripts      "\u0600a"                                         2    2     2     2     0*    2     2     2 
-174  other-scripts      "\u0f40\u0f71"                                    2    2     2     2     1*    1*    1*    2 
-175  other-scripts      "\u1780\u17d2\u1798\u17c2\u179a"                  5    5     5     5     2*    4*    4*    5 
+172  other-scripts      "\u0928\u092e\u0938\u094d\u0924\u0947"            6    6     6     6     3*    4*    4*    6
+173  other-scripts      "\u0600a"                                         2    2     2     2     0*    2     2     2
+174  other-scripts      "\u0f40\u0f71"                                    2    2     2     2     1*    1*    1*    2
+175  other-scripts      "\u1780\u17d2\u1798\u17c2\u179a"                  5    5     5     5     2*    4*    4*    5
 176  control            "a\tb"                                            3  (Prettier rewrote the cell text; not scored)
 177  control            "a\x01b"                                          2    3*    2     2     2     2     2     3*
-178  control            "a\x7fb"                                          3    3     2*    2*    2*    2*    2*    3 
+178  control            "a\x7fb"                                          3    3     2*    2*    2*    2*    2*    3
 179  control            "a\u0085b"                                        2    3*    2     2     2     2     2     3*
 180  control            "a\u0080b"                                        2    3*    2     2     2     2     2     3*
 181  control            "a\x1bb"                                          2    3*    2     2     2     2     2     3*
@@ -1109,26 +1113,26 @@ id   class              cell                                           PRET rune
 183  control            "a\u00a0b"                                        3    3     3     3     3     3     3     3    (all agree)
 184  control            "a\u2003b"                                        3    3     3     3     3     3     3     3    (all agree)
 185  control            "a\u2007b"                                        3    3     3     3     3     3     3     3    (all agree)
-186  control            "a\u2028b"                                        3    3     3     3     2*    2*    2*    3 
+186  control            "a\u2028b"                                        3    3     3     3     2*    2*    2*    3
 187  control            "a\bb"                                            2    3*    2     2     2     2     2     3*
 188  long               "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...    200  200   200   200   200   200   200   200    (all agree)
 189  long               "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...   5000 5000  5000  5000  5000  5000  5000  5000    (all agree)
-190  long               "\u6f22\u6f22\u6f22\u6f22\u6f22\u6f22\u6f...   2000 1000* 2000  2000  2000  2000  2000  2000 
-191  long               "\U0001f600\U0001f600\U0001f600\U0001f600...   1000  500* 1000  1000  1000  1000  1000  1000 
+190  long               "\u6f22\u6f22\u6f22\u6f22\u6f22\u6f22\u6f...   2000 1000* 2000  2000  2000  2000  2000  2000
+191  long               "\U0001f600\U0001f600\U0001f600\U0001f600...   1000  500* 1000  1000  1000  1000  1000  1000
 192  long               "ab\u6f22\U0001f600e\u0301 ab\u6f22\U0001...    483  423*  483   483   483   483   483   543*
 193  long               "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...   100000 100000  100000  100000  100000  100000  100000  100000    (all agree)
-194  new-unicode        "\U0001fae9"                                      2    1*    2     2     2     2     1*    2 
-195  new-unicode        "\U0001fa89"                                      2    1*    2     2     2     2     1*    2 
-196  new-unicode        "\U0001fac8"                                      2    1*    2     2     2     2     1*    2 
-197  new-unicode        "\U0002ebf0"                                      2    1*    2     2     2     2     2     2 
-198  new-unicode        "\U000323b0"                                      2    1*    2     2     2     2     2     2 
-199  new-unicode        "\U0001fac6"                                      2    1*    2     2     2     2     1*    2 
+194  new-unicode        "\U0001fae9"                                      2    1*    2     2     2     2     1*    2
+195  new-unicode        "\U0001fa89"                                      2    1*    2     2     2     2     1*    2
+196  new-unicode        "\U0001fac8"                                      2    1*    2     2     2     2     1*    2
+197  new-unicode        "\U0002ebf0"                                      2    1*    2     2     2     2     2     2
+198  new-unicode        "\U000323b0"                                      2    1*    2     2     2     2     2     2
+199  new-unicode        "\U0001fac6"                                      2    1*    2     2     2     2     1*    2
 200  invalid-utf8       "a\xffb"                                          3    3     3     3     3     3     3     3    (all agree)
 201  invalid-utf8       "\xc3"                                            1    1     1     1     1     1     1     1    (all agree)
 202  invalid-utf8       "\xe6\xbc"                                        1    2*    2*    2*    1     2*    2*    2*
 203  invalid-utf8       "a\xc0\xafb"                                      4    4     4     4     4     4     4     4    (all agree)
-204  invalid-utf8       "\xed\xa0\x80"                                    3    3     3     3     1*    3     3     3 
-205  invalid-utf8       "\xf4\x90\x80\x80"                                4    4     4     4     1*    4     4     4 
+204  invalid-utf8       "\xed\xa0\x80"                                    3    3     3     3     1*    3     3     3
+205  invalid-utf8       "\xf4\x90\x80\x80"                                4    4     4     4     1*    4     4     4
 206  invalid-utf8       "\xf0\x9f\x98"                                    1    3*    3*    3*    1     3*    3*    3*
 207  invalid-utf8       "ok\x80\x80\x80"                                  5    5     5     5     5     5     5     5    (all agree)
 
@@ -1202,74 +1206,74 @@ Columns: case, candidate, width returned, milliseconds, MB allocated during the 
 
 ```text
 case               candidate           width        ms     alloc MB   peak MB  note
-ascii-100MB        runecount       104857600        39            0       105  
-ascii-100MB        table-eaw       104857600       425          400       506  
-ascii-100MB        table-emoji     104857600      1177          400       506  
-ascii-100MB        x/text/width    104857600       340            0       106  
-ascii-100MB        go-runewidth    104857600        67            0       105  
-ascii-100MB        uniseg          104857600      1256            0       105  
-ascii-100MB        displaywidth    104857600        50            0       106  
-cjk-100MB          runecount        34952533        85            0       106  
-cjk-100MB          table-eaw        69905066       532          133       239  
-cjk-100MB          table-emoji      69905066       838          133       239  
-cjk-100MB          x/text/width     69905066       255            0       105  
-cjk-100MB          go-runewidth     69905066       182            0       108  
-cjk-100MB          uniseg           69905066      1595            0       106  
-cjk-100MB          displaywidth     69905066       535            0       106  
-invalid-100MB      runecount       104857600       238            0       105  
-invalid-100MB      table-eaw       104857600      1385          400       506  
-invalid-100MB      table-emoji     104857600      2474          400       506  
-invalid-100MB      x/text/width    104857600       744            0       106  
-invalid-100MB      go-runewidth    104857600      1333            0       108  
-invalid-100MB      uniseg          104857600      4890            0       106  
-invalid-100MB      displaywidth    104857600      1123            0       106  
-combining-10M      runecount        10000001        20            0         0  
-combining-10M      table-eaw               1        70           38        68  
-combining-10M      table-emoji             1       135           38        82  
-combining-10M      x/text/width     10000001        59            0        44  
-combining-10M      go-runewidth            1        83            0        46  
-combining-10M      uniseg                  1       210            0        44  
-combining-10M      displaywidth            1        43            0        44  
-zwj-chain-5M       runecount        10000001        26            0         0  
-zwj-chain-5M       table-eaw        15000002       146           38       111  
-zwj-chain-5M       table-emoji             2       106           38       111  
-zwj-chain-5M       x/text/width     15000002       125            0        72  
-zwj-chain-5M       go-runewidth            2       104            0        74  
-zwj-chain-5M       uniseg                  2       242            0        72  
-zwj-chain-5M       displaywidth            2        61            0        72  
-regional-5M        runecount         5000000        13            0         0  
-regional-5M        table-eaw         5000000        70           19        44  
-regional-5M        table-emoji       5000000        35           19         0  
-regional-5M        x/text/width      5000000        42            0        24  
-regional-5M        go-runewidth      5000000        91            0        27  
-regional-5M        uniseg            5000000       127            0        24  
-regional-5M        displaywidth      5000000        63            0        25  
-skin-vs-5M         runecount         5000001        12            0         0  
-skin-vs-5M         table-eaw         5000002        53           19        58  
-skin-vs-5M         table-emoji       5000000       104           19        58  
-skin-vs-5M         x/text/width      7500002        40            0        39  
-skin-vs-5M         go-runewidth            2        50            0        41  
-skin-vs-5M         uniseg                  2       102            0        39  
-skin-vs-5M         displaywidth            2        26            0         0  
-tags-5M            runecount         5000001        13            0         0  
-tags-5M            table-eaw         5000002        64           19        44  
-tags-5M            table-emoji             2        32           19         0  
-tags-5M            x/text/width      5000002        43            0        44  
-tags-5M            go-runewidth            2        52            0        46  
-tags-5M            uniseg                  2       126            0        44  
-tags-5M            displaywidth            2        29            0         0  
-crlf-ascii-1MBx    runecount         1000000         0            0         0  
-crlf-ascii-1MBx    table-eaw          500000         3            3         0  
-crlf-ascii-1MBx    table-emoji        500000        11            3         0  
-crlf-ascii-1MBx    x/text/width      1000000         3            0         0  
-crlf-ascii-1MBx    go-runewidth       500000         0            0         0  
-crlf-ascii-1MBx    uniseg             500000        10            0         0  
-crlf-ascii-1MBx    displaywidth       500000         4            0         0  
-emoji-100MB        runecount        26214400        76            0       105  
-emoji-100MB        table-eaw        52428800       378          100       206  
-emoji-100MB        table-emoji      52428800       599          100       206  
-emoji-100MB        x/text/width     52428800       225            0       105  
-emoji-100MB        go-runewidth     52428800       303            0       108  
-emoji-100MB        uniseg           52428800      1097            0       106  
-emoji-100MB        displaywidth     52428800       523            0       105  
+ascii-100MB        runecount       104857600        39            0       105
+ascii-100MB        table-eaw       104857600       425          400       506
+ascii-100MB        table-emoji     104857600      1177          400       506
+ascii-100MB        x/text/width    104857600       340            0       106
+ascii-100MB        go-runewidth    104857600        67            0       105
+ascii-100MB        uniseg          104857600      1256            0       105
+ascii-100MB        displaywidth    104857600        50            0       106
+cjk-100MB          runecount        34952533        85            0       106
+cjk-100MB          table-eaw        69905066       532          133       239
+cjk-100MB          table-emoji      69905066       838          133       239
+cjk-100MB          x/text/width     69905066       255            0       105
+cjk-100MB          go-runewidth     69905066       182            0       108
+cjk-100MB          uniseg           69905066      1595            0       106
+cjk-100MB          displaywidth     69905066       535            0       106
+invalid-100MB      runecount       104857600       238            0       105
+invalid-100MB      table-eaw       104857600      1385          400       506
+invalid-100MB      table-emoji     104857600      2474          400       506
+invalid-100MB      x/text/width    104857600       744            0       106
+invalid-100MB      go-runewidth    104857600      1333            0       108
+invalid-100MB      uniseg          104857600      4890            0       106
+invalid-100MB      displaywidth    104857600      1123            0       106
+combining-10M      runecount        10000001        20            0         0
+combining-10M      table-eaw               1        70           38        68
+combining-10M      table-emoji             1       135           38        82
+combining-10M      x/text/width     10000001        59            0        44
+combining-10M      go-runewidth            1        83            0        46
+combining-10M      uniseg                  1       210            0        44
+combining-10M      displaywidth            1        43            0        44
+zwj-chain-5M       runecount        10000001        26            0         0
+zwj-chain-5M       table-eaw        15000002       146           38       111
+zwj-chain-5M       table-emoji             2       106           38       111
+zwj-chain-5M       x/text/width     15000002       125            0        72
+zwj-chain-5M       go-runewidth            2       104            0        74
+zwj-chain-5M       uniseg                  2       242            0        72
+zwj-chain-5M       displaywidth            2        61            0        72
+regional-5M        runecount         5000000        13            0         0
+regional-5M        table-eaw         5000000        70           19        44
+regional-5M        table-emoji       5000000        35           19         0
+regional-5M        x/text/width      5000000        42            0        24
+regional-5M        go-runewidth      5000000        91            0        27
+regional-5M        uniseg            5000000       127            0        24
+regional-5M        displaywidth      5000000        63            0        25
+skin-vs-5M         runecount         5000001        12            0         0
+skin-vs-5M         table-eaw         5000002        53           19        58
+skin-vs-5M         table-emoji       5000000       104           19        58
+skin-vs-5M         x/text/width      7500002        40            0        39
+skin-vs-5M         go-runewidth            2        50            0        41
+skin-vs-5M         uniseg                  2       102            0        39
+skin-vs-5M         displaywidth            2        26            0         0
+tags-5M            runecount         5000001        13            0         0
+tags-5M            table-eaw         5000002        64           19        44
+tags-5M            table-emoji             2        32           19         0
+tags-5M            x/text/width      5000002        43            0        44
+tags-5M            go-runewidth            2        52            0        46
+tags-5M            uniseg                  2       126            0        44
+tags-5M            displaywidth            2        29            0         0
+crlf-ascii-1MBx    runecount         1000000         0            0         0
+crlf-ascii-1MBx    table-eaw          500000         3            3         0
+crlf-ascii-1MBx    table-emoji        500000        11            3         0
+crlf-ascii-1MBx    x/text/width      1000000         3            0         0
+crlf-ascii-1MBx    go-runewidth       500000         0            0         0
+crlf-ascii-1MBx    uniseg             500000        10            0         0
+crlf-ascii-1MBx    displaywidth       500000         4            0         0
+emoji-100MB        runecount        26214400        76            0       105
+emoji-100MB        table-eaw        52428800       378          100       206
+emoji-100MB        table-emoji      52428800       599          100       206
+emoji-100MB        x/text/width     52428800       225            0       105
+emoji-100MB        go-runewidth     52428800       303            0       108
+emoji-100MB        uniseg           52428800      1097            0       106
+emoji-100MB        displaywidth     52428800       523            0       105
 ```

@@ -5,6 +5,7 @@ created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
 ---
+
 # AKM API specification
 
 Version 1.0.
@@ -29,27 +30,27 @@ The words MUST, SHOULD and MAY are used as in RFC 2119.
 
 Every response is one JSON object:
 
-| Field | Type | Meaning |
-|---|---|---|
-| `api_version` | string | `"1.0"`: the version of this spec the response conforms to. |
-| `operation` | string | The operation name. |
-| `request` | object | The request exactly as given, with no defaults added. The defaults are in this spec. |
-| `ok` | boolean | `true` if the operation ran. A `check` that finds errors is still `ok: true` (see `clean`). |
-| *operation fields* | | Defined per operation in section 4. Present only when `ok` is `true`. |
-| `error` | object | Present only when `ok` is `false`: `code`, `message`, optional `details`. |
+| Field              | Type    | Meaning                                                                                     |
+| ------------------ | ------- | ------------------------------------------------------------------------------------------- |
+| `api_version`      | string  | `"1.0"`: the version of this spec the response conforms to.                                 |
+| `operation`        | string  | The operation name.                                                                         |
+| `request`          | object  | The request exactly as given, with no defaults added. The defaults are in this spec.        |
+| `ok`               | boolean | `true` if the operation ran. A `check` that finds errors is still `ok: true` (see `clean`). |
+| _operation fields_ |         | Defined per operation in section 4. Present only when `ok` is `true`.                       |
+| `error`            | object  | Present only when `ok` is `false`: `code`, `message`, optional `details`.                   |
 
 Error codes (the closed set for 1.0):
 
-| Code | Meaning | Exit | HTTP |
-|---|---|---|---|
-| `invalid_request` | An unknown or malformed parameter, a value outside its enum, a missing required parameter. | 2 | 400 |
-| `unauthorized` | HTTP only: the token is missing or wrong. | n/a | 401 |
-| `not_found` | An id, section or path does not resolve. | 2 | 404 |
-| `ambiguous` | A reference resolves to more than one record (a collision, rule I1). `details.paths` lists them. | 2 | 409 |
-| `stale` | A write carried `if_match` and the file changed since (section 7). `details.etag` is the file's current etag. | 2 | 412 |
-| `refused` | A precondition failed: closing with an empty `## Outcome`, an unclean git tree on `migrate`, a claim held by someone else, a status move that is not allowed, a section write to a closed record, an HTTP write with no `If-Match`. `details.reason` is a short code. | 2 | 409; 428 for `if_match_required` |
-| `unreadable` | The repository, a file or the manifest could not be read or parsed in a way that stops the operation. | 2 | 500 |
-| `internal` | A bug. | 2 | 500 |
+| Code              | Meaning                                                                                                                                                                                                                                                               | Exit | HTTP                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| `invalid_request` | An unknown or malformed parameter, a value outside its enum, a missing required parameter.                                                                                                                                                                            | 2    | 400                              |
+| `unauthorized`    | HTTP only: the token is missing or wrong.                                                                                                                                                                                                                             | n/a  | 401                              |
+| `not_found`       | An id, section or path does not resolve.                                                                                                                                                                                                                              | 2    | 404                              |
+| `ambiguous`       | A reference resolves to more than one record (a collision, rule I1). `details.paths` lists them.                                                                                                                                                                      | 2    | 409                              |
+| `stale`           | A write carried `if_match` and the file changed since (section 7). `details.etag` is the file's current etag.                                                                                                                                                         | 2    | 412                              |
+| `refused`         | A precondition failed: closing with an empty `## Outcome`, an unclean git tree on `migrate`, a claim held by someone else, a status move that is not allowed, a section write to a closed record, an HTTP write with no `If-Match`. `details.reason` is a short code. | 2    | 409; 428 for `if_match_required` |
+| `unreadable`      | The repository, a file or the manifest could not be read or parsed in a way that stops the operation.                                                                                                                                                                 | 2    | 500                              |
+| `internal`        | A bug.                                                                                                                                                                                                                                                                | 2    | 500                              |
 
 Exit codes of the CLI binding: `0` for `ok: true` with `clean: true` (or an operation with no `clean` field); `1` for `ok: true` and `clean: false` (only `check` and `migrate`); `2` for any `ok: false`. This keeps the specification's `0 / 1 / 2` meaning (clean or warnings only / errors found / could not read).
 
@@ -57,14 +58,14 @@ Exit codes of the CLI binding: `0` for `ok: true` with `clean: true` (or an oper
 
 `ls`, `search`, `show`, `board` and the write operations return records:
 
-| Field | Type | Meaning |
-|---|---|---|
-| `id` | string | `YYMMDD-xxxx`. |
-| `type` | string | `work` or `adr`. |
-| `path` | string | The file, for example `docs/work/261027-m3qz-add-json-output.md`. |
-| `id_date` | string | The id's date, `YYYY-MM-DD` (UTC). |
-| `etag` | string | The first 16 lowercase hex characters of the SHA-256 of the file's bytes. Used for `if_match` (section 7). |
-| `fields` | object | The frontmatter. |
+| Field     | Type   | Meaning                                                                                                    |
+| --------- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| `id`      | string | `YYMMDD-xxxx`.                                                                                             |
+| `type`    | string | `work` or `adr`.                                                                                           |
+| `path`    | string | The file, for example `docs/work/261027-m3qz-add-json-output.md`.                                          |
+| `id_date` | string | The id's date, `YYYY-MM-DD` (UTC).                                                                         |
+| `etag`    | string | The first 16 lowercase hex characters of the SHA-256 of the file's bytes. Used for `if_match` (section 7). |
+| `fields`  | object | The frontmatter.                                                                                           |
 
 `fields` holds frontmatter. `show` and the write operations return every field of the record type, `null` when absent, plus unknown fields the file has. `ls`, `search` and `board` return a short default set (below) unless the request lists fields. The full list, for a work item: `id`, `title`, `summary`, `status`, `kind`, `parent`, `blocked_by`, `priority`, `created`, `updated`, `authored_by`, `decisions`, and with the claims extension `claimed_by` and `claimed_at`; for an ADR `id`, `title`, `summary`, `status`, `date`, `scope`, `supersedes`, `superseded_by`, `authored_by`. Lists are arrays of strings; `priority` is an integer; everything else is a string.
 
@@ -92,38 +93,38 @@ Request: none. Response: `tool` (`name`, `version`), `api_versions` (array of su
 
 List records, header fields only.
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `type` | `work` or `adr` | both | |
-| `status` | array of status | any | Matches if the record's status is in the list. Work and ADR statuses are both allowed. |
-| `parent` | id | any | Work items whose `parent` is this id. |
-| `blocked` | boolean | any | `true`: work items with a non-empty `blocked_by`. `false`: those without. |
-| `scope` | string | any | ADRs with a matching `scope` entry. An entry ending in `/` is a path prefix: it matches when the value starts with it (`src/store/open.go` matches `src/store/`). Any other entry matches only when equal to the value (`cli` matches `cli`). |
-| `since` | date | none | Records whose `updated` (work) or `date` (ADR) is on or after it. |
-| `sort` | array of sort key | `["id"]` | A key is a field name, `-` before it for descending, or `roadmap`. Sortable: `id`, `title`, `status`, `kind`, `priority`, `created`, `updated`, `date`, `roadmap`. Absent values sort last in both directions. `roadmap` sorts by position in `ROADMAP.md` (Now, Next, Later in file order), records not on it after, so `["roadmap", "-priority", "id"]` is the open-work order. |
-| `fields` | array of string | the default set | Which keys of `fields` to return. `"*"` for all fields of the type. |
-| `limit` | integer ≥ 1 | none | |
-| `offset` | integer ≥ 0 | 0 | |
-| `count_only` | boolean | false | Return `total` and `count` with no records. |
-| `next` | boolean | false | Add `next_line` to work items. |
+| Parameter    | Type              | Default         | Meaning                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------ | ----------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`       | `work` or `adr`   | both            |                                                                                                                                                                                                                                                                                                                                                                                   |
+| `status`     | array of status   | any             | Matches if the record's status is in the list. Work and ADR statuses are both allowed.                                                                                                                                                                                                                                                                                            |
+| `parent`     | id                | any             | Work items whose `parent` is this id.                                                                                                                                                                                                                                                                                                                                             |
+| `blocked`    | boolean           | any             | `true`: work items with a non-empty `blocked_by`. `false`: those without.                                                                                                                                                                                                                                                                                                         |
+| `scope`      | string            | any             | ADRs with a matching `scope` entry. An entry ending in `/` is a path prefix: it matches when the value starts with it (`src/store/open.go` matches `src/store/`). Any other entry matches only when equal to the value (`cli` matches `cli`).                                                                                                                                     |
+| `since`      | date              | none            | Records whose `updated` (work) or `date` (ADR) is on or after it.                                                                                                                                                                                                                                                                                                                 |
+| `sort`       | array of sort key | `["id"]`        | A key is a field name, `-` before it for descending, or `roadmap`. Sortable: `id`, `title`, `status`, `kind`, `priority`, `created`, `updated`, `date`, `roadmap`. Absent values sort last in both directions. `roadmap` sorts by position in `ROADMAP.md` (Now, Next, Later in file order), records not on it after, so `["roadmap", "-priority", "id"]` is the open-work order. |
+| `fields`     | array of string   | the default set | Which keys of `fields` to return. `"*"` for all fields of the type.                                                                                                                                                                                                                                                                                                               |
+| `limit`      | integer ≥ 1       | none            |                                                                                                                                                                                                                                                                                                                                                                                   |
+| `offset`     | integer ≥ 0       | 0               |                                                                                                                                                                                                                                                                                                                                                                                   |
+| `count_only` | boolean           | false           | Return `total` and `count` with no records.                                                                                                                                                                                                                                                                                                                                       |
+| `next`       | boolean           | false           | Add `next_line` to work items.                                                                                                                                                                                                                                                                                                                                                    |
 
 Response: `total` (matches before `limit`), `count` (records returned), `records`. An unknown `type` or `status` value is `invalid_request`. A `status` that does not apply to the chosen `type` matches nothing.
 
 ### 4.3 `search`
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `text` | string | **required** | A case-insensitive substring. Whitespace-separated words must all match (AND). |
-| `body` | boolean | false | Also search bodies. Otherwise title, summary and scope. |
-| `type`, `status`, `fields`, `limit`, `offset` | | | As for `ls`. |
+| Parameter                                     | Type    | Default      | Meaning                                                                        |
+| --------------------------------------------- | ------- | ------------ | ------------------------------------------------------------------------------ |
+| `text`                                        | string  | **required** | A case-insensitive substring. Whitespace-separated words must all match (AND). |
+| `body`                                        | boolean | false        | Also search bodies. Otherwise title, summary and scope.                        |
+| `type`, `status`, `fields`, `limit`, `offset` |         |              | As for `ls`.                                                                   |
 
 Response: as `ls`, with `matches` on each record: an array of `{field, line, snippet}`; `field` is a frontmatter field name or `body`; `line` is the 1-based line in the file (frontmatter lines count); `snippet` is the matching line, trimmed to 160 characters. A record matches when every word appears in one of title, summary or scope (or in the body with `body`). `matches` has one entry for each of those fields, or for each body line, that contains at least one of the words. Records are ordered by number of matches descending, then `id`.
 
 ### 4.4 `show`
 
-| Parameter | Type | Meaning |
-|---|---|---|
-| `id` | id | **required** |
+| Parameter | Type   | Meaning                                                                                                          |
+| --------- | ------ | ---------------------------------------------------------------------------------------------------------------- |
+| `id`      | id     | **required**                                                                                                     |
 | `section` | string | A section heading, case-insensitive, without the `##` (`next`, `goal`, `log`, `outcome`, `context`, `decision`). |
 
 Response: `record` (with all fields the file has), `sections` (the file's `##` headings in order, lowercase), and either `body` (the whole body, if `section` is absent) or `section` (`{name, text}`, the text without its heading). A missing section is `not_found`.
@@ -132,8 +133,8 @@ Response: `record` (with all fields the file has), `sections` (the file's `##` h
 
 The Kanban grouping, as data. A client draws it; `akmctl board` draws it as text.
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
+| Parameter  | Type                 | Default                        | Meaning                 |
+| ---------- | -------------------- | ------------------------------ | ----------------------- |
 | `statuses` | array of work status | `["active","blocked","ready"]` | Columns, in this order. |
 
 Response: `columns` (array of `{status, count, records}`, in the order requested; `records` sorted `roadmap`, `-priority`, `id`) and `totals` (an object with the count of every work status, including those with no column). `blocked_by` is in the default set here, so a client can group blocked items by what they wait on.
@@ -142,11 +143,11 @@ Response: `columns` (array of `{status, count, records}`, in the order requested
 
 Run the rules of section 6 of the specification.
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `target` | version string | the tool's own | Run the rules of another layout version and classify each finding (section 7 of the specification). |
-| `rules` | array of string | all | Rule ids (`WK4`) or prefixes (`WK`, `L`). |
-| `as_of` | timestamp or date | now | The clock for staleness rules (WK10, claims). Tests set it. |
+| Parameter | Type              | Default        | Meaning                                                                                             |
+| --------- | ----------------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| `target`  | version string    | the tool's own | Run the rules of another layout version and classify each finding (section 7 of the specification). |
+| `rules`   | array of string   | all            | Rule ids (`WK4`) or prefixes (`WK`, `L`).                                                           |
+| `as_of`   | timestamp or date | now            | The clock for staleness rules (WK10, claims). Tests set it.                                         |
 
 Response: `clean` (true when no finding has severity `E`), `errors`, `warnings` (counts), `count` (findings), `findings`, and `reconcile` (`state`: `current`, `behind`, `ahead`, `unsupported`, `conflict` or `absent`; and `steps`, an array of strings, when `behind`).
 
@@ -156,10 +157,10 @@ A finding is `{rule, severity, file, line, id, message, class}`: `severity` is `
 
 Regenerate `docs/adr/README.md` (section 4 of the specification).
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `dry_run` | boolean | false | Compute, do not write. |
-| `include_content` | boolean | false | Return the generated text. |
+| Parameter         | Type    | Default | Meaning                    |
+| ----------------- | ------- | ------- | -------------------------- |
+| `dry_run`         | boolean | false   | Compute, do not write.     |
+| `include_content` | boolean | false   | Return the generated text. |
 
 Response: `path`, `changed` (the generated text differs from the file), `written` (the file was written), and `content` when asked. Side effect: writes the file unless `dry_run`.
 
@@ -169,45 +170,45 @@ Response: `path`, `changed` (the generated text differs from the file), `written
 
 ### 4.9 `when`
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `id` | id | **required** | Need not exist as a record; any string that matches the id pattern. |
-| `as_of` | date | today (UTC) | |
+| Parameter | Type | Default      | Meaning                                                             |
+| --------- | ---- | ------------ | ------------------------------------------------------------------- |
+| `id`      | id   | **required** | Need not exist as a record; any string that matches the id pattern. |
+| `as_of`   | date | today (UTC)  |                                                                     |
 
 Response: `id`, `date`, `weekday` (English name), `age_days` (integer, negative if the id is dated after `as_of`).
 
 ### 4.10 `new`
 
-| Parameter | Type | Meaning |
-|---|---|---|
-| `kind` | `work` or `adr` | **required** |
-| `slug` | string | **required**. Lowercase kebab-case, at most 60 characters. |
-| `title` | string | Default: the slug with hyphens as spaces. |
-| `fields` | object | Initial values: for `work`, `summary`, `kind`, `parent`, `priority`, `blocked_by`, `decisions`; for `adr`, `summary`, `scope`. Others are `invalid_request`. |
-| `as_of` | timestamp | The clock for the id's date. Tests set it. |
+| Parameter | Type            | Meaning                                                                                                                                                      |
+| --------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `kind`    | `work` or `adr` | **required**                                                                                                                                                 |
+| `slug`    | string          | **required**. Lowercase kebab-case, at most 60 characters.                                                                                                   |
+| `title`   | string          | Default: the slug with hyphens as spaces.                                                                                                                    |
+| `fields`  | object          | Initial values: for `work`, `summary`, `kind`, `parent`, `priority`, `blocked_by`, `decisions`; for `adr`, `summary`, `scope`. Others are `invalid_request`. |
+| `as_of`   | timestamp       | The clock for the id's date. Tests set it.                                                                                                                   |
 
 Response: `record` and `path`. The new file comes from the template, with a fresh id, `created` and `updated` (or `date`) set to today, status `raw` (work) or `proposed` (ADR). A `parent` that does not resolve is `not_found`. The id is chosen so that no existing file in the three directories has it. Side effect: writes one file.
 
 ### 4.11 `set`
 
-| Parameter | Type | Meaning |
-|---|---|---|
-| `id` | id | **required** |
-| `changes` | object | **required**. Field to new value. A `null` value removes the field. |
-| `if_match` | etag | The record's `etag` as the client last saw it (section 7). |
-| `dry_run` | boolean, default false | Compute and return the change; write nothing (section 7). |
-| `as_of` | date or timestamp | The clock for `updated`. Tests set it. |
+| Parameter  | Type                   | Meaning                                                             |
+| ---------- | ---------------------- | ------------------------------------------------------------------- |
+| `id`       | id                     | **required**                                                        |
+| `changes`  | object                 | **required**. Field to new value. A `null` value removes the field. |
+| `if_match` | etag                   | The record's `etag` as the client last saw it (section 7).          |
+| `dry_run`  | boolean, default false | Compute and return the change; write nothing (section 7).           |
+| `as_of`    | date or timestamp      | The clock for `updated`. Tests set it.                              |
 
 Response: `record` (after) and `changed` (the field names that differ), and `diff` when `dry_run` is true. Allowed fields are those of the record type except `id`, `created`, `status` values `done` and `dropped` for work (use `close`) and `claimed_by`/`claimed_at` (use `claim`). `updated` (work) is set to today whenever the file changes; `date` (ADR) only when `status` changes. A value outside the field's type or enum is `invalid_request`. A change that breaks a rule the tool can see from the record alone is `refused` with `details.reason: "rule"` and `details.rule` naming it: `WK5` (status `blocked` with no `blocked_by`), `WK4` (a record as its own parent), `WK9` (a closed item given an open status) and `A3` (an ADR set to `superseded` with no `superseded_by`). Content rules such as WK6 (an empty `## Next`) are left to `check`, because an agent sets the status first and writes the section next. Unknown fields cannot be set; `date` (ADR) and `updated` are managed by the tool. Unchanged values are not written, so `changed` can be empty. Only frontmatter fields change here; the body is changed by `section` (section 4.16). Side effect: rewrites one file, unless `dry_run`.
 
 ### 4.12 `close`
 
-| Parameter | Type | Meaning |
-|---|---|---|
-| `id` | id | **required**; a work item. |
-| `status` | `done` or `dropped` | **required** |
-| `outcome` | string | The text of the `## Outcome` section. When given and not blank, it replaces the section (or creates it, as `section` does) in the same write as the status change and the rename. |
-| `if_match`, `dry_run`, `as_of` | | As for `set`. |
+| Parameter                      | Type                | Meaning                                                                                                                                                                           |
+| ------------------------------ | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | id                  | **required**; a work item.                                                                                                                                                        |
+| `status`                       | `done` or `dropped` | **required**                                                                                                                                                                      |
+| `outcome`                      | string              | The text of the `## Outcome` section. When given and not blank, it replaces the section (or creates it, as `section` does) in the same write as the status change and the rename. |
+| `if_match`, `dry_run`, `as_of` |                     | As for `set`.                                                                                                                                                                     |
 
 Response: `record`, `moved_from`, `moved_to` (paths), and `diff` when `dry_run` is true (its `new_path` is `moved_to`). Sets the status, removes any `claimed_by` and `claimed_at`, sets `updated`, and moves the file to `done/` inside the work folder (`docs/work/done/` by default) with a plain rename (Git sees a rename once the change is staged; the tool does not stage, section 7). `refused` with `details.reason: "empty_outcome"` if `## Outcome` is empty or missing after `outcome` is applied (neither the file nor the parameter supplies one); `refused` with `details.reason: "open_children"` when closing `done` a parent with children not `done` or `dropped` (WK8). Side effect: rewrites one file and renames it, unless `dry_run`.
 
@@ -223,13 +224,13 @@ Claims extension. `id` (**required**), `as` (**required**, a free string), `if_m
 
 Reconcile the repository with a layout version (section 7 of the specification).
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `mode` | `report`, `plan`, `apply_safe`, `handoff` | `report` | |
-| `target` | version string | the tool's own | |
-| `acknowledge_backup` | boolean | false | Must be `true` for `apply_safe` (the safeguard of the specification). |
-| `migrations` | array of migration objects | none | One-off migrations to search besides the embedded ones: `{from, to, steps}` as below. The CLI flag `--migration <file>` reads a file holding one object or a list and passes it here. |
-| `as_of` | date or timestamp | now | The clock for the migration log. Tests set it. |
+| Parameter            | Type                                      | Default        | Meaning                                                                                                                                                                               |
+| -------------------- | ----------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`               | `report`, `plan`, `apply_safe`, `handoff` | `report`       |                                                                                                                                                                                       |
+| `target`             | version string                            | the tool's own |                                                                                                                                                                                       |
+| `acknowledge_backup` | boolean                                   | false          | Must be `true` for `apply_safe` (the safeguard of the specification).                                                                                                                 |
+| `migrations`         | array of migration objects                | none           | One-off migrations to search besides the embedded ones: `{from, to, steps}` as below. The CLI flag `--migration <file>` reads a file holding one object or a list and passes it here. |
+| `as_of`              | date or timestamp                         | now            | The clock for the migration log. Tests set it.                                                                                                                                        |
 
 `from` is the `layout` version in the manifest, or `"0.0.0"` when the manifest is missing. The path from `from` to `target` is found among the migrations the tool embeds (one step per `<from>-to-<to>`, searched breadth-first); `state` is `current` (equal), `behind` (a path exists), `ahead` (the repository is newer) or `unsupported` (older, no path). This release embeds none, because no layout before 1.0.0 was published; the machinery is tested with a made-up 0.9.0. A repository with no layout history is on `"0.0.0"`; the `migrations` parameter adds a one-off migration (`{from: "0.0.0", to: "1.0.0", steps}`) to the search, so such a repository can be converted from a file kept in the working tree. The parameter is validated like an embedded file: an unknown member, step kind or class, a step without its required parameters, a path outside the repository, a repeated step id or a bad version is `invalid_request` with `details.parameter` `migrations`. Every safeguard of `apply_safe` applies unchanged, and the migration is not recorded in the repository except through `docs/.migrate-log`, the tag and the branch.
 
@@ -254,13 +255,13 @@ A step object may carry `notes`, an array of strings, present only when there is
 
 Replace or extend one `##` section of a record's body. `set` changes frontmatter only; this operation is how a client writes the text of a record (the goal, the next step, the outcome, a log line).
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `id` | id | **required** | A work item or an ADR. |
-| `name` | string | **required** | The text of a `##` heading, compared without regard to case, without the hashes. One line, not empty. |
-| `text` | string | **required** | The new text. May be empty. Line endings are written as the file has them. |
-| `mode` | `replace` or `append` | `replace` | `replace` makes `text` the whole section. `append` adds `text` on new lines after the last non-blank line of the section. |
-| `if_match`, `dry_run`, `as_of` | | | As for `set`. |
+| Parameter                      | Type                  | Default      | Meaning                                                                                                                   |
+| ------------------------------ | --------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | id                    | **required** | A work item or an ADR.                                                                                                    |
+| `name`                         | string                | **required** | The text of a `##` heading, compared without regard to case, without the hashes. One line, not empty.                     |
+| `text`                         | string                | **required** | The new text. May be empty. Line endings are written as the file has them.                                                |
+| `mode`                         | `replace` or `append` | `replace`    | `replace` makes `text` the whole section. `append` adds `text` on new lines after the last non-blank line of the section. |
+| `if_match`, `dry_run`, `as_of` |                       |              | As for `set`.                                                                                                             |
 
 A section that does not exist is created before `## Log`, or at the end when there is no Log, with a blank line after its heading (the form Prettier leaves unchanged); `close` with `outcome` creates `## Outcome` the same way. Response: `record` (after), `section` (`{name, text}`: the section as `show` returns it after the write, `name` in lower case), `changed` (boolean: the file text differs) and `diff` when `dry_run` is true.
 
@@ -285,6 +286,7 @@ A section that does not exist is created before `## Log`, or at the end when the
 `akmctl ui` serves the binding on the loopback interface. It is for one local user and a local client (the workbench UI, an editor extension), not a network service.
 
 **Security (all MUST):**
+
 - Bind to `127.0.0.1` or `::1` only; there is no option to bind elsewhere in 1.0.
 - Every request carries `Authorization: Bearer <token>`. The token is random (at least 128 bits), chosen at start and kept in memory only. `akmctl ui` prints it once on stderr inside the URL it opens, as a fragment (`http://127.0.0.1:PORT/#token=...`). A URL fragment is never sent to the server, so the page itself holds no token and no data: it is served without authentication, reads the token from the fragment, removes it from the address bar and sends it as the bearer header. A missing or wrong token is `unauthorized` (401), with no other detail.
 - The server checks `Host` against its own loopback address and port, and rejects any request with an `Origin` header that is not the same origin (a defence against DNS rebinding and cross-site requests).
@@ -296,25 +298,25 @@ A section that does not exist is created before `## Log`, or at the end when the
 
 **Routes** (base `/api/v1`; the version is in the path; the response `api_version` is `1.0`):
 
-| Method and path | Operation | Parameters |
-|---|---|---|
-| `GET /version` | `version` | |
-| `GET /records` | `ls` | query: the `ls` parameters; lists comma-separated (`status=ready,active`); `sort=roadmap,-priority` |
-| `GET /search` | `search` | query: `text`, `body`, `type`, `status`, `fields`, `limit`, `offset` |
-| `GET /records/{id}` | `show` | query: `section` |
-| `GET /board` | `board` | query: `statuses` |
-| `GET /check` | `check` | query: `target`, `rules`, `as_of` |
-| `GET /` | the workbench page | no token |
-| `GET /find/{id}` | `find` | |
-| `GET /when/{id}` | `when` | query: `as_of` |
-| `POST /records` | `new` | JSON body: the request object |
-| `PATCH /records/{id}` | `set` | JSON body: `changes` (and `if_match`, `dry_run`) |
-| `PUT /records/{id}/sections/{name}` | `section` | JSON body: `text`, `mode`, `if_match`, `dry_run`, `as_of`; `name` is the last path segment (a `name` in the body must equal it) |
-| `POST /records/{id}/close` | `close` | JSON body: `status`, `outcome`, `if_match`, `dry_run` |
-| `POST /records/{id}/claim` | `claim` | JSON body: `as`, `if_match`, `takeover`, `dry_run` |
-| `DELETE /records/{id}/claim` | `release` | `If-Match` header; optional JSON body: `dry_run` |
-| `POST /index` | `index` | JSON body: `dry_run`, `include_content` |
-| `POST /migrate` | `migrate` | JSON body: the request object |
+| Method and path                     | Operation          | Parameters                                                                                                                      |
+| ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /version`                      | `version`          |                                                                                                                                 |
+| `GET /records`                      | `ls`               | query: the `ls` parameters; lists comma-separated (`status=ready,active`); `sort=roadmap,-priority`                             |
+| `GET /search`                       | `search`           | query: `text`, `body`, `type`, `status`, `fields`, `limit`, `offset`                                                            |
+| `GET /records/{id}`                 | `show`             | query: `section`                                                                                                                |
+| `GET /board`                        | `board`            | query: `statuses`                                                                                                               |
+| `GET /check`                        | `check`            | query: `target`, `rules`, `as_of`                                                                                               |
+| `GET /`                             | the workbench page | no token                                                                                                                        |
+| `GET /find/{id}`                    | `find`             |                                                                                                                                 |
+| `GET /when/{id}`                    | `when`             | query: `as_of`                                                                                                                  |
+| `POST /records`                     | `new`              | JSON body: the request object                                                                                                   |
+| `PATCH /records/{id}`               | `set`              | JSON body: `changes` (and `if_match`, `dry_run`)                                                                                |
+| `PUT /records/{id}/sections/{name}` | `section`          | JSON body: `text`, `mode`, `if_match`, `dry_run`, `as_of`; `name` is the last path segment (a `name` in the body must equal it) |
+| `POST /records/{id}/close`          | `close`            | JSON body: `status`, `outcome`, `if_match`, `dry_run`                                                                           |
+| `POST /records/{id}/claim`          | `claim`            | JSON body: `as`, `if_match`, `takeover`, `dry_run`                                                                              |
+| `DELETE /records/{id}/claim`        | `release`          | `If-Match` header; optional JSON body: `dry_run`                                                                                |
+| `POST /index`                       | `index`            | JSON body: `dry_run`, `include_content`                                                                                         |
+| `POST /migrate`                     | `migrate`          | JSON body: the request object                                                                                                   |
 
 - The response body is the response object, with the HTTP status of section 2 (`200` for `ok: true`, `201` for a successful `new`). The body is the same JSON the CLI prints. `check` and `migrate` return `200` even when `clean` is `false`.
 - A record response carries `ETag: "<etag>"`. A write route reads `If-Match: "<etag>"` as `if_match` when the body has none.

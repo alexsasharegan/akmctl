@@ -4,6 +4,7 @@ status: active
 created_at: 2026-10-28
 updated_at: 2026-10-28
 ---
+
 # AKM guide: a repository that remembers and runs on rails
 
 Version 1.0.0.
@@ -18,12 +19,12 @@ AKM is the same idea as personal knowledge management (PKM), moved inside a repo
 
 It has four parts:
 
-| Part | What it is |
-|---|---|
-| The standard | A written spec: the layout, record formats, rules, ids and versions |
-| The starter | A clone template with instructions and opt-in extensions |
-| The tool | `akmctl`, a Go CLI that queries and checks the records, plus a workbench UI started with `akmctl ui` |
-| The skills | Instructions an agent loads to follow the procedures |
+| Part         | What it is                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| The standard | A written spec: the layout, record formats, rules, ids and versions                                  |
+| The starter  | A clone template with instructions and opt-in extensions                                             |
+| The tool     | `akmctl`, a Go CLI that queries and checks the records, plus a workbench UI started with `akmctl ui` |
+| The skills   | Instructions an agent loads to follow the procedures                                                 |
 
 The tool is an accelerator, not a dependency. Everything it does can be done by reading plain files.
 
@@ -42,12 +43,12 @@ The tool is an accelerator, not a dependency. Everything it does can be done by 
 
 ## 3. The four questions and where they are answered
 
-| Question | Answered by | Cost to read |
-|---|---|---|
-| What is this and how do I work in it? | `AGENTS.md` (60 to 80 lines), `docs/architecture.md` | A few dozen lines |
-| Why is it like this? | `docs/adr/` (decision records), with a generated index | The index, then one record |
-| What is planned? | `docs/ROADMAP.md` (ordered lists) | One short file |
-| Where did we stop? | `docs/work/` (one file per item), each with `## Next` | The listing, then one section |
+| Question                              | Answered by                                            | Cost to read                  |
+| ------------------------------------- | ------------------------------------------------------ | ----------------------------- |
+| What is this and how do I work in it? | `AGENTS.md` (60 to 80 lines), `docs/architecture.md`   | A few dozen lines             |
+| Why is it like this?                  | `docs/adr/` (decision records), with a generated index | The index, then one record    |
+| What is planned?                      | `docs/ROADMAP.md` (ordered lists)                      | One short file                |
+| Where did we stop?                    | `docs/work/` (one file per item), each with `## Next`  | The listing, then one section |
 
 A reader routes by headers. Every record has frontmatter in YAML-lite (id, title, summary, status, dates) that is cheap to read; the body is read only when needed. The ADR index is generated from those headers, and the open-work listing is derived on demand.
 
@@ -109,14 +110,14 @@ Write the encoder behind the existing `list` command, then add the schema test.
 ## Outcome
 ```
 
-| Status | Meaning |
-|---|---|
-| `raw` | Captured, not specified |
-| `ready` | Specified: a goal and a "done when" list |
-| `active` | Being worked; has a `## Next` |
+| Status    | Meaning                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| `raw`     | Captured, not specified                                                                            |
+| `ready`   | Specified: a goal and a "done when" list                                                           |
+| `active`  | Being worked; has a `## Next`                                                                      |
 | `blocked` | Cannot proceed; `blocked_by` names item ids or free text (a person, a role, an outside dependency) |
-| `done` | Finished; `## Outcome` gives evidence for each "done when" line |
-| `dropped` | Decided against; `## Outcome` gives the reason |
+| `done`    | Finished; `## Outcome` gives evidence for each "done when" line                                    |
+| `dropped` | Decided against; `## Outcome` gives the reason                                                     |
 
 `priority` is an optional integer (higher is sooner, default 0) that only sorts the listing; the roadmap wins. A parent can close only when all its children are done or dropped.
 
@@ -134,13 +135,13 @@ Short, in five parts: identity, commands, where things live, rules, and a Do-not
 
 ## 5. Who does what
 
-| The agent | The maintainer |
-|---|---|
-| Keeps `status`, `## Next` and `## Log` current, in the same commit as the code | Orders the roadmap |
-| Files new items, as `raw` when unsure | Accepts or rejects ADRs |
-| Drafts ADRs as `proposed` | Unblocks what is `blocked` on a person |
-| Closes items with evidence | Reviews records marked `authored_by: agent` and removes the mark |
-| Runs the checks | Decides what changes the layout, and runs migrations |
+| The agent                                                                      | The maintainer                                                   |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Keeps `status`, `## Next` and `## Log` current, in the same commit as the code | Orders the roadmap                                               |
+| Files new items, as `raw` when unsure                                          | Accepts or rejects ADRs                                          |
+| Drafts ADRs as `proposed`                                                      | Unblocks what is `blocked` on a person                           |
+| Closes items with evidence                                                     | Reviews records marked `authored_by: agent` and removes the mark |
+| Runs the checks                                                                | Decides what changes the layout, and runs migrations             |
 
 The paperwork is the agent's. The decisions are the maintainer's.
 
@@ -197,17 +198,17 @@ Once a repo has a manifest, `akmctl migrate` handles later layout versions: it r
 
 The files are the source of truth, so a bare agent can work:
 
-| Need | Without the tool |
-|---|---|
-| Which decisions exist | Read `docs/adr/README.md` |
-| What work is active | `grep -l '^status: active' docs/work/*.md` |
-| What is blocked, and on whom | `grep -l '^status: blocked' docs/work/*.md`, then read `blocked_by` |
-| Where to resume an item | Read its `## Next` |
-| Mint an id | `id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
-| Create a record | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id |
-| Close an item | Set `status`, write `## Outcome`, set `updated` to today's UTC date, `git mv` the file to `docs/work/done/` |
-| Find a record by id | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'` |
-| The ADR index is stale or in conflict | Do not hand-edit it; ask the maintainer to regenerate it with the tool |
+| Need                                  | Without the tool                                                                                            |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Which decisions exist                 | Read `docs/adr/README.md`                                                                                   |
+| What work is active                   | `grep -l '^status: active' docs/work/*.md`                                                                  |
+| What is blocked, and on whom          | `grep -l '^status: blocked' docs/work/*.md`, then read `blocked_by`                                         |
+| Where to resume an item               | Read its `## Next`                                                                                          |
+| Mint an id                            | `id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
+| Create a record                       | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id                                  |
+| Close an item                         | Set `status`, write `## Outcome`, set `updated` to today's UTC date, `git mv` the file to `docs/work/done/` |
+| Find a record by id                   | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'`                                                     |
+| The ADR index is stale or in conflict | Do not hand-edit it; ask the maintainer to regenerate it with the tool                                      |
 
 This is slower and uses more tokens, but it must stay correct.
 
@@ -229,10 +230,10 @@ This is slower and uses more tokens, but it must stay correct.
 - Code and tests win over prose. If a doc is wrong, fix it or say so.
 - A well-formed record can still be wrong. Review, do not trust.
 - Records are ordinary Obsidian notes: Obsidian reads and edits them without making them invalid (it drops comments and turns inline lists into block lists when it saves a property, which is cosmetic). A repository does not have to be a vault.
-    - To get clickable references in Obsidian, write a quoted wikilink with an id alias (`parent: "[[261027-m3qz-fix-login|261027-m3qz]]"`) or set `reference_style: wikilink`; bare ids stay valid.
-    - In the body of a note, write relative Markdown links so the note reads the same on a Git host. Obsidian's default wikilinks are tolerated, and the tool warns when one does not resolve. In a vault, turn off Obsidian's "Use Wikilinks" setting if you want it to write Markdown links.
-    - Obsidian types each property by name for the whole vault, so if you open a repo inside a vault that already uses `id` as a number, Obsidian shows a type mismatch (the value is not changed).
-    - Files whose names start with a dot (`docs/.layout`, `.agents/`) do not appear in Obsidian.
+  - To get clickable references in Obsidian, write a quoted wikilink with an id alias (`parent: "[[261027-m3qz-fix-login|261027-m3qz]]"`) or set `reference_style: wikilink`; bare ids stay valid.
+  - In the body of a note, write relative Markdown links so the note reads the same on a Git host. Obsidian's default wikilinks are tolerated, and the tool warns when one does not resolve. In a vault, turn off Obsidian's "Use Wikilinks" setting if you want it to write Markdown links.
+  - Obsidian types each property by name for the whole vault, so if you open a repo inside a vault that already uses `id` as a number, Obsidian shows a type mismatch (the value is not changed).
+  - Files whose names start with a dot (`docs/.layout`, `.agents/`) do not appear in Obsidian.
 - Format with the pinned Prettier (config: `embeddedLanguageFormatting: off`), so frontmatter stays readable by the tool.
 - Do not turn the flow into ceremony. The rails are a path for the agent, not a report for a meeting.
 
@@ -248,11 +249,11 @@ This is slower and uses more tokens, but it must stay correct.
 
 ## 11. Where things are
 
-| What | Where |
-|---|---|
-| The rules: layout, formats, checks, versions | [agent-ready-repo-spec](agent-ready-repo-spec.md) |
-| The tool's operations, JSON, bindings and fixtures | [akm-api-spec](akm-api-spec.md) |
-| The tool | the `akmctl` repository: prebuilt binaries, its README and changelog |
+| What                                               | Where                                                                |
+| -------------------------------------------------- | -------------------------------------------------------------------- |
+| The rules: layout, formats, checks, versions       | [agent-ready-repo-spec](agent-ready-repo-spec.md)                    |
+| The tool's operations, JSON, bindings and fixtures | [akm-api-spec](akm-api-spec.md)                                      |
+| The tool                                           | the `akmctl` repository: prebuilt binaries, its README and changelog |
 
 ## Glossary
 

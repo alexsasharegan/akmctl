@@ -5,6 +5,7 @@ created_at: 2026-10-28
 updated_at: 2026-10-28
 authored_by: agent
 ---
+
 # Vault migration: dry-run findings and runbook
 
 Dry run of [261027-nrwf-vault-agent-ready-migration](../../work/done/261027-nrwf-vault-agent-ready-migration.md) by Claude Code on a copy of the vault. The real vault was not modified. Drafts for review: [vault-migration-drafts](vault-migration-drafts.md). Scripts: `Deep Thought/9 scripts/akm-migration/`.
@@ -21,18 +22,18 @@ Dry run of [261027-nrwf-vault-agent-ready-migration](../../work/done/261027-nrwf
 
 ## Step timings (copy on this Mac)
 
-| Step | Time |
-| --- | --- |
-| copy of the repo (no `.bak`, `.tmp`, `node_modules`) | 4 s |
-| migrate report / plan / apply-safe | 0.1 s / 0.8 s / 0.5 s |
-| renames list and ADR slugs | 0.1 s |
-| link repair and renames (script, stands in for Obsidian) | 1.5 s |
-| ADR prose rewrite | 0.7 s |
-| 21 summaries with `akmctl set` | 0.7 s |
-| `akmctl index`, `akmctl check` | 0.07 s, 0.09 s |
-| `verify.py` | 10.7 s |
-| conformance script | 0.4 s |
-| whole scripted pipeline | 21 s |
+| Step                                                     | Time                  |
+| -------------------------------------------------------- | --------------------- |
+| copy of the repo (no `.bak`, `.tmp`, `node_modules`)     | 4 s                   |
+| migrate report / plan / apply-safe                       | 0.1 s / 0.8 s / 0.5 s |
+| renames list and ADR slugs                               | 0.1 s                 |
+| link repair and renames (script, stands in for Obsidian) | 1.5 s                 |
+| ADR prose rewrite                                        | 0.7 s                 |
+| 21 summaries with `akmctl set`                           | 0.7 s                 |
+| `akmctl index`, `akmctl check`                           | 0.07 s, 0.09 s        |
+| `verify.py`                                              | 10.7 s                |
+| conformance script                                       | 0.4 s                 |
+| whole scripted pipeline                                  | 21 s                  |
 
 Not measured: the 145 Obsidian renames (the CLI cannot run on a copy; the pilot renamed one note). Hand edits (dependents, drafts) took most of the session.
 
