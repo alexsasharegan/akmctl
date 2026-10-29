@@ -2,7 +2,7 @@
 
 The command-line tool for AKM (agent knowledge management), a standard that keeps a repository's decisions, direction and work in flight as Markdown records. The name is a working title.
 
-Status: under construction. The contract is the AKM API spec (`akm-api-spec`), with schemas and fixtures, kept in the maintainer's notes until a public home exists. Nothing here is released.
+Status: under construction. The contract is the AKM API spec ([`docs/spec/akm-api-spec.md`](docs/spec/akm-api-spec.md)), with its schemas and fixtures in [`docs/spec/akm-api/`](docs/spec/akm-api/). Nothing here is released.
 
 ## Layout
 
@@ -17,7 +17,10 @@ Status: under construction. The contract is the AKM API spec (`akm-api-spec`), w
 - `internal/fsx`: the repository lock and atomic writes.
 - `internal/server`: the HTTP binding (loopback only, bearer token) and the workbench page.
 - `internal/cli`: the command-line binding.
-- `testdata`: conformance fixtures shared with the spec (`yaml-lite.json`, `api/`).
+- `testdata`: conformance fixtures shared with the spec (`yaml-lite.json`, `api/`); a copy of `docs/spec/akm-api/.fixtures`, kept in step by hand.
+- `docs/spec`: the AKM standard, the guide, the API spec, its schemas and fixtures.
+- `docs/design`: the design history (decision log, comparison, reviews, library evaluations), including `vault-migration/`.
+- `scripts/vault-migration`: the scripts of the run that migrated the maintainer's vault; history, vault-specific.
 
 ## Use
 

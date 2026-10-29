@@ -1,6 +1,6 @@
 # Architecture
 
-`akmctl` reads a repository's AKM records (work items, ADRs, the roadmap, the manifest `docs/.layout`) and offers one set of operations over them through two bindings: a command line and a loopback HTTP server. The contract is the AKM API spec; the fixtures in `testdata/api/` are its executable form.
+`akmctl` reads a repository's AKM records (work items, ADRs, the roadmap, the manifest `docs/.layout`) and offers one set of operations over them through two bindings: a command line and a loopback HTTP server. The contract is the AKM API spec in `docs/spec/akm-api-spec.md`; the fixtures in `testdata/api/` are its executable form, a copy of `docs/spec/akm-api/.fixtures` kept in step by hand (work item 261029-x4ws).
 
 ## Packages
 
@@ -27,6 +27,10 @@
 - Records the tool writes use bare ids unless the manifest sets `reference_style: wikilink`.
 - The CLI and the HTTP binding return the same JSON envelope for the same request.
 - `testdata/` is byte-exact: `.gitattributes` turns line-ending conversion off for it.
+
+## Where the standard lives
+
+This repository holds the whole of AKM: the standard (`docs/spec/agent-ready-repo-spec.md`), the guide (`docs/spec/akm-guide.md`), the API spec (`docs/spec/akm-api-spec.md`) with its schemas, validator and fixtures (`docs/spec/akm-api/`), the decisions that shaped them (`docs/adr/`, `docs/design/agent-ready-repo-decision-log.md`) and the closed work (`docs/work/done/`). There is no template repository; `akmctl init` and `akmctl migrate` are the way in (ADR 261029-j0d0). `scripts/vault-migration/` is the history of the first migration, kept as the seed of the `migrate` discovery phase.
 
 ## Versions
 

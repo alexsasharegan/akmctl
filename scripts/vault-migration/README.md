@@ -1,3 +1,7 @@
+# Vault migration scripts (history)
+
+These scripts are the history of the run that took the maintainer's notes vault to the AKM layout on 2026-10-28 and 2026-10-29. They are vault-specific: paths, folder names and the Obsidian CLI rename loop are those of that vault, and nothing here is maintained or run by the tool. They are kept as the seed for the generic `migrate` discovery phase ([261029-tgfe](../../docs/work/261029-tgfe-migrate-discovery-no-manifest.md)). The run is described in [vault-migration-runbook](../../docs/design/vault-migration/vault-migration-runbook.md) and [vault-migration-drafts](../../docs/design/vault-migration/vault-migration-drafts.md). The text below is the vault's own README, unchanged.
+
 # AKM migration scripts (vault, dry run of 2026-10-28)
 
 Used by the dry run on a copy of the vault; the real run uses the same files. Python 3 standard library and bash only. Runbook: `Deep Thought/9 pkm/design/vault-migration-runbook.md`; drafts: `vault-migration-drafts.md`.

@@ -14,6 +14,9 @@
 - [261029-f5vn] Date new ids with the local day, not UTC
 - [261029-nf6h] mint_ids: build the slug from the title
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
+- [261029-0gb4] Add akmctl init with the profiles code and notes
+- [261029-tgfe] Give migrate a discovery phase for repositories with no manifest
+- [261029-dsga] Rewrite the standard's template section to describe init
 
 ## Later
 
@@ -40,5 +43,9 @@
 - [261029-yj59] Move closed records to done/ by status in one step
 - [261029-m0vm] move_file: report the inbound links it leaves broken
 - [261029-ap3y] Keep docs/.akm.lock out of commits
+- [261029-x4ws] Keep one copy of the API fixtures
+- [261026-mrdr] pkm-workbench: sort options
+- [261026-np3c] pkm-workbench: delete a task, with its backlinks listed
+- [261026-zg0g] pkm-workbench: filters
 
 ## Dropped
