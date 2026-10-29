@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/migrate.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "report",
+            "plan",
+            "apply_safe",
+            "handoff"
+          ]
+        },
+        "target": {
+          "$ref": "common.json#/$defs/version"
+        },
+        "acknowledge_backup": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        },
+        "migrations": {
+          "type": "array",
+          "items": {
+            "$ref": "common.json#/$defs/migration"
+          }
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "migrate"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "mode": {
+              "type": "string"
+            },
+            "from": {
+              "$ref": "common.json#/$defs/version"
+            },
+            "to": {
+              "$ref": "common.json#/$defs/version"
+            },
+            "state": {
+              "$ref": "common.json#/$defs/reconcile_state"
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/migrate_step"
+              }
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/finding"
+              }
+            },
+            "clean": {
+              "type": "boolean"
+            },
+            "handoff": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "mode",
+            "from",
+            "to",
+            "state",
+            "steps",
+            "findings",
+            "clean"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

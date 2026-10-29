@@ -1,0 +1,19 @@
+{
+  "name": "a missing id",
+  "repo": "basic",
+  "request": {
+    "id": "261099-zzzz"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "show",
+    "request": {
+      "id": "261099-zzzz"
+    },
+    "ok": false,
+    "error": {
+      "code": "not_found",
+      "message": "no record with id 261099-zzzz"
+    }
+  }
+}

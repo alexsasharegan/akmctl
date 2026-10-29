@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/board.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "common.json#/$defs/work_status"
+          }
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "board"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "$ref": "common.json#/$defs/work_status"
+                  },
+                  "count": {
+                    "type": "integer"
+                  },
+                  "records": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "common.json#/$defs/record"
+                    }
+                  }
+                },
+                "required": [
+                  "status",
+                  "count",
+                  "records"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "totals": {
+              "type": "object",
+              "properties": {
+                "raw": {
+                  "type": "integer"
+                },
+                "ready": {
+                  "type": "integer"
+                },
+                "active": {
+                  "type": "integer"
+                },
+                "blocked": {
+                  "type": "integer"
+                },
+                "done": {
+                  "type": "integer"
+                },
+                "dropped": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "raw",
+                "ready",
+                "active",
+                "blocked",
+                "done",
+                "dropped"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "columns",
+            "totals"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

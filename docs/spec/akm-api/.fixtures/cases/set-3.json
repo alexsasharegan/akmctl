@@ -1,0 +1,30 @@
+{
+  "name": "a stale etag writes nothing",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "priority": 1
+    },
+    "if_match": "0000000000000000"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261022-e5f6",
+      "changes": {
+        "priority": 1
+      },
+      "if_match": "0000000000000000"
+    },
+    "ok": false,
+    "error": {
+      "code": "stale",
+      "message": "the record changed since it was read",
+      "details": {
+        "etag": "1e3e49990ff5d8ed"
+      }
+    }
+  }
+}

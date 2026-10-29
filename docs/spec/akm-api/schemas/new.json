@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/new.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "common.json#/$defs/record_type"
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "maxLength": 60
+        },
+        "title": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object"
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        }
+      },
+      "required": [
+        "kind",
+        "slug"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "new"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "record": {
+              "$ref": "common.json#/$defs/record"
+            },
+            "path": {
+              "$ref": "common.json#/$defs/path"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "record",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

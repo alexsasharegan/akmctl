@@ -1,0 +1,23 @@
+{
+ "0": "Vault decisions are recorded as short ADRs in 9 pkm/adr, drafted first, with past decisions backfilled on a best-effort basis.",
+ "1": "Periodic review skills read one level down (annual from quarterly, weekly from daily) and write terse, structured notes under 1,000 words.",
+ "2": "Periodic review artifacts carry semver versions, v1.0.0 is the current state, and each major bump needs its own ADR.",
+ "3": "Periodic notes live under 1 Calendar with year and month nesting, three-letter month folders and shared calendar keys; core Daily Notes is off.",
+ "4": "The weekly review keeps synthesis with the agent and moves the mechanical gather and apply steps into weekly_review.py; Sleep becomes a section.",
+ "5": "History logging and state serialization are split: git-autosave runs five times a day under launchd and the git bundle runs monthly after a gc.",
+ "6": "Weekend analytics run as two stages: a compiler turn builds a materialized-view index of the week, then a reasoning turn works from that index.",
+ "7": "Incident report for 2026-07-02 to 07-07: git-autosave and the cloud syncs failed on a system git shim and a reset Full Disk Access, with the fixes.",
+ "8": "git-autosave moved from hourly cron to once a day, then to launchd after macOS updates kept resetting cron's Full Disk Access.",
+ "9": "Git tracks the vault for history only with no remote; copies reach Google Drive and iCloud by rsync every 15 minutes, and the work laptop is not synced.",
+ "10": "Agents use the Obsidian CLI for anything Obsidian knows how to do (links, search, properties, moves) and plain file edits for note text.",
+ "11": "Every database is a base plus a hub note, with records of one type in a subfolder and the hub beside it, so the dashboard is reachable without opening it.",
+ "12": "Tasks are notes with type: task under 9 pkm/tasks, carried through their life by the task-lifecycle skill; bookkeeping is allowed in any mode.",
+ "13": "Notebooks are tracked by an opt-in #notebook/daily tag in the daily note and a previous property that links each notebook to the one before.",
+ "14": "The frontmatter field registry is the authority for field names and types, and a conformance test checks every note against it.",
+ "15": "Review skills v2.1 to v2.3: a Self group, Shavian not read in reviews, stricter sleep rules, a Phoenix-time default and notebook gathering.",
+ "16": "type: moc marks hand-curated maps (style guide and moc-builder skill); for projects the folder in 2 PROJECTS is the index, with no base or status field.",
+ "17": "Backup syncs use Homebrew rsync with --whole-file --delete, so cloud placeholder files cannot break a run; the launchd plists are committed.",
+ "18": "pkm-workbench is a local Go server in its own repo that serves task views from the vault's files and writes changes back to the frontmatter.",
+ "19": "AKM is adopted as the standard for repository records: flat frontmatter, YYMMDD-xxxx ids, work items and ADRs in one id space, and the akmctl tool.",
+ "20": "Obsidian compatibility is a stated goal of AKM and the tiebreaker in design conflicts, though Obsidian itself is not required."
+}

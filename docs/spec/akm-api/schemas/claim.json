@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/claim.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "as": {
+          "type": "string",
+          "minLength": 1
+        },
+        "if_match": {
+          "$ref": "common.json#/$defs/etag"
+        },
+        "takeover": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        },
+        "dry_run": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "as"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "claim"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "record": {
+              "$ref": "common.json#/$defs/record"
+            },
+            "previous_holder": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "diff": {
+              "$ref": "common.json#/$defs/diff"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "record",
+            "previous_holder"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

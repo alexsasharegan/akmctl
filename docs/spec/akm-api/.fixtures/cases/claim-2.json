@@ -1,0 +1,26 @@
+{
+  "name": "another holder's fresh claim refuses",
+  "repo": "claims",
+  "request": {
+    "id": "261020-a2b3",
+    "as": "agent-1",
+    "as_of": "2026-10-28T09:30"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "claim",
+    "request": {
+      "id": "261020-a2b3",
+      "as": "agent-1",
+      "as_of": "2026-10-28T09:30"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261020-a2b3 is claimed by agent-9",
+      "details": {
+        "reason": "claimed"
+      }
+    }
+  }
+}

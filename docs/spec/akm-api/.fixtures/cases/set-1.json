@@ -1,0 +1,53 @@
+{
+  "name": "change two fields, refresh updated",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "priority": 4,
+      "summary": "Document them."
+    },
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261022-e5f6",
+      "changes": {
+        "priority": 4,
+        "summary": "Document them."
+      },
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "b2c21c55d3cd307c",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": "Document them.",
+        "status": "ready",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 4,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "changed": [
+      "priority",
+      "summary"
+    ]
+  },
+  "after": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\npriority: 4\nsummary: Document them.\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+  }
+}

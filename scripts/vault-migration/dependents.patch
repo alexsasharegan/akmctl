@@ -1,0 +1,957 @@
+diff --git a/.agents/skills/moc-builder/SKILL.md b/.agents/skills/moc-builder/SKILL.md
+index a955806..36d9398 100644
+--- a/.agents/skills/moc-builder/SKILL.md
++++ b/.agents/skills/moc-builder/SKILL.md
+@@ -1,10 +1,7 @@
+ ---
+ name: moc-builder
+ version: 1.0.0
+-description: >-
+-    Build, update or review a map of content (MOC, `type: moc`) in the vault, following the MOC style
+-    guide. Use for "build a MOC for X", "update the MOC", "review this MOC", or "is this a MOC or a
+-    base?". Writing or editing needs Build mode; reviewing a map against the checklist runs in Query.
++description: "Build, update or review a map of content (MOC, `type: moc`) in the vault, following the MOC style guide. Use for \"build a MOC for X\", \"update the MOC\", \"review this MOC\", or \"is this a MOC or a base?\". Writing or editing needs Build mode; reviewing a map against the checklist runs in Query."
+ ---
+ 
+ # MOC Builder Skill
+diff --git a/.agents/skills/monthly-review/SKILL.md b/.agents/skills/monthly-review/SKILL.md
+index ed25ad6..77b37e7 100644
+--- a/.agents/skills/monthly-review/SKILL.md
++++ b/.agents/skills/monthly-review/SKILL.md
+@@ -1,10 +1,6 @@
+ ---
+ name: monthly-review
+-description: >-
+-    Synthesizes and writes comprehensive monthly retrospective notes in Obsidian by aggregating all daily notes,
+-    weekly reviews, and field note notebooks of a target month, extracting active projects, completed tasks,
+-    milestones, event cross-references, and somatic/creative patterns, and compiling a structured TL;DR,
+-    project ledger, task cache, chronological appendix, event matrix, and Health roll-up (Sleep and Weight) into the periodic monthly review note.
++description: "Synthesizes and writes comprehensive monthly retrospective notes in Obsidian by aggregating all daily notes, weekly reviews, and field note notebooks of a target month, extracting active projects, completed tasks, milestones, event cross-references, and somatic/creative patterns, and compiling a structured TL;DR, project ledger, task cache, chronological appendix, event matrix, and Health roll-up (Sleep and Weight) into the periodic monthly review note."
+ ---
+ 
+ # Monthly Review Skill
+@@ -415,6 +411,6 @@ Safely write the synthesized review into the target monthly file:
+ 
+ After the review note is written, check whether the ADR sweep is due. This step only reports; it writes nothing.
+ 
+-1. Read the `Last sweep:` line in the "Sweep watermark" section of `Deep Thought/9 pkm/adr/README.md`.
++1. Read the `Last sweep:` line in the "Sweep watermark" section of `Deep Thought/9 pkm/design/adr-conventions.md`.
+ 2. Count tasks flagged for an ADR: `rg -l '^adr: candidate' "Deep Thought/9 pkm/tasks"`.
+ 3. The sweep is **due** when the watermark is a month or more old, or five or more tasks carry `adr: candidate`. If it is due, tell Alexander in the report and point to that README section. Do not run the sweep inside the monthly review: it ends in drafting ADRs, which needs his yes at each candidate and a separate Build step.
+diff --git a/.agents/skills/obsidian/SKILL.md b/.agents/skills/obsidian/SKILL.md
+index e50ee3b..16d568f 100644
+--- a/.agents/skills/obsidian/SKILL.md
++++ b/.agents/skills/obsidian/SKILL.md
+@@ -1,16 +1,6 @@
+ ---
+ name: obsidian
+-description: >-
+-    Complete reference and workflow guide for the Obsidian CLI (`obsidian`), installed as part of
+-    the Obsidian desktop application and available system-wide. Covers file creation, reading,
+-    appending, moving, renaming, deleting; wikilink-based resolution for files and paths; vault
+-    introspection (vaults, files, folders, tags, properties, aliases, links, backlinks,
+-    unresolved links, deadends, orphans); search (full-text and contextual); task management
+-    (listing, filtering, toggling); metadata manipulation (properties, tags, aliases); template
+-    handling; plugin/theme management; sync operations; daily-note shortcuts; database (base)
+-    queries; and developer/devtools commands. Use for any vault operation — whether routine
+-    maintenance, targeted edits, discovery passes, integration with external tooling (rg, jq,
+-    xsv, csvkit), or building domain-specific skills on top of the CLI.
++description: "Complete reference and workflow guide for the Obsidian CLI (`obsidian`), installed as part of the Obsidian desktop application and available system-wide. Covers file creation, reading, appending, moving, renaming, deleting; wikilink-based resolution for files and paths; vault introspection (vaults, files, folders, tags, properties, aliases, links, backlinks, unresolved links, deadends, orphans); search (full-text and contextual); task management (listing, filtering, toggling); metadata manipulation (properties, tags, aliases); template handling; plugin/theme management; sync operations; daily-note shortcuts; database (base) queries; and developer/devtools commands. Use for any vault operation — whether routine maintenance, targeted edits, discovery passes, integration with external tooling (rg, jq, xsv, csvkit), or building domain-specific skills on top of the CLI."
+ ---
+ 
+ # Obsidian CLI Skill
+diff --git a/.agents/skills/reader-card/SKILL.md b/.agents/skills/reader-card/SKILL.md
+index 896b3c2..cbe1633 100644
+--- a/.agents/skills/reader-card/SKILL.md
++++ b/.agents/skills/reader-card/SKILL.md
+@@ -1,12 +1,7 @@
+ ---
+ name: reader-card
+ version: 0.1.0
+-description: >-
+-    Turns Readwise Reader documents tagged `vault` (articles, feed items, newsletters, videos with
+-    transcripts) into Capsule, Concept or Summary cards in `0 Inbox/`, automatically and in FIFO order,
+-    through a daily launchd job that runs headless Sonnet jobs under a daily quota. Use for "run the Reader
+-    queue", "what is waiting from Reader", "card this Reader item now", or when changing or debugging the
+-    pipeline. Subject-agnostic.
++description: "Turns Readwise Reader documents tagged `vault` (articles, feed items, newsletters, videos with transcripts) into Capsule, Concept or Summary cards in `0 Inbox/`, automatically and in FIFO order, through a daily launchd job that runs headless Sonnet jobs under a daily quota. Use for \"run the Reader queue\", \"what is waiting from Reader\", \"card this Reader item now\", or when changing or debugging the pipeline. Subject-agnostic."
+ ---
+ 
+ # Reader Card Skill
+diff --git a/.agents/skills/shavian/SKILL.md b/.agents/skills/shavian/SKILL.md
+index c1c3933..9e51504 100644
+--- a/.agents/skills/shavian/SKILL.md
++++ b/.agents/skills/shavian/SKILL.md
+@@ -1,11 +1,7 @@
+ ---
+ name: shavian
+ version: 1.1.0
+-description: >-
+-    Read, check, and write Shavian script in this vault. Shavian is off limits to agents: use this skill
+-    ONLY when Alexander explicitly asks to read, transliterate, look up or proofread Shavian; never merely
+-    because a note contains Shavian (U+10450-1047F). Provides a Read-Lex backed gloss/lookup helper and points to the vault's Shavian
+-    references and the shared Names & Spellings list.
++description: "Read, check, and write Shavian script in this vault. Shavian is off limits to agents: use this skill ONLY when Alexander explicitly asks to read, transliterate, look up or proofread Shavian; never merely because a note contains Shavian (U+10450-1047F). Provides a Read-Lex backed gloss/lookup helper and points to the vault's Shavian references and the shared Names & Spellings list."
+ ---
+ 
+ # Shavian Skill
+diff --git a/.agents/skills/task-lifecycle/SKILL.md b/.agents/skills/task-lifecycle/SKILL.md
+index 215659c..ac75924 100644
+--- a/.agents/skills/task-lifecycle/SKILL.md
++++ b/.agents/skills/task-lifecycle/SKILL.md
+@@ -1,11 +1,7 @@
+ ---
+ name: task-lifecycle
+-version: 1.2.0
+-description: >-
+-    Carry one task in the vault's task queue through its whole lifecycle: file or open it, claim it,
+-    do the work while logging to the task note, close it, and run the ADR check. Use whenever a thread
+-    is asked to work a task ("use the task-lifecycle skill on [[2026-10-20 some-task]]"), to file a
+-    new task ("file a task: ..."), or to promote a to-do into the queue.
++version: 1.3.0
++description: "Carry one task in the vault's task queue through its whole lifecycle: file or open it, claim it, do the work while logging to the task note, close it, and run the ADR check. Use whenever a thread is asked to work a task (\"use the task-lifecycle skill on [[2026-10-20 some-task]]\"), to file a new task (\"file a task: ...\"), or to promote a to-do into the queue."
+ ---
+ 
+ # Task Lifecycle Skill
+@@ -16,7 +12,7 @@ The vault is the memory. Another thread, or Alexander days later, must be able t
+ 
+ ## Mode
+ 
+-The mode gates in `AGENTS.md` govern the work itself. The bookkeeping exception: in any mode you may edit and commit the task note you are working (`status`, `updated_at`, `adr`, `## Log`, `## Outcome`), and create a task note Alexander explicitly asks you to file. Nothing else.
++The mode gates in `AGENTS.md` govern the work itself. The bookkeeping exception: in any mode you may edit and commit the task note you are working (`status`, `updated`, `adr`, `## Log`, `## Outcome`), and create a task note Alexander explicitly asks you to file. Nothing else.
+ 
+ ## 1. Start
+ 
+@@ -29,14 +25,14 @@ The mode gates in `AGENTS.md` govern the work itself. The bookkeeping exception:
+     **The mode is the one Alexander names in the prompt** (`Build: continue [[task]]`). `## Next` records the last mode only as a suggestion and never grants it. With no mode named, stay in Query: do the bookkeeping, report where the task stands and ask which mode to work in. Do not stall silently and do not assume Build.
+ 3. **Filing a new task:**
+     - Look for duplicates first: `rg -il '<key words>' "Deep Thought/9 pkm/tasks"`. If an open task already covers it, add to that one instead.
+-    - Create `Deep Thought/9 pkm/tasks/YYYY-MM-DD short-label.md` (filing date, unique kebab-case label) with the hub's frontmatter, including `authored_by: agent`. `status` is `ready` when you can write a done-when (scope plus what done looks like), otherwise `raw`; `blocked` if it waits on him. A project is optional. Statuses and meanings: the hub's table. `project` links the project's note, and is left off when the task fits none; routine vault upkeep (inbox triage, the ADR sweep) uses `[[Vault Maintenance]]`; `origin` links where the work came from.
++    - Create the note with `akmctl new work <slug>` (it mints the id and writes `Deep Thought/9 pkm/tasks/<id>-<slug>.md`; without the tool, mint the id by the recipe in `AGENTS.md`) and fill the hub's frontmatter, including `authored_by: agent`. `status` is `ready` when you can write a done-when (scope plus what done looks like), otherwise `raw`; `blocked` if it waits on him. A project is optional. Statuses and meanings: the hub's table. `project` links the project's note, and is left off when the task fits none; routine vault upkeep (inbox triage, the ADR sweep) uses `[[Vault Maintenance]]`; `origin` links where the work came from.
+     - Body: an imperative `# Title`; context (quote the source when migrating; clean up dictation without rewriting his voice); what done looks like, if known; `## Log` with a filing line.
+     - Promoting a to-do: use the hub's migration mark in the source note, except in past periodic notes, which stay untouched.
+     - Commit the new note on its own. Stop there unless asked to work it.
+ 
+ ## 2. Claim
+ 
+-Set `status: active` and `updated_at`, add `- YYYY-MM-DD: claimed (<where>).`, naming the one place you run (for example `Claude Code on the Mac` or `Vault project thread`), add a `## Next` block (below), and commit the note on its own (`Task: claim <label>`). The claim tells other threads the task is taken.
++Set `status: active` and `updated`, add `- YYYY-MM-DD: claimed (<where>).`, naming the one place you run (for example `Claude Code on the Mac` or `Vault project thread`), add a `## Next` block (below), and commit the note on its own (`Task: claim <label>`). The claim tells other threads the task is taken.
+ 
+ The `## Next` block sits above `## Log`. It is overwritten, never appended; the log is the history:
+ 
+@@ -55,7 +51,7 @@ The `## Next` block sits above `## Log`. It is overwritten, never appended; the
+ 
+ - Follow the task's brief. If it has none, agree a plan with Alexander first.
+ - Log as you go, one dated line per entry: decisions with their reason, findings, what changed and where, and anything Alexander says that changes the plan. A few meaningful lines, not a transcript.
+-- Commit small. Include the task note (new log line, `updated_at`) in the same commit as the work it describes. Stage by path; never commit other threads' files.
++- Commit small. Include the task note (new log line, `updated`) in the same commit as the work it describes. Stage by path; never commit other threads' files.
+ - Nothing lives only in scratch space. Backups of originals, and anything you change outside the repo (system files, `~/Library`, app settings), get a copy or a verbatim record in the vault, committed with the work, so the change can be understood and undone after the session ends.
+ - New work that turns up: in Build mode, file it as a new task with `origin` set to this task and link it in the log. In Plan or Query mode, log `Follow-up: ...` and file it once in Build.
+ - Stuck on Alexander or something outside the vault: set `blocked`, log what is needed and from whom, commit, and tell him. Set `active` again when it clears.
+@@ -68,7 +64,7 @@ The `## Next` block sits above `## Log`. It is overwritten, never appended; the
+ 2. Add an `## Outcome` section above `## Log`: one to three lines on what changed, where, and the commit hashes. For `dropped`, the reason. Delete the `## Next` block; the outcome replaces it.
+ 3. Find open tasks that link to this one: `rg -l '<this note name>' "Deep Thought/9 pkm/tasks"`, then check each one's `status`. Close those this task resolved, each with its own outcome; for the rest, log what changed for them.
+ 4. Run the ADR check: read `adr-check.md` in this folder and follow it.
+-5. Set `updated_at`, add a final `closed` log line, and commit (`Task: close <label>`).
++5. Set `updated`, add a final `closed` log line, move the note to `Deep Thought/9 pkm/tasks/done/` (`akmctl close <id> done` does the status, `updated` and the move), and commit (`Task: close <label>`).
+ 
+ ## 5. Report
+ 
+diff --git a/.agents/skills/task-lifecycle/adr-check.md b/.agents/skills/task-lifecycle/adr-check.md
+index 8115c63..bf23ad1 100644
+--- a/.agents/skills/task-lifecycle/adr-check.md
++++ b/.agents/skills/task-lifecycle/adr-check.md
+@@ -16,7 +16,7 @@ Ask of the closed task and its work commits:
+ 
+ - Set `adr: candidate` in the frontmatter.
+ - In `## Outcome`, add a `Why:` line: the decision, the reason, and the alternatives that were rejected. If the log doesn't hold the reason, ask Alexander now; this is the one moment it is cheap to capture.
+-- If the change is large (a new architecture, a reversal of an accepted ADR, or several areas affected), offer to draft the ADR now, following `Deep Thought/9 pkm/adr/README.md`. Otherwise leave it for the sweep.
++- If the change is large (a new architecture, a reversal of an accepted ADR, or several areas affected), offer to draft the ADR now, following `Deep Thought/9 pkm/design/adr-conventions.md`. Otherwise leave it for the sweep.
+ - Log `ADR check: candidate (<which questions>).`
+ 
+ Don't edit ADRs or the ADR index as part of the check. Drafting one needs Alexander's yes and Build mode. The sweep sets `adr: recorded` once an ADR covers the task, or `adr: declined` when Alexander turns the candidate down.
+diff --git a/.agents/skills/weekly-review/SKILL.md b/.agents/skills/weekly-review/SKILL.md
+index 936fcd4..b23265a 100644
+--- a/.agents/skills/weekly-review/SKILL.md
++++ b/.agents/skills/weekly-review/SKILL.md
+@@ -1,12 +1,7 @@
+ ---
+ name: weekly-review
+ version: 2.3.1
+-description: >-
+-    Writes the Weekly Retrospective for a target week (YYYY-Www) in the Obsidian vault. A helper script
+-    gathers the deterministic inputs (week bounds, eligibility, daily-note logs, tracked field notebooks and chain gaps,
+-    date-linked notes, sensitive-data flags); the agent synthesizes Events, Projects, Thinking, and
+-    Relationships and applies the result to the weekly note. Use for any "weekly review", "catch up on
+-    weeks", or "populate W##" request.
++description: "Writes the Weekly Retrospective for a target week (YYYY-Www) in the Obsidian vault. A helper script gathers the deterministic inputs (week bounds, eligibility, daily-note logs, tracked field notebooks and chain gaps, date-linked notes, sensitive-data flags); the agent synthesizes Events, Projects, Thinking, and Relationships and applies the result to the weekly note. Use for any \"weekly review\", \"catch up on weeks\", or \"populate W##\" request."
+ ---
+ 
+ # Weekly Review Skill
+diff --git a/.agents/skills/youtube-summary/SKILL.md b/.agents/skills/youtube-summary/SKILL.md
+index 3be5521..941705e 100644
+--- a/.agents/skills/youtube-summary/SKILL.md
++++ b/.agents/skills/youtube-summary/SKILL.md
+@@ -1,12 +1,7 @@
+ ---
+ name: youtube-summary
+ version: 1.0.0
+-description: >-
+-    Turns YouTube videos into summary cards in the Obsidian vault: lists a video, playlist or channel,
+-    fetches the captions into an untracked cache, and writes one Capsule, Concept or Summary card per
+-    video from the card templates, with source attribution, related-note links and a validation pass.
+-    Use for "summarize this video", "make cards from this playlist", or any request to turn YouTube
+-    content into notes. Subject-agnostic.
++description: "Turns YouTube videos into summary cards in the Obsidian vault: lists a video, playlist or channel, fetches the captions into an untracked cache, and writes one Capsule, Concept or Summary card per video from the card templates, with source attribution, related-note links and a validation pass. Use for \"summarize this video\", \"make cards from this playlist\", or any request to turn YouTube content into notes. Subject-agnostic."
+ ---
+ 
+ # YouTube Summary Skill
+diff --git a/AGENTS.md b/AGENTS.md
+index 16e6974..2cbed78 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,135 +1,42 @@
+ # AGENTS.md
+ 
+-Orientation guide, structural configuration, and operational boundaries for AI agents operating within this workspace.
+-
+-## User & Interaction
+-
+-The user's name is **Alexander**. Use his name directly, not generic placeholders like "user". Alexander uses he/him/his pronouns.
+-
+-Read `Deep Thought/9 pkm/me.md` at the start of every session: who Alexander is, how he works with AI, tone and formatting, and privacy limits. Default mode is **Query** unless he names another.
+-
+-In Claude Code, a `SessionStart` hook (`.claude/settings.json`, `.claude/hooks/session-start.sh`) injects `me.md` and the open-task list on startup, resume, clear and compact. They are already in context: don't read `me.md` again unless it is missing or was edited since. Other tools, and any tool opened on `Deep Thought/` alone, don't run the hook: read `me.md` yourself.
+-
+-Three more hooks in `.claude/hooks/` keep a task resumable: `UserPromptSubmit` adds a reminder to the turn when Alexander signs off, `Stop` blocks the stop once if this session worked an `active` task whose note is older than the work (so refresh its `## Next`), and `PreCompact` adds instructions so the summary keeps the task path, mode and next step. The `task-lifecycle` skill has the `## Next` rules. How the `Stop` hook decides, its known quirks and what to do when it nags about a task you did not work: `Deep Thought/9 pkm/runbooks/Agent Hooks.md`.
+-
+-### Mode Gates
+-
+-The workspace operates under three distinct modes. The agent must respect the current mode and only perform actions permitted within it.
+-
+-| Mode                    | Permitted Actions                                                                     | Forbidden Actions                                                                         |
+-| ----------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+-| **Plan / Design**       | Discussion, architecture review, proposal of changes, running read-only CLI commands  | Live execution, editing documents, running CLI commands that write/edit, modifying skills |
+-| **Query / Investigate** | Read-only research, analysis, information gathering, reporting findings               | Any file edits, any write operations, any CLI commands that modify state                  |
+-| **Build**               | Execute approved changes, make edits, write files, update skills, run CLI commands    | Making changes outside the explicitly approved scope                                      |
+-
+-**Task bookkeeping exception:** in any mode, an agent may edit and commit the task note it is working (`status`, `updated_at`, `adr`, `## Log`, `## Outcome`), and may create a task note Alexander explicitly asks it to file. Nothing else. See the `task-lifecycle` skill.
+-
+-## Workspace & Vault Structure
+-
+-- **Vault Location**: `Deep Thought/` (under workspace root). All note interactions, configurations, and vault assets live inside this directory.
+-- **Repo Root**: one level above the vault. It holds `AGENTS.md`, `.agents/skills/` and the git repository, so a tool opened on `Deep Thought/` alone won't see them.
+-- **Top-Level Layout (Numbered PARA + Utilities)**:
+-    - `0 Inbox/`: Staging ground for rapid capture, raw incoming thoughts, and unorganized notes (`scratchpad.md`). Default landing folder for untargeted new notes.
+-    - `1 Calendar/`: Temporal index housing all periodic notes (daily logs, weekly agendas/reviews, monthly retros, quarterly reviews, yearly indices).
+-    - `2 PROJECTS/`: Active, outcome-driven initiatives with defined completion states (e.g., travel plans, tax workflows, design manifests).
+-    - `3 AREAS/`: Long-term responsibilities and operational domains requiring ongoing maintenance (e.g., `Finances`, `Family`, `Health`, `LifeOS`, `Writing`).
+-    - `4 RESOURCES/`: Evergreen knowledge base, topical research, literature notes, patristics, linguistics, and reference documentation.
+-    - `5 ARCHIVES/`: Dormant, completed, or superseded material preserved for historical record.
+-    - `8 assets/`: Central repository for binary attachments, images, diagrams, and PDFs.
+-    - `9 scripts/`: Maintenance, backup, and diff utilities.
+-    - `9 pkm/`: Vault meta history and design: ADRs (`adr/`), design docs (`design/`), and runbooks (`runbooks/`). See `9 pkm/adr/README.md` for ADR conventions.
+-    - `9 templates/`: Template directory, split in two. Files directly in it (`TMPL - *.md`) are native Obsidian (core Templates plugin) templates, with `{{date}}` and `{{title}}` placeholders. `9 templates/templater/` (`tpl - *.md`) holds Templater scripts for the periodic notes. See Templates below.
+-
+-## Obsidian Configuration & Periodic Notes
+-
+-Configuration extracted from `.obsidian/app.json`, `.obsidian/plugins/periodic-notes/data.json`, and `.obsidian/daily-notes.json`:
+-
+-- **General App Configuration**:
+-    - **New File Location**: `folder` -> `0 Inbox/`
+-    - **Attachment Location**: `8 assets/`
+-    - **Link Updating**: Automatically update internal links (`alwaysUpdateLinks: true`)
+-    - **Indentation**: Spaces, Tab Size: 4 (`useTab: false`, `tabSize: 4`)
+-- **Daily Notes (`periodic-notes`)**:
+-    - **Folder**: `1 Calendar`
+-    - **Format**: `YYYY/MM MMM/YYYY-MM-DD dddd`
+-    - **Full Relative Path Pattern**: `1 Calendar/YYYY/MM MMM/YYYY-MM-DD dddd.md` (e.g., `1 Calendar/2026/09 Sep/2026-09-10 Thursday.md`)
+-    - **Active Template**: `9 templates/templater/tpl - daily.md`
+-- **Weekly Notes (`periodic-notes`)**:
+-    - **Folder**: `1 Calendar`
+-    - **Format**: `YYYY/YYYY-[W]ww`
+-    - **Full Relative Path Pattern**: `1 Calendar/YYYY/YYYY-[W]ww.md` (e.g., `1 Calendar/2026/2026-W37.md`)
+-    - **Active Template**: `9 templates/templater/tpl - weekly.md`
+-- **Other Periodic Intervals (`periodic-notes`)**:
+-    - **Monthly**: `1 Calendar/YYYY/YYYY-MM-[Monthly-Retro].md` (Template: `9 templates/templater/tpl - monthly.md`)
+-    - **Quarterly**: `1 Calendar/YYYY/YYYY-[Q]Q.md` (Template: `9 templates/templater/tpl - quarterly.md`)
+-    - **Yearly**: `1 Calendar/YYYY/YYYY-[Yearly-Index].md` (Template: `9 templates/templater/tpl - yearly.md`)
+-
+-## Templates
+-
+-- **Where**: `Deep Thought/9 templates/`. The `TMPL - *.md` files at its root are native Obsidian templates; `templater/` holds the Templater scripts. To create a note of a known kind, copy the matching template, fill the placeholders and keep its frontmatter. Templates conform to the field registry (`9 pkm/design/frontmatter-fields.md`); `python3 "Deep Thought/9 scripts/frontmatter/conformance.py" templates` checks them. Change a template, then run it.
+-- **Cards** (the Gemini-era output schemas, now templates): `TMPL - Capsule Card` (tier 1: a brief chat, a quick definition), `TMPL - Concept Card` (tier 2: a technical deep-dive or medium discussion), `TMPL - Summary Card` (tier 3: a long source needing a full extraction). Pick the tier by the size of the source and say which you picked. The Odyssey project has its own `TMPL - Odyssey Concept Card`. A template's `%% %%` comment holds its usage; delete it from the note.
+-- A card an agent writes carries `authored_by: agent`. The templates leave it out because Alexander writes cards too.
+-
+-## Global Conventions & Syntax
+-
+-- **Internal Linking**:
+-    - Standard Obsidian wikilinks `[[Target Note]]` or `[[Target Note|Custom Display Text]]`.
+-    - Avoid raw Markdown links (`[text](path)`) for internal note references.
+-- **YAML Frontmatter**:
+-    - Use frontmatter blocks (`---`) at the start of notes for machine-readable properties (`type`, `date`, `tags`, `quarter`, `week`, etc.).
+-    - Distinguish schema attributes from topical indexing: place structural classifications (e.g., `type: daily`, `type: weekly`) into YAML properties rather than cluttering inline tags.
+-- **AI-authored marker**: when an agent creates a note, add `authored_by: agent` to its frontmatter. It marks a note Alexander has not rewritten, so he knows he may not be fully aware of its content. Notes he wrote, or that an agent only assisted with, carry no marker. He removes it when he takes ownership. Don't add it to an existing note just because an agent edited it.
+-- **Tagging Taxonomy Rules** (from `Vault Architecture & Tagging Design Manifest.md`):
+-    - **Three-Tier Limit**: Nested tags must not exceed three levels (`#root/mid/leaf`).
+-    - **Three-Note Rule**: Do not mint a new hashtag unless it cross-references at least three distinct notes; use plain text search terms instead.
+-    - **Negative Filtering Integrity**: Tags like `#journal/daily` and `#regula/*` are structural markers generated by templates; avoid manually applying or modifying these.
+-- **Names & Dictation**:
+-    - Alexander dictates a lot, so names are often misspelled. Check `Deep Thought/3 AREAS/LifeOS/Names & Spellings.md` before guessing at an unfamiliar name, and add new names there (new rows only; do not rewrite old notes).
+-    - Daily logs and field notes may be written in Shavian script. Shavian in the vault's private writing is **off limits to agents**: do not read, translate, paraphrase, quote or gloss it, and do not spend tokens on it. Treat a Shavian block as opaque and mention it by date only. Alexander reads it himself. The `shavian` skill (`.agents/skills/shavian/SKILL.md`) is used only when he explicitly asks.
+-    - The rule covers his private writing only. Shavian in code repositories, corpora and published posts (`shavian2tengwar`, `poetic-overtones`, `alexregan.com`) is ordinary material that an agent may read and work with (2026-10-26).
+-- **Bracket Escaping**:
+-    - When placing brackets around phrases or sentences in Markdown (e.g., editorial notes, photo descriptions like `\[Photo: ...]`), always escape the first opening bracket (`\[text]`).
+-    - This prevents Obsidian and Markdown parsers from mistaking bracketed prose for broken link syntax, reference shortcuts, or footnote triggers.
+-
+-## Obsidian CLI Tooling
+-
+-The Obsidian desktop application ships with an official CLI (`obsidian`) available system-wide. It communicates with a running Obsidian instance via Chrome DevTools Protocol and provides structured access to vault operations including file CRUD, link analysis, metadata manipulation, search, tasks, templates, plugin/theme management, sync, and devtools.
+-
+-- **Skill reference**: `.agents/skills/obsidian/SKILL.md` — comprehensive command reference and workflow patterns. The skill description is intentionally broad so the agent naturally considers it for any vault-related task.
+-- **Core resolution modes**: `file=<name>` resolves by note name (wikilink-style); `path=<path>` uses exact filesystem path relative to vault root.
+-- **Vault targeting**: Use `--vault="Deep Thought"` to target a specific vault by name, or omit to use the active vault.
+-- **JSON interchange**: Many commands support `--format=json` — pipe to `jq` for filtering and programmatic processing.
+-- **Requirement**: Obsidian desktop must be running for CLI commands to work.
+-
+-See the skill's [Quick Reference Matrix](.agents/skills/obsidian/SKILL.md#quick-reference-matrix) for a command-by-command lookup.
+-
+-## Git & Backups
+-
+-- Git tracks the repo root for history only. There is no remote: nothing to pull or push.
+-- An autosave commits everything roughly five times a day. Agents commit only the files they changed, staged by path.
+-- Commit messages are the change log; there is no separate log file.
+-- Scheduled jobs: every launchd job that belongs to the vault (autosave, backups, the daily scripture job, the Reader card job) is listed with its schedule, plist, log and runbook in `Deep Thought/9 pkm/runbooks/launchd Jobs.md`. Start there; a new job adds a row.
+-- Backup strategy: `Deep Thought/9 pkm/design/PKM_Backup.md`.
+-
+-## Code Repositories
+-
+-- Alexander's code lives in clones outside the vault, at `~/github.com/<owner>/<repo>`. `Deep Thought/9 pkm/Repos.md` maps the names he uses ("the blog", "Shavian to Tengwar", "the shortener") to those repos. When he names a project that isn't in the vault, read that note first, then the repo's own `AGENTS.md`.
+-
+-## Task Queue
+-
+-- Agent-assisted work is tracked as task notes (`type: task`) in `Deep Thought/9 pkm/tasks/`, not as checkboxes. The hub, `Deep Thought/9 pkm/Tasks.md` (beside `Tasks.base`), holds the procedure: scope, statuses, naming, frontmatter, and how to migrate a to-do.
+-- Check open tasks at the start of a session, file pending work as a task instead of leaving it in chat, and update the task in the same commit as the work.
+-- To file, work or close a task, use the `task-lifecycle` skill (`.agents/skills/task-lifecycle/SKILL.md`).
+-
+-## Modification Boundaries & Safety Rules
+-
+-- **Past Periodic Notes Are Read-Only**:
+-    - Daily logs, weekly plans, and reviews prior to the current active period are historical records. Treat all past periodic notes as strictly read-only context.
+-    - Do not edit historical calendar notes unless explicitly instructed by the user with a specific date and target.
+-- **Reference & Archive Preservation**:
+-    - Files in `4 RESOURCES/` and `5 ARCHIVES/` serve as reference and archival ground. Do not edit, reorganize, or delete these files unless specifically targeted for an update.
+-- **Strict Scope Limitation**:
+-    - Modify only files explicitly designated by the user's current prompt or directly required by the target operation.
+-    - Never perform unprompted vault-wide formatting passes, link rewriting, or mass metadata changes.
+-- **New Note Placement**:
+-    - Place newly generated, unclassified notes in `0 Inbox/` unless a specific PARA destination folder is clearly specified by the task.
++Alexander's personal knowledge vault (an Obsidian vault in `Deep Thought/`, tracked by git at this root), worked by him and by agents under the rules below.
++
++## Commands
++
++- Check the vault: `python3 "Deep Thought/9 scripts/frontmatter/conformance.py"` (frontmatter against the field registry) and `akmctl check` (task and ADR records; run it before committing records).
++- Regenerate the ADR index after any ADR change: `akmctl index`.
++- Obsidian CLI (needs the app running): `obsidian --vault="Deep Thought" <command>`; see `.agents/skills/obsidian/SKILL.md`.
++- Commit only the files you changed, staged by path: `git add -- <path>`, then `git commit`. No remote: nothing to pull or push.
++
++## Where things live
++
++- Vault: `Deep Thought/` (PARA: `0 Inbox`, `1 Calendar`, `2 PROJECTS`, `3 AREAS`, `4 RESOURCES`, `5 ARCHIVES`, `8 assets`, `9 pkm`, `9 scripts`, `9 templates`). Full layout, Obsidian settings and periodic-note paths: [[vault-conventions]].
++- Who Alexander is and how to talk to him: `Deep Thought/9 pkm/me.md` (read it at the start of a session; the `SessionStart` hook injects it in Claude Code).
++- Open work: `akmctl ls --status ready,active,blocked`. Records: `Deep Thought/9 pkm/tasks/` (closed in `done/`). Procedure: `Deep Thought/9 pkm/Tasks.md` and the `task-lifecycle` skill.
++- Decisions: `Deep Thought/9 pkm/adr/README.md` (generated index); conventions in `Deep Thought/9 pkm/design/adr-conventions.md`.
++- Roadmap: `Deep Thought/9 pkm/design/akm-roadmap.md`. Design and runbooks: `Deep Thought/9 pkm/design/`, `Deep Thought/9 pkm/runbooks/`. Hooks: `.claude/hooks/` (see the runbook "Agent Hooks").
++- Skills: `.agents/skills/<name>/SKILL.md`; index in `Deep Thought/9 pkm/skills-map.md`. Read a skill when its description fits the work.
++- Code lives in clones outside the vault; `Deep Thought/9 pkm/Repos.md` maps the names Alexander uses to repos.
++
++## Rules
++
++- Default mode is Query (read only). Plan / Design discusses and proposes; Build edits only within the approved scope. Task bookkeeping (status, `updated`, `## Next`, `## Log`, `## Outcome` of the task you work) is allowed in any mode.
++- List the open work before starting; resume the `active` task you hold, else take the top `ready` one; if several are unclaimed, ask. Work only under a task note.
++- A hard-to-reverse choice needs an ADR draft with status `proposed`. Never edit the body of an `accepted` ADR; supersede it.
++- Update the task's `## Next` and `## Log` in the same commit as the work. Run `akmctl check` before committing records.
++- Links are Obsidian wikilinks (`[[File name]]`); rename notes with the Obsidian CLI so links are repaired. Escape a bracket that opens prose: `\[Photo: ...]`.
++- A note an agent creates carries `authored_by: agent` in its frontmatter; frontmatter fields come from `Deep Thought/9 pkm/design/frontmatter-fields.md`.
++- New unclassified notes go to `0 Inbox/`. Check `Deep Thought/3 AREAS/LifeOS/Names & Spellings.md` before guessing a name (dictation).
++- Modify only the files the prompt names or the operation needs. No vault-wide formatting, link or metadata passes.
++- Code and tests win over prose; when a note is wrong, fix it or say so.
++- Without `akmctl`, use `rg`/`grep` on the task frontmatter (`rg -l '^status: active' "Deep Thought/9 pkm/tasks"`) and tell Alexander how to install it.
++- Mint an id: `id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"`, then check no file in the task, done and ADR folders starts with `$id-`.
++
++## Do not, without asking
++
++- Read, translate, quote or gloss Shavian in Alexander's private writing (daily logs, field notes); treat it as opaque. Exceptions: [[vault-conventions]].
++- Edit past periodic notes (daily, weekly, monthly, quarterly, yearly) before the current period, or anything in `4 RESOURCES/` or `5 ARCHIVES/`.
++- Push, create a remote, or change the autosave job (`com.deepthought.git-autosave`); the autosave commits about five times a day.
++- Delete a note, change `.obsidian/` settings, or change a skill, hook or template outside a task that says so.
++- Put credentials, tokens or personal identifiers into notes, commits or scripts.
+diff --git a/Deep Thought/9 pkm/Tasks.base b/Deep Thought/9 pkm/Tasks.base
+index f3e80bd..a3fc965 100644
+--- a/Deep Thought/9 pkm/Tasks.base	
++++ b/Deep Thought/9 pkm/Tasks.base	
+@@ -3,8 +3,8 @@ filters:
+     - type == "task"
+     - file.inFolder("9 pkm/tasks")
+ formulas:
+-  age_days: if(updated_at, (today() - updated_at).days, "")
+-  stale: if(updated_at, (today() - updated_at).days > 30, true)
++  age_days: if(updated, (today() - updated).days, "")
++  stale: if(updated, (today() - updated).days > 30, true)
+ properties:
+   formula.age_days:
+     displayName: days since update
+@@ -39,7 +39,7 @@ views:
+       - file.name
+       - status
+       - project
+-      - updated_at
++      - updated
+   - type: table
+     name: Blocked
+     filters:
+@@ -48,7 +48,7 @@ views:
+     order:
+       - file.name
+       - project
+-      - updated_at
++      - updated
+   - type: table
+     name: Stale
+     filters:
+@@ -66,13 +66,13 @@ views:
+     filters:
+       and:
+         - status == "done" || status == "dropped"
+-        - (today() - updated_at).days <= 14
++        - (today() - updated).days <= 14
+     order:
+       - file.name
+       - status
+       - project
+       - adr
+-      - updated_at
++      - updated
+   - type: cards
+     name: Cards by status
+     filters:
+@@ -87,7 +87,7 @@ views:
+       - project
+       - formula.age_days
+     sort:
+-      - property: updated_at
++      - property: updated
+         direction: DESC
+   - type: cards
+     name: Cards by project
+diff --git a/Deep Thought/9 pkm/Tasks.md b/Deep Thought/9 pkm/Tasks.md
+index ac1f4c3..cb0c34c 100644
+--- a/Deep Thought/9 pkm/Tasks.md	
++++ b/Deep Thought/9 pkm/Tasks.md	
+@@ -2,13 +2,13 @@
+ type: hub
+ status: active
+ created_at: 2026-10-20
+-updated_at: 2026-10-25
++updated_at: 2026-10-29
+ tags:
+     - pkm/rails
+ ---
+ # Tasks
+ 
+-The queue for **agent-assisted work** in this vault. A *task* here is a note in `9 pkm/tasks/` with `type: task`, not a Markdown checkbox. `obsidian tasks` lists checkboxes and does not read this queue. (The name is provisional: [[261020-1xy0-disambiguate-task-name]].)
++The queue for **agent-assisted work** in this vault. A *task* here is a note in `9 pkm/tasks/` (closed ones in `9 pkm/tasks/done/`) with `type: task`, not a Markdown checkbox. Tasks follow the AKM work-item form ([[agent-ready-repo-spec]], section 3); `akmctl ls` lists them. `obsidian tasks` lists checkboxes and does not read this queue. (The name is provisional: [[261020-1xy0-disambiguate-task-name]].)
+ 
+ This note is the hub for `Tasks.base`, which sits beside it ([[base-and-hub]]); the task notes live in the `tasks/` folder. The hub holds the procedure for agents and humans, plus live views for Alexander.
+ 
+@@ -39,37 +39,39 @@ The axis is refinement, then progress: `raw` → `ready` → `active` → `done`
+ 
+ ## Filing a task
+ 
+-- One note per task, named `YYYY-MM-DD short-label` (the filing date plus a kebab-case label). No sequence numbers, so parallel threads never collide.
++- One note per task, named `<id>-<slug>` (for example `261029-k7f2-short-label`): `akmctl new work <slug>` mints the id and writes the file. The id is the UTC date plus four random characters, so parallel threads never collide.
+ - Frontmatter:
+ 
+     ```yaml
++    id: "YYMMDD-xxxx"             # minted; equals the filename's id part
++    title: Short imperative title # matches the first heading
+     type: task
+     status: ready                  # raw | ready | active | blocked | done | dropped
+     project: "[[Project note]]"   # groups tasks; the project's hub or main note
+     origin: "[[Source note]]"     # where the work came from
+-    created_at: YYYY-MM-DD
+-    updated_at: YYYY-MM-DD
++    created: YYYY-MM-DD
++    updated: YYYY-MM-DD
+     authored_by: agent            # only when an agent filed the note
+     adr: candidate                # only when closing a task that changed how things are done; the sweep later sets recorded or declined
+     ```
+ 
+ - `project` is optional. A task that fits no project has none; do not invent one. Routine upkeep that recurs (inbox triage, the ADR sweep) goes under [[Vault Maintenance]].
+-- Body: a title, one or two lines of context (quote the original to-do when migrating), a `## Next` block while the task is `active` or `blocked`, and a `## Log` of dated one-liners. Field rules: [[frontmatter-fields]].
+-- `## Next` is what a cold thread reads first. It is overwritten, never appended; the log stays the history. Format and rules are in the `task-lifecycle` skill. Delete it when the task closes (the `## Outcome` replaces it).
++- Body: a title, a `## Goal` (context and a done-when list; quote the original to-do when migrating), a `## Next` block while the task is `active` or `blocked`, and a `## Log` of dated one-liners. Field rules: [[frontmatter-fields]].
++- `## Next` is what a cold thread reads first. It is overwritten, never appended; the log stays the history. Format and rules are in the `task-lifecycle` skill. Delete it when the task closes (the `## Outcome` replaces it), then close with `akmctl close <id> done`, which moves the file to `tasks/done/`.
+ 
+ ## Resuming a task
+ 
+ Start a fresh thread and give it the mode and the note:
+ 
+ ```text
+-Build: continue [[2026-10-24 some-task]] with the task-lifecycle skill.
++Build: continue [[261024-k7f2-some-task]] with the task-lifecycle skill.
+ ```
+ 
+ Use `Query`, `Plan` or `Build`. The thread reads the note's `## Next`, then the log as needed. Alexander names the mode; `## Next` records the last mode only as a suggestion. With no mode named, the thread stays in Query, reports where the task stands and asks which mode to work in.
+ 
+ ## Migrating a to-do
+ 
+-Replace the checkbox in the source note with the Bullet Journal migration mark and a link, and keep the text: `- [>] original text → [[YYYY-MM-DD short-label]]`. Never delete the line.
++Replace the checkbox in the source note with the Bullet Journal migration mark and a link, and keep the text: `- [>] original text → [[YYMMDD-xxxx-short-label]]`. Never delete the line.
+ 
+ ## Agent rules
+ 
+@@ -77,7 +79,7 @@ The full procedure is the `task-lifecycle` skill (`.agents/skills/task-lifecycle
+ 
+ 1. At the start of a session, check open tasks for the work at hand. In Claude Code the `SessionStart` hook already injects the open-task list (status, name, project, capped at 30, active first); read the task note itself before working it.
+ 2. File pending work as a task instead of leaving it only in chat.
+-3. Update `status` and `updated_at` in the same commit as the work.
++3. Update `status` and `updated` in the same commit as the work.
+ 4. While a task is `active` or `blocked`, keep its `## Next` current: before any pause or question to Alexander, after a commit, and when he signs off. Claude Code hooks remind (`AGENTS.md`).
+ 5. Close with a `## Outcome` line: what changed and the commit hash.
+ 6. If the task changed a convention, standard or procedure, set `adr: candidate` and add one line on why, including what was rejected. These feed the ADR sweep ([[261020-fy6d-adr-sweep-watermark]]).
+diff --git a/Deep Thought/9 pkm/adr/261023-f7rd-task-queue-and-the-task-lifecycle-skill.md b/Deep Thought/9 pkm/adr/261023-f7rd-task-queue-and-the-task-lifecycle-skill.md
+index 944e1ad..1a13589 100644
+--- a/Deep Thought/9 pkm/adr/261023-f7rd-task-queue-and-the-task-lifecycle-skill.md	
++++ b/Deep Thought/9 pkm/adr/261023-f7rd-task-queue-and-the-task-lifecycle-skill.md	
+@@ -7,6 +7,7 @@ status: accepted
+ created: 2026-10-23
+ updated: 2026-10-23
+ date: 2026-10-23
++summary: "Tasks are notes with type: task under 9 pkm/tasks, carried through their life by the task-lifecycle skill; bookkeeping is allowed in any mode."
+ ---
+ 
+ # ADR 261023-f7rd: Task Queue and the task-lifecycle Skill
+@@ -23,7 +24,7 @@ Agent-assisted work was tracked in chat and in Markdown checkboxes scattered thr
+ - **One skill carries a task through its life:** the `task-lifecycle` skill files, claims, works, logs and closes it. Filing is its first phase, so there is no separate triage skill. Claiming is a committed `status: active` and a log line, so other threads see the task is taken.
+ - **Bookkeeping is allowed in any mode.** `AGENTS.md` gains an exception: in any mode an agent may edit and commit the task note it is working (`status`, `updated_at`, `adr`, `Log`, `Outcome`) and create a task note Alexander explicitly asks it to file. This amends the mode gates; the work itself still follows them.
+ - **State goes on disk.** Decisions, findings and changes are logged on the task as they happen. At close, open tasks that link to the closed one are checked, and nothing may live only in scratch space (v1.1.0).
+-- **The ADR check at close flags, it does not draft.** A closed task that changed a convention, procedure, tool or earlier decision gets `adr: candidate` and a `Why:` line; the sweep ([[9 pkm/adr/README#Sweep watermark|the README's sweep section]]) drafts ADRs later.
++- **The ADR check at close flags, it does not draft.** A closed task that changed a convention, procedure, tool or earlier decision gets `adr: candidate` and a `Why:` line; the sweep ([[adr-conventions#Sweep watermark|the README's sweep section]]) drafts ADRs later.
+ - `CLAUDE.md` at the repo root imports `AGENTS.md`, so Claude Code on the Mac starts from the same source of truth.
+ 
+ Rejected: Markdown checkboxes (no status, no history, no links); a separate triage skill; requiring Build mode for every log line; drafting an ADR at every close; copying `AGENTS.md` into `CLAUDE.md`.
+diff --git a/Deep Thought/9 pkm/design/ADR Candidates.md b/Deep Thought/9 pkm/design/ADR Candidates.md
+index f62e18c..1eabd27 100644
+--- a/Deep Thought/9 pkm/design/ADR Candidates.md	
++++ b/Deep Thought/9 pkm/design/ADR Candidates.md	
+@@ -37,7 +37,7 @@ Needs a new ADR: 1, 3 (convert), 4, 5, 10, 11, 13, 17. Recorded in the backfill:
+ 
+ ## Sweep 2026-10-23 (first sweep)
+ 
+-Scanned 17 tasks with `adr: candidate` and `git log af32c2e..e0a373a` (from [[261020-5be4-base-and-hub-every-database-gets-a-hub]]). No existing ADR already covers a flagged task, so none was set to `recorded`. Carried over from the backfill and still unwritten: 1, 3, 4, 5, 10, 11, 13, 17 above. Process: [[9 pkm/adr/README#Sweep watermark|the README's sweep section]].
++Scanned 17 tasks with `adr: candidate` and `git log af32c2e..e0a373a` (from [[261020-5be4-base-and-hub-every-database-gets-a-hub]]). No existing ADR already covers a flagged task, so none was set to `recorded`. Carried over from the backfill and still unwritten: 1, 3, 4, 5, 10, 11, 13, 17 above. Process: [[adr-conventions#Sweep watermark|the README's sweep section]].
+ 
+ | # | Decision (working title) | Evidence | Rejected | Recommendation |
+ | - | ------------------------ | -------- | -------- | -------------- |
+diff --git a/Deep Thought/9 pkm/design/adr-conventions.md b/Deep Thought/9 pkm/design/adr-conventions.md
+index e8e2403..4935dcf 100644
+--- a/Deep Thought/9 pkm/design/adr-conventions.md	
++++ b/Deep Thought/9 pkm/design/adr-conventions.md	
+@@ -1,35 +1,17 @@
+ ---
+-type: readme
+-updated_at: 2026-10-28
++type: design
++status: active
++created: 2026-10-19
++updated: 2026-10-29
++tags:
++    - pkm/rails
+ ---
+ 
+-# ADR Index & Conventions
++# ADR conventions
+ 
+ ## Index
+ 
+-| ID | Title | Status | Created | Updated |
+-|---|---|---|---|---|
+-| [[261019-b423-record-vault-decisions-as-adrs]] | Record Vault Decisions as ADRs | accepted | 2026-10-19 | 2026-10-20 |
+-| [[260912-3q6j-periodic-review-skill-design]] | Periodic Review Skill Design | accepted | 2026-09-12 | 2026-09-12 |
+-| [[260912-extg-periodic-review-skill-version-1-0-0]] | Periodic Review Skill Version 1.0.0 | accepted | 2026-09-12 | 2026-09-12 |
+-| [[260601-wvft-calendar-layout-periodic-notes-paths]] | Calendar Layout: Periodic Notes Paths under 1 Calendar | accepted | 2026-06-01 | 2026-10-19 |
+-| [[261014-eq0g-periodic-review-skill-v2-0-0]] | Periodic Review Skill v2.0.0: Deterministic Gather and Apply Scripts | accepted | 2026-10-14 | 2026-10-23 |
+-| [[260531-q4ts-transition-to-tiered-atomic-multi]] | Transition to Tiered Atomic Multi-Interval Architecture | accepted | 2026-05-31 | 2026-10-19 |
+-| [[260531-eh31-two-stage-materialized-view-ingestion]] | Two-Stage Materialized View Ingestion Pipeline | accepted | 2026-05-31 | 2026-10-19 |
+-| [[260707-a27j-incident-report-speed-layer-failure]] | Incident Report: Speed Layer Failure & Cloud Replication Blackout | accepted | 2026-07-07 | 2026-10-19 |
+-| [[260528-qabh-git-autosave-scheduling-cron]] | Git Autosave Scheduling: cron, then launchd | accepted | 2026-05-28 | 2026-10-23 |
+-| [[241103-b2mb-git-for-history-only-no-remote-cloud]] | Git for History Only: No Remote, Cloud Copies by rsync | accepted | 2024-11-03 | 2026-10-20 |
+-| [[260912-bcdr-obsidian-cli-as-the-agent-interface]] | Obsidian CLI as the Agent Interface | accepted | 2026-09-12 | 2026-10-20 |
+-| [[261020-5be4-base-and-hub-every-database-gets-a-hub]] | Base and Hub: Every Database Gets a Hub Note | accepted | 2026-10-20 | 2026-10-20 |
+-| [[261023-f7rd-task-queue-and-the-task-lifecycle-skill]] | Task Queue and the task-lifecycle Skill | accepted | 2026-10-23 | 2026-10-23 |
+-| [[261023-xp6v-notebook-tracking-by-tag-and-chain]] | Notebook Tracking by Tag and Chain | accepted | 2026-10-23 | 2026-10-23 |
+-| [[261023-mtpt-frontmatter-field-registry]] | Frontmatter Field Registry and Conformance Test | accepted | 2026-10-23 | 2026-10-23 |
+-| [[261023-890k-review-skills-after-v2-0-shavian-sleep]] | Review Skills after v2.0: Shavian, Sleep and Notebooks | accepted | 2026-10-23 | 2026-10-23 |
+-| [[261023-n0sv-moc-type-style-guide-and-the-projects]] | MOC Type, Style Guide and the Projects Index | accepted | 2026-10-23 | 2026-10-23 |
+-| [[261023-nt8w-backup-sync-with-homebrew-rsync]] | Backup Sync with Homebrew rsync | accepted | 2026-10-23 | 2026-10-23 |
+-| [[261025-r0ye-pkm-workbench-a-local-server]] | pkm-workbench: A Local Server over the Vault's Files | accepted | 2026-10-25 | 2026-10-26 |
+-| [[261027-ensf-akm-an-agent-knowledge-management]] | AKM: An Agent Knowledge Management Standard for Repositories | accepted | 2026-10-27 | 2026-10-28 |
+-| [[261028-zh0w-obsidian-compatibility-is-a-stated-goal]] | Obsidian Compatibility Is a Stated Goal of the AKM Standard | accepted | 2026-10-28 | 2026-10-28 |
++The index is generated: run `akmctl index` (from the repository root) and read `9 pkm/adr/README.md`. Do not edit it by hand.
+ 
+ ### Related decision records still outside this folder
+ 
+@@ -38,16 +20,19 @@ updated_at: 2026-10-28
+ 
+ ## Schema
+ 
+-Every ADR uses the following frontmatter:
++Every ADR uses the AKM frontmatter ([[agent-ready-repo-spec]], section 4), plus the vault's own fields:
+ 
+ ```yaml
+ ---
+ type: adr
+-id: 1          # numeric, no quoting, no zero-padding
+-title: "Title" # string, quoted if it contains special characters
++id: "YYMMDD-xxxx"        # minted; equals the filename's id part
++adr_number: 19           # the legacy number, kept for old references
++title: "Title"
++summary: "One sentence, at most 160 characters: what was decided and when to read it."
+ status: accepted
+-created_at: YYYY-MM-DD
+-updated_at: YYYY-MM-DD
++date: YYYY-MM-DD         # the date of the last status change
++created: YYYY-MM-DD
++updated: YYYY-MM-DD
+ ---
+ ```
+ 
+@@ -55,47 +40,46 @@ updated_at: YYYY-MM-DD
+ 
+ | Field | Type | Required | Notes |
+ |---|---|---|---|
+-| `type` | string | yes | Always `adr` |
+-| `id` | number | yes | Integer, no zero-padding, no quotes |
+-| `title` | string | yes | Human-readable; quote in YAML if it contains `:`, `—`, or other YAML-sensitive characters |
+-| `status` | enum | yes | One of: `proposed`, `active`, `accepted`, `superseded`, `rejected`, `error` |
+-| `created_at` | date | yes | ISO 8601 |
+-| `updated_at` | date | yes | ISO 8601 — only change on actual edit |
++| `type` | string | yes (vault) | Always `adr` |
++| `id` | string | yes | `YYMMDD-xxxx`, minted by `akmctl new adr <slug>` |
++| `adr_number` | number | no | The old `ADR-NNN` number; new ADRs do not get one |
++| `title` | string | yes | Quote in YAML if it contains `:` |
++| `summary` | string | yes | One sentence, at most 160 characters; the index shows it |
++| `status` | enum | yes | `proposed`, `accepted`, `rejected`, `deprecated`, `superseded` |
++| `date` | date | yes | The date of the last status change |
++| `created`, `updated` | date | yes (vault) | As for task notes |
+ 
+ ### Naming
+ 
+-- File name: `ADR-NNN.md` where `NNN` is the zero-padded three-digit ID (for filesystem sort order).
+-- `id` field: bare number, no padding (e.g., `id: 1`, not `id: "001"`).
+-- Wikilinks: always use the padded format in the target name — `[[ADR-042|42]]` — to match the filename convention.
+-- **Wikilinks in markdown tables:** Do not use aliasing (`|`) inside table cells — the pipe character conflicts with column separators. Use bare wikilinks (`[[ADR-042]]`) in tables; the display will be the filename, which is acceptable in an ID column.
++- File name: `<id>-<slug>.md`, for example `261027-ensf-akm-an-agent-knowledge-management.md`. The slug is the title in lower-case words, about 40 characters.
++- In prose an ADR is introduced as "ADR 261027-ensf" (the id alone after the word ADR).
++- Wikilinks use the whole file name, `[[261027-ensf-akm-an-agent-knowledge-management]]`; in a table cell a link takes no alias.
+ 
+ ## Status Vocabulary
+ 
+ | Status | Meaning |
+ |---|---|
+ | `proposed` | ADR is drafted, not yet reviewed or accepted |
+-| `active` | ADR is accepted and currently governing the design |
+-| `accepted` | ADR has been reviewed and adopted (preferred for stable decisions) |
+-| `superseded` | A newer ADR has replaced this one; see the Relations section for the successor |
++| `accepted` | ADR has been reviewed and adopted |
++| `superseded` | A newer ADR has replaced this one; `superseded_by` names it |
+ | `rejected` | ADR was considered but not adopted |
+-| `error` | ADR has an issue that needs correction (broken assumption, missing detail) |
++| `deprecated` | ADR no longer applies, with no successor |
++
++The old words `active` and `error` are retired; `active` meant `accepted`.
+ 
+ ## Process
+ 
+-1. **Draft** a new ADR in `drafts/` from the `TMPL - ADR` template, keeping `id: NNN`:
+-   ```bash
+-   obsidian create path="9 pkm/adr/drafts/DRAFT - Title.md" template="TMPL - ADR" --vault="Deep Thought"
+-   ```
+-2. **Review** the draft. If accepted, give it the next free number, rename it to `ADR-NNN.md` in this folder, set `id`, `status: accepted` and the heading, and add it to the index table.
+-3. **Supersede**: When an older ADR is replaced, update its `status` to `superseded` and add the new ADR to its Relations section.
+-4. **Index updates**: The README index table must be updated in the same edit that creates or modifies any ADR, so the index never drifts.
+-5. **Relations**: Document supersessions and cross-references in the Relations section. The Obsidian link graph (discovered via `obsidian links` / `obsidian backlinks`) handles implicit relations.
++1. **Draft** a new ADR with `akmctl new adr <slug>` (status `proposed`); fill the sections from `TMPL - ADR`.
++2. **Review** the draft. If accepted, set `status: accepted` and `date`, run `akmctl index` and commit.
++3. **Supersede**: set the old ADR's `status` to `superseded` and `superseded_by`, and `supersedes` on the new one.
++4. **Index**: regenerate it with `akmctl index` in the same commit that creates or changes any ADR; `akmctl check` (rule A4) fails when it is stale.
++5. **Relations**: document supersessions and cross-references in the Relations section. The Obsidian link graph (`obsidian links` / `obsidian backlinks`) handles implicit relations.
+ 
+ ## Sweep watermark
+ 
+ The sweep turns flagged tasks and the git log into ADR candidates. A task closed with `adr: candidate` (see `.agents/skills/task-lifecycle/adr-check.md`) stays flagged until an ADR covers it (`recorded`) or Alexander declines it (`declined`), so the watermark only bounds the `git log` scan for decisions that never went through a task.
+ 
+-Last sweep: 2026-10-23, through commit `e0a373a` (first sweep; it scanned from [[261020-5be4-base-and-hub-every-database-gets-a-hub]], commit `af32c2e`). Candidates 19 to 27 are in [[ADR Candidates]]; 19 to 25 became ADR-012 to ADR-017 the same day (26 and 27 skipped).
++Last sweep: 2026-10-23, through commit `e0a373a` (first sweep; it scanned from [[261020-5be4-base-and-hub-every-database-gets-a-hub]], commit `af32c2e`). Candidates 19 to 27 are in [[ADR Candidates]]; 19 to 25 became ADR 261023-f7rd to ADR 261023-nt8w the same day (26 and 27 skipped).
+ 
+ **When:** during the monthly review, or whenever five or more tasks carry `adr: candidate`.
+ 
+diff --git a/Deep Thought/9 pkm/design/frontmatter-fields.md b/Deep Thought/9 pkm/design/frontmatter-fields.md
+index 1fc1bba..a2acac3 100644
+--- a/Deep Thought/9 pkm/design/frontmatter-fields.md	
++++ b/Deep Thought/9 pkm/design/frontmatter-fields.md	
+@@ -26,11 +26,12 @@ Obsidian keeps one type per property name vault-wide, so a field name must mean
+ | `tags` | list | Tags |
+ | `created_at` | date | The day the note was created. Always a date |
+ | `updated_at` | date | The day it was last meaningfully edited |
++| `created`, `updated` | date | The same two dates on AKM records only (tasks, ADRs), under the standard's names (2026-10-29). Notes of every other kind keep `created_at` / `updated_at` |
+ | `status` | text | Lifecycle state, with values specific to each `type` |
+ | `title`, `subtitle`, `author`, `translator` | text | Work being described, when it differs from the filename |
+ | `aliases` | list | Obsidian aliases |
+ | `source_url` | text | Where the content came from |
+-| `id` | number | Sequence number for a numbered series (FN-n, ADR-n). Numeric only, no prefix. The one exception is the placeholder `NNN` in `TMPL - ADR` and in drafts under `9 pkm/adr/drafts/`, replaced by the next free number when the draft is accepted ([[261019-b423-record-vault-decisions-as-adrs]]) |
++| `id` | text | The AKM id `YYMMDD-xxxx` of a task or an ADR, minted by `akmctl new` and equal to the filename's id part. Field notes keep a numeric `id` (FN-n), a known collision (2026-10-29): AKM reads `id` only in `9 pkm/tasks/` and `9 pkm/adr/` |
+ | `previous` | text | The one before it in a series (a field-notebook chain, any numbered series): a wikilink in quotes, for example `previous: "[[FN-111]]"`. The first in a chain has none (2026-10-21) |
+ | `authored_by` | text | `agent` only, on a note an agent wrote that Alexander has not rewritten (2026-10-23). Absent means he wrote it or it was assisted. He removes it once he has rewritten or reviewed the note and taken ownership. Not `source`, which holds URLs |
+ | `project` | text | The project a note belongs to: a wikilink to the project's note (tasks), or a plain slug in older finance notes (`26-fin`) |
+@@ -106,6 +107,8 @@ For the daily scripture library (`4 RESOURCES/Scripture/`, `4 RESOURCES/Common P
+ 
+ | Field | Type | Meaning |
+ | ----- | ---- | ------- |
++| `summary` | text | One sentence, at most 160 characters (AKM records; required on an ADR) |
++| `adr_number` | number | The legacy `ADR-NNN` number of an ADR, kept for old references |
+ | `origin` | text | Wikilink to the note the task came from. Not `source` (URLs in some notes) or `source_url` (web addresses) |
+ | `adr` | text | `candidate` when a closed task changed a convention or procedure; the ADR sweep sets `recorded` once an ADR covers it, or `declined` when Alexander turns the candidate down |
+ 
+diff --git a/Deep Thought/9 pkm/runbooks/Agent Hooks.md b/Deep Thought/9 pkm/runbooks/Agent Hooks.md
+index 12d5638..4884d13 100644
+--- a/Deep Thought/9 pkm/runbooks/Agent Hooks.md	
++++ b/Deep Thought/9 pkm/runbooks/Agent Hooks.md	
+@@ -30,6 +30,7 @@ What the Claude Code hooks in this repo do, how the `Stop` hook decides, and wha
+ 
+ - **"This session worked the task":** the transcript contains that task note's path in any tool call, anywhere in the session.
+ - **"The work":** the newest non-autosave commit, or edited or new file, outside the task notes and the calendar, made after the session began.
++- **Which notes:** `Deep Thought/9 pkm/tasks/*.md` only. Since the AKM migration the names are `<id>-<slug>` and closed tasks live in `tasks/done/`, which the hook does not scan (a closed task is never stale). Nothing in the four scripts needed a change.
+ - **Stale:** the task note's modified time is more than 120 seconds older than that work, and the note says `status: active` in its first 12 lines.
+ - **Once per piece of work:** a per-session marker in `$TMPDIR` holds the newest work already reminded about.
+ - **Known gap, from the hook's own comment:** work swept into an autosave commit before the stop is missed. It never nags falsely in that case, it just stays quiet.
+diff --git a/Deep Thought/9 pkm/skills-map.md b/Deep Thought/9 pkm/skills-map.md
+index b709b65..98b14cb 100644
+--- a/Deep Thought/9 pkm/skills-map.md	
++++ b/Deep Thought/9 pkm/skills-map.md	
+@@ -15,7 +15,7 @@ Index of agent skills. Each lives at `.agents/skills/<name>/SKILL.md` in the rep
+ | `weekly-review` (v2.3.1) | "weekly review", "catch up on weeks", "populate W##" | Target week `YYYY-Www`; `scripts/weekly_review.py gather` collects daily logs, field notes, date-linked notes, sensitive-data flags | Weekly Retrospective written into that week's note | Build; Plan or Query run `gather` only and report |
+ | `monthly-review` | "monthly review", "monthly retro" | Target month `YYYY-MM`, eligible only once the month has closed; daily notes, weekly reviews, field notes, backlinks | `1 Calendar/YYYY/YYYY-MM-Monthly-Retro.md` | Build (inferred; the skill does not state it) |
+ | `shavian` (v1.1.0) | **Only on Alexander's explicit request** to transliterate, look up or proofread Shavian; agents never read it otherwise | Note path or text; `scripts/shavian.py` gloss/lookup over Read-Lex; [[Names & Spellings]] | Readings and glosses in chat; new name rows in Names & Spellings | Query to read; Build to add names |
+-| `task-lifecycle` (v1.1.0) | "use the task-lifecycle skill on <task note>", "file a task: ...", promoting a to-do | A task note or a description; the [[Tasks]] hub | A filed, claimed, logged and closed task note; ADR check at close (`adr-check.md`) | Any mode for bookkeeping on the task note; the work follows the usual gates |
++| `task-lifecycle` (v1.3.0) | "use the task-lifecycle skill on <task note>", "file a task: ...", promoting a to-do | A task note or a description; the [[Tasks]] hub | A filed, claimed, logged and closed task note; ADR check at close (`adr-check.md`) | Any mode for bookkeeping on the task note; the work follows the usual gates |
+ | `moc-builder` (v1.0.0) | "build a MOC for X", "update the MOC", "review this MOC", "is this a MOC or a base?" | A topic, a folder or a list of notes; [[moc-style-guide]] | A `type: moc` note at a location Alexander names; or a pass/fail review with unresolved, ambiguous and reasonless links | Build to write or edit (a diff is shown first); Query or Plan review only |
+ | `youtube-summary` (v1.0.0) | "summarize this video", "make cards from this playlist", any request to turn YouTube content into notes | A video, playlist, channel or search URL; `scripts/list_videos.py`, `scripts/transcripts.py` (captions into an untracked cache) | One Capsule, Concept or Summary card per video (`<Title> (video)`), checked with `scripts/check_card.py`; folder proposed per run, `0 Inbox/` by default | Query/Plan to list and propose; Build to fetch and write |
+ | `reader-card` (v0.1.0) | "run the Reader queue", "what is waiting from Reader", "card this Reader item"; also runs unattended by launchd | Readwise Reader documents tagged `vault` (Keychain token); `scripts/reader_cards.py` fetch, drain, scheduled, status | One Capsule, Concept or Summary card per document in `0 Inbox/`, committed by path, validated with `youtube-summary`'s `check_card.py`; daily quota of 3 headless Sonnet runs | Build for the scheduled job (bounded: writes only to `0 Inbox/`); Query to read `status` |
+diff --git a/Deep Thought/9 pkm/vault-conventions.md b/Deep Thought/9 pkm/vault-conventions.md
+new file mode 100644
+index 0000000..50755ff
+--- /dev/null
++++ b/Deep Thought/9 pkm/vault-conventions.md	
+@@ -0,0 +1,144 @@
++---
++type: reference
++status: active
++created: 2026-10-29
++updated: 2026-10-29
++authored_by: agent
++tags:
++    - pkm/rails
++---
++# Vault conventions
++
++Moved from the vault's `AGENTS.md` when that file was cut to the five-part AKM contract ([[agent-ready-repo-spec]], section 2). The text below is the old file from "User & Interaction" on, unchanged; `AGENTS.md` carries the short rules and points here for the detail.
++
++## User & Interaction
++
++The user's name is **Alexander**. Use his name directly, not generic placeholders like "user". Alexander uses he/him/his pronouns.
++
++Read `Deep Thought/9 pkm/me.md` at the start of every session: who Alexander is, how he works with AI, tone and formatting, and privacy limits. Default mode is **Query** unless he names another.
++
++In Claude Code, a `SessionStart` hook (`.claude/settings.json`, `.claude/hooks/session-start.sh`) injects `me.md` and the open-task list on startup, resume, clear and compact. They are already in context: don't read `me.md` again unless it is missing or was edited since. Other tools, and any tool opened on `Deep Thought/` alone, don't run the hook: read `me.md` yourself.
++
++Three more hooks in `.claude/hooks/` keep a task resumable: `UserPromptSubmit` adds a reminder to the turn when Alexander signs off, `Stop` blocks the stop once if this session worked an `active` task whose note is older than the work (so refresh its `## Next`), and `PreCompact` adds instructions so the summary keeps the task path, mode and next step. The `task-lifecycle` skill has the `## Next` rules. How the `Stop` hook decides, its known quirks and what to do when it nags about a task you did not work: `Deep Thought/9 pkm/runbooks/Agent Hooks.md`.
++
++### Mode Gates
++
++The workspace operates under three distinct modes. The agent must respect the current mode and only perform actions permitted within it.
++
++| Mode                    | Permitted Actions                                                                     | Forbidden Actions                                                                         |
++| ----------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
++| **Plan / Design**       | Discussion, architecture review, proposal of changes, running read-only CLI commands  | Live execution, editing documents, running CLI commands that write/edit, modifying skills |
++| **Query / Investigate** | Read-only research, analysis, information gathering, reporting findings               | Any file edits, any write operations, any CLI commands that modify state                  |
++| **Build**               | Execute approved changes, make edits, write files, update skills, run CLI commands    | Making changes outside the explicitly approved scope                                      |
++
++**Task bookkeeping exception:** in any mode, an agent may edit and commit the task note it is working (`status`, `updated_at`, `adr`, `## Log`, `## Outcome`), and may create a task note Alexander explicitly asks it to file. Nothing else. See the `task-lifecycle` skill.
++
++## Workspace & Vault Structure
++
++- **Vault Location**: `Deep Thought/` (under workspace root). All note interactions, configurations, and vault assets live inside this directory.
++- **Repo Root**: one level above the vault. It holds `AGENTS.md`, `.agents/skills/` and the git repository, so a tool opened on `Deep Thought/` alone won't see them.
++- **Top-Level Layout (Numbered PARA + Utilities)**:
++    - `0 Inbox/`: Staging ground for rapid capture, raw incoming thoughts, and unorganized notes (`scratchpad.md`). Default landing folder for untargeted new notes.
++    - `1 Calendar/`: Temporal index housing all periodic notes (daily logs, weekly agendas/reviews, monthly retros, quarterly reviews, yearly indices).
++    - `2 PROJECTS/`: Active, outcome-driven initiatives with defined completion states (e.g., travel plans, tax workflows, design manifests).
++    - `3 AREAS/`: Long-term responsibilities and operational domains requiring ongoing maintenance (e.g., `Finances`, `Family`, `Health`, `LifeOS`, `Writing`).
++    - `4 RESOURCES/`: Evergreen knowledge base, topical research, literature notes, patristics, linguistics, and reference documentation.
++    - `5 ARCHIVES/`: Dormant, completed, or superseded material preserved for historical record.
++    - `8 assets/`: Central repository for binary attachments, images, diagrams, and PDFs.
++    - `9 scripts/`: Maintenance, backup, and diff utilities.
++    - `9 pkm/`: Vault meta history and design: ADRs (`adr/`), design docs (`design/`), and runbooks (`runbooks/`). See `9 pkm/adr/README.md` for ADR conventions.
++    - `9 templates/`: Template directory, split in two. Files directly in it (`TMPL - *.md`) are native Obsidian (core Templates plugin) templates, with `{{date}}` and `{{title}}` placeholders. `9 templates/templater/` (`tpl - *.md`) holds Templater scripts for the periodic notes. See Templates below.
++
++## Obsidian Configuration & Periodic Notes
++
++Configuration extracted from `.obsidian/app.json`, `.obsidian/plugins/periodic-notes/data.json`, and `.obsidian/daily-notes.json`:
++
++- **General App Configuration**:
++    - **New File Location**: `folder` -> `0 Inbox/`
++    - **Attachment Location**: `8 assets/`
++    - **Link Updating**: Automatically update internal links (`alwaysUpdateLinks: true`)
++    - **Indentation**: Spaces, Tab Size: 4 (`useTab: false`, `tabSize: 4`)
++- **Daily Notes (`periodic-notes`)**:
++    - **Folder**: `1 Calendar`
++    - **Format**: `YYYY/MM MMM/YYYY-MM-DD dddd`
++    - **Full Relative Path Pattern**: `1 Calendar/YYYY/MM MMM/YYYY-MM-DD dddd.md` (e.g., `1 Calendar/2026/09 Sep/2026-09-10 Thursday.md`)
++    - **Active Template**: `9 templates/templater/tpl - daily.md`
++- **Weekly Notes (`periodic-notes`)**:
++    - **Folder**: `1 Calendar`
++    - **Format**: `YYYY/YYYY-[W]ww`
++    - **Full Relative Path Pattern**: `1 Calendar/YYYY/YYYY-[W]ww.md` (e.g., `1 Calendar/2026/2026-W37.md`)
++    - **Active Template**: `9 templates/templater/tpl - weekly.md`
++- **Other Periodic Intervals (`periodic-notes`)**:
++    - **Monthly**: `1 Calendar/YYYY/YYYY-MM-[Monthly-Retro].md` (Template: `9 templates/templater/tpl - monthly.md`)
++    - **Quarterly**: `1 Calendar/YYYY/YYYY-[Q]Q.md` (Template: `9 templates/templater/tpl - quarterly.md`)
++    - **Yearly**: `1 Calendar/YYYY/YYYY-[Yearly-Index].md` (Template: `9 templates/templater/tpl - yearly.md`)
++
++## Templates
++
++- **Where**: `Deep Thought/9 templates/`. The `TMPL - *.md` files at its root are native Obsidian templates; `templater/` holds the Templater scripts. To create a note of a known kind, copy the matching template, fill the placeholders and keep its frontmatter. Templates conform to the field registry (`9 pkm/design/frontmatter-fields.md`); `python3 "Deep Thought/9 scripts/frontmatter/conformance.py" templates` checks them. Change a template, then run it.
++- **Cards** (the Gemini-era output schemas, now templates): `TMPL - Capsule Card` (tier 1: a brief chat, a quick definition), `TMPL - Concept Card` (tier 2: a technical deep-dive or medium discussion), `TMPL - Summary Card` (tier 3: a long source needing a full extraction). Pick the tier by the size of the source and say which you picked. The Odyssey project has its own `TMPL - Odyssey Concept Card`. A template's `%% %%` comment holds its usage; delete it from the note.
++- A card an agent writes carries `authored_by: agent`. The templates leave it out because Alexander writes cards too.
++
++## Global Conventions & Syntax
++
++- **Internal Linking**:
++    - Standard Obsidian wikilinks `[[Target Note]]` or `[[Target Note|Custom Display Text]]`.
++    - Avoid raw Markdown links (`[text](path)`) for internal note references.
++- **YAML Frontmatter**:
++    - Use frontmatter blocks (`---`) at the start of notes for machine-readable properties (`type`, `date`, `tags`, `quarter`, `week`, etc.).
++    - Distinguish schema attributes from topical indexing: place structural classifications (e.g., `type: daily`, `type: weekly`) into YAML properties rather than cluttering inline tags.
++- **AI-authored marker**: when an agent creates a note, add `authored_by: agent` to its frontmatter. It marks a note Alexander has not rewritten, so he knows he may not be fully aware of its content. Notes he wrote, or that an agent only assisted with, carry no marker. He removes it when he takes ownership. Don't add it to an existing note just because an agent edited it.
++- **Tagging Taxonomy Rules** (from `Vault Architecture & Tagging Design Manifest.md`):
++    - **Three-Tier Limit**: Nested tags must not exceed three levels (`#root/mid/leaf`).
++    - **Three-Note Rule**: Do not mint a new hashtag unless it cross-references at least three distinct notes; use plain text search terms instead.
++    - **Negative Filtering Integrity**: Tags like `#journal/daily` and `#regula/*` are structural markers generated by templates; avoid manually applying or modifying these.
++- **Names & Dictation**:
++    - Alexander dictates a lot, so names are often misspelled. Check `Deep Thought/3 AREAS/LifeOS/Names & Spellings.md` before guessing at an unfamiliar name, and add new names there (new rows only; do not rewrite old notes).
++    - Daily logs and field notes may be written in Shavian script. Shavian in the vault's private writing is **off limits to agents**: do not read, translate, paraphrase, quote or gloss it, and do not spend tokens on it. Treat a Shavian block as opaque and mention it by date only. Alexander reads it himself. The `shavian` skill (`.agents/skills/shavian/SKILL.md`) is used only when he explicitly asks.
++    - The rule covers his private writing only. Shavian in code repositories, corpora and published posts (`shavian2tengwar`, `poetic-overtones`, `alexregan.com`) is ordinary material that an agent may read and work with (2026-10-26).
++- **Bracket Escaping**:
++    - When placing brackets around phrases or sentences in Markdown (e.g., editorial notes, photo descriptions like `\[Photo: ...]`), always escape the first opening bracket (`\[text]`).
++    - This prevents Obsidian and Markdown parsers from mistaking bracketed prose for broken link syntax, reference shortcuts, or footnote triggers.
++
++## Obsidian CLI Tooling
++
++The Obsidian desktop application ships with an official CLI (`obsidian`) available system-wide. It communicates with a running Obsidian instance via Chrome DevTools Protocol and provides structured access to vault operations including file CRUD, link analysis, metadata manipulation, search, tasks, templates, plugin/theme management, sync, and devtools.
++
++- **Skill reference**: `.agents/skills/obsidian/SKILL.md` — comprehensive command reference and workflow patterns. The skill description is intentionally broad so the agent naturally considers it for any vault-related task.
++- **Core resolution modes**: `file=<name>` resolves by note name (wikilink-style); `path=<path>` uses exact filesystem path relative to vault root.
++- **Vault targeting**: Use `--vault="Deep Thought"` to target a specific vault by name, or omit to use the active vault.
++- **JSON interchange**: Many commands support `--format=json` — pipe to `jq` for filtering and programmatic processing.
++- **Requirement**: Obsidian desktop must be running for CLI commands to work.
++
++See the skill's [Quick Reference Matrix](.agents/skills/obsidian/SKILL.md#quick-reference-matrix) for a command-by-command lookup.
++
++## Git & Backups
++
++- Git tracks the repo root for history only. There is no remote: nothing to pull or push.
++- An autosave commits everything roughly five times a day. Agents commit only the files they changed, staged by path.
++- Commit messages are the change log; there is no separate log file.
++- Scheduled jobs: every launchd job that belongs to the vault (autosave, backups, the daily scripture job, the Reader card job) is listed with its schedule, plist, log and runbook in `Deep Thought/9 pkm/runbooks/launchd Jobs.md`. Start there; a new job adds a row.
++- Backup strategy: `Deep Thought/9 pkm/design/PKM_Backup.md`.
++
++## Code Repositories
++
++- Alexander's code lives in clones outside the vault, at `~/github.com/<owner>/<repo>`. `Deep Thought/9 pkm/Repos.md` maps the names he uses ("the blog", "Shavian to Tengwar", "the shortener") to those repos. When he names a project that isn't in the vault, read that note first, then the repo's own `AGENTS.md`.
++
++## Task Queue
++
++- Agent-assisted work is tracked as task notes (`type: task`) in `Deep Thought/9 pkm/tasks/`, not as checkboxes. The hub, `Deep Thought/9 pkm/Tasks.md` (beside `Tasks.base`), holds the procedure: scope, statuses, naming, frontmatter, and how to migrate a to-do.
++- Check open tasks at the start of a session, file pending work as a task instead of leaving it in chat, and update the task in the same commit as the work.
++- To file, work or close a task, use the `task-lifecycle` skill (`.agents/skills/task-lifecycle/SKILL.md`).
++
++## Modification Boundaries & Safety Rules
++
++- **Past Periodic Notes Are Read-Only**:
++    - Daily logs, weekly plans, and reviews prior to the current active period are historical records. Treat all past periodic notes as strictly read-only context.
++    - Do not edit historical calendar notes unless explicitly instructed by the user with a specific date and target.
++- **Reference & Archive Preservation**:
++    - Files in `4 RESOURCES/` and `5 ARCHIVES/` serve as reference and archival ground. Do not edit, reorganize, or delete these files unless specifically targeted for an update.
++- **Strict Scope Limitation**:
++    - Modify only files explicitly designated by the user's current prompt or directly required by the target operation.
++    - Never perform unprompted vault-wide formatting passes, link rewriting, or mass metadata changes.
++- **New Note Placement**:
++    - Place newly generated, unclassified notes in `0 Inbox/` unless a specific PARA destination folder is clearly specified by the task.
+diff --git a/Deep Thought/9 scripts/frontmatter/conformance.py b/Deep Thought/9 scripts/frontmatter/conformance.py
+index 83f9308..455c23b 100644
+--- a/Deep Thought/9 scripts/frontmatter/conformance.py	
++++ b/Deep Thought/9 scripts/frontmatter/conformance.py	
+@@ -32,15 +32,15 @@ VAULT_EXCLUDE = (".obsidian/", ".trash/", "9 templates/", "2 PROJECTS/Pocket Lib
+ # one turning up again is a regression. Pairs are the value types the field may hold.
+ KNOWN = {
+     "event_date": ("open", {"date", "datetime"}, "date and datetime both kept, since event time can matter"),
+-    "id": ("fixed", {"number"}, "draft ADRs and the ADR template keep `NNN` until numbered"),
+-    "created": ("fixed", set(), "renamed to `created_at`"),
++    "id": ("open", {"number", "text"}, "Field Notes keep a numeric `id`; tasks and ADRs hold the AKM id `YYMMDD-xxxx` (2026-10-29)"),
++    "created": ("fixed", {"date"}, "AKM records (tasks, ADRs) use `created`; every other note uses `created_at`"),
+     "created_at": ("fixed", {"date"}, "one note held a path (fixed 2026-05-23)"),
+     "source_link": ("fixed", {"text"}, "one note held a list (removed)"),
+ }
+ # Appendix E: fields whose values mix int and float, which are both numbers.
+ HARMLESS = {"amount", "custodian_eligible"}
+ # Values the registry says may keep a non-conforming shape until a decision is made.
+-KNOWN_VALUES = {("id", "NNN"): "placeholder in the ADR template and drafts until numbered (registry, `id`)"}
++KNOWN_VALUES = {}
+ # Registry rule 5: plugin-owned fields are exempt.
+ EXEMPT_PREFIXES = ("excalidraw-", "kanban-plugin")
+ EXEMPT = {"cssclasses"}
+diff --git a/Deep Thought/9 templates/TMPL - ADR.md b/Deep Thought/9 templates/TMPL - ADR.md
+index 5f67ead..c13c628 100644
+--- a/Deep Thought/9 templates/TMPL - ADR.md	
++++ b/Deep Thought/9 templates/TMPL - ADR.md	
+@@ -1,13 +1,15 @@
+ ---
+ type: adr
+-id: NNN
++id: "YYMMDD-xxxx"
+ title: "Title"
++summary: "One sentence, at most 160 characters: what was decided and when to read this record."
+ status: proposed
+-created_at: {{date}}
+-updated_at: {{date}}
++date: {{date}}
++created: {{date}}
++updated: {{date}}
+ ---
+ 
+-# ADR-NNN: Title
++# ADR YYMMDD-xxxx: Title
+ 
+ ## Context
+ 
+@@ -23,6 +25,6 @@ updated_at: {{date}}
+ 
+ ## Relations
+ 
+-- Superseded by: [[ADR-NNN]]
++- Superseded by: [[YYMMDD-xxxx-slug]]
+ - Related to:
+-  - [[ADR-NNN]]
++  - [[YYMMDD-xxxx-slug]]

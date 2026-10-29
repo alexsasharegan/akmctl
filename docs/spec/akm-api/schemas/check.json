@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/check.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "$ref": "common.json#/$defs/version"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "check"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "clean": {
+              "type": "boolean"
+            },
+            "errors": {
+              "type": "integer"
+            },
+            "warnings": {
+              "type": "integer"
+            },
+            "count": {
+              "type": "integer"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/finding"
+              }
+            },
+            "reconcile": {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "$ref": "common.json#/$defs/reconcile_state"
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "clean",
+            "errors",
+            "warnings",
+            "count",
+            "findings",
+            "reconcile"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

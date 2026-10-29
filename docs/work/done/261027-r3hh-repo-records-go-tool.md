@@ -1,0 +1,92 @@
+---
+id: 261027-r3hh
+type: task
+status: done
+origin: "[[261026-m74k-agent-ready-repo-layout-spike]]"
+created: 2026-10-27
+updated: 2026-10-28
+authored_by: agent
+adr: candidate
+title: Build the Go tool and workbench UI for repo records
+---
+# Build the Go tool and workbench UI for repo records
+
+## Goal
+
+One shared Go codebase that builds a CLI and the workbench UI, in a repository of its own, implementing [[261027-xkd4-repo-records-api-spec]] over the layout in [[agent-ready-repo-spec]]. Source: conversation of 2026-10-27.
+
+Decided so far:
+
+- Go, standard library only (Y28: its own display-width code, Y9: its own parser). Decided 2026-10-28: a hand-written parser for the frontmatter grammar (section 0 of [[agent-ready-repo-spec]]) that edits by splicing bytes; `go.yaml.in/yaml/v3` in the test suite only, as an oracle ([[go-yaml-library-evaluation]]).
+- One binary with subcommands (queries and checks); working title `akmctl`, with the UI as `akmctl ui` (decided 2026-10-28; the standard is AKM, agent knowledge management).
+- Distribution: prebuilt release binaries, so installing needs no Go toolchain; building from source stays possible.
+- `pkm-workbench` is expected to fold into this project or be coupled to it as an extension. What it has today and what must change: the subagent summary in [[agent-ready-repo-spec]] (no list parsing, no `id`, `title`, `parent`, `blocked_by` or `priority`, no JSON listing).
+
+Done when: a first release builds on the maintainer's platforms, passes the API spec's conformance fixtures, and the workbench UI shows a Kanban over the layout's records. Break this down when the API spec is ready.
+
+- Commands decided 2026-10-28: `set` and `close` (refresh `updated`, move to `done/`), `claim` and `release` (optional claims extension), a safety check extension, and an index generator whose table matches Prettier's output byte for byte. `renumber` is not in v1. Migrations are embedded in the binary.
+- Includes `akmctl migrate`: a conformance report, declarative codemod-style safe steps (dry run by default, no deletes, idempotent), and an agent handoff prompt with safeguards; see [[agent-ready-repo-spec]].
+
+## What `pkm-workbench` has today (subagent summary, 2026-10-27; read-only, code not run)
+
+A Go stdlib-only server, `pkm-wb`. It already has the same six statuses in one table, a Kanban for the first four, atomic conflict-checked writes, watch mode and a move wizard. It loads only `9 pkm/tasks/` with `type: task`; its frontmatter parser is hand-rolled, flat and string-only, so it cannot read lists (`blocked_by`, `decisions`, `scope`) or integers (`priority`). It has no `id`, `title`, `summary`, `parent`, `blocked_by`, `kind` or `priority`; it uses `created_at`, `updated_at`, `project`, `origin`, `adr`. It has no JSON listing. Views are Go code in `internal/tasks/views.go`.
+
+## Owned here (Y24, Y28, Y30)
+
+Display width for the ADR index: Prettier's string-width rule (control characters, U+0300 to U+036F and variation selectors count 0; East Asian Wide and Fullwidth count 2; an emoji sequence counts 2, or 1 for a narrow text-style emoji; everything else 1; whitespace runs collapsed first), with tables generated from Unicode data by a committed generator, tested against Prettier on the 206-cell fixture in [[go-width-library-evaluation]] (Appendices B to E). The built-in secret patterns, the CLI flags and the file formats of the `claims` and `safety` extensions, and the `akmctl` YAML-lite parser (its grammar and fixtures are section 0 of [[agent-ready-repo-spec]]; dates and timestamps are plain strings, as in YAML 1.2 core, Y26).
+
+Link checks (Y31): L1 resolves relative Markdown links (decode `%20`, accept angle brackets, skip URLs, anchors and code); L2 resolves wikilinks by filename or path, warning on zero or several matches. The ADR index is written with Markdown links.
+
+Reference parsing (Y30): read a frontmatter reference as a bare id or a quoted wikilink (`"[[<id>-<slug>|<id>]]"`), resolve by the leading id, ignore the slug; write bare ids unless the manifest key `reference_style` is `wikilink`; never rewrite an existing reference.
+
+## Plan (milestones, 2026-10-28)
+
+Each milestone ends in a working, tested state and a commit in the tool repository.
+
+1. **Scaffold:** repository, `go.mod`, layout, `README`, licence, test runner.
+2. **Parser:** YAML-lite parser and byte-splice editor; section 0 fixtures; `go.yaml.in/yaml/v3` oracle in tests.
+3. **Model and read operations:** record loader (ids, references, sections, etag), `ls`, `show`, `find`, `when`, `search`, `board`, the JSON envelope, the CLI binding, the fixture runner against `design/akm-api/.fixtures/`.
+4. **Checks and index:** `check` with all rules (WK, I, A, RM, G, L, S), the ADR index generator with the width code and its Prettier fixture.
+5. **Writes:** `new`, `set`, `close`, `claim`, `release`, atomic writes, compare-and-swap with the lock, write fixtures.
+6. **HTTP and UI:** `akmctl ui`, the HTTP binding with its security rules, the Kanban.
+7. **Migrate and safety:** `migrate` and the `safety` extension.
+8. **Release:** prebuilt binaries for the maintainer's platforms.
+
+## Outcome
+
+- The tool is built and released as v0.1.0: `github.com/alexsasharegan/akmctl` (private, MIT, working title), local clone `~/github.com/alexsasharegan/akmctl`. Release archives for macOS (arm64, amd64), Linux (arm64, amd64) and Windows (amd64) with SHA256SUMS are on the GitHub release `v0.1.0`; the macOS arm64 asset was downloaded, its checksum verified and it runs (`akmctl 0.1.0 (API 1.0)`).
+- Done-when met: it passes all 25 API conformance fixtures (Go tests on macOS, Linux and Windows in CI, plus the race test on Linux) and `akmctl ui` shows a Kanban over the records (checked in the built-in browser). Built: the parser and editor, record model, all API operations, `check` with the claims and safety extensions, the ADR index, `migrate`, the HTTP binding, the workbench page, release tooling. Tool repo commits 713ea21 to the v0.1.0 tag; vault notes 53efe69 to 3643fbd.
+- Not done, with owners: `mint_ids`, live refresh and field editing in the UI, exact width for non-standard emoji joins, and a layout migration (none exists yet) belong to later work on the tool; the name and going public (Y22, Y37) are Alexander's; the vault migration is [[261027-nrwf-vault-agent-ready-migration]]; the spec cleanup is [[261028-j3m9-akm-spec-v1-cleanup]].
+- Why (ADR check): the tool's design choices are decided in [[261027-ensf-akm-an-agent-knowledge-management]], [[261028-zh0w-obsidian-compatibility-is-a-stated-goal]] and Y1 to Y37 of the decision log: a standard-library-only Go tool with a hand-written YAML-lite parser edited by byte splice; an advisory-lock compare-and-swap write path; an HTTP binding that is loopback-only with a per-run token and a URL-fragment hand-off; declarative embedded migrations applied only after a backup tag and branch; MIT licence; five-platform releases by a shell script, no GoReleaser; private until the name is settled. Rejected: a YAML library, GoReleaser, `git mv` inside the tool, reading before authenticating, public hosting before the name.
+
+## Log
+
+- 2026-10-27: filed by Claude Code on the Mac at Alexander's direction, split out of [[261026-m74k-agent-ready-repo-layout-spike]]. Raw: blocked in practice on the API spec and the layout, which this spike finishes.
+- 2026-10-27: scope widened with `migrate` (proposed in [[agent-ready-repo-spec]]).
+- 2026-10-28: [[261026-m74k-agent-ready-repo-layout-spike]] closed; [[261027-ensf-akm-an-agent-knowledge-management]] accepted. Alexander leans toward AKM Workbench as the UI's own name, with `akmctl` as the CLI, but has not decided; convention (`akmctl ui`) has momentum. The choice decides one binary or two.
+- 2026-10-28: decisions from the spec review interview recorded in [[agent-ready-repo-decision-log]] (Y1 to Y14): hand-written parser, `set`/`close`, claims and safety extensions, embedded migrations, Prettier-stable index.
+- 2026-10-28: UI packaging decided: `akmctl ui`, one binary (Y18). A small dependency is allowed for display width (Y16).
+- 2026-10-28: took over the pkm-workbench summary and the extension details from the decision log (Y24, Y25); YAML-lite accepted (Y21), then aligned to YAML 1.2 core after the Obsidian test (Y26).
+- 2026-10-28: display width is the tool's own code, no dependency (Y28); Obsidian compatibility is a stated goal (Y29).
+- 2026-10-28: [[261027-xkd4-repo-records-api-spec]] closed: the contract this tool implements is [[akm-api-spec]] with schemas and fixtures under `design/akm-api/`. Implement the CLI and HTTP bindings and pass the fixtures; the write fixtures and the `docs/.akm.lock` name are left for this task.
+- 2026-10-28: claimed (Claude Code on the Mac); milestones written.
+- 2026-10-28: with Alexander: repository `~/github.com/alexsasharegan/akmctl`, local only, module `github.com/alexsasharegan/akmctl`; this session covers milestones 1 and 2.
+- 2026-10-28: milestones 1 and 2 done (tool repo commit 713ea21). `internal/frontmatter`: `Parse`, `ParseBare` (the manifest has no `---` lines), `Get`, `Set`, `Delete`, `Rename`, `Bytes`, `Body`; edits splice bytes and keep comments, order, quoting, line endings. Tests: 52 fixtures in `testdata/yaml-lite.json` (copied to the vault fixtures), the yaml/v3 oracle on accepted and rejected cases, edit tests, and `FuzzAgainstOracle` (about 2 minutes of fuzzing, clean after the fixes below). `go.yaml.in/yaml/v3` v3.0.5 added for tests (within the approved scope).
+- 2026-10-28: fuzzing against the oracle found corners where libraries disagree; the subset now rejects them and the spec says so (section 0, "Stricter than YAML"): control characters, keys over 255 characters, `?` or a leading `:` in inline-list plain items, `0x`/`0o`/`0b` prefixes in any case and underscore-number forms. Decision for review: the spec's grammar is now stricter than first written; none of it affects dates, ids, versions or the fields in the layout.
+- 2026-10-28: no licence file yet in the tool repo (Alexander's choice, not made).
+- 2026-10-28: milestone 3 done (tool repo): `internal/record` (loader, roadmap, manifest, sections, etag, wikilink-to-id), `internal/api` (envelope, request validation against a parameter table, `version`, `ls`, `search`, `show`, `board`, `find`, `when`), `internal/cli` (flags map to parameters, `--format json|table|ids`, `--repo`, exit 2 on any failure). The API fixtures run as a Go test (11 of 15; the rest wait for milestone 4). Fixtures are copied into `testdata/api/`; the vault copy stays the source until the repos are merged, so a change to one must be copied to the other.
+- 2026-10-28: licence question open: Alexander wants permissive, attribution welcome, and nobody able to relicense it as their own; advice given (MIT/Apache-2.0 allow closed derivatives; MPL-2.0 keeps modified files open), choice not made.
+- 2026-10-28: licence decided: MIT (Y35). `LICENSE` added.
+- 2026-10-28: milestone 4 done (tool repo c2b3b02). `internal/check`: rules WK1 to WK12, I1, A1 to A4, RM1 to RM4, G1 to G3 (G3 checks only `scripts/...` paths named in Commands), L1, L2, S1 (version compare; no migration path yet, so an older layout reports `unsupported`), S2, CL1, CL2; 41 rule tests. `SF1` to `SF3` (safety extension) and `check --target` classification belong to milestone 7. `internal/index`: generator, matches the fixture byte for byte, passes Prettier 3.9.10 `--check` also with CJK, emoji, bold, backticks and escaped pipes in cells. `internal/width`: Prettier's rule; tables generated by `gen/main.go` from Unicode 17.0.0 files committed in `data/`; tested against 197 of Prettier's cell widths with one known miss (a ZWJ pair that is not a standard emoji sequence: Prettier does not join it, the tool would need the list of standard sequences) and invalid UTF-8 cells skipped (the parser rejects them). Downloads with Alexander's OK: Unicode 17.0.0 `EastAsianWidth.txt` and `emoji-data.txt`, and `prettier@3.9.10` via npx for the ground truth.
+- 2026-10-28: open for the spec: the index column `supersedes / superseded_by` shows the ids joined with ` / ` and does not say which is which. Checked with Prettier 3.9.10: cells with `_`, a lone `*`, `2 * 3 * 4`, `<b>` and `[x]` come back with the text unchanged, so no markdown escaping is needed so far; cells with other constructs are untested.
+- 2026-10-28: milestone 5 done (tool repo 21e9199): `new`, `set`, `close`, `claim`, `release`. Writes take an exclusive flock on `docs/.akm.lock`, re-read the record under the lock, check `if_match`, write through a temp file and a rename; `close` rewrites then renames into `done/`; `index` also takes the lock. Edits go through the frontmatter byte-splice editor, so unrelated lines are untouched. Reference style `wikilink` is honoured when writing. CLI: `new work <slug> --title ... --field k=v`, `set <id> k=v ...`, `close <id> done|dropped`, `claim <id> --as <name>`, `release <id>`, `--if-match`, `--as-of`.
+- 2026-10-28: spec amendments from building it ([[akm-api-spec]]): `as_of` on `set`, `close` and `release` (tests set the clock); `close` renames instead of `git mv` (the tool never touches the index); `set` refuses only the rules it can see from the record (WK4 self-parent, WK5, WK9, A3), not content rules like WK6; unknown fields cannot be set; write cases in the fixtures carry `after` and `removed`; `new` has no exact fixture (random ids); `docs/.akm.lock` is in the layout tree.
+- 2026-10-28: milestone 6 done (tool repo): `internal/server` and `akmctl ui [--port N] [--open] [--repo dir]`. Every `/api/v1` route needs the bearer token (reads too); Host must be the loopback address and port; a foreign Origin gets 403; no CORS headers, no preflight; `If-Match` is required on `set`, `close`, `claim` and `release` (428, reason `if_match_required`); `new` answers 201; `ETag` on record responses; the lock and etag logic is the same as the CLI's. The page (`web/index.html`, `app.js`, `app.css`, embedded) has the board (raw, ready, active, blocked, and closed on request), drag a card to change status, a record panel with fields and sections, claim, release, close and drop, an ADR list and a check view. Sandboxed by a CSP; record text is shown with `textContent` only. Tested: 9 server tests (auth, Host and Origin, CORS, page without token, reads, write flow, bad writes, loopback bind, shutdown) and a manual run in the built-in browser (board renders, the status select changed a record on disk and the board updated).
+- 2026-10-28: spec change from building it: the token travels in the URL fragment, not inside the served page, so the page holds no secret and needs no authentication; the spec's HTTP section says so, and lists the page routes and the CSP.
+- 2026-10-28: not done in the UI: no live refresh (reload button only), no editing of fields other than status, no new-item form, no keyboard support for moving cards; the drag and prompt for `blocked_by` was not exercised by hand.
+- 2026-10-28: milestone 7 done (tool repo 58dd65b). `internal/migrate`: declarative steps (rename_field, set_default, rename_heading, move_file, add_file, manual) embedded from `migrations/*.json`, chain search between layout versions, `Plan`, `Apply` (idempotent, never deletes or overwrites), `Preflight` (git work tree, clean tree, free tag and branch names), tag and branch creation, `docs/.migrate-log`, the manifest bump only when no manual step is left, and the handoff text. No migrations are embedded (no layout before 1.0.0 was published); tested with a made-up 0.9.0 in a real temporary git repo: report, plan, apply (files, log, tag, branch), idempotence, every refusal, handoff. `check` now reports `behind` with the steps and classifies findings for `--target`. `mint_ids` is not implemented. `POST /api/v1/migrate` is on the HTTP binding; the CLI has `--mode`, `--target`, `--acknowledge-backup`, `--out`.
+- 2026-10-28: `internal/check/safety.go`: SF1 patterns, SF2 deny list (`re:` for regular expressions), SF3 entropy, SF4 allow markers; 16 tests with fake credentials built from pieces. Calibrated on 227 of Alexander's own design notes (15,000 lines): 21 false positives at first (go.sum hashes, a playlist id in a URL), none after skipping hash prefixes and URLs. `AKM_CORPUS=<dir> go test -run TestSafetyCorpus -v ./internal/check` repeats the measurement on any notes folder (never run on employer material).
+- 2026-10-28: remaining gaps after milestone 7: release builds and the name (milestone 8); `mint_ids`; the UI has no live refresh, no field editing beyond status, no new-item form; the width code differs from Prettier on non-standard emoji joins; `check --target` accepts only the tool's own layout version; `G3` checks only `scripts/` paths; the ADR index column `supersedes / superseded_by` does not say which is which; the vault migration ([[261027-nrwf-vault-agent-ready-migration]]) and the v1.0 spec cleanup ([[261028-j3m9-akm-spec-v1-cleanup]]) are separate tasks.
+- 2026-10-28: milestone 8 started with Alexander's choices: five platforms, a shell script plus CI workflows (no GoReleaser), v0.1.0, and a private GitHub repo (`gh repo create alexsasharegan/akmctl --private`, pushed). The name stays a working title (Y37). `scripts/release.sh 0.1.0` built all five archives locally and the checksums verify; the darwin arm64 binary reports `akmctl 0.1.0 (API 1.0)`. Actions are pinned by commit SHA (checkout v7.0.1, setup-go v7.0.0). The v0.1.0 tag is not created yet.
+- 2026-10-28: CI on the first push failed on Windows only: the runner converted line endings and changed the byte-exact fixtures. `.gitattributes` now keeps LF everywhere and `testdata` byte-exact; all three platforms pass, which also exercised the Windows lock fallback.
+- 2026-10-28: tagged and pushed `v0.1.0`; the release workflow built and published six assets. Closed. ADR check: candidate (3: a new tool, release process and hosting; 5: the security rules of the HTTP binding and the backup safeguards of `migrate` could be weakened without knowing why). The reasons are in the Outcome; not drafted now, since ADR 261027-ensf and ADR 261028-zh0w cover the standard and the decision log holds the rest. It can go to the ADR sweep or into the consolidated v1.0 ADR ([[261028-j3m9-akm-spec-v1-cleanup]]).

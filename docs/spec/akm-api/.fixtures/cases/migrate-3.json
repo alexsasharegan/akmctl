@@ -1,0 +1,32 @@
+{
+  "name": "without the migrations parameter there is no path from 0.0.0",
+  "repo": "legacy",
+  "request": {
+    "mode": "plan"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "migrate",
+    "request": {
+      "mode": "plan"
+    },
+    "ok": true,
+    "mode": "plan",
+    "from": "0.0.0",
+    "to": "1.0.0",
+    "state": "unsupported",
+    "steps": [],
+    "findings": [
+      {
+        "rule": "S1",
+        "severity": "W",
+        "file": "docs/.layout",
+        "line": null,
+        "id": null,
+        "message": "the manifest has no layout key",
+        "class": "info"
+      }
+    ],
+    "clean": false
+  }
+}

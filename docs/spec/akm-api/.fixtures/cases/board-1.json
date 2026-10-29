@@ -1,0 +1,114 @@
+{
+  "name": "default columns",
+  "repo": "basic",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "board",
+    "request": {},
+    "ok": true,
+    "columns": [
+      {
+        "status": "active",
+        "count": 2,
+        "records": [
+          {
+            "id": "261015-c4d5",
+            "type": "work",
+            "path": "docs/work/261015-c4d5-machine-readable-listings.md",
+            "id_date": "2026-10-15",
+            "etag": "acae08a2f3cf6b27",
+            "fields": {
+              "id": "261015-c4d5",
+              "title": "Machine-readable listings",
+              "summary": "Make listings available as JSON for tools.",
+              "status": "active",
+              "kind": "feature",
+              "parent": null,
+              "priority": 3,
+              "updated": "2026-10-26",
+              "blocked_by": null
+            }
+          },
+          {
+            "id": "261020-a2b3",
+            "type": "work",
+            "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+            "id_date": "2026-10-20",
+            "etag": "b31236f6ee03e09b",
+            "fields": {
+              "id": "261020-a2b3",
+              "title": "Add JSON output to ls",
+              "summary": "Print ls results as JSON.",
+              "status": "active",
+              "kind": null,
+              "parent": "261015-c4d5",
+              "priority": 2,
+              "updated": "2026-10-27",
+              "blocked_by": null
+            }
+          }
+        ]
+      },
+      {
+        "status": "blocked",
+        "count": 1,
+        "records": [
+          {
+            "id": "261024-g7h8",
+            "type": "work",
+            "path": "docs/work/261024-g7h8-publish-the-first-release.md",
+            "id_date": "2026-10-24",
+            "etag": "3a839cf44a210de1",
+            "fields": {
+              "id": "261024-g7h8",
+              "title": "Publish the first release",
+              "summary": null,
+              "status": "blocked",
+              "kind": null,
+              "parent": null,
+              "priority": 1,
+              "updated": "2026-10-25",
+              "blocked_by": [
+                "261020-a2b3",
+                "legal review"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "status": "ready",
+        "count": 1,
+        "records": [
+          {
+            "id": "261022-e5f6",
+            "type": "work",
+            "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+            "id_date": "2026-10-22",
+            "etag": "1e3e49990ff5d8ed",
+            "fields": {
+              "id": "261022-e5f6",
+              "title": "Document the exit codes",
+              "summary": null,
+              "status": "ready",
+              "kind": null,
+              "parent": "261015-c4d5",
+              "priority": null,
+              "updated": "2026-10-22",
+              "blocked_by": null
+            }
+          }
+        ]
+      }
+    ],
+    "totals": {
+      "raw": 1,
+      "ready": 1,
+      "active": 2,
+      "blocked": 1,
+      "done": 1,
+      "dropped": 0
+    }
+  }
+}

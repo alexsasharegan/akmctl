@@ -1,0 +1,121 @@
+{
+  "name": "work items are read from the folder the manifest names",
+  "repo": "vault",
+  "request": {
+    "type": "work"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "type": "work"
+    },
+    "ok": true,
+    "total": 6,
+    "count": 6,
+    "records": [
+      {
+        "id": "261010-j9k0",
+        "type": "work",
+        "path": "Deep Thought/9 pkm/tasks/done/261010-j9k0-choose-a-licence.md",
+        "id_date": "2026-10-10",
+        "etag": "685fa88a7ccd8978",
+        "fields": {
+          "id": "261010-j9k0",
+          "title": "Choose a licence",
+          "summary": null,
+          "status": "done",
+          "kind": null,
+          "parent": null,
+          "priority": null,
+          "updated": "2026-10-12"
+        }
+      },
+      {
+        "id": "261015-c4d5",
+        "type": "work",
+        "path": "Deep Thought/9 pkm/tasks/261015-c4d5-machine-readable-listings.md",
+        "id_date": "2026-10-15",
+        "etag": "acae08a2f3cf6b27",
+        "fields": {
+          "id": "261015-c4d5",
+          "title": "Machine-readable listings",
+          "summary": "Make listings available as JSON for tools.",
+          "status": "active",
+          "kind": "feature",
+          "parent": null,
+          "priority": 3,
+          "updated": "2026-10-26"
+        }
+      },
+      {
+        "id": "261020-a2b3",
+        "type": "work",
+        "path": "Deep Thought/9 pkm/tasks/261020-a2b3-add-json-output-to-ls.md",
+        "id_date": "2026-10-20",
+        "etag": "b31236f6ee03e09b",
+        "fields": {
+          "id": "261020-a2b3",
+          "title": "Add JSON output to ls",
+          "summary": "Print ls results as JSON.",
+          "status": "active",
+          "kind": null,
+          "parent": "261015-c4d5",
+          "priority": 2,
+          "updated": "2026-10-27"
+        }
+      },
+      {
+        "id": "261022-e5f6",
+        "type": "work",
+        "path": "Deep Thought/9 pkm/tasks/261022-e5f6-document-the-exit-codes.md",
+        "id_date": "2026-10-22",
+        "etag": "1e3e49990ff5d8ed",
+        "fields": {
+          "id": "261022-e5f6",
+          "title": "Document the exit codes",
+          "summary": null,
+          "status": "ready",
+          "kind": null,
+          "parent": "261015-c4d5",
+          "priority": null,
+          "updated": "2026-10-22"
+        }
+      },
+      {
+        "id": "261024-g7h8",
+        "type": "work",
+        "path": "Deep Thought/9 pkm/tasks/261024-g7h8-publish-the-first-release.md",
+        "id_date": "2026-10-24",
+        "etag": "3a839cf44a210de1",
+        "fields": {
+          "id": "261024-g7h8",
+          "title": "Publish the first release",
+          "summary": null,
+          "status": "blocked",
+          "kind": null,
+          "parent": null,
+          "priority": 1,
+          "updated": "2026-10-25"
+        }
+      },
+      {
+        "id": "261026-m1n2",
+        "type": "work",
+        "path": "Deep Thought/9 pkm/tasks/261026-m1n2-explore-a-plugin-system.md",
+        "id_date": "2026-10-26",
+        "etag": "c04c7e0e447bc6e9",
+        "fields": {
+          "id": "261026-m1n2",
+          "title": "Explore a plugin system",
+          "summary": null,
+          "status": "raw",
+          "kind": null,
+          "parent": null,
+          "priority": null,
+          "updated": "2026-10-26"
+        }
+      }
+    ]
+  }
+}

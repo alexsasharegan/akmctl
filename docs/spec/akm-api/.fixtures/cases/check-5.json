@@ -1,0 +1,23 @@
+{
+  "name": "a clean repository with moved folders",
+  "repo": "vault",
+  "request": {
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "check",
+    "request": {
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "clean": true,
+    "errors": 0,
+    "warnings": 0,
+    "count": 0,
+    "findings": [],
+    "reconcile": {
+      "state": "current"
+    }
+  }
+}

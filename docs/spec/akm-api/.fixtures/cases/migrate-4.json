@@ -1,0 +1,56 @@
+{
+  "name": "an unknown step kind in a migration file is rejected",
+  "repo": "legacy",
+  "request": {
+    "mode": "plan",
+    "migrations": [
+      {
+        "from": "0.0.0",
+        "to": "1.0.0",
+        "steps": [
+          {
+            "id": "created",
+            "kind": "run_script",
+            "class": "auto",
+            "description": "created_at becomes created",
+            "dir": "Deep Thought/9 pkm/tasks",
+            "from": "created_at",
+            "to": "created"
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "migrate",
+    "request": {
+      "mode": "plan",
+      "migrations": [
+        {
+          "from": "0.0.0",
+          "to": "1.0.0",
+          "steps": [
+            {
+              "id": "created",
+              "kind": "run_script",
+              "class": "auto",
+              "description": "created_at becomes created",
+              "dir": "Deep Thought/9 pkm/tasks",
+              "from": "created_at",
+              "to": "created"
+            }
+          ]
+        }
+      ]
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "migrations[0]: step created: unknown kind \"run_script\"",
+      "details": {
+        "parameter": "migrations"
+      }
+    }
+  }
+}

@@ -1,0 +1,566 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/common.json",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^\\d{6}-[0-9a-hjkmnp-tv-z]{4}$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$"
+    },
+    "date_or_timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2})?$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "etag": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work_status": {
+      "enum": [
+        "raw",
+        "ready",
+        "active",
+        "blocked",
+        "done",
+        "dropped"
+      ]
+    },
+    "any_status": {
+      "enum": [
+        "raw",
+        "ready",
+        "active",
+        "blocked",
+        "done",
+        "dropped",
+        "proposed",
+        "accepted",
+        "rejected",
+        "deprecated",
+        "superseded"
+      ]
+    },
+    "record_type": {
+      "enum": [
+        "work",
+        "adr"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "E",
+        "W"
+      ]
+    },
+    "finding_class": {
+      "enum": [
+        "auto",
+        "manual",
+        "info"
+      ]
+    },
+    "reconcile_state": {
+      "enum": [
+        "current",
+        "behind",
+        "ahead",
+        "unsupported",
+        "conflict",
+        "absent"
+      ]
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "path",
+        "id_date",
+        "etag",
+        "fields"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "type": {
+          "$ref": "common.json#/$defs/record_type"
+        },
+        "path": {
+          "$ref": "common.json#/$defs/path"
+        },
+        "id_date": {
+          "$ref": "common.json#/$defs/date"
+        },
+        "etag": {
+          "$ref": "common.json#/$defs/etag"
+        },
+        "fields": {
+          "type": "object"
+        },
+        "next_line": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "matches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "line": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1
+              },
+              "snippet": {
+                "type": "string",
+                "maxLength": 160
+              }
+            },
+            "required": [
+              "field",
+              "line",
+              "snippet"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "common.json#/$defs/severity"
+        },
+        "file": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "line": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "class": {
+          "anyOf": [
+            {
+              "$ref": "common.json#/$defs/finding_class"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "rule",
+        "severity",
+        "file",
+        "line",
+        "id",
+        "message",
+        "class"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "unauthorized",
+            "not_found",
+            "ambiguous",
+            "stale",
+            "refused",
+            "unreadable",
+            "internal"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "migrate_step": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "class": {
+          "$ref": "common.json#/$defs/finding_class"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "applied",
+            "skipped"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "renames": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "$ref": "#/$defs/path"
+              },
+              "to": {
+                "$ref": "#/$defs/path"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "class",
+        "files",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "envelope_ok": {
+      "type": "object",
+      "required": [
+        "api_version",
+        "operation",
+        "request",
+        "ok"
+      ],
+      "properties": {
+        "api_version": {
+          "const": "1.0"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "request": {
+          "type": "object"
+        },
+        "ok": {
+          "const": true
+        }
+      }
+    },
+    "envelope_error": {
+      "type": "object",
+      "required": [
+        "api_version",
+        "operation",
+        "request",
+        "ok",
+        "error"
+      ],
+      "properties": {
+        "api_version": {
+          "const": "1.0"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "request": {
+          "type": "object"
+        },
+        "ok": {
+          "const": false
+        },
+        "error": {
+          "$ref": "common.json#/$defs/error"
+        }
+      },
+      "additionalProperties": false
+    },
+    "diff": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "common.json#/$defs/path"
+        },
+        "new_path": {
+          "$ref": "common.json#/$defs/path"
+        },
+        "hunks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "header": {
+                "type": "string",
+                "pattern": "^@@ -\\d+(,\\d+)? \\+\\d+(,\\d+)? @@$"
+              },
+              "lines": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "op": {
+                      "enum": [
+                        "ctx",
+                        "add",
+                        "rem"
+                      ]
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "old": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 1
+                    },
+                    "new": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "op",
+                    "text",
+                    "old",
+                    "new"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "header",
+              "lines"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "path",
+        "new_path",
+        "hunks"
+      ],
+      "additionalProperties": false
+    },
+    "section_text": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "migration_step": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "rename_field",
+            "set_default",
+            "remove_field",
+            "copy_field",
+            "title_from_h1",
+            "goal_scaffold",
+            "rename_heading",
+            "move_file",
+            "add_file",
+            "mint_ids",
+            "manual"
+          ]
+        },
+        "class": {
+          "enum": [
+            "auto",
+            "manual",
+            "info"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "fixes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scope": {
+          "enum": [
+            "work",
+            "adr",
+            "all"
+          ]
+        },
+        "field": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "content": {
+          "type": "string"
+        },
+        "dir": {
+          "$ref": "#/$defs/path"
+        },
+        "date_field": {
+          "type": "string"
+        },
+        "recursive": {
+          "type": "boolean"
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rename": {
+          "type": "boolean"
+        },
+        "seed": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "class"
+      ],
+      "additionalProperties": false
+    },
+    "migration": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/version"
+        },
+        "to": {
+          "$ref": "#/$defs/version"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/migration_step"
+          }
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "steps"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

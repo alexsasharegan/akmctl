@@ -1,0 +1,18 @@
+{
+  "name": "a path from an id",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "find",
+    "request": {
+      "id": "261022-e5f6"
+    },
+    "ok": true,
+    "id": "261022-e5f6",
+    "type": "work",
+    "path": "docs/work/261022-e5f6-document-the-exit-codes.md"
+  }
+}

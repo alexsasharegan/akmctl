@@ -1,0 +1,86 @@
+{
+  "name": "open work, roadmap then priority, with next lines",
+  "repo": "basic",
+  "request": {
+    "status": [
+      "ready",
+      "active"
+    ],
+    "sort": [
+      "roadmap",
+      "-priority",
+      "id"
+    ],
+    "next": true,
+    "fields": [
+      "title",
+      "status",
+      "priority"
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "status": [
+        "ready",
+        "active"
+      ],
+      "sort": [
+        "roadmap",
+        "-priority",
+        "id"
+      ],
+      "next": true,
+      "fields": [
+        "title",
+        "status",
+        "priority"
+      ]
+    },
+    "ok": true,
+    "total": 3,
+    "count": 3,
+    "records": [
+      {
+        "id": "261015-c4d5",
+        "type": "work",
+        "path": "docs/work/261015-c4d5-machine-readable-listings.md",
+        "id_date": "2026-10-15",
+        "etag": "acae08a2f3cf6b27",
+        "fields": {
+          "title": "Machine-readable listings",
+          "status": "active",
+          "priority": 3
+        },
+        "next_line": "Finish the children."
+      },
+      {
+        "id": "261020-a2b3",
+        "type": "work",
+        "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "id_date": "2026-10-20",
+        "etag": "b31236f6ee03e09b",
+        "fields": {
+          "title": "Add JSON output to ls",
+          "status": "active",
+          "priority": 2
+        },
+        "next_line": "Write the encoder test."
+      },
+      {
+        "id": "261022-e5f6",
+        "type": "work",
+        "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+        "id_date": "2026-10-22",
+        "etag": "1e3e49990ff5d8ed",
+        "fields": {
+          "title": "Document the exit codes",
+          "status": "ready",
+          "priority": null
+        },
+        "next_line": null
+      }
+    ]
+  }
+}

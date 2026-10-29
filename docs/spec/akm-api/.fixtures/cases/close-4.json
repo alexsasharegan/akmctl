@@ -1,0 +1,197 @@
+{
+  "name": "dry run of a close with an outcome: the diff names the new path",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "status": "done",
+    "outcome": "Shipped in 0.2.",
+    "dry_run": true,
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "close",
+    "request": {
+      "id": "261020-a2b3",
+      "status": "done",
+      "outcome": "Shipped in 0.2.",
+      "dry_run": true,
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261020-a2b3",
+      "type": "work",
+      "path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+      "id_date": "2026-10-20",
+      "etag": "b31236f6ee03e09b",
+      "fields": {
+        "id": "261020-a2b3",
+        "title": "Add JSON output to ls",
+        "summary": "Print ls results as JSON.",
+        "status": "done",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 2,
+        "created": "2026-10-20",
+        "updated": "2026-10-28",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "moved_from": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+    "moved_to": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+    "diff": {
+      "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+      "new_path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+      "hunks": [
+        {
+          "header": "@@ -2,11 +2,11 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "id: 261020-a2b3",
+              "old": 2,
+              "new": 2
+            },
+            {
+              "op": "ctx",
+              "text": "title: Add JSON output to ls",
+              "old": 3,
+              "new": 3
+            },
+            {
+              "op": "ctx",
+              "text": "summary: Print ls results as JSON.",
+              "old": 4,
+              "new": 4
+            },
+            {
+              "op": "rem",
+              "text": "status: active",
+              "old": 5,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "status: done",
+              "old": null,
+              "new": 5
+            },
+            {
+              "op": "ctx",
+              "text": "parent: 261015-c4d5",
+              "old": 6,
+              "new": 6
+            },
+            {
+              "op": "ctx",
+              "text": "priority: 2",
+              "old": 7,
+              "new": 7
+            },
+            {
+              "op": "ctx",
+              "text": "created: 2026-10-20",
+              "old": 8,
+              "new": 8
+            },
+            {
+              "op": "rem",
+              "text": "updated: 2026-10-27",
+              "old": 9,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "updated: 2026-10-28",
+              "old": null,
+              "new": 9
+            },
+            {
+              "op": "ctx",
+              "text": "---",
+              "old": 10,
+              "new": 10
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 11,
+              "new": 11
+            },
+            {
+              "op": "ctx",
+              "text": "# Add JSON output to ls",
+              "old": 12,
+              "new": 12
+            }
+          ]
+        },
+        {
+          "header": "@@ -21,5 +21,9 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 21,
+              "new": 21
+            },
+            {
+              "op": "ctx",
+              "text": "Saved: 2026-10-27 18:00",
+              "old": 22,
+              "new": 22
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 23,
+              "new": 23
+            },
+            {
+              "op": "add",
+              "text": "## Outcome",
+              "old": null,
+              "new": 24
+            },
+            {
+              "op": "add",
+              "text": "",
+              "old": null,
+              "new": 25
+            },
+            {
+              "op": "add",
+              "text": "Shipped in 0.2.",
+              "old": null,
+              "new": 26
+            },
+            {
+              "op": "add",
+              "text": "",
+              "old": null,
+              "new": 27
+            },
+            {
+              "op": "ctx",
+              "text": "## Log",
+              "old": 24,
+              "new": 28
+            },
+            {
+              "op": "ctx",
+              "text": "- 2026-10-20: started.",
+              "old": 25,
+              "new": 29
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "would_be": {
+    "docs/work/done/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: done\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Outcome\n\nShipped in 0.2.\n\n## Log\n- 2026-10-20: started.\n"
+  }
+}

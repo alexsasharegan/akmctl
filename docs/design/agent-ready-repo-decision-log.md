@@ -1,0 +1,190 @@
+---
+type: design
+status: draft
+created_at: 2026-10-28
+updated_at: 2026-10-28
+tags:
+    - pkm/rails
+---
+# AKM decision log and open questions
+
+The history behind [[agent-ready-repo-spec]]: assumptions, decisions made in interviews, and what is still open. The spec keeps only normative text; this note keeps the reasons and the record. Decision ids in the spec (D1 to D8, O1 to O4, X1 to X11, Y1 to Y14) refer to the tables here and to [[agent-ready-repo-comparison]]. Context: [[261027-ensf-akm-an-agent-knowledge-management]], [[261026-m74k-agent-ready-repo-layout-spike]].
+
+The specification, the guide and the API spec were rewritten as clean first editions on 2026-10-28 (Y38): [[agent-ready-repo-spec]] (version 1.0.0), [[akm-guide]] and [[akm-api-spec]] no longer cite the ids below. This log is where those ids are explained; the rule ids (R, H, C, WK, I, A, RM, G, L, S, CL, SF) are the ones that remain in the specification.
+
+## A. Assumptions, as decided (interview of 2026-10-27)
+
+Numbers are the draft's.
+
+| # | Item | Decision |
+|---|---|---|
+| X1 | Closed items move to `docs/work/done/` | Accepted. |
+| X2 | Record ids | **Changed twice.** First to `YYYYMMDD-slug`; then, after the maintainer's requirements (section 0), to `YYMMDD-xxxx`: UTC two-digit-year date plus four random Crockford base-32 characters (Crockford alphabet), one id space for ADRs and work items, slug only in the filename. |
+| X3 | Roadmap sections `Now`, `Next`, `Later`, `Dropped` | Accepted. "On hold" is `status: blocked`; done items leave the lists. |
+| X4 | `kind` field, four values, default `chore` | Accepted. |
+| X5 | `authored_by: agent` on items and ADRs | Accepted. |
+| X6 | ADR `## Review` and `## Revert` | Kept, optional; the record-decision skill prompts for them on costly or hard-to-reverse decisions. |
+| X7 | Warn at 30 days stale | Accepted (configurable). |
+| X8 | Tool language | **Changed 2026-10-27:** Go, not Python. One shared Go codebase for the CLI and the workbench UI. Reasons: a Go toolchain is a given for the maintainer's work, one portable binary, easy parallel file reads, and the workbench is already Go. |
+
+| X9 | `summary` field: required on ADRs, optional on work items, up to 160 characters | Accepted. The index and listings route from headers alone (H1). |
+| X10 | Optional ADR `scope` field (paths, globs or topic words) | Accepted. |
+| X11 | `docs/.layout` manifest | **Accepted and widened 2026-10-27:** layout version plus extension versions, declared layout dependencies, a reconcile result, and the rule that only MAJOR bumps need a migration. The migrate design (report, safe steps, handoff, safeguards) was accepted as proposed. |
+
+## B. Decided in review (2026-10-27 and 2026-10-28)
+
+- **When the tool is absent:** it is an accelerator, not a dependency (H6); `AGENTS.md` lists plain-file fallbacks (section 2). Confirmed.
+- **No committed work index.** Work records change too often. The listing is always derived on demand.
+- **A JSON listing is required,** as the stable output of a query layer over ADRs and work items.
+- **One tool, with subcommands.** The query commands (`ls`, `search`, `show`, `board`) and the checks live in one binary. The command set was accepted.
+- **Go, one shared codebase** for the CLI and the workbench UI (supersedes X8's Python). `pkm-workbench` is expected to fold into this project or be coupled to it as an extension; the maintainer expects to dogfood the layout in the vault, which implies migrating the vault and changing the workbench.
+- **A transport-neutral API spec.** The operations (list, show, search, check, new, find, when, renumber, board) get request and response schemas, with a stable JSON response, so that other implementations can be written against the same spec. At least two bindings: the CLI (arguments in, JSON out) and HTTP (routes and query parameters in, the same JSON out). A binding for gRPC or another transport can follow. The executable form of the spec is a set of conformance fixtures: sample repos with expected outputs that every implementation must reproduce.
+- **Working title (2026-10-28):** the standard is **AKM** (agent knowledge management, the in-repo sibling of PKM); the tool is `akmctl`. For the UI, `akmctl ui` (decided 2026-10-28, Y18); a separate AKM Workbench was considered. Recorded as a working title, not final: overlap with `itlackey/akm` (a CLI for agent knowledge, npm `akm-cli`), the AgenticAKM paper, and AKM as an architecture-knowledge-management research term is accepted knowingly.
+- **Distribution.** The agent-ready project is a **clone template**: the layout, its instructions, and default extensions that a repo opts into. The workbench tool and UI live in **another repository**, released as **prebuilt binaries** so installing needs no Go toolchain; building from source stays possible. (Revises O4: the template repo no longer carries a script to copy, and the skill, templates and `VERSION` are copied while the tool is installed.)
+- **Go dependencies.** Standard library preferred. A YAML library is in view; it is chosen by due diligence on, in order: baseline requirements, performance, security, and, as a tiebreaker, popularity and support (task [[261027-wkxv-go-yaml-library-evaluation]]).
+- **Scope split.** This spike finishes the layout spec, the layout ADR and the guide, and hands off outputs to separate tasks: [[261027-xkd4-repo-records-api-spec]], [[261027-r3hh-repo-records-go-tool]], [[261027-wkxv-go-yaml-library-evaluation]] and [[261027-nrwf-vault-agent-ready-migration]]. The tool depends on the layout.
+- **Vault migration** is a known open item, not a decision.
+
+## C. Interview of 2026-10-28 (after the spec review)
+
+From [[akm-spec-review]]. The maintainer took the recommended option on every question.
+
+| # | Question | Decision |
+|---|---|---|
+| Y1 | H6 and record creation (a bare agent cannot mint an id) | `AGENTS.md` carries a one-line shell recipe for minting an id. H6 is reworded: every read and every record creation works without the tool; regenerating the index and running the full checks need it. R7: minted by the tool or the recipe, never typed by an agent. |
+| Y2 | Claiming an `active` item | Optional extension `claims`: advisory `claimed_by` and `claimed_at`, set and cleared by the tool, never a lock, stale after 24 hours (anyone may take over by logging it). No-tool fallback: a first `## Log` line "claimed (where)". Resume rule: resume the item you hold; else take the top `ready` item; if several unclaimed `active` items, ask. |
+| Y3 | Prettier | Required, pinned (3.x) in the template, config `embeddedLanguageFormatting: off`; the generator emits the aligned, Prettier-stable index table and the file is also in `.prettierignore`; A5 compares the generated bytes; an inline list stays on one line; no `fmt` command; the test is re-run on each Prettier bump. |
+| Y4 | Rule A4 (accepted-body check) | Dropped from v1. Immutability is convention only (D6). It may return as an extension once "accepting commit" is defined. The index check becomes A4. |
+| Y5 | How migrations reach the tool | Embedded in the binary: each release embeds the migrations it supports; the template's `migrations/` is their source. A newer migration needs a newer tool. |
+| Y6 | Where settings live | In `docs/.layout`, as flat keys in the manifest's format. No `.akm.toml`. The status enum and the roadmap sections are fixed in v1 (no extra statuses or sections). |
+| Y7 | Large tier | Nested `AGENTS.md` only (nearest wins). Records stay flat at the repo root; `scope` and `parent` tie records to components. |
+| Y8 | H5 grammar | A normative grammar with accept and reject fixtures is written into section 0 of the spec, drafted from the review's parser and the YAML evaluation's parser. Edge rules not previously decided (booleans and null, number forms, escapes, tabs, BOM, line endings) are my proposals for the maintainer to review. |
+| Y9 | YAML | Confirmed: hand-written parser, no YAML library in the tool; `go.yaml.in/yaml/v3` only in the test suite as an oracle ([[go-yaml-library-evaluation]]). |
+| Y10 | `set` and `close` commands | Added: `akmctl set <id> field=value` (refreshes `updated`) and `akmctl close <id> done|dropped` (sets the status, moves the file to `done/`, refreshes `updated`, refuses an empty Outcome). The plain-file steps are the fallback. |
+| Y11 | The spec's history | Moved out of the spec into this note. The spec keeps only normative text and points here. |
+| Y12 | ADR 261027-ensf errata | Applied as dated errata: `dropped` added to the flow, the acceptance commit hash added, the unsourced star count removed. |
+| Y13 | Secrets and private text | Optional extension `safety`: built-in patterns for well-formed credentials plus a repo-declared deny list (`docs/.akm-deny`); findings print file, line and rule, never the matched text. Narrows the C11 gap to "no check beyond known patterns and the deny list". |
+| Y14 | Work-item `summary` and `renumber` | `summary` stays optional on work items (the title is the fallback). `renumber` is not in v1; the manual repair is documented. |
+| Y15 | Grammar edge rules | Confirmed as proposed: plain booleans and null-likes are errors unless quoted; non-canonical numbers (leading zeros, floats, hex, exponents) are errors unless quoted; double-quoted strings allow only `\"` and `\\`; a tab is an error; a byte-order mark is an error; LF and CRLF both parse and are preserved on edit. |
+| Y16 | Display width for the index table | A small dependency, not the standard library alone. Exception to "standard library only": one width library, chosen by due diligence ([[261028-0snt-go-width-library-evaluation]]). Recommended instead was padding by rune count; this was the maintainer's call. **Superseded by Y28.** |
+| Y17 | Prettier pin | The latest 3.x at the time the template ships, re-tested with the review's fixtures at that point and on each bump. (3.9.10 is the version tested on 2026-10-28.) |
+| Y18 | UI packaging | A subcommand: `akmctl ui`. One binary. AKM Workbench as a separate product is not pursued for v1. |
+| Y19 | Name status | AKM and `akmctl` stay a working title; the shortlist is not reopened now. |
+| Y20 | `authored_by: agent` markers | Removed from ADR 261027-ensf, the spec, the guide, this log, the spec review and the YAML evaluation (treated as reviewed through the interviews). Other agent-authored notes (the comparison, the discovery note, the first-pass layout note, task notes) keep the marker.
+| Y21 | YAML-lite relation to YAML | Accepted 2026-10-28 as a strict subset of YAML that means the same in a YAML parser and errors on everything unsupported. The first version required quoted dates and rejected 1.1-ambiguous text; **revised by Y26** after the Obsidian test. The statement lives in section 0 of the spec and the guide's glossary (placement accepted). |
+| Y22 | The name | Stays a working title (Y19), with a revisit trigger: decide finally before the template repository is created or anything is published. |
+| Y23 | Display-width library | Run the evaluation: [[261028-0snt-go-width-library-evaluation]], started as a background session; the maintainer confirms its recommendation. |
+| Y24 | Claims and safety extension detail | The spec keeps the contract (fields, rules, the deny-list file, the `claim` and `release` commands). The built-in pattern list, the CLI flags and the file formats are owned by [[261027-xkd4-repo-records-api-spec]] and [[261027-r3hh-repo-records-go-tool]]. |
+| Y25 | Vault dogfooding and the `pkm-workbench` fit | Detail moved to their tasks: [[261027-nrwf-vault-agent-ready-migration]] and [[261027-r3hh-repo-records-go-tool]]. |
+| Y26 | YAML-lite aligned to YAML 1.2 core (Obsidian) | Accepted 2026-10-28, after the Obsidian test ([[#F. Evidence: YAML-lite against Obsidian (2026-10-28)|section F]]). Reverses Y21's date quoting and the boolean and base-60 parts of Y15: unquoted dates and timestamps, `yes`/`no`/`on`/`off`/`y`/`n` and `12:30` are plain strings (as in YAML 1.2 core and as Obsidian writes them); `true`/`false` are booleans and `null`/`~` are null; capitalised `True`/`Null` spellings, floats, hex, octal, exponents, signs other than `-`, leading zeros and underscores stay errors; keys spelled `true`/`false`/`null`/`~` are errors. The tool writes new dates unquoted. The test oracle reads date-shaped values as text. Obsidian was the tiebreaker, as the maintainer set. |
+| Y27 | A clean v1.0 spec | The spec, the guide and the ADR for the standard are working documents that carry the path to v1.0: status banners, notes such as "revised by", "accepted", "reversed", errata lines, decision-id citations and assumption tables. For the v1.0 release they are rewritten as a clean normative document that states the result and not how it was reached. History stays in this log, in the ADRs and in git. Not now: the notes are useful while decisions are still moving. Task: [[261028-j3m9-akm-spec-v1-cleanup]]. |
+| Y28 | Display width: own implementation | Supersedes Y16. No dependency: `akmctl` implements Prettier's string-width rule itself (Prettier 3.9.10's `getStringWidth`, [[go-width-library-evaluation]] Appendix B), with East Asian Wide/Fullwidth and emoji tables generated from Unicode data by a committed generator, and the evaluation's 206-cell Prettier comparison as its test. `displaywidth` is not the basis: it measures grapheme clusters, Prettier counts code points. The standard library only is restored. |
+| Y29 | Obsidian compatibility is a stated goal | AKM records must stay valid when Obsidian reads and edits them; where a design choice and Obsidian's behaviour conflict, Obsidian wins (the maintainer's tiebreaker). Obsidian is not required: a repository need not be a vault. Accepted as [[261028-zh0w-obsidian-compatibility-is-a-stated-goal]] (2026-10-28); recorded in the spec as H7. Effects so far: YAML 1.2 core, unquoted dates (Y26). Wikilinks as quoted strings in properties are valid and already used in the vault; areas still to check are listed in the ADR. |
+| Y30 | References: bare id canonical, wikilink string accepted | A frontmatter reference may be a quoted wikilink, `"[[<filename>\|<id>]]"`, which Obsidian shows as a link and keeps unchanged when it edits a property (section F). Obsidian resolves by whole filename, so `[[<id>]]` does not resolve; the wikilink must carry the slug and an id alias. The tool reads both forms, resolves by the leading id, writes bare ids unless `reference_style: wikilink`, and never rewrites existing references. Rejected: wikilink as the only form (needs the slug in every reference; breaks plain-text use, grep for an id and non-Obsidian repos); bare id only (no links, backlinks or graph in Obsidian). |
+| Y31 | Links in bodies: Markdown links are the standard, wikilinks tolerated | Generated and tool-written links (the ADR index) are relative Markdown links; Obsidian resolves them and flags broken ones. L1 (error) checks them. Wikilinks are what Obsidian writes by default, so a body may contain them: new rule L2 (warning) resolves them by filename as Obsidian does. Rejected: forbidding wikilinks (fights the maintainer's own vault, H7); checking them as errors (resolution depends on Obsidian's shortest-path rules and on filenames being unique); skipping them (broken links go unseen). |
+| Y32 | Property types and hidden files under Obsidian | Obsidian types a property by name for the whole vault (`.obsidian/types.json`), and shows a mismatch between the expected and the inferred type without changing the value. AKM ships no type settings and keeps its field names. A repo opened as a vault gets Obsidian's inferred types (`created`, `updated` date; `priority` number; `blocked_by`, `decisions` list). A vault that already types an AKM name differently resolves it on its side: this vault types `id` as number, AKM's `id` is a string, so the vault migration must decide. Dot-files (`docs/.layout`, `.agents/`, `.prettierrc.json`) are neither shown nor indexed by Obsidian; no record is a dot-file, so nothing changes, and the manifest is edited by the tool. |
+| Y33 | No field prefix; keep `id` | Considered a namespace for all fields (`akm_`, not `akm-`: it matches `blocked_by`, and `jq .akm_id` needs no quoting). Rejected: one collision (`id`, in one vault) does not justify rewriting every record and the spec; `tags`, `aliases` and `cssclasses` cannot be prefixed anyway; the clash is only a display warning. Field names stay. The vault resolves its own `id` clash in [[261027-nrwf-vault-agent-ready-migration]]. If more names collide in practice, prefix only the colliding fields (`akm_id` first) in a later version. |
+| Y34 | API spec shape | The API is specified in [[akm-api-spec]]: prose plus JSON Schema (2020-12), one schema file per operation and a `common.json`, with fixtures that validate against them. HTTP allows writes, on loopback only, with a per-run bearer token, a Host and Origin check and no CORS; writes carry an optional `if_match` etag. Rejected: read-only HTTP (the UI would need the CLI for every change); OpenAPI (more tooling, and the CLI binding needs its own description). Spec and fixtures live in the vault's design folder until the tool repository exists. |
+| Y35 | Tool licence: MIT | `akmctl` is MIT-licensed (copyright Alexander Regan). Considered: Apache-2.0 (patent grant, NOTICE attribution), MPL-2.0 (modified files stay open). MIT chosen for the widest adoption; it does not stop a closed derivative, which Alexander accepts. The repository is local only (`~/github.com/alexsasharegan/akmctl`, module `github.com/alexsasharegan/akmctl`); the Unicode data under `internal/width/data` keeps the Unicode licence. |
+| Y36 | `migrate` and `safety` as built | `migrate` is declarative steps embedded in the binary (rename_field, set_default, rename_heading, move_file, add_file, manual), searched as a chain between layout versions; `apply_safe` needs `acknowledge_backup`, a clean git tree, makes a tag and a branch, logs to `docs/.migrate-log` and never commits; the manifest moves only when no manual step remains; this release embeds no migrations. `safety` gained SF4 (allow markers), `re:` for regular deny entries, URL and hash exclusions for SF3. `check --target` classifies findings by the steps' `fixes`; only the tool's own layout version can be a target. |
+| Y37 | Release and hosting | Five platforms (macOS arm64 and amd64, Linux amd64 and arm64, Windows amd64) built by `scripts/release.sh` with the standard Go toolchain (CGO off, trimpath, version stamped with a linker flag), archived with SHA256SUMS; a GitHub Actions workflow runs the script on a `v*` tag and uploads the archives. No GoReleaser. First version v0.1.0 (pre-1.0, the CLI and API may still change). The repository `alexsasharegan/akmctl` is on GitHub, private, with the name as a working title (Y22): renaming a private repository is cheap, publishing it publicly is the step Y22 says to wait on. |
+| Y38 | The clean v1.0 text | Done, with Alexander's choices: the name is final (the standard is AKM, the tool is `akmctl`; Y22 is closed); the text was rewritten in place, so note names and links stay and git holds the earlier text; ADR 261027-ensf (with its errata) and ADR 261028-zh0w stay as the record, with no consolidated ADR; the API spec was included. Removed: banners and status notes, decision-id citations (D, O, X, Y), links into the vault (tasks, evaluation notes, this log), the pointer section, first-person history and dates of acceptance. Added: the contract clauses C1 to C12 are defined in the specification (section 9) because the comparison note that defined them is history. Kept: every rule id, requirement, principle and fixture. The tool's CLI table was corrected to what `akmctl` 0.1 does (`--count-only`, `migrate --mode`, exit code 2 for any refused or failed command). `CHANGELOG` and `VERSION` files belong to the template repository. |
+| Y39 | UI port decisions | Decided by Alexander on 2026-10-28 after the planning report: client-rendered vanilla JS over `/api/v1` (no framework, no build); live updates by polling about every 2 s, no event stream; the token stays in the URL fragment, no cookie and no state file; the generic wizard rules come from the standard (WK5 to WK7), the vault-specific ADR questions stay in `pkm-wb`; the four Monaspace fonts are bundled unmodified (about 2.3 MB, OFL). The body-write additions the port needs (a `section` operation, `outcome` on `close`, `dry_run` with a `diff`, `version.repository`, the documented `details.etag` on `stale`) go into API 1.0 itself, not a 1.1: no consumer of 1.0 exists, so the spec is edited in place until it is published. `pkm-wb` is frozen with a pointer, and retired when the vault migrates. Task: [[261028-a149-akmctl-ui-port-pkm-workbench]]. |
+| Y40 | UI finish decisions | Made by the implementing agent, then settled by Alexander on 2026-10-28: the Obsidian link is always `obsidian://open?path=<absolute path>` (the repository root need not be the vault root; the `vault=&file=` form was dropped; tested by opening a vault note this way, which worked); the `--obsidian-vault` flag and the `obsidian_vault` config field are now unused. The link is hidden when the root is unknown. Moving a card out of blocked asks whether to clear `blocked_by` (default yes, a `null` in `set`). Leaving active for ready or raw releases a claim first when claims are on. Takeover of another holder's claim uses a browser confirm, not the wizard. Task: [[261028-a149-akmctl-ui-port-pkm-workbench]]. |
+| Y41 | Vault migration scope | Decided by Alexander on 2026-10-28: the first migration covers tasks and ADRs (`9 pkm/tasks/` and `9 pkm/adr/`); every vault-specific task field is converted to the AKM form (`created_at`/`updated_at` to `created`/`updated`, `project` and `origin` and `adr` folded into AKM fields); task files are renamed to `<id>-<slug>.md` with no link lost, either by renaming through Obsidian (which rewrites links) or by a scripted link rewrite. He grants scoped approval to edit past periodic notes only to repair links to renamed notes (see the task note for the exact scope). Plan first, then a run on a copy of the vault. Task: [[261027-nrwf-vault-agent-ready-migration]]. |
+| Y42 | Vault migration mechanics | Decided by Alexander on 2026-10-28 after a pilot: the vault keeps its tasks and ADRs inside the vault under `9 pkm/`, and the manifest maps them (optional keys `work_dir`, `adr_dir`, `roadmap`, defaults `docs/work`, `docs/adr`, `docs/ROADMAP.md`; renaming the canonical folders is not advised); `project`, `origin` and `adr` stay as extra fields (no folding into `parent` or `decisions`); links are repaired by renaming through Obsidian, not by a scripted rewrite. Pilot: renaming `2026-10-26 task-status-vocabulary` (47 links in 46 files) through the `obsidian` CLI rewrote every link, frontmatter links included, and a masked comparison showed only the link text changed in all 46 files; Obsidian writes `[[new-name]]` with no alias, so the readable old name is lost in prose, and Alexander accepted that. The pilot was reverted from the tag `pre-pilot-rename`. Consequence for the tool: `mint_ids` must be able to emit the old-to-new rename map and write the `id` field without renaming on disk, so Obsidian does the renames. Task: [[261027-nrwf-vault-agent-ready-migration]]. |
+| Y43 | The vault migration run | Done on 2026-10-28 by following [[vault-migration-runbook]] on the branch `migrate-0.0.0-to-1.0.0` (tags `pre-akm-migration`, `pre-migrate-0.0.0-to-1.0.0`), then fast-forwarded into `main`: 124 tasks and 21 ADRs got ids, `title`, `created`/`updated` and (tasks) a `## Goal` scaffold; 76 closed tasks moved to `tasks/done/`; 145 renames ran through the Obsidian CLI in 92 seconds, and Obsidian rewrote the links. Verification after the run: link multiset equal except the two sweep links repaired by the dependents patch, masked diff clean, no unresolved link added, 67 Shavian-containing files changed in link spans only. Findings: Obsidian does not see `.agents/` (3 links repaired by hand); Templater evaluated `<% %>` in one moved note while the tool created it (restored by hand; check for Templater's trigger on new files); `akmctl` dates ids in UTC, so late-evening ids carry tomorrow's date. `akmctl check`: 0 errors, 47 warnings (45 RM4, 2 L2). |
+
+Mechanical fixes made the same day (no decision needed): see the log of [[261028-1z36-akm-spec-open-questions]].
+
+## D. Still open
+
+- **v1.0 cleanup (Y27):** [[261028-j3m9-akm-spec-v1-cleanup]].
+- **Obsidian compatibility (Y29):** the ADR is a draft awaiting the maintainer's acceptance; the areas to check are listed in it.
+- **Name (Y22):** AKM and `akmctl` are a working title. Revisit trigger: decide finally before the template repository is created or anything is published. The overlap with `itlackey/akm`, the AgenticAKM paper and AKM as a research term is accepted knowingly ([[261027-ensf-akm-an-agent-knowledge-management]]).
+
+Quoted dates and the vault are no longer a problem (Y26). Everything else that was open is decided above or owned by a task: [[261027-xkd4-repo-records-api-spec]], [[261027-r3hh-repo-records-go-tool]], [[261027-nrwf-vault-agent-ready-migration]].
+
+## E. Evidence: YAML-lite against a YAML 1.2 parser (2026-10-28)
+
+> **Partly superseded by Y26.** This test was run against the first draft of YAML-lite. After the Obsidian test the subset accepts unquoted dates, `yes`/`no`/`on`/`off` and `12:30` as strings (as YAML 1.2 core does), and supports `true`, `false` and `null`. The findings about the oracle still hold: it decodes date-shaped values as timestamps, so the test reads them as text.
+
+Run with `go.yaml.in/yaml/v3` v3.0.5 (Go 1.27, scratch directory) over 26 one-block inputs, decoding into `map[string]any`. Findings:
+
+- Every input the subset accepts decoded to the same data. The one place YAML-lite first differed, `created: 2026-10-28` (returned as a timestamp, `time.Time`), was then made to require quotes (Y21) and is now accepted again as a string (Y26); the oracle reads date-shaped values as text.
+- Inputs the subset rejects but YAML accepts (so the subset is stricter, as stated): `priority: 02` and `+2` (decoded as the integer 2), `layout: 1.2` (a float), `blocked_by: [a, [b]]` (nested), `note: &x value` (an anchor), `text: |` (a block scalar), boolean-like `done: yes` (decoded as the string `yes` by this 1.2 parser; YAML 1.1 reads a boolean), `gone: ~` (null), `time: 12:30` (a string here; YAML 1.1 reads a base-60 integer).
+- `tags:` with items `- a` and an over-indented `- b` is not an error in YAML: it is one multi-line plain scalar, `a - b`. The subset rejects it, which is why block-list items must share one indentation.
+- Inputs both reject: `title: Add: a thing`, `blocked_by: [a,,b]`, `x: ]a`, and a duplicate key.
+- Not checked: the key `on` (a boolean in YAML 1.1; a string here), added to the rules as an error; PyYAML or other 1.1 parsers; CRLF files; tabs.
+
+A condensed version of the program used:
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	yaml "go.yaml.in/yaml/v3"
+)
+
+func main() {
+	cases := []string{
+		"status: active", "priority: 2", "priority: 02", "priority: +2",
+		"created: 2026-10-28", "layout: 1.0.0", "layout: 1.2", "time: 12:30",
+		"id: 261027-m3qz", "title: Add: a thing", "done: yes", "gone: ~",
+		"blocked_by: [a, [b]]", "blocked_by: [a,,b]", "tags:\n- a\n   - b",
+		"owner: x\nowner: y", "note: &x value", "text: |\n  a", "x: ]a", "on: x",
+	}
+	for _, in := range cases {
+		var m map[string]any
+		err := yaml.Unmarshal([]byte(strings.ReplaceAll(in, "\\n", "\n")), &m)
+		fmt.Printf("%-24q -> %v (err: %v)\n", in, m, err)
+	}
+}
+```
+
+## F. Evidence: YAML-lite against Obsidian (2026-10-28)
+
+Question from the maintainer: does Obsidian read quoted dates as dates, and what does its conformance do? If YAML-lite breaks Obsidian, Obsidian wins (the tiebreaker).
+
+Method: Obsidian 1.14.5 on the vault "Deep Thought", driven through `obsidian eval` (the CLI's devtools). Four throwaway notes in `0 Inbox/`, using properties already typed as date (`created_at`, `updated_at`), so no property types were changed. The notes were deleted afterwards and never committed (autosave did not run in between); `types.json` is unchanged.
+
+**Reading (three variants of `created_at: 2026-10-28`: unquoted, double-quoted, single-quoted).** All three come back from `app.metadataCache` as the same JavaScript string `"2026-10-28"`. Quoting is invisible to Obsidian when it reads.
+
+**Type inference.** `app.metadataTypeManager.getTypeInfo('created_at', value)` infers `date` for the strings `2026-10-28` and `2026-10-28T14:30` (and the number 20261028), and `text` for `not a date` and `2026-13-45`. The "expected" type is `date` from `types.json`. A mismatch between expected and inferred is what Obsidian flags. Because the value is the same string either way, a quoted date is a date to Obsidian. (One web summary said a quoted date infers as text; the test shows it does not.)
+
+**Writing.** `app.fileManager.processFrontMatter` is the call behind the Properties panel and most plugins. An unrelated edit (`status: done`) rewrote the whole block from a parsed object, identically for all three variants:
+
+- quoted dates become unquoted (`created_at: "2026-10-28"` to `created_at: 2026-10-28`);
+- the `# a comment` line is dropped;
+- the inline list `[one, two]` becomes a block list (two-space indent);
+- unneeded quotes are removed (`'single'` to `single`);
+- key order is kept; long lines are not folded.
+
+A second note with edge-case string values showed what Obsidian leaves unquoted and what it quotes:
+
+| Value | Obsidian writes | YAML-lite as drafted (Y21) |
+|---|---|---|
+| `"2026-10-28"`, `"2026-10-28T14:30"` | unquoted | rejects unquoted dates and timestamps |
+| `"yes"`, `"on"` | unquoted | rejects (boolean spellings) |
+| `"12:30"` | unquoted | rejects (base-60 form) |
+| true (a checkbox property) | `true` | rejects |
+| `"1.2"`, `"02"`, `"~"`, `"null"` | quoted | fine |
+| `"a: b"`, `"a #b"`, `"- x"`, `"[x]"`, `""` | quoted | fine |
+| `"1.0.0"`, `"261027-m3qz"`, long 160-character text, `café 日本 😀`, `say "hi"` | unquoted, unfolded | fine |
+| null | empty value | fine (empty is null) |
+
+**Conclusion.** Obsidian reads the quoted form as a date, but it rewrites dates unquoted on the first property edit, and it leaves `yes`, `on`, `12:30` and timestamps unquoted. Requiring quoted dates (Y21) would make every Obsidian-edited note fail validation. Obsidian is the tiebreaker, so Y21 cannot stand as drafted.
+
+**Not tested:** the Properties panel dialogs themselves (for example any prompt when changing a property's type); only the API calls behind them. Obsidian versions other than 1.14.5. Plugins (the Linter, for instance) that change how frontmatter is written.
+
+**Wikilinks in properties (Obsidian 1.14.5, 2026-10-28; Y30).** One throwaway note in `0 Inbox/`, deleted afterwards. `parent: "[[note]]"`, `"[[note|alias]]"` and a quoted wikilink inside a block list are all listed by `app.metadataCache` as frontmatter links (display text is the alias when given). `processFrontMatter` left the quoted wikilinks byte-for-byte unchanged on an unrelated edit. `getFirstLinkpathDest` finds a note by its whole name and returns nothing for a name prefix (`2026-10-28` finds no note), so a link to a record needs the full filename. The vault already holds 179 notes with a quoted wikilink property. Not tested: link updating when a target is renamed (`alwaysUpdateLinks` is on in this vault).
+
+**Links in bodies (Obsidian 1.14.5, 2026-10-28; Y31).** One throwaway note in `0 Inbox/`, deleted afterwards. `[t](../9%20pkm/adr/ADR-020.md)` and `[t](<../9 pkm/adr/ADR-020.md>)` resolve to the note; a link to a missing file is listed in `unresolvedLinks`; the same path with a bare space and no angle brackets is not recognised as a link at all. `[[ADR-020]]` and `[[ADR-020|x]]` resolve by filename.
+
+**Property types and dot-files (Obsidian 1.14.5, 2026-10-28; Y32).** Read-only, with `app.metadataTypeManager.getTypeInfo`. `id` is expected as `number` in this vault (`types.json`); the AKM value `261027-m3qz` is inferred as `text`, a mismatch, while the number `20` matches. `created` (date string), `priority` (integer), `blocked_by` (list) and `parent` (string) come back with expected equal to inferred. `app.vault` holds no dot-files, though the vault folder contains one (`.tmp`). Not tested: how the Properties panel displays a mismatch.
+
+**Recommended change (accepted as Y26).** Align YAML-lite to YAML 1.2 **core schema**, the schema Obsidian reads and writes: an unquoted `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` is a string (as in 1.2 core); `yes`, `no`, `on`, `off`, `y`, `n` and `12:30` are plain strings (as in 1.2 core); `true` and `false` are booleans and `null`/`~` are null, both supported; floats, hex, octal, exponents, signs other than `-` and leading zeros stay errors (Obsidian quotes strings that look like them). The claim becomes "a strict subset of YAML 1.2 core; YAML 1.1 parsers and go-yaml's generic decode differ on dates, `yes`/`no` and base-60, so the test oracle reads date-shaped values as text." The tool writes new dates unquoted, as Obsidian does. This reverses Y21's date quoting and the boolean and base-60 parts of Y15. Accepted by the maintainer on 2026-10-28.
+

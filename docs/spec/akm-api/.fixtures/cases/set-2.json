@@ -1,0 +1,29 @@
+{
+  "name": "blocked needs blocked_by",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "status": "blocked"
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261022-e5f6",
+      "changes": {
+        "status": "blocked"
+      }
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "status blocked needs a non-empty blocked_by",
+      "details": {
+        "reason": "rule",
+        "rule": "WK5"
+      }
+    }
+  }
+}

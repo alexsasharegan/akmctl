@@ -1,0 +1,723 @@
+{
+  "from": "0.0.0",
+  "to": "1.0.0",
+  "steps": [
+    {
+      "id": "conventions",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "ADR conventions note moves beside the design notes (adr/README.md becomes the generated index).",
+      "from": "Deep Thought/9 pkm/adr/README.md",
+      "to": "Deep Thought/9 pkm/design/adr-conventions.md"
+    },
+    {
+      "id": "candidates",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "ADR Candidates moves beside the conventions note.",
+      "from": "Deep Thought/9 pkm/adr/ADR Candidates.md",
+      "to": "Deep Thought/9 pkm/design/ADR Candidates.md"
+    },
+    {
+      "id": "done-001",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 adr-base-and-hub.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 adr-base-and-hub.md"
+    },
+    {
+      "id": "done-002",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 adr-sweep-watermark.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 adr-sweep-watermark.md"
+    },
+    {
+      "id": "done-003",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 ai-authored-marker.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 ai-authored-marker.md"
+    },
+    {
+      "id": "done-004",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 backups-before-bulk-ai.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 backups-before-bulk-ai.md"
+    },
+    {
+      "id": "done-005",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 ballot-deadline.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 ballot-deadline.md"
+    },
+    {
+      "id": "done-006",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 ballot-research-plan.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 ballot-research-plan.md"
+    },
+    {
+      "id": "done-007",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 base-and-hub-standard.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 base-and-hub-standard.md"
+    },
+    {
+      "id": "done-008",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 correct-pkm-backup-docs.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 correct-pkm-backup-docs.md"
+    },
+    {
+      "id": "done-009",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 declare-core-fields.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 declare-core-fields.md"
+    },
+    {
+      "id": "done-010",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 hub-hsa-claims.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 hub-hsa-claims.md"
+    },
+    {
+      "id": "done-011",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 hub-life-notes.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 hub-life-notes.md"
+    },
+    {
+      "id": "done-012",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 hub-obligations.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 hub-obligations.md"
+    },
+    {
+      "id": "done-013",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 moc-style-guide-skill.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 moc-style-guide-skill.md"
+    },
+    {
+      "id": "done-014",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 personal-lexicon.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 personal-lexicon.md"
+    },
+    {
+      "id": "done-015",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 rails-files-location.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 rails-files-location.md"
+    },
+    {
+      "id": "done-016",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 review-september-2026.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 review-september-2026.md"
+    },
+    {
+      "id": "done-017",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 revisit-rails-checklist.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 revisit-rails-checklist.md"
+    },
+    {
+      "id": "done-018",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 rsync-failing.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 rsync-failing.md"
+    },
+    {
+      "id": "done-019",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 settle-draft-adr-id.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 settle-draft-adr-id.md"
+    },
+    {
+      "id": "done-020",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 sleep-in-monthly-review.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 sleep-in-monthly-review.md"
+    },
+    {
+      "id": "done-021",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 task-lifecycle-skill.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 task-lifecycle-skill.md"
+    },
+    {
+      "id": "done-022",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 task-lifecycle-v1-1.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 task-lifecycle-v1-1.md"
+    },
+    {
+      "id": "done-023",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 task-triage-skill.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 task-triage-skill.md"
+    },
+    {
+      "id": "done-024",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 template-conformance-test.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 template-conformance-test.md"
+    },
+    {
+      "id": "done-025",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-111-w39.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-111-w39.md"
+    },
+    {
+      "id": "done-026",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-111-w40.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-111-w40.md"
+    },
+    {
+      "id": "done-027",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-111-w41.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-111-w41.md"
+    },
+    {
+      "id": "done-028",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-111.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-111.md"
+    },
+    {
+      "id": "done-029",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-79-w41.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-79-w41.md"
+    },
+    {
+      "id": "done-030",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-79-w42.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-79-w42.md"
+    },
+    {
+      "id": "done-031",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 transcribe-fn-79-w43.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 transcribe-fn-79-w43.md"
+    },
+    {
+      "id": "done-032",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 update-w39.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 update-w39.md"
+    },
+    {
+      "id": "done-033",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 update-w40.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 update-w40.md"
+    },
+    {
+      "id": "done-034",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 update-w41.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 update-w41.md"
+    },
+    {
+      "id": "done-035",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 update-w42.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 update-w42.md"
+    },
+    {
+      "id": "done-036",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 update-weeks-for-fn-111.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 update-weeks-for-fn-111.md"
+    },
+    {
+      "id": "done-037",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 vendor-readlex.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 vendor-readlex.md"
+    },
+    {
+      "id": "done-038",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-20 verify-backup-schedulers.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-20 verify-backup-schedulers.md"
+    },
+    {
+      "id": "done-039",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 backfill-notebook-chain-2026.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 backfill-notebook-chain-2026.md"
+    },
+    {
+      "id": "done-040",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 notebook-chain-conventions.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 notebook-chain-conventions.md"
+    },
+    {
+      "id": "done-041",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 php-rce-patch.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 php-rce-patch.md"
+    },
+    {
+      "id": "done-042",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 project-list-base-or-moc.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 project-list-base-or-moc.md"
+    },
+    {
+      "id": "done-043",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 registry-reconciliation.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 registry-reconciliation.md"
+    },
+    {
+      "id": "done-044",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 unregistered-fields.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 unregistered-fields.md"
+    },
+    {
+      "id": "done-045",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 vault-map-moc-type.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 vault-map-moc-type.md"
+    },
+    {
+      "id": "done-046",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-21 weekly-review-notebook-gather.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-21 weekly-review-notebook-gather.md"
+    },
+    {
+      "id": "done-047",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 aei-amex-outside-activity-approval.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 aei-amex-outside-activity-approval.md"
+    },
+    {
+      "id": "done-048",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 backfill-sleep-w36-w37.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 backfill-sleep-w36-w37.md"
+    },
+    {
+      "id": "done-049",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 correct-sep1-shavian-quote.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 correct-sep1-shavian-quote.md"
+    },
+    {
+      "id": "done-050",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 grant-repo-access-and-commit-26fin-aei.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 grant-repo-access-and-commit-26fin-aei.md"
+    },
+    {
+      "id": "done-051",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 monthly-review-skill-fixes.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 monthly-review-skill-fixes.md"
+    },
+    {
+      "id": "done-052",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 shavian-off-limits.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 shavian-off-limits.md"
+    },
+    {
+      "id": "done-053",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 weekly-review-skill-fixes.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 weekly-review-skill-fixes.md"
+    },
+    {
+      "id": "done-054",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-23 yearly-backup-archive.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-23 yearly-backup-archive.md"
+    },
+    {
+      "id": "done-055",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-24 html-views-poc.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-24 html-views-poc.md"
+    },
+    {
+      "id": "done-056",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-24 local-views-server-design.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-24 local-views-server-design.md"
+    },
+    {
+      "id": "done-057",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-24 resume-state-and-mode.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-24 resume-state-and-mode.md"
+    },
+    {
+      "id": "done-058",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-24 session-start-boot-hook.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-24 session-start-boot-hook.md"
+    },
+    {
+      "id": "done-059",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-24 user-level-agent-file.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-24 user-level-agent-file.md"
+    },
+    {
+      "id": "done-060",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-25 build-pkm-workbench.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-25 build-pkm-workbench.md"
+    },
+    {
+      "id": "done-061",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-25 bujo-blog-summary-cards.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-25 bujo-blog-summary-cards.md"
+    },
+    {
+      "id": "done-062",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-25 bujo-youtube-channel-summaries.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-25 bujo-youtube-channel-summaries.md"
+    },
+    {
+      "id": "done-063",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-25 gemini-schemas-to-templates.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-25 gemini-schemas-to-templates.md"
+    },
+    {
+      "id": "done-064",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-25 summary-card-template.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-25 summary-card-template.md"
+    },
+    {
+      "id": "done-065",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-25 youtube-to-summary-pipeline.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-25 youtube-to-summary-pipeline.md"
+    },
+    {
+      "id": "done-066",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-26 agent-ready-repo-layout-spike.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-26 agent-ready-repo-layout-spike.md"
+    },
+    {
+      "id": "done-067",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-26 repos-hub.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-26 repos-hub.md"
+    },
+    {
+      "id": "done-068",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-26 task-status-vocabulary.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-26 task-status-vocabulary.md"
+    },
+    {
+      "id": "done-069",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-27 go-yaml-library-evaluation.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-27 go-yaml-library-evaluation.md"
+    },
+    {
+      "id": "done-070",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-27 repo-records-api-spec.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-27 repo-records-api-spec.md"
+    },
+    {
+      "id": "done-071",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-27 repo-records-go-tool.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-27 repo-records-go-tool.md"
+    },
+    {
+      "id": "done-072",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-28 akm-spec-open-questions.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-28 akm-spec-open-questions.md"
+    },
+    {
+      "id": "done-073",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-28 akm-spec-v1-cleanup.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-28 akm-spec-v1-cleanup.md"
+    },
+    {
+      "id": "done-074",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-28 akmctl-dogfood-akm-layout.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-28 akmctl-dogfood-akm-layout.md"
+    },
+    {
+      "id": "done-075",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-28 akmctl-ui-port-pkm-workbench.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-28 akmctl-ui-port-pkm-workbench.md"
+    },
+    {
+      "id": "done-076",
+      "kind": "move_file",
+      "class": "auto",
+      "description": "Closed task moves to done/.",
+      "from": "Deep Thought/9 pkm/tasks/2026-10-28 go-width-library-evaluation.md",
+      "to": "Deep Thought/9 pkm/tasks/done/2026-10-28 go-width-library-evaluation.md"
+    },
+    {
+      "id": "task-created",
+      "kind": "rename_field",
+      "class": "auto",
+      "description": "created_at -> created",
+      "dir": "Deep Thought/9 pkm/tasks",
+      "recursive": true,
+      "from": "created_at",
+      "to": "created"
+    },
+    {
+      "id": "task-updated",
+      "kind": "rename_field",
+      "class": "auto",
+      "description": "updated_at -> updated",
+      "dir": "Deep Thought/9 pkm/tasks",
+      "recursive": true,
+      "from": "updated_at",
+      "to": "updated"
+    },
+    {
+      "id": "task-title",
+      "kind": "title_from_h1",
+      "class": "auto",
+      "description": "title from the first heading",
+      "dir": "Deep Thought/9 pkm/tasks",
+      "recursive": true
+    },
+    {
+      "id": "task-goal",
+      "kind": "goal_scaffold",
+      "class": "auto",
+      "description": "mechanical ## Goal scaffold (review the open ones)",
+      "dir": "Deep Thought/9 pkm/tasks",
+      "recursive": true
+    },
+    {
+      "id": "task-ids",
+      "kind": "mint_ids",
+      "class": "auto",
+      "description": "ids from created; files NOT renamed (Obsidian renames them)",
+      "dir": "Deep Thought/9 pkm/tasks",
+      "recursive": true,
+      "date_field": "created",
+      "rename": false,
+      "seed": "vault-tasks-2026-10"
+    },
+    {
+      "id": "adr-number",
+      "kind": "rename_field",
+      "class": "auto",
+      "description": "numeric id -> adr_number",
+      "dir": "Deep Thought/9 pkm/adr",
+      "from": "id",
+      "to": "adr_number"
+    },
+    {
+      "id": "adr-date",
+      "kind": "copy_field",
+      "class": "auto",
+      "description": "date = created_at",
+      "dir": "Deep Thought/9 pkm/adr",
+      "from": "created_at",
+      "to": "date"
+    },
+    {
+      "id": "adr-ids",
+      "kind": "mint_ids",
+      "class": "auto",
+      "description": "ids from created_at; files NOT renamed (Obsidian renames them)",
+      "dir": "Deep Thought/9 pkm/adr",
+      "date_field": "created_at",
+      "rename": false,
+      "seed": "vault-adr-2026-10"
+    },
+    {
+      "id": "adr-created",
+      "kind": "rename_field",
+      "class": "auto",
+      "description": "created_at -> created",
+      "dir": "Deep Thought/9 pkm/adr",
+      "from": "created_at",
+      "to": "created"
+    },
+    {
+      "id": "adr-updated",
+      "kind": "rename_field",
+      "class": "auto",
+      "description": "updated_at -> updated",
+      "dir": "Deep Thought/9 pkm/adr",
+      "from": "updated_at",
+      "to": "updated"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/section.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "replace",
+            "append"
+          ]
+        },
+        "if_match": {
+          "$ref": "common.json#/$defs/etag"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "section"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "record": {
+              "$ref": "common.json#/$defs/record"
+            },
+            "diff": {
+              "$ref": "common.json#/$defs/diff"
+            },
+            "section": {
+              "$ref": "common.json#/$defs/section_text"
+            },
+            "changed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "record",
+            "section",
+            "changed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

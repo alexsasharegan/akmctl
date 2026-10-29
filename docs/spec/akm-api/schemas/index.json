@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/index.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "dry_run": {
+          "type": "boolean"
+        },
+        "include_content": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "index"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "path": {
+              "$ref": "common.json#/$defs/path"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "written": {
+              "type": "boolean"
+            },
+            "content": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "path",
+            "changed",
+            "written"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

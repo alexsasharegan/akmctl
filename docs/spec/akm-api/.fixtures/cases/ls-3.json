@@ -1,0 +1,42 @@
+{
+  "name": "accepted ADRs",
+  "repo": "basic",
+  "request": {
+    "type": "adr",
+    "status": [
+      "accepted"
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "type": "adr",
+      "status": [
+        "accepted"
+      ]
+    },
+    "ok": true,
+    "total": 1,
+    "count": 1,
+    "records": [
+      {
+        "id": "261012-p3q4",
+        "type": "adr",
+        "path": "docs/adr/261012-p3q4-store-records-as-markdown-files.md",
+        "id_date": "2026-10-12",
+        "etag": "1171b8ae1d3054b7",
+        "fields": {
+          "id": "261012-p3q4",
+          "title": "Store records as Markdown files",
+          "summary": "Records are Markdown files with frontmatter; read this before changing the format.",
+          "status": "accepted",
+          "date": "2026-10-12",
+          "scope": [
+            "docs/"
+          ]
+        }
+      }
+    ]
+  }
+}

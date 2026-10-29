@@ -1,0 +1,51 @@
+{
+  "name": "three errors",
+  "repo": "broken",
+  "request": {
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "check",
+    "request": {
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "clean": false,
+    "errors": 3,
+    "warnings": 0,
+    "count": 3,
+    "findings": [
+      {
+        "rule": "RM1",
+        "severity": "E",
+        "file": "docs/ROADMAP.md",
+        "line": 8,
+        "id": null,
+        "message": "roadmap entry 261099-bbbb does not resolve to a work item",
+        "class": null
+      },
+      {
+        "rule": "WK6",
+        "severity": "E",
+        "file": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "line": null,
+        "id": "261020-a2b3",
+        "message": "status active requires a non-empty ## Next",
+        "class": null
+      },
+      {
+        "rule": "WK4",
+        "severity": "E",
+        "file": "docs/work/261022-e5f6-document-the-exit-codes.md",
+        "line": 5,
+        "id": "261022-e5f6",
+        "message": "parent 261099-aaaa does not resolve to an existing item",
+        "class": null
+      }
+    ],
+    "reconcile": {
+      "state": "current"
+    }
+  }
+}

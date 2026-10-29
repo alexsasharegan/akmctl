@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/close.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "done",
+            "dropped"
+          ]
+        },
+        "if_match": {
+          "$ref": "common.json#/$defs/etag"
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "close"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "record": {
+              "$ref": "common.json#/$defs/record"
+            },
+            "moved_from": {
+              "$ref": "common.json#/$defs/path"
+            },
+            "moved_to": {
+              "$ref": "common.json#/$defs/path"
+            },
+            "diff": {
+              "$ref": "common.json#/$defs/diff"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "record",
+            "moved_from",
+            "moved_to"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

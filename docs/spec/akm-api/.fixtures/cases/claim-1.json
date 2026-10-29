@@ -1,0 +1,46 @@
+{
+  "name": "claim a ready item",
+  "repo": "claims",
+  "request": {
+    "id": "261022-e5f6",
+    "as": "agent-1",
+    "as_of": "2026-10-28T09:30"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "claim",
+    "request": {
+      "id": "261022-e5f6",
+      "as": "agent-1",
+      "as_of": "2026-10-28T09:30"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "7386e8551c778ec1",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": null,
+        "status": "active",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": null,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "authored_by": null,
+        "decisions": null,
+        "claimed_by": "agent-1",
+        "claimed_at": "2026-10-28T09:30"
+      }
+    },
+    "previous_holder": null
+  },
+  "after": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: active\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Log\n- 2026-10-28: claimed (agent-1).\n"
+  }
+}

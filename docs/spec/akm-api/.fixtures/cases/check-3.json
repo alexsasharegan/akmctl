@@ -1,0 +1,39 @@
+{
+  "name": "one rule family",
+  "repo": "broken",
+  "request": {
+    "rules": [
+      "RM"
+    ],
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "check",
+    "request": {
+      "rules": [
+        "RM"
+      ],
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "clean": false,
+    "errors": 1,
+    "warnings": 0,
+    "count": 1,
+    "findings": [
+      {
+        "rule": "RM1",
+        "severity": "E",
+        "file": "docs/ROADMAP.md",
+        "line": 8,
+        "id": null,
+        "message": "roadmap entry 261099-bbbb does not resolve to a work item",
+        "class": null
+      }
+    ],
+    "reconcile": {
+      "state": "current"
+    }
+  }
+}

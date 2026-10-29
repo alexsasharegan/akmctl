@@ -1,0 +1,24 @@
+{
+  "name": "an empty Outcome refuses",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "status": "done"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "close",
+    "request": {
+      "id": "261020-a2b3",
+      "status": "done"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261020-a2b3 has no ## Outcome; write it before closing",
+      "details": {
+        "reason": "empty_outcome"
+      }
+    }
+  }
+}

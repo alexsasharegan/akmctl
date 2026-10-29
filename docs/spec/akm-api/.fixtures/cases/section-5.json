@@ -1,0 +1,26 @@
+{
+  "name": "the Log section cannot be replaced",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "name": "Log",
+    "text": "- rewritten"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "section",
+    "request": {
+      "id": "261020-a2b3",
+      "name": "Log",
+      "text": "- rewritten"
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "the Log section is append-only: use mode append",
+      "details": {
+        "parameter": "mode"
+      }
+    }
+  }
+}

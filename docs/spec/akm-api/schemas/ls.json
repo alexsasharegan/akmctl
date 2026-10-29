@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/ls.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "common.json#/$defs/record_type"
+        },
+        "status": {
+          "type": "array",
+          "items": {
+            "$ref": "common.json#/$defs/any_status"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "blocked": {
+          "type": "boolean"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "since": {
+          "$ref": "common.json#/$defs/date"
+        },
+        "sort": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count_only": {
+          "type": "boolean"
+        },
+        "next": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "ls"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "total": {
+              "type": "integer"
+            },
+            "count": {
+              "type": "integer"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/record"
+              }
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "total",
+            "count",
+            "records"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

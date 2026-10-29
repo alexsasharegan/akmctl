@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/version.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "version"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "tool": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "version"
+              ],
+              "additionalProperties": false
+            },
+            "api_versions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "layout_versions": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/version"
+              }
+            },
+            "extensions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "repository": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "layout": {
+                      "$ref": "common.json#/$defs/version"
+                    },
+                    "extensions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "reference_style": {
+                      "enum": [
+                        "id",
+                        "wikilink"
+                      ]
+                    },
+                    "claim_stale_hours": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "work_dir": {
+                      "$ref": "common.json#/$defs/path"
+                    },
+                    "adr_dir": {
+                      "$ref": "common.json#/$defs/path"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "layout",
+                    "extensions",
+                    "reference_style",
+                    "claim_stale_hours",
+                    "work_dir",
+                    "adr_dir"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "tool",
+            "api_versions",
+            "layout_versions",
+            "extensions",
+            "repository"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}
