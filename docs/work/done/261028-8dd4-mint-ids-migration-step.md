@@ -24,6 +24,7 @@ Done when:
 - [x] Fixtures in `testdata/` cover a batch with a date field, one without, and a collision.
 
 ## Outcome
+
 mint_ids is built: a migrate step that, for each Markdown file in a directory with no id, mints an id (date from a chosen field, today otherwise; unique in the batch and across docs/adr, docs/work and docs/work/done), renames it to <id>-<slug>.md, writes id first and quoted, and reports references to the old name without rewriting them. It runs in report, plan, apply_safe and handoff, never commits, and a second run changes nothing. No migration embeds it yet. The ids shown by plan are examples: apply draws again. CI passed on Linux, macOS and Windows.
 
 ## Log
