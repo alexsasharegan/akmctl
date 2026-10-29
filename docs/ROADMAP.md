@@ -4,7 +4,6 @@
 
 ## Next
 
-- [261028-8dd4] Build the mint_ids migration step: the vault migration needs it
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
 
 ## Later
