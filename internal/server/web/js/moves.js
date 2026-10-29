@@ -72,6 +72,7 @@ export function planMove(i) {
   if (NEEDS_NEXT.includes(i.to) && !has("next")) steps.push("next");
   if (i.to === "blocked" && !(i.blockedBy || []).length) steps.push("blocked_by");
   if (CLOSED.includes(i.to) && !has("outcome")) steps.push("outcome");
+  if (i.from === "blocked" && !CLOSED.includes(i.to) && i.to !== "blocked" && (i.blockedBy || []).length) steps.push("unblock");
   if (i.to === "done") steps.push("decision");
   const gated = steps.length > 0 || ALWAYS_REVIEWED.includes(i.to);
   if (gated && i.claims && i.to === "active") steps.push("identity");
@@ -98,17 +99,20 @@ export function buildOps(i, a) {
   if (i.to === "done" && (d.mode === "link" || d.mode === "new")) {
     ops.push({ kind: "set", changes: { decisions: uniq([...(i.decisions || []), d.mode === "new" ? NEW_ADR : d.id]) } });
   }
+  const unblock = i.from === "blocked" && a.unblock !== false && (i.blockedBy || []).length;
   switch (i.to) {
     case "raw":
     case "ready":
-      ops.push({ kind: "set", changes: { status: i.to } });
+      // leaving active with a claim: release it first (claims on)
+      if (i.claims && i.from === "active" && i.claimed) ops.push({ kind: "release" });
+      ops.push({ kind: "set", changes: unblock ? { status: i.to, blocked_by: null } : { status: i.to } });
       break;
     case "active":
       if (i.claims) {
         // claim sets the status only when the record is ready
-        if (i.from !== "ready") ops.push({ kind: "set", changes: { status: "active" } });
+        if (i.from !== "ready") ops.push({ kind: "set", changes: unblock ? { status: "active", blocked_by: null } : { status: "active" } });
         ops.push({ kind: "claim", as: text(a.identity) });
-      } else ops.push({ kind: "set", changes: { status: "active" } });
+      } else ops.push({ kind: "set", changes: unblock ? { status: "active", blocked_by: null } : { status: "active" } });
       break;
     case "blocked": {
       const changes = { status: "blocked" };

@@ -7,7 +7,7 @@ import { buildOps, requestFor, resolveOp, previewable, opLabel, validateStep } f
 import { slugify } from "./capture.js";
 import { renderDiff } from "./review.js";
 
-const STEP_NAMES = { goal: "Goal", next: "Next step", blocked_by: "Waiting on", outcome: "Outcome", decision: "Decision", identity: "Identity", review: "Review" };
+const STEP_NAMES = { goal: "Goal", next: "Next step", blocked_by: "Waiting on", outcome: "Outcome", decision: "Decision", identity: "Identity", unblock: "Waiting on", review: "Review" };
 
 const TEXT = {
   goal: { q: "What does done look like?", help: "One or two lines. It is written under ## Goal; say how you will know it is finished.", rows: 3, field: "goal" },
@@ -30,7 +30,7 @@ export function openWizard(deps, spec) {
     at: 0,
     err: "",
     phase: "edit", // edit | loading | review | writing | conflict | error
-    a: { goal: "", next: "", blocked_by: "", outcome: spec.outcomeDefault || "", identity: spec.identity || "", decision: { mode: "none", id: "", title: "", slug: "" } },
+    a: { unblock: true, goal: "", next: "", blocked_by: "", outcome: spec.outcomeDefault || "", identity: spec.identity || "", decision: { mode: "none", id: "", title: "", slug: "" } },
     previews: [],
     takeover: false,
     fatal: null,
@@ -85,6 +85,18 @@ export function openWizard(deps, spec) {
         el("span", { class: "label", text: drop ? "Why was it dropped?" : "What was the outcome?" }),
         el("span", { class: "help", text: drop ? "The reason, in a line or two. It is written under ## Outcome." : "What changed and where, in one to three lines. Add the evidence for the done-when line. It is written under ## Outcome." }),
         el("textarea", { id: "wz-outcome", rows: "4", "data-f": "outcome", "aria-invalid": W.err ? "true" : null, "aria-describedby": W.err ? "wz-err" : null }, W.a.outcome),
+      ),
+    ];
+  }
+
+  function unblockStep() {
+    return [
+      el(
+        "label",
+        { class: "check" + (W.a.unblock ? " on" : "") },
+        el("input", { type: "checkbox", id: "wz-unblock", checked: W.a.unblock ? true : null }),
+        el("span", { class: "label", text: "Clear blocked_by?" }),
+        el("span", { class: "help", text: "It no longer waits on what it listed. Untick to keep the list." }),
       ),
     ];
   }
@@ -185,6 +197,7 @@ export function openWizard(deps, spec) {
     if (TEXT[s]) kids = textStep(s);
     else if (s === "outcome") kids = outcomeStep();
     else if (s === "identity") kids = identityStep();
+    else if (s === "unblock") kids = unblockStep();
     else if (s === "decision") kids = decisionStep();
     else return reviewBody();
     return err ? kids.concat(err) : kids;
@@ -355,7 +368,8 @@ export function openWizard(deps, spec) {
     }
   });
   root.addEventListener("change", (e) => {
-    if (e.target.name === "wz-dec") {
+    if (e.target.id === "wz-unblock") W.a.unblock = e.target.checked;
+    else if (e.target.name === "wz-dec") {
       W.a.decision.mode = e.target.value;
       W.err = "";
       render("wz-dec-" + e.target.value);

@@ -3,6 +3,7 @@
 import { el, text } from "./util.js";
 import { field, isId, childrenOf, obsidianUrl } from "./logic.js";
 import { show, describeError, state } from "./store.js";
+import { claimControls } from "./flow.js";
 
 // Sections that start collapsed (everything else starts open).
 const COLLAPSED = new Set(["log"]);
@@ -82,6 +83,9 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       el("div", { class: "dlg-body" }, dl),
     ];
     const body = parts[1];
+    const claimSlot = el("div", { class: "claim-slot" });
+    body.prepend(claimSlot);
+    claimControls(r, () => self && self.refresh()).then((n) => n && claimSlot.append(n)).catch(() => {});
     if (kids.length) {
       body.append(
         el("h3", { class: "sec-h", text: "Children (" + kids.length + ")" }),
@@ -98,13 +102,15 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     drawerEl.setAttribute("aria-labelledby", "drawer-t");
   }
 
+  let self = null;
+
   function reveal() {
     scrim.hidden = false;
     drawerEl.hidden = false;
     viewEl.inert = true;
   }
 
-  return {
+  self = {
     isOpen: () => current !== null,
     id: () => current,
     async open(id) {
@@ -143,7 +149,10 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       try {
         data = await show(id);
       } catch (e) {
-        return; // keep what is shown; the next change tries again
+        if (e && e.code === "not_found" && mySeq === seq && current === id) {
+          drawerEl.replaceChildren(el("header", { class: "dlg-head" }, el("h2", { id: "drawer-t", tabindex: "-1", text: id }), el("button", { type: "button", class: "btn quiet", id: "drawer-close", onclick: () => ctx.close() }, "Close ", el("kbd", { text: "Esc" }))), el("p", { class: "muted pad", text: "This record was removed." }));
+        }
+        return; // otherwise keep what is shown; the next change tries again
       }
       if (mySeq !== seq || current !== id) return;
       keep = { open: new Map(secs.map((d) => [name(d), d.open])), text: new Map(secs.map((d) => [name(d), d.querySelector(".body").textContent])) };
@@ -186,4 +195,5 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       return false;
     },
   };
+  return self;
 }

@@ -1,7 +1,7 @@
 // Moves, undo, capture and drag and drop on the board. Safe moves write at
 // once with the record's etag and offer `u`; every other move goes through the
 // wizard and the review (wizard.js). Nothing here builds HTML.
-import { el } from "./util.js";
+import { el, ageDays, ageText, text } from "./util.js";
 import { api, ApiError, state, show, describeError } from "./store.js";
 import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl } from "./logic.js";
 import { neighbour, sectionsOf, planMove, buildOps, requestFor, validateStep } from "./moves.js";
@@ -94,7 +94,7 @@ export async function moveTo(id, to, extra = {}) {
       return toast(describeError(e), "bad");
     }
     const claims = await claimsOn();
-    const move = { id, from, to, claims, sections: sectionsOf(data.body), blockedBy: blockedBy(data.record), decisions: arr(data.record.fields.decisions) };
+    const move = { id, from, to, claims, sections: sectionsOf(data.body), blockedBy: blockedBy(data.record), claimed: !!field(data.record, "claimed_by"), decisions: arr(data.record.fields.decisions) };
     const plan = planMove(move);
     if (plan.kind === "noop") return;
     if (plan.kind === "safe") return await safeMove(rec, move);
@@ -377,4 +377,41 @@ function dragSetup(host) {
     const to = laneStatus(col);
     if (to) moveTo(id, to);
   });
+}
+
+// ---- claim controls in the drawer ----
+
+/**
+ * The claim line and buttons for a record shown in the drawer, or null when the
+ * repository does not enable claims. `r` is the full record from `show`;
+ * `reload()` redraws the drawer after a write.
+ */
+export async function claimControls(r, reload) {
+  if (r.type !== "work" || !(await claimsOn())) return null;
+  const f = r.fields || {};
+  const holder = f.claimed_by ? text(f.claimed_by) : "";
+  const me = getIdentity();
+  const status = text(f.status);
+  const run = async (what, op, o) => {
+    try {
+      const q = requestFor(op, r.id, o);
+      await api(q.method, q.path, { body: q.body, etag: r.etag });
+      toast(what + " " + r.id + ".");
+    } catch (e) {
+      toast(describeError(e), "bad");
+    }
+    await refresh(r.id);
+    reload();
+  };
+  const btn = (label, fn) => el("button", { type: "button", class: "btn quiet", onclick: fn }, label);
+  const kids = [];
+  if (holder) {
+    const age = f.claimed_at ? ageText(ageDays(String(f.claimed_at).slice(0, 10))) : "";
+    kids.push(el("span", { class: "claim-holder", text: "Claimed by " + holder + (age ? ", " + age : "") }));
+    if (holder === me) kids.push(btn("Release", () => run("Released", { kind: "release" })));
+    else if (me) kids.push(btn("Take over", () => (window.confirm("Take over " + r.id + " from " + holder + "?") ? run("Took over", { kind: "claim", as: me }, { takeover: true }) : null)));
+  } else if ((status === "ready" || status === "active") && me) {
+    kids.push(el("span", { class: "claim-holder", text: "Not claimed" }), btn("Claim as " + me, () => run("Claimed", { kind: "claim", as: me })));
+  } else if (!me) kids.push(el("span", { class: "claim-holder", text: "Set a name for claims from the palette." }));
+  return el("div", { class: "claim-bar" }, kids);
 }
