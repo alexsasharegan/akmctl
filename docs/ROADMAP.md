@@ -4,6 +4,8 @@
 
 ## Next
 
+- [261029-9ep9] Put the repository name in the page title
+- [261029-4hx0] Add an SVG favicon
 - [261029-30my] Filter the board and tables by project
 - [261029-btny] Center the WORKBENCH label and repository name with the title
 - [261029-rmrk] Fix the card border that shows on only three sides
