@@ -63,6 +63,40 @@ func stepOf(t *testing.T, resp Obj, id string) Obj {
 	return nil
 }
 
+// snap reads every file under root except .git, which git itself may change at
+// any time (background maintenance).
+func snap(t *testing.T, root string) map[string]string {
+	t.Helper()
+	m := map[string]string{}
+	filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if d.IsDir() && d.Name() == ".git" {
+			return filepath.SkipDir
+		}
+		if !d.IsDir() {
+			b, _ := os.ReadFile(p)
+			rel, _ := filepath.Rel(root, p)
+			m[filepath.ToSlash(rel)] = string(b)
+		}
+		return nil
+	})
+	return m
+}
+
+func sameSnap(a, b map[string]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for k, v := range a {
+		if w, ok := b[k]; !ok || v != w {
+			return false
+		}
+	}
+	return true
+}
+
 func gitOut(t *testing.T, root string, args ...string) string {
 	t.Helper()
 	out, err := exec.Command("git", append([]string{"-C", root}, args...)...).CombinedOutput()
@@ -76,7 +110,7 @@ func TestMigrateMintIDsModes(t *testing.T) {
 	mintRegistry(t)
 	root := mintFixtureRepo(t)
 	gitRepo(t, root)
-	before := tree(t, root)
+	before := snap(t, root)
 
 	// report: the step is listed, nothing is computed or written
 	resp := mustOK(t, root, "migrate", Request{})
@@ -100,7 +134,7 @@ func TestMigrateMintIDsModes(t *testing.T) {
 	if st, _ := step.Get("status"); st != "pending" {
 		t.Fatalf("plan status %v", st)
 	}
-	if !sameTree(before, tree(t, root)) {
+	if !sameSnap(before, snap(t, root)) {
 		t.Fatal("plan changed the tree")
 	}
 
@@ -110,7 +144,7 @@ func TestMigrateMintIDsModes(t *testing.T) {
 	if h, _ := resp.Get("handoff"); !strings.Contains(h.(string), "reference not rewritten: docs/overview.md line 3") {
 		t.Fatalf("handoff:\n%v", h)
 	}
-	if !sameTree(before, tree(t, root)) {
+	if !sameSnap(before, snap(t, root)) {
 		t.Fatal("handoff changed the tree")
 	}
 
@@ -171,12 +205,7 @@ func TestMigrateMintIDsTwice(t *testing.T) {
 	}
 	gitOut(t, root, "add", "docs/.layout")
 	gitOut(t, root, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "manifest back")
-	before := tree(t, root)
-	for p := range before {
-		if strings.HasPrefix(p, ".git/") {
-			delete(before, p)
-		}
-	}
+	before := snap(t, root)
 
 	migrateRand = bytes.NewReader(bytes.Repeat([]byte{9}, 64))
 	resp := mustOK(t, root, "migrate", Request{"mode": "plan"})
@@ -187,18 +216,13 @@ func TestMigrateMintIDsTwice(t *testing.T) {
 	if st, _ := stepOf(t, resp, "mint-notes").Get("status"); st != "skipped" {
 		t.Fatalf("second run status %v", st)
 	}
-	after := tree(t, root)
-	for p := range after {
-		if strings.HasPrefix(p, ".git/") {
-			delete(after, p)
-		}
-	}
+	after := snap(t, root)
 	for p, v := range after {
 		switch p {
 		case "docs/.layout", migrate.LogPath:
 			continue
 		}
-		if w, ok := before[p]; !ok || w.text != v.text {
+		if w, ok := before[p]; !ok || w != v {
 			t.Errorf("%s changed on the second run", p)
 		}
 	}
