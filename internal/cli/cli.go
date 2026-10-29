@@ -440,7 +440,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --out <file>\nui flags: --port <n> (default: any free port)  --open  --obsidian-vault <name>\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --out <file>\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

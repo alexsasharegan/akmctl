@@ -33,8 +33,6 @@ type Server struct {
 	Info  api.Info
 	// Hosts are the Host header values accepted (host:port).
 	Hosts []string
-	// ObsidianVault is the vault name the UI uses for obsidian:// links (may be empty).
-	ObsidianVault string
 }
 
 // NewToken returns 128 bits of randomness as hex.

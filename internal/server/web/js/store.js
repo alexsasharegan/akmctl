@@ -124,7 +124,7 @@ export const SNAPSHOT_FIELDS = ["id", "title", "summary", "status", "kind", "par
 export const state = {
   records: [], // work and ADRs, work in roadmap order
   loadedAt: null,
-  config: { root: "", identity: "", obsidian_vault: "" },
+  config: { root: "", identity: "" },
   closed: null, // recently closed work, loaded when the table is first shown
 };
 

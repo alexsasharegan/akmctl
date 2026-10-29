@@ -56,9 +56,8 @@ func (s *Server) uiConfig(w http.ResponseWriter) {
 		root = s.Root
 	}
 	b, _ := json.Marshal(map[string]string{
-		"root":           root,
-		"identity":       osUser(),
-		"obsidian_vault": s.ObsidianVault,
+		"root":     root,
+		"identity": osUser(),
 	})
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(append(b, '\n'))

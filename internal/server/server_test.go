@@ -531,25 +531,11 @@ func TestUIConfig(t *testing.T) {
 	if cfg["identity"] == "" {
 		t.Fatal("no identity")
 	}
-	if v, ok := cfg["obsidian_vault"]; !ok || v != "" {
-		t.Fatalf("obsidian_vault %q %v", v, ok)
+	if len(cfg) != 2 {
+		t.Fatalf("config keys %v, want root and identity only", cfg)
 	}
 	// other methods are not the config route
 	if r := do(t, ts, "POST", "/ui/config", `{}`, nil); r.status != 404 {
 		t.Fatalf("POST config: %d", r.status)
-	}
-}
-
-func TestUIConfigObsidianVault(t *testing.T) {
-	root := t.TempDir()
-	s := &Server{Root: root, Token: token, ObsidianVault: "Deep Thought", Info: api.Info{Name: "akmctl", Version: "test"}}
-	ts := httptest.NewServer(s.Handler())
-	defer ts.Close()
-	s.Hosts = []string{strings.TrimPrefix(ts.URL, "http://")}
-	_, b := get(t, ts, "/ui/config", map[string]string{"Authorization": "Bearer " + token})
-	var cfg map[string]string
-	json.Unmarshal(b, &cfg)
-	if cfg["obsidian_vault"] != "Deep Thought" {
-		t.Fatalf("%v", cfg)
 	}
 }
