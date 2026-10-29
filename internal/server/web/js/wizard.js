@@ -3,7 +3,7 @@
 // A write that finds the record changed shows the conflict and writes nothing more.
 import { el } from "./util.js";
 import { api, ApiError, describeError } from "./store.js";
-import { buildOps, requestFor, resolveOp, previewable, opLabel, validateStep } from "./moves.js";
+import { buildOps, requestFor, resolveOp, previewable, opLabel, validateStep, wizardKey } from "./moves.js";
 import { slugify } from "./capture.js";
 import { renderDiff } from "./review.js";
 
@@ -15,7 +15,6 @@ const TEXT = {
   blocked_by: { q: "What is it waiting on?", help: "One entry per line: a record id, or a few words about a person or a thing outside the repository.", rows: 3, field: "blocked_by" },
 };
 
-const isTyping = (t) => !!t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" || (t.tagName === "INPUT" && !["checkbox", "radio", "button"].includes(t.type)));
 
 /**
  * deps: { openDialog, closeDialog, setDialogHints, MOD }.
@@ -43,6 +42,9 @@ export function openWizard(deps, spec) {
   const MOD = deps.MOD;
   const ops = () => buildOps(move, W.a);
 
+  // a textarea keeps Enter for a new line, so its steps advance on Mod+Enter
+  const nextKey = (s) => (TEXT[s] || s === "outcome" ? MOD + "+Enter" : "Enter");
+
   // ---- hints ----
 
   function hints() {
@@ -50,7 +52,7 @@ export function openWizard(deps, spec) {
     const back = W.at ? "back" : "cancel";
     let h;
     let mode = "STEP " + (W.at + 1) + " / " + steps.length;
-    if (s !== "review") h = [[MOD + "+Enter", "next"], ["Esc", back]];
+    if (s !== "review") h = [[nextKey(s), "next"], ["Esc", back]];
     else {
       mode = "REVIEW";
       if (W.phase === "conflict") h = [["Enter", "reload the records"], ["Esc", "back"]];
@@ -220,7 +222,7 @@ export function openWizard(deps, spec) {
     if (last && W.phase === "conflict") foot.push(el("button", { type: "button", class: "btn primary", "data-act": "reload" }, "Reload the records ", el("kbd", { text: "Enter" })));
     else if (last && W.canTakeover && W.phase === "error") foot.push(el("button", { type: "button", class: "btn primary", "data-act": "takeover" }, "Take over the claim"));
     else if (last) foot.push(el("button", { type: "button", class: "btn primary", "data-act": "write", disabled: canWrite ? null : true }, writeLabel + " ", el("kbd", { text: "Enter" })));
-    else foot.push(el("button", { type: "button", class: "btn primary", "data-act": "next" }, "Next ", el("kbd", { text: MOD + "+Enter" })));
+    else foot.push(el("button", { type: "button", class: "btn primary", "data-act": "next" }, "Next ", el("kbd", { text: nextKey(s) })));
     root.replaceChildren(
       el(
         "header",
@@ -382,22 +384,13 @@ export function openWizard(deps, spec) {
   }
 
   function onKey(e) {
-    const mod = e.metaKey || e.ctrlKey;
-    if (e.key === "Escape") {
-      e.preventDefault();
-      back();
-      return;
-    }
-    if (e.key === "Enter" && mod) {
-      e.preventDefault();
-      next();
-      return;
-    }
-    if (cur() === "review" && e.key === "Enter" && e.target.tagName !== "BUTTON" && !isTyping(e.target)) {
-      e.preventDefault();
-      if (W.phase === "conflict") reload();
-      else write();
-    }
+    const act = wizardKey({ key: e.key, mod: e.metaKey || e.ctrlKey, tag: e.target.tagName, type: e.target.type, phase: W.phase, step: cur() });
+    if (!act) return;
+    e.preventDefault();
+    if (act === "back") back();
+    else if (act === "next") next();
+    else if (act === "reload") reload();
+    else write();
   }
 
   deps.openDialog(root, { mode: "STEP", hints: [], onKey });

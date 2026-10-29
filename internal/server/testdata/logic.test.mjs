@@ -343,4 +343,21 @@ assert.equal(L.obsidianUrl({ root: "", obsidian_vault: "v" }, "a.md"), "");
   const rel = M.buildOps({ ...base, from: "active", blockedBy: [], claimed: true }, {});
   assert.deepEqual(rel.map((o) => o.kind), ["release", "set"]);
 }
+{
+  const k = (o) => M.wizardKey({ key: "Enter", mod: false, tag: "DIV", type: "", phase: "edit", step: "unblock", ...o });
+  assert.equal(k({ tag: "INPUT", type: "checkbox" }), "next");
+  assert.equal(k({ mod: true, tag: "INPUT", type: "checkbox" }), "next");
+  assert.equal(k({ tag: "INPUT", type: "text", step: "identity" }), "next");
+  assert.equal(k({ tag: "TEXTAREA", step: "goal" }), "");
+  assert.equal(k({ tag: "TEXTAREA", step: "goal", mod: true }), "next");
+  assert.equal(k({ tag: "SELECT" }), "");
+  assert.equal(k({ tag: "BUTTON" }), "");
+  assert.equal(k({ step: "review", phase: "review" }), "write");
+  assert.equal(k({ step: "review", phase: "review", mod: true }), "");
+  assert.equal(k({ step: "review", phase: "review", tag: "BUTTON" }), "");
+  assert.equal(k({ step: "review", phase: "conflict" }), "reload");
+  assert.equal(k({ step: "review", phase: "loading" }), "");
+  assert.equal(k({ key: "Escape", tag: "TEXTAREA" }), "back");
+  assert.equal(k({ key: "a" }), "");
+}
 console.log("ok");

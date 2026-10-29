@@ -223,3 +223,19 @@ export function validateStep(step, a, to) {
   }
   return "";
 }
+
+/**
+ * What a key does in the wizard: "back" (Esc), "next", "write", "reload" or "".
+ * k: { key, mod, tag, type, phase, step }. Enter advances a step, except where it
+ * means something else: a textarea (a new line), a select, a button (it presses itself).
+ * Mod+Enter advances from anywhere and never writes; Enter writes on the review.
+ */
+export function wizardKey(k) {
+  if (k.key === "Escape") return "back";
+  if (k.key !== "Enter") return "";
+  const review = k.step === "review";
+  if (k.mod) return review ? "" : "next";
+  if (k.tag === "TEXTAREA" || k.tag === "SELECT" || k.tag === "BUTTON") return "";
+  if (review) return k.phase === "conflict" ? "reload" : k.phase === "review" ? "write" : "";
+  return "next";
+}
