@@ -13,7 +13,7 @@ summary: The workbench has no favicon, so the browser tab shows a blank icon.
 
 ## Goal
 
-Add a favicon as an SVG served from the embedded assets (a path under the allowed asset prefixes, for example /fonts-free /icons/favicon.svg or a new allowed prefix; the asset server allows only listed prefixes and extensions, so add .svg to the allowlist with the right content type) and link it from index.html. Design: a simple mark that fits the Quiet paper style and reads at 16 px; it should work in light and dark (use prefers-color-scheme inside the SVG, or a colour that works on both). Optional, noted for later: a per-repository colour accent so two tabs differ at a glance, derived from a hash of the repository name.
+Add a favicon as an SVG served from the embedded assets (the asset server serves only listed prefixes and extensions, so add a path such as /icons/favicon.svg, or allow .svg under an existing prefix, with the right content type) and link it from index.html. Design: a simple mark that fits the Quiet paper style and reads at 16 px; it should work in light and dark (use prefers-color-scheme inside the SVG, or a colour that works on both). Optional, noted for later: a per-repository colour accent so two tabs differ at a glance, derived from a hash of the repository name.
 
 Done when:
 
