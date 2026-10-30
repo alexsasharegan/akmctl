@@ -7,7 +7,7 @@ import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl } from "./logic.js";
 import { neighbour, sectionsOf, planMove, buildOps, requestFor, validateStep } from "./moves.js";
 import { openWizard } from "./wizard.js";
 import { openCapture } from "./capture.js";
-import { openDialog, closeOverlay, setDialogHints, toast, MOD, overlayOpen } from "./ui.js";
+import { openDialog, closeOverlay, setDialogHints, toast, dismissToast, MOD, overlayOpen } from "./ui.js";
 import { remember } from "./board.js";
 
 const IDENTITY_KEY = "akm-identity";
@@ -81,17 +81,17 @@ function workRecord(id) {
 export async function moveTo(id, to, extra = {}) {
   if (busy || overlayOpen()) return;
   const rec = workRecord(id);
-  if (!rec) return toast("Only a work item can be moved.", "bad");
+  if (!rec) return toast("Only a work item can be moved.", { level: "error" });
   const from = field(rec, "status");
   if (from === to) return toast(id + " is already " + to + ".");
-  if (CLOSED.includes(from)) return toast(id + " is closed; a closed record is not moved.", "bad");
+  if (CLOSED.includes(from)) return toast(id + " is closed; a closed record is not moved.", { level: "error" });
   busy = true;
   try {
     let data;
     try {
       data = await show(id);
     } catch (e) {
-      return toast(describeError(e), "bad");
+      return toast(describeError(e), { level: "error" });
     }
     const claims = await claimsOn();
     const move = { id, from, to, claims, sections: sectionsOf(data.body), blockedBy: blockedBy(data.record), claimed: !!field(data.record, "claimed_by"), decisions: arr(data.record.fields.decisions) };
@@ -110,7 +110,7 @@ export async function moveTo(id, to, extra = {}) {
       onReload: () => refresh(id),
       onDone: (res) => {
         if (res.identity && move.claims && to === "active") rememberIdentity(res.identity);
-        toast(doneText(rec, to, res));
+        toast(doneText(rec, to, res), { level: "success" });
         refresh(id);
       },
     });
@@ -132,7 +132,7 @@ async function safeMove(rec, move) {
   if (move.claims && move.to === "active" && !identity) {
     // no name to claim as: ask for it in the wizard instead of guessing
     const plan = { kind: "gated", steps: ["identity"] };
-    openWizard(deps, { rec, title: titleOf(rec), i: move, plan, identity, adrs: [], onReload: () => refresh(rec.id), onDone: (res) => (rememberIdentity(res.identity), toast("Claimed " + titleOf(rec) + "."), refresh(rec.id)) });
+    openWizard(deps, { rec, title: titleOf(rec), i: move, plan, identity, adrs: [], onReload: () => refresh(rec.id), onDone: (res) => (rememberIdentity(res.identity), toast("Claimed " + titleOf(rec) + ".", { level: "success" }), refresh(rec.id)) });
     return;
   }
   const ops = buildOps(move, { identity });
@@ -145,8 +145,8 @@ async function safeMove(rec, move) {
       etag = r.record.etag;
     }
   } catch (e) {
-    if (e instanceof ApiError && e.code === "stale") toast(titleOf(rec) + " changed since it was loaded. Nothing was written; the records were reloaded.", "bad");
-    else toast(describeError(e), "bad");
+    if (e instanceof ApiError && e.code === "stale") toast(titleOf(rec) + " changed since it was loaded. Nothing was written; the records were reloaded.", { level: "error" });
+    else toast(describeError(e), { level: "error" });
     await refresh(rec.id);
     return;
   }
@@ -157,8 +157,8 @@ async function safeMove(rec, move) {
 }
 
 function undoToast(msg, label = "Undo") {
-  const box = toast(msg + " ", "", 12000);
-  box.append(el("button", { type: "button", class: "btn quiet toast-btn", onclick: () => (box.remove(), undo()) }, label + " ", el("kbd", { text: "u" })));
+  const box = toast(msg + " ", { level: "success", ms: 12000 });
+  if (box) box.querySelector(".toast-body").append(el("button", { type: "button", class: "btn quiet toast-btn", onclick: () => (dismissToast(box), undo()) }, label + " ", el("kbd", { text: "u" })));
 }
 
 /** Undo the last safe move or capture. A capture is dropped with a reason: there is no delete. */
@@ -166,7 +166,7 @@ export async function undo() {
   if (busy || overlayOpen()) return;
   const u = last;
   if (!u) return toast("Nothing to undo.");
-  for (const b of document.querySelectorAll("#toasts .toast-btn")) b.closest(".toast").remove();
+  for (const b of document.querySelectorAll("#toasts .toast-btn")) dismissToast(b.closest(".toast"));
   if (u.kind === "capture") {
     last = null;
     return moveTo(u.id, "dropped", { outcomeDefault: "Captured by mistake." });
@@ -182,10 +182,10 @@ export async function undo() {
     const q = requestFor({ kind: "set", changes: { status: u.from } }, u.id);
     const r = await api(q.method, q.path, { body: q.body, etag });
     await refresh(u.id);
-    toast("Moved " + u.id + " back to " + u.from + ". The updated date was not restored: it now reads " + (r.record.fields.updated || "today") + (u.claimed ? ", and the claim stays in the log" : "") + ".", "", 7000);
+    toast("Moved " + u.id + " back to " + u.from + ". The updated date was not restored: it now reads " + (r.record.fields.updated || "today") + (u.claimed ? ", and the claim stays in the log" : "") + ".", { level: "success", ms: 12000 });
   } catch (e) {
-    if (e instanceof ApiError && e.code === "stale") toast(u.id + " changed after the move, so it was not undone.", "bad");
-    else toast("Undo failed: " + describeError(e), "bad");
+    if (e instanceof ApiError && e.code === "stale") toast(u.id + " changed after the move, so it was not undone.", { level: "error" });
+    else toast("Undo failed: " + describeError(e), { level: "error" });
     await refresh(u.id);
   } finally {
     busy = false;
@@ -263,7 +263,7 @@ export function flowActions(currentId) {
   const on = (fn) => () => {
     const id = cur();
     if (id) fn(id);
-    else toast("Focus a card first.");
+    else toast("Focus a card first.", { level: "warning" });
   };
   return [
     { label: "Move the focused card one lane left", keys: ["H"], run: on((id) => flowKeys({ key: "H" }, id)) },
@@ -397,9 +397,9 @@ export async function claimControls(r, reload) {
     try {
       const q = requestFor(op, r.id, o);
       await api(q.method, q.path, { body: q.body, etag: r.etag });
-      toast(what + " " + r.id + ".");
+      toast(what + " " + r.id + ".", { level: "success" });
     } catch (e) {
-      toast(describeError(e), "bad");
+      toast(describeError(e), { level: "error" });
     }
     await refresh(r.id);
     reload();
