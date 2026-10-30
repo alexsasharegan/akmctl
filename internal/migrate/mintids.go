@@ -40,9 +40,9 @@ func (e Env) rand() io.Reader {
 
 func (e Env) now() time.Time {
 	if !e.Now.IsZero() {
-		return e.Now.UTC()
+		return e.Now
 	}
-	return time.Now().UTC()
+	return time.Now()
 }
 
 var (
