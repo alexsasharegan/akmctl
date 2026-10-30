@@ -1,14 +1,15 @@
 ---
 id: "261029-kb88"
-title: create obsidian board
-summary: a cmd to generate an obsidian base which mirrors the workbench ui
-status: raw
+title: Generate an Obsidian Bases file that mirrors the workbench
+summary: A command that writes an Obsidian Bases file for the work items and ADRs, mirroring the workbench views; written once and never overwritten
+status: ready
 kind: feature
 created: 2026-10-29
 updated: 2026-10-29
+priority: 1
 ---
 
-# create obsidian board
+# Generate an Obsidian Bases file that mirrors the workbench
 
 ## Goal
 
@@ -155,6 +156,32 @@ views:
       - formula.age_days
 ```
 
+Decisions (Alexander, 2026-10-29): the file is written once and never overwritten, like `init`; the user then edits it freely in Obsidian.
+
+The Obsidian Bases file mirrors the workbench: table views for open work, ready and active, blocked, stale (by `updated` against the manifest's `stale_days`) and recently closed (by `closed`); cards grouped by status and by parent or cycle; and an ADR table. Folder filters come from the manifest's `work_dir` and `adr_dir`, and the properties are the AKM fields (id, title, status, kind, priority, parent, cycle, keep, created, updated, closed, claimed_by). The example above is the starting shape, with the vault-specific names replaced.
+
+It is an API operation like the others (schema, fixtures, CLI and HTTP), with a name to settle (`akmctl obsidian` is the working name).
+
+Open questions to answer first:
+
+- Does Obsidian Bases support a `kanban` view type in core, or only through a plugin? If not, the board is cards grouped by status with a fixed group order.
+- Obsidian Bases' file format may change between Obsidian releases; generate a documented subset and say which Obsidian version it was checked against.
+- A vault can be a parent of the repository, so folder filters are relative to the vault root, not the repository root. The command needs to find the vault root (the nearest `.obsidian` folder upward) or take it as an option.
+- Whether this needs an ADR (a generated file that tracks another product's format).
+
+Done when:
+
+- [ ] the open questions are answered in this item's Log
+- [ ] the operation is in the API spec with a schema and fixtures, and the CLI command writes the file and refuses to overwrite an existing one
+- [ ] the generated file parses as YAML, every filter and property names an AKM field, and the folder filters use the manifest's directories
+- [ ] Alexander opens it in Obsidian and each view renders (manual check; the tool cannot test this)
+- [ ] the README and docs/glossary.md name it as Obsidian Bases
+
+## Next
+
+Ready. Start by answering the open questions, because they decide the file's shape.
+
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: refined with Alexander.

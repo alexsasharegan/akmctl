@@ -6,6 +6,15 @@
 
 ## Next
 
+Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
+
+- [261029-kmre] Workbench toasts: placement, levels, persistence and a countdown border
+- [261029-kb33] Workbench form controls: a custom select and a summary text area with a counter
+- [261029-aezq] Capture modal: header, width, a cycle field and the submit button
+- [261029-bdt9] Workbench parent picker: a searchable list with match highlighting
+- [261028-esyt] Show and edit a record's fields in the drawer
+- [261029-kb88] Generate an Obsidian Bases file that mirrors the workbench
+
 ## Later
 
 ### 1.0.0
@@ -41,14 +50,11 @@ Workbench and polish:
 
 - [261029-30my] Filter the board and tables by project
 - [261029-ctzc] Make wikilinks in drawer fields clickable and open them in Obsidian
-- [261029-paw7] Show a record's frontmatter as a typed table in the drawer
 - [261029-rmrk] Fix the card border that shows on only three sides
 - [261029-57jq] The closed table flickers on reload
 - [261029-8948] Show the claim holder on workbench cards
 - [261029-g8x2] The review diff is against the current file, not after earlier writes
 - [261029-jm46] Restart of akmctl ui forces a new URL
-- [261028-esyt] Edit more than status in the workbench
-- [261028-fcc1] Add a capture form to the workbench
 - [261026-mrdr] pkm-workbench: sort options
 - [261026-np3c] pkm-workbench: delete a task, with its backlinks listed
 - [261026-zg0g] pkm-workbench: filters

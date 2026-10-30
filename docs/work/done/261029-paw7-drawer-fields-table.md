@@ -1,9 +1,10 @@
 ---
 id: "261029-paw7"
 title: Show a record's frontmatter as a typed table in the drawer
-status: ready
+status: dropped
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: feature
 priority: 3
 summary: The drawer lists fields as plain text rows; type each value (string, date, number, link) and lay them out as a table.
@@ -22,6 +23,11 @@ Done when:
 - [ ] Lists render one item per line, wikilinks as links (see the wikilink item).
 - [ ] Unit tests cover the value typing; checked in the browser on the vault in light and dark.
 
+## Outcome
+
+Merged into 261028-esyt (the typed table is now part of editing fields in the drawer).
+
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: claimed (claude).
