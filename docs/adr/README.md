@@ -29,6 +29,7 @@
 
 ## Proposed
 
-| id                                                   | title                                                                | date       | scope | summary                                                              | supersedes / superseded_by |
-| ---------------------------------------------------- | -------------------------------------------------------------------- | ---------- | ----- | -------------------------------------------------------------------- | -------------------------- |
-| [261029-6cp5](261029-6cp5-roadmap-now-next-later.md) | The roadmap follows Now / Next / Later, with milestones inside Later | 2026-10-29 |       | The roadmap follows Now / Next / Later, with milestones inside Later |                            |
+| id                                                        | title                                                                | date       | scope | summary                                                              | supersedes / superseded_by |
+| --------------------------------------------------------- | -------------------------------------------------------------------- | ---------- | ----- | -------------------------------------------------------------------- | -------------------------- |
+| [261029-6cp5](261029-6cp5-roadmap-now-next-later.md)      | The roadmap follows Now / Next / Later, with milestones inside Later | 2026-10-29 |       | The roadmap follows Now / Next / Later, with milestones inside Later |                            |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0)         | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0)         |                            |
