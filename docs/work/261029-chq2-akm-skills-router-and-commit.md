@@ -26,9 +26,10 @@ Done when:
 
 ## Next
 
-Not started.
+All four done-when lines are met on this branch. Next: the maintainer reviews, merges, and the config work lets init install akm-commit when git_commits is on (no Go install logic exists yet). Close the item with the Outcome drafted in the agent report.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: claimed (skills-agent).
+- 2026-10-29: renamed the skills to akm-work-items and akm-record-decision; added the akm router skill with 18 references (config.md marked added in this release), the optional akm-commit skill, and tests for the references and the always-installed skills; init fixtures regenerated.
