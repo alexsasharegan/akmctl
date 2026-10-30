@@ -43,7 +43,6 @@ Workbench and polish:
 - [261029-8948] Show the claim holder on workbench cards
 - [261029-g8x2] The review diff is against the current file, not after earlier writes
 - [261029-jm46] Restart of akmctl ui forces a new URL
-- [261028-k0ek] Give the workbench live refresh
 - [261028-esyt] Edit more than status in the workbench
 - [261028-fcc1] Add a capture form to the workbench
 - [261026-mrdr] pkm-workbench: sort options
