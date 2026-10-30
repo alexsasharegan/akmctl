@@ -2,6 +2,8 @@
 
 ## Now
 
+- [261029-pzb1] Write the glossary and require every new feature to register its terms
+
 ## Next
 
 ## Later

@@ -2,6 +2,8 @@
 
 `akmctl` reads a repository's AKM records (work items, ADRs, the roadmap, the manifest `.layout`, `docs/.layout` by default) and offers one set of operations over them through two bindings: a command line and a loopback HTTP server. The contract is the AKM API spec in `docs/spec/akm-api-spec.md`; the fixtures in `testdata/api/` are its executable form, a copy of `docs/spec/akm-api/.fixtures` kept in step by hand (work item 261029-x4ws).
 
+The words used here are defined in [glossary.md](glossary.md).
+
 ## Packages
 
 | Package                | Role                                                                                                                                                                  |

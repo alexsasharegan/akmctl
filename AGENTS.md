@@ -16,6 +16,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 
 - `docs/architecture.md`: the map of packages and the invariants.
 - `docs/adr/`: decisions; `docs/adr/README.md` is the generated routing index.
+- `docs/glossary.md`: the words the project uses and avoids (record, work item, workbench parts, Obsidian Bases).
 - `docs/ROADMAP.md`: the order of work, in the Now / Next / Later convention with milestones in Later (ADR 261029-6cp5); finished work leaves it for `done/` and the changelog. Open work: `/tmp/akmctl ls --status ready,active,blocked`.
 - `docs/work/`: work items; `docs/work/done/` holds closed ones.
 - `.agents/skills/`: the procedures (`akm`, `akm-work-items`, `akm-record-decision`).
@@ -32,6 +33,8 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path, one logical commit per step.
 - Without the tool: decisions are in `docs/adr/README.md`; `grep -lE '^status: ?"?active"?$' docs/work/*.md` lists active work (same for `ready`, `blocked`); close an item by setting `status`, writing `## Outcome`, setting `updated` and `git mv` to `docs/work/done/`. Never hand-edit the ADR index.
 - The `akmctl` binary must work on macOS and Linux. Windows is best effort and not required below 1.0.0 (ADR 261029-eegx): CI runs it without blocking.
+
+- Register every new term in `docs/glossary.md` in the same change: a feature, command, field, rule or workbench part. Write "Obsidian Bases" in full, never "base" alone.
 
 ## Do not, without asking
 
