@@ -630,6 +630,10 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 		if prev != who {
 			logLine = "took over from " + prev + " (" + who + ")."
+		} else if st == "active" {
+			// the same holder already holds an active item: the claim is
+			// refreshed (claimed_at) but not logged a second time
+			logLine = ""
 		}
 	}
 	set := func(k string, v frontmatter.Value) *Error {
@@ -648,7 +652,9 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 			return nil, serr
 		}
 	}
-	e.text = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol)
+	if logLine != "" {
+		e.text = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol)
+	}
 	rec, cerr := e.commit("")
 	if cerr != nil {
 		return nil, cerr
