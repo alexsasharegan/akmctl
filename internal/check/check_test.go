@@ -135,6 +135,7 @@ func TestRules(t *testing.T) {
 		{"L1 broken link", "L1", "E", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [the guide](docs/guide.md).\n" }}},
 		{"L2 unresolved wikilink", "L2", "W", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [[Nowhere]].\n" }}},
 		{"S1 behind", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 0.3.0", "layout: 0.1.0")}},
+		{"S1 additive", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 0.3.0", "layout: 0.2.0")}},
 		{"S1 missing manifest", "S1", "W", map[string]func(string) string{"docs/.layout": nil}},
 		{"S3 bad flag", "S3", "E", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: maybe\n" }}},
 		{"S4 on without the skill", "S4", "W", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: true\n" }, ".git/HEAD": func(string) string { return "ref: refs/heads/main\n" }}},

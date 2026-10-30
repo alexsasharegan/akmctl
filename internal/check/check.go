@@ -16,6 +16,10 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
+// additiveFrom maps a layout version to the one that only adds optional fields to it,
+// so the upgrade is an edit of the manifest and needs no migration step.
+var additiveFrom = map[string]string{"0.2.0": "0.3.0"}
+
 // LayoutVersion is the layout version this tool checks against.
 const LayoutVersion = "0.3.0"
 
@@ -635,6 +639,10 @@ func (c *checker) manifest() (string, []string) {
 			}
 			c.add("S1", "W", c.repo.ManifestPath(), c.manifestLine("layout"), "", "the repository is on layout %s; run akmctl migrate to reach %s (%d steps)", repoV, LayoutVersion, len(steps))
 			return "behind", steps
+		}
+		if additiveFrom[repoV] == LayoutVersion {
+			c.add("S1", "W", c.repo.ManifestPath(), c.manifestLine("layout"), "", "the repository is on layout %s; %s only adds optional fields, so set layout and every extension.* line in the manifest to %s", repoV, LayoutVersion, LayoutVersion)
+			return "unsupported", nil
 		}
 		c.add("S1", "W", c.repo.ManifestPath(), c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path from it", repoV, LayoutVersion)
 		return "unsupported", nil
