@@ -1,0 +1,22 @@
+{
+  "name": "an unknown profile is rejected",
+  "repo": "basic",
+  "request": {
+    "profile": "wiki"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "init",
+    "request": {
+      "profile": "wiki"
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "profile: unknown value \"wiki\"",
+      "details": {
+        "parameter": "profile"
+      }
+    }
+  }
+}

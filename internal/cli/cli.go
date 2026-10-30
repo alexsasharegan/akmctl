@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -19,7 +20,7 @@ import (
 var Version = "0.0.0-dev"
 
 // positional names the parameter that takes the positional arguments.
-var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "set": {"id"}, "section": {"id", "name"}}
+var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "init": {"dir"}, "set": {"id"}, "section": {"id", "name"}}
 
 // Run executes one command line and returns the exit code.
 func Run(args []string, stdout, stderr io.Writer, cwd string) int {
@@ -194,6 +195,27 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		}
 	}
 	info := api.Info{Name: "akmctl", Version: Version}
+	if op == "init" {
+		// there is no repository yet: the base is the working directory (or
+		// --repo), and a dir that is absolute or climbs out of it becomes the base
+		base := repoDir
+		if d, ok := req["dir"].(string); ok && !relativeDir(d) {
+			base = d
+			if !filepath.IsAbs(d) {
+				base = filepath.Join(repoDir, d)
+			}
+			base, _ = filepath.Abs(base)
+			delete(req, "dir")
+		} else if ok {
+			req["dir"] = filepath.ToSlash(filepath.Clean(d))
+		}
+		resp, aerr := api.Run(&record.Repo{Root: base}, info, op, req)
+		print(stdout, stderr, format, op, resp, aerr == nil)
+		if aerr != nil {
+			return 2
+		}
+		return 0
+	}
 	root, err := record.FindRoot(repoDir)
 	if err == nil {
 		if flagGiven(args, "--repo") {
@@ -249,6 +271,12 @@ func readMigrationFile(p string) ([]any, error) {
 		return x, nil
 	}
 	return nil, fmt.Errorf("%s: a migration file holds an object or a list of objects", p)
+}
+
+// relativeDir reports whether d stays inside the directory it is relative to.
+func relativeDir(d string) bool {
+	c := filepath.ToSlash(filepath.Clean(d))
+	return !filepath.IsAbs(d) && c != ".." && !strings.HasPrefix(c, "../") && !strings.Contains(d, ":")
 }
 
 func flagGiven(args []string, name string) bool {
@@ -416,6 +444,18 @@ func text(w io.Writer, op string, resp api.Obj) {
 		e, _ := resp.Get("errors")
 		wn, _ := resp.Get("warnings")
 		fmt.Fprintf(w, "%v errors, %v warnings\n", e, wn)
+	case "init":
+		dir, _ := resp.Get("dir")
+		prof, _ := resp.Get("profile")
+		wr, _ := resp.Get("written")
+		sk, _ := resp.Get("skipped")
+		fmt.Fprintf(w, "initialised %v (profile %v)\n", dir, prof)
+		for _, p := range wr.([]string) {
+			fmt.Fprintln(w, "  wrote   ", p)
+		}
+		for _, p := range sk.([]string) {
+			fmt.Fprintln(w, "  skipped ", p, "(exists)")
+		}
 	case "index":
 		p, _ := resp.Get("path")
 		ch, _ := resp.Get("changed")
@@ -475,7 +515,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init --profile code|notes [dir]  (writes missing files, never overwrites)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

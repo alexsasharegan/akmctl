@@ -54,6 +54,8 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opIndex(repo, req)
 	case "migrate":
 		body, err = opMigrate(repo, req)
+	case "init":
+		body, err = opInit(repo, req)
 	case "new":
 		body, err = opNew(repo, req)
 	case "set":

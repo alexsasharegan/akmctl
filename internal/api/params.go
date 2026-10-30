@@ -95,6 +95,7 @@ var specs = map[string]map[string]param{
 	"claim":   {"id": s(req, pat(reID)), "as": s(req), "if_match": s(pat(reEtag)), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"release": {"id": s(req, pat(reID)), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"migrate": {"mode": {kind: kString, enum: []string{"report", "plan", "apply_safe", "handoff"}}, "target": s(pat(reVersion)), "acknowledge_backup": {kind: kBool}, "migrations": {kind: kObjects}, "as_of": s(pat(reDateTS))},
+	"init":    {"profile": {kind: kString, enum: []string{"code", "notes"}, required: true}, "dir": s()},
 	"index":   {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
 }
 
