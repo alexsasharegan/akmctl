@@ -384,3 +384,76 @@ const longName = "a-repository-with-an-extremely-long-name-that-goes-on-and-on-f
 assert.equal(L.pageTitle({ view: "Board", repo: longName }), "Board - " + longName + " - akmctl");
 assert.equal(L.pageTitle({ view: "Record 261029-9ep9: Name the page", repo: "akmctl" }), "Record 261029-9ep9: Name the page - akmctl - akmctl");
 assert.equal(L.pageTitle({ view: "ADRs" }), "ADRs - akmctl");
+
+// toast queue
+{
+  const T = await import("./toasts.js");
+  const sp = (o) => T.toastSpec("m", o);
+  assert.deepEqual(sp(), { msg: "m", level: "info", persistent: false, ms: 8000 });
+  assert.equal(sp({ level: "error" }).persistent, true);
+  assert.equal(sp({ level: "error", persistent: false }).persistent, false);
+  assert.equal(sp({ level: "success", persistent: true }).persistent, true);
+  assert.equal(sp({ ms: 12000 }).ms, 12000);
+  assert.equal(sp({ ms: -1 }).ms, 8000);
+  assert.throws(() => T.toastSpec("m", "bad"), TypeError);
+  assert.throws(() => T.toastSpec("m", { level: "bad" }), RangeError);
+  assert.equal(T.roleFor("error"), "alert");
+  assert.equal(T.roleFor("warning"), "alert");
+  assert.equal(T.roleFor("success"), "status");
+  assert.equal(T.roleFor("info"), "status");
+
+  // the limit evicts the oldest ephemeral toast
+  let q = T.createToastQueue();
+  const a = q.add(sp(), 0).id;
+  const b = q.add(sp(), 1).id;
+  const c = q.add(sp(), 2).id;
+  const d = q.add(sp(), 3);
+  assert.deepEqual(d.evicted, [a]);
+  assert.deepEqual(q.ids(), [b, c, d.id]);
+
+  // a persistent toast is not evicted by an ephemeral one
+  q = T.createToastQueue();
+  const p1 = q.add(sp({ level: "error" }), 0).id;
+  const e1 = q.add(sp(), 0).id;
+  const p2 = q.add(sp({ level: "error" }), 0).id;
+  let r = q.add(sp(), 0);
+  assert.deepEqual(r.evicted, [e1]);
+  assert.deepEqual(q.ids(), [p1, p2, r.id]);
+  q.add(sp({ level: "error" }), 0); // evicts the ephemeral one again
+  r = q.add(sp(), 0); // full of persistent: the newcomer is dropped
+  assert.equal(r.id, null);
+  assert.equal(q.ids().length, 3);
+  r = q.add(sp({ level: "error" }), 0); // a persistent newcomer evicts the oldest persistent
+  assert.deepEqual(r.evicted, [p1]);
+  assert.equal(q.newestPersistent(), r.id);
+  assert.equal(q.dismiss(r.id), true);
+  assert.equal(q.dismiss(r.id), false);
+  assert.equal(q.newestPersistent(), q.ids().at(-1));
+  assert.equal(T.createToastQueue().newestPersistent(), null);
+
+  // timers: expiry, pause, resume, two holds
+  q = T.createToastQueue();
+  const t = q.add(sp({ ms: 1000 }), 100).id;
+  const pe = q.add(sp({ level: "error" }), 100).id;
+  assert.equal(q.remaining(t, 100), 1000);
+  assert.equal(q.remaining(t, 400), 700);
+  assert.equal(q.remaining(pe, 400), null);
+  assert.deepEqual(q.expired(1099), []);
+  assert.deepEqual(q.expired(1100), [t]);
+  q.pause(t, "hover", 400);
+  assert.equal(q.paused(t), true);
+  assert.equal(q.remaining(t, 5000), 700);
+  assert.deepEqual(q.expired(5000), []);
+  q.pause(t, "focus", 5000);
+  q.resume(t, "hover", 6000);
+  assert.equal(q.paused(t), true); // focus still holds it
+  assert.equal(q.remaining(t, 7000), 700);
+  q.resume(t, "focus", 7000);
+  assert.equal(q.paused(t), false);
+  assert.equal(q.remaining(t, 7200), 500);
+  assert.deepEqual(q.expired(7700), [t]);
+  q.resume(t, "focus", 8000); // a release without a hold changes nothing
+  assert.equal(q.remaining(t, 8000), 0);
+  assert.deepEqual(q.clear().sort(), [t, pe].sort());
+  assert.deepEqual(q.ids(), []);
+}

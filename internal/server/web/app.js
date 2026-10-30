@@ -136,7 +136,7 @@ async function reload(announce) {
   } catch (e) {
     if (e instanceof ApiError && e.code === "unauthorized") showProblem("No valid token", "Open the URL that akmctl ui printed; it holds the token in its fragment (#token=...). The token lasts as long as that akmctl ui process.");
     else if (!loaded) showProblem("The records did not load", describeError(e));
-    else toast(describeError(e), "bad");
+    else toast(describeError(e), { level: "error" });
   }
 }
 

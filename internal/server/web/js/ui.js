@@ -3,6 +3,7 @@
 import { el, clear, debounce, text } from "./util.js";
 import { score, searchRecords, field } from "./logic.js";
 import { searchBody, describeError } from "./store.js";
+import { createToastQueue, toastSpec, roleFor } from "./toasts.js";
 
 export const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || "");
 export const MOD = isMac ? "⌘" : "Ctrl";
@@ -82,14 +83,86 @@ export function setPage(p) {
 
 // ---- toast ----
 
-export function toast(msg, kind, ms) {
-  const bad = kind === "bad";
-  const box = el("div", { class: "toast" + (bad ? " bad" : "") }, bad ? el("strong", { text: "Error: " }) : null, msg);
-  const host = $("#toasts");
-  host.append(box);
-  while (host.children.length > 3) host.firstChild.remove();
-  setTimeout(() => box.remove(), ms || (bad ? 9000 : 3500));
+const GLYPH = { success: "✓", info: "i", warning: "!", error: "×" };
+const LABEL = { success: "Success", info: "Info", warning: "Warning", error: "Error" };
+const TQ = createToastQueue();
+const tnodes = new Map(); // id -> { box, timer }
+
+function tdrop(id) {
+  const n = tnodes.get(id);
+  if (!n) return;
+  clearTimeout(n.timer);
+  n.box.remove();
+  tnodes.delete(id);
+}
+
+function tarm(id) {
+  const n = tnodes.get(id);
+  if (!n) return;
+  clearTimeout(n.timer);
+  const left = TQ.remaining(id, performance.now());
+  if (left === null || TQ.paused(id)) return;
+  n.timer = setTimeout(() => {
+    for (const x of TQ.expired(performance.now())) (TQ.dismiss(x), tdrop(x));
+    if (TQ.get(id)) tarm(id); // woke a few ms early
+  }, left + 5);
+}
+
+/**
+ * Show a toast and return its element (null if the queue is full of persistent
+ * toasts and this one is ephemeral). opts: { level, persistent, ms } - level is
+ * success | info | warning | error (default info); an error stays until it is
+ * dismissed, the others clear after 8 seconds (ms overrides); persistent forces
+ * either way. The top border is the countdown; hover or focus pauses it. Room is
+ * left for an opts.actions list (buttons) without changing this signature.
+ */
+export function toast(msg, opts) {
+  const spec = toastSpec(msg, opts);
+  const { id, evicted } = TQ.add(spec, performance.now());
+  for (const x of evicted) tdrop(x);
+  if (id === null) return null;
+  const close = el("button", { type: "button", class: "toast-close", "aria-label": "Dismiss " + LABEL[spec.level].toLowerCase() + " message", title: "Dismiss", text: "×" });
+  const box = el(
+    "div",
+    { class: "toast " + spec.level + (spec.persistent ? " persistent" : ""), role: roleFor(spec.level), "data-toast": String(id) },
+    el("span", { class: "toast-glyph", "aria-hidden": "true", text: GLYPH[spec.level] }),
+    el("span", { class: "toast-level", text: LABEL[spec.level] + ": " }),
+    el("span", { class: "toast-body", text: spec.msg }),
+    close,
+  );
+  box.style.setProperty("--toast-ms", spec.ms + "ms");
+  const hold = (reason) => () => (TQ.pause(id, reason, performance.now()), tarm(id));
+  const release = (reason) => () => (TQ.resume(id, reason, performance.now()), tarm(id));
+  box.addEventListener("mouseenter", hold("hover"));
+  box.addEventListener("mouseleave", release("hover"));
+  box.addEventListener("focusin", hold("focus"));
+  box.addEventListener("focusout", release("focus"));
+  close.addEventListener("click", () => dismissToast(box));
+  $("#toasts").append(box);
+  tnodes.set(id, { box, timer: 0 });
+  tarm(id);
   return box;
+}
+
+/** Dismiss one toast (its element, as toast() returned it). */
+export function dismissToast(box) {
+  const id = Number(box && box.dataset.toast);
+  TQ.dismiss(id);
+  tdrop(id);
+}
+
+/** Remove every toast (a dialog opens: a toast would sit over its buttons). */
+export function clearToasts() {
+  for (const id of TQ.clear()) tdrop(id);
+}
+
+/** Escape: dismiss the newest persistent toast; true if there was one. */
+function dismissNewestPersistent() {
+  const id = TQ.newestPersistent();
+  if (id === null) return false;
+  TQ.dismiss(id);
+  tdrop(id);
+  return true;
 }
 
 // ---- overlays ----
@@ -118,7 +191,7 @@ function openOverlay(kind, dialog) {
  */
 export function openDialog(dialog, hooks) {
   S.modal = { mode: "", hints: [], onKey: null, ...hooks };
-  clear($("#toasts")); // a toast would sit over the dialog's buttons
+  clearToasts(); // a toast would sit over the dialog's buttons
   openOverlay("modal", dialog);
 }
 
@@ -285,7 +358,7 @@ const bodyLookup = debounce(async (q, seq) => {
     S.pal.bodyQ = q;
     palRender();
   } catch (e) {
-    if (seq === S.pal.seq && S.overlay === "palette") toast("Body search failed: " + describeError(e), "bad");
+    if (seq === S.pal.seq && S.overlay === "palette") toast("Body search failed: " + describeError(e), { level: "error" });
   }
 }, 250);
 
@@ -374,6 +447,10 @@ function onKeyDown(e) {
     return;
   }
   if (typing(e.target) || mod || e.altKey) return;
+  if (e.key === "Escape" && dismissNewestPersistent()) {
+    e.preventDefault();
+    return;
+  }
   if (e.key === "?") openHelp();
   else if (e.key === "/") openPalette();
   else if (e.key === "t") toggleTheme();

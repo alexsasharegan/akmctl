@@ -46,7 +46,7 @@ Done when:
 
 ## Next
 
-Ready; no dependencies. Start here: it has the highest priority.
+Implemented and checked in the browser (dark and light); waiting for Alexander's review before closing. Not done: toast action buttons (261029-mj49 will add an Open action through opts.actions; the undo button is still appended by flow.js undoToast), and reduced motion was not exercised in a browser (CSS only).
 
 ## Log
 
@@ -54,3 +54,4 @@ Ready; no dependencies. Start here: it has the highest priority.
 - 2026-10-29: refined with Alexander (first cut without actions).
 - 2026-10-29: claimed (claude).
 - 2026-10-29: claimed; implementation delegated to an agent. Design note: leave room in the toast API for an actions list (see 261029-mj49, which wants an Open action after a capture).
+- 2026-10-29: implemented: js/toasts.js queue (limit, persistence, holds), levels with glyph and word, countdown top border, close icon, Escape, bottom right; callers migrated; glossary Toast row updated.
