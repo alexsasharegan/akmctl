@@ -2,24 +2,36 @@
 
 ## Now
 
-## Next
+- [261029-d3cp] Name the roadmap convention and define the 1.0.0 milestone
 
-Beta (greenfield only; adoption is not claimed). Order of work:
+## Next
 
 ## Later
 
-1.0.0 requirements (adoption and safety):
+### 1.0.0
+
+Exit criteria (draft, for Alexander to edit). The layout, the API and the spec are declared stable at 1.0.0, and:
+
+1. **Adoption works.** An existing repository can be brought into AKM with `migrate`: discovery finds its records, the plan simulates every step, and apply reports what it leaves broken.
+2. **Writes are safe.** A write that changes several files cannot stop half-way, and the last operation can be undone.
+3. **Other layouts are first-class.** `check` can validate a repository against a layout other than the tool's own.
+4. **The standard has no known gaps.** One copy of the API fixtures, and the known rule defects (L2, S2, orphaned ADRs from the done wizard) are closed.
+5. **Compatibility is stated.** The spec says what a MINOR and a MAJOR change to the layout, the API and the extensions mean.
+
+Items:
 
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest
-- [261028-a2wd] Let check --target accept layouts other than the tool's own
 - [261029-47m0] migrate plan: simulate move_file steps
 - [261029-m0vm] move_file: report the inbound links it leaves broken
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback
 - [261029-shz5] Undo covers only the last safe move or capture
+- [261028-a2wd] Let check --target accept layouts other than the tool's own
 - [261029-x4ws] Keep one copy of the API fixtures
 - [261029-z4gk] Rule L2: understand escaped pipes in wikilinks inside tables
 - [261029-wpak] Rule S2: accept block scalars in SKILL.md frontmatter
 - [261029-nkqv] A new ADR made by the done wizard can be orphaned
+
+### Not promised for 1.0.0
 
 Workbench and polish:
 

@@ -16,7 +16,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 
 - `docs/architecture.md`: the map of packages and the invariants.
 - `docs/adr/`: decisions; `docs/adr/README.md` is the generated routing index.
-- `docs/ROADMAP.md`: the order of work. Open work: `/tmp/akmctl ls --status ready,active,blocked`.
+- `docs/ROADMAP.md`: the order of work, in the Now / Next / Later convention with milestones in Later (ADR 261029-6cp5); finished work leaves it for `done/` and the changelog. Open work: `/tmp/akmctl ls --status ready,active,blocked`.
 - `docs/work/`: work items; `docs/work/done/` holds closed ones.
 - `.agents/skills/`: the procedures (`akm`, `akm-work-items`, `akm-record-decision`).
 - `docs/spec/`: the AKM standard, the guide, the API spec and `akm-api/` (schemas, validator, fixtures). `docs/design/`: the design history. `testdata/api/` is a copy of `docs/spec/akm-api/.fixtures`; the spec copy is the source, so change both by hand (work item 261029-x4ws files the fix).
