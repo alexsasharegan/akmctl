@@ -2,7 +2,7 @@
 id: "261029-eegx"
 title: "Platform support tiers: macOS and Linux supported, Windows best effort before 1.0.0"
 summary: "macOS is supported, Linux is supported, Windows is best effort and out of scope for any release below 1.0.0."
-status: proposed
+status: accepted
 date: 2026-10-29
 ---
 
