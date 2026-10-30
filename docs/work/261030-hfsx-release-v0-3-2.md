@@ -31,3 +31,4 @@ Alexander tags and pushes v0.3.2 (git tag v0.3.2 && git push origin v0.3.2), the
 - 2026-10-30: filed.
 - 2026-10-30: claimed (claude).
 - 2026-10-30: changelog heading 0.3.2 added; waiting for the tag, which is the maintainer's.
+- 2026-10-30: v0.3.2 tag pushed by Alexander; wrote docs/release.md and linked it from AGENTS.md.

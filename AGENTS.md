@@ -7,7 +7,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Build: `go build -o /tmp/akmctl ./cmd/akmctl` (Go 1.27; standard library only, plus `go.yaml.in/yaml/v3` in tests).
 - Test: `go vet ./... && go test ./...`; add `-race` on Linux or macOS. `gofmt -l .` prints nothing.
 - Width tables: `go generate ./internal/width` (Unicode 17.0.0 data in `internal/width/data`).
-- Release archives: `scripts/release.sh <version>`; CI runs it on a `v*` tag.
+- Release archives: `scripts/release.sh <version>`; CI runs it on a `v*` tag. The steps are in `docs/release.md`.
 - Records check: build the tool as above, then `/tmp/akmctl check` (this repo is its own test case; use the build of the current branch, not an installed copy).
 - Format records and schemas: `npm ci` once, then `npm run format:check` and `npm run schemas` (Prettier 3.9.10 and Ajv 8 are dev dependencies in `package.json`); `/tmp/akmctl index` regenerates `docs/adr/README.md`.
 - Full check before a commit: the test, records check and format commands above.
@@ -18,6 +18,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - `docs/adr/`: decisions; `docs/adr/README.md` is the generated routing index.
 - `docs/glossary.md`: the words the project uses and avoids (record, work item, workbench parts, Obsidian Bases).
 - `docs/ROADMAP.md`: the order of work, in the Now / Next / Later convention with milestones in Later (ADR 261029-6cp5); finished work leaves it for `done/` and the changelog. Open work: `/tmp/akmctl ls --status ready,active,blocked`.
+- `docs/release.md`: how a version is cut (prepare, tag, verify); the maintainer tags.
 - `docs/work/`: work items; `docs/work/done/` holds closed ones.
 - `.agents/skills/`: the procedures (`akm`, `akm-work-items`, `akm-record-decision`).
 - `docs/spec/`: the AKM standard, the guide, the API spec and `akm-api/` (schemas, validator, fixtures). `docs/design/`: the design history. `testdata/api/` is a copy of `docs/spec/akm-api/.fixtures`; the spec copy is the source, so change both by hand (work item 261029-x4ws files the fix).
