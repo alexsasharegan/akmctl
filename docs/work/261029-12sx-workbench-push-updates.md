@@ -33,3 +33,4 @@ Whatever is chosen, the stat-based change token (261029-xeph) is the foundation:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: Alexander leans toward FSEvents through cgo for the macOS driver when this is pulled in; the ADR should confirm after the poll measurement (261029-xeph).
