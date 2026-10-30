@@ -34,6 +34,8 @@ Items:
 Workbench and polish:
 
 - [261029-95f2] Replace the init questionnaire with a Bubble Tea wizard
+- [261029-xeph] Measure the workbench poll, then add a conditional poll with a change token
+- [261029-12sx] Push updates to the workbench with a watcher, keeping polling as the fallback
 
 - [261029-30my] Filter the board and tables by project
 - [261029-ctzc] Make wikilinks in drawer fields clickable and open them in Obsidian
