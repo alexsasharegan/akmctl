@@ -326,3 +326,57 @@ func trimLeadingBlank(l []string) []string {
 	}
 	return l
 }
+
+// moveClosed moves every record in dir (the subfolders only with recursive)
+// whose status is done or dropped (or one of statuses) into the done folder: to
+// when set, else done/ inside dir. It is the one-step form of a move_file per
+// closed record: a record already there, or whose target exists, is left
+// alone, and nothing is overwritten. It returns the new paths.
+func moveClosed(repo *record.Repo, s Step, dry bool) ([]string, []string, error) {
+	files := []string{}
+	ts, notes, err := targets(repo, s)
+	if err != nil {
+		return files, notes, err
+	}
+	dest := path.Join(path.Clean(s.Dir), "done")
+	if s.To != "" {
+		if !safeRel(s.To) {
+			return files, notes, fmt.Errorf("to %q must be a repository-relative path", s.To)
+		}
+		dest = path.Clean(s.To)
+	}
+	closed := s.Statuses
+	if len(closed) == 0 {
+		closed = []string{"done", "dropped"}
+	}
+	for _, t := range ts {
+		if path.Dir(t.Path) == dest || strings.HasPrefix(t.Path, dest+"/") {
+			continue
+		}
+		doc, note, ok := parseTarget(t)
+		if note != "" {
+			notes = append(notes, note)
+		}
+		if !ok || !statusAllowed(doc, closed) {
+			continue
+		}
+		to := path.Join(dest, path.Base(t.Path))
+		abs := filepath.Join(repo.Root, filepath.FromSlash(to))
+		if _, err := os.Stat(abs); err == nil {
+			notes = append(notes, t.Path+": left in place, "+to+" exists")
+			continue
+		}
+		files = append(files, to)
+		if dry {
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+			return files, notes, err
+		}
+		if err := os.Rename(filepath.Join(repo.Root, filepath.FromSlash(t.Path)), abs); err != nil {
+			return files, notes, err
+		}
+	}
+	sort.Strings(files)
+	return files, notes, nil
+}

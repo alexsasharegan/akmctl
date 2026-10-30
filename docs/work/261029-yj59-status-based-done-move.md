@@ -1,7 +1,7 @@
 ---
 id: "261029-yj59"
 title: Move closed records to done/ by status in one step
-status: ready
+status: active
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
@@ -17,10 +17,17 @@ Add a migrate step that moves every record whose status is done or dropped into 
 
 Done when:
 
-- [ ] A step with a dir parameter moves closed records.
-- [ ] .migrate-log stays small for 100 files.
-- [ ] Tests on the vault fixture.
+- [x] A step with a dir parameter moves closed records.
+- [x] .migrate-log stays small for 100 files.
+- [x] Tests on the vault fixture.
+
+## Next
+
+Review move_closed (internal/migrate/steps.go); the schema enum and API spec step list do not name it yet (spec edits were out of scope). Then close with the drafted Outcome.
 
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: claimed (life-agent).
+- 2026-10-29: added the move_closed migrate step (dir, optional to, default dir/done; statuses default done and dropped; never overwrites) and a count field in .migrate-log lines. Tests in internal/migrate/moveclosed_test.go on the vault fixture and on 100 notes.
+- 2026-10-29: released (life-agent).
