@@ -2,15 +2,24 @@
 id: "261029-2k7z"
 title: spike for shell completions
 summary: "add shell autocompletion command for bash, zsh, fish, and powershell"
-status: raw
+status: ready
 kind: spike
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 # spike for shell completions
 
 ## Goal
+
+A spike: settle the design and prove it with a prototype, then file the implementation as its own work item. The sections below are the proposal under test, not a commitment.
+
+### Done when
+
+- [ ] The open question below is answered in the Log, from the CLI's dispatcher code.
+- [ ] A prototype `akmctl completion zsh` works end to end: the script sources without output, and tab completes subcommands and flags with their descriptions.
+- [ ] The Log records whether PowerShell is in scope for the first release (the proposal names it, the technical design covers only Bash, Zsh and Fish).
+- [ ] An implementation work item is filed (`akmctl new work`) whose Goal carries the acceptance criteria below, adjusted for what the prototype showed.
 
 ### Problem / Context
 
@@ -57,9 +66,9 @@ akmctl completion bash | sudo tee /etc/bash_completion.d/akmctl > /dev/null
   - The completion hook must execute before heavy runtime operations (e.g., reading remote configs, authenticating network clients, or loading heavy dependencies).
   - Check for the completion trigger at the very top of `main()` to guarantee terminal responses within $< 30\text{ ms}$.
 
-Does the CLI use a custom subcommand dispatcher (e.g., switching on `os.Args[1]` with separate `flag.FlagSet` instances), or a single flat set of flags?
+Open question (the spike answers it): does the CLI use a custom subcommand dispatcher (e.g., switching on `os.Args[1]` with separate `flag.FlagSet` instances), or a single flat set of flags?
 
-#### Acceptance Criteria
+#### Acceptance criteria for the implementation item
 
 - [ ] Running `akmctl completion <shell>` generates a valid, working completion script for Bash, Zsh, Fish, and PowerShell.
 - [ ] Passing an invalid or missing shell argument returns an actionable error and exits with code 1.
@@ -71,3 +80,5 @@ Does the CLI use a custom subcommand dispatcher (e.g., switching on `os.Args[1]`
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-30: reframed as a spike: the done-when is the design question, a zsh prototype and a filed implementation item; the old acceptance criteria move to that item. Commit cc3bce9 only added this record; no completion code exists.
+- 2026-10-30: marked ready.

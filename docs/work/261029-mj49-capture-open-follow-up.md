@@ -1,9 +1,9 @@
 ---
 id: "261029-mj49"
 title: After a capture, offer to open the new record
-status: raw
+status: ready
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 kind: feature
 priority: 0
 summary: "After the capture modal files a raw record, a toast offers to open it: an Open action, or a temporary key binding the toast names"
@@ -31,3 +31,4 @@ Done when:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-30: marked ready; the open-where question can be settled while building.

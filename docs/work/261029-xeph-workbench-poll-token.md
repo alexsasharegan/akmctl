@@ -1,9 +1,9 @@
 ---
 id: "261029-xeph"
 title: Measure the workbench poll, then add a conditional poll with a change token
-status: raw
+status: ready
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 kind: feature
 priority: 3
 summary: Measure what one workbench poll costs on a repository of about 10000 files; if it is slow, add a change token and If-None-Match so an unchanged poll answers 304
@@ -26,3 +26,4 @@ Done when:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-30: marked ready.

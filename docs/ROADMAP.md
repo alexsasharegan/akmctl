@@ -57,6 +57,7 @@ Workbench and polish:
 - [261026-mrdr] pkm-workbench: sort options
 - [261026-np3c] pkm-workbench: delete a task, with its backlinks listed
 - [261026-zg0g] pkm-workbench: filters
+- [261029-mj49] After a capture, offer to open the new record
 
 Hardening and small rules:
 
@@ -65,5 +66,7 @@ Hardening and small rules:
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
+- [261029-2k7z] spike for shell completions
+- [261030-43jw] Evaluate and potentially migrate to Oxc toolchain (oxlint / oxfmt)
 
 ## Dropped

@@ -3,9 +3,9 @@ id: "261029-12sx"
 title: Push updates to the workbench with a watcher, keeping polling as the fallback
 status: raw
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 kind: feature
-priority: 3
+priority: -1
 summary: Server-sent events fed by a file watcher, with the 2 second poll kept as the fallback, a manifest toggle and an akmctl ui --watch override
 ---
 
@@ -30,7 +30,14 @@ Options for a native macOS driver (FSEvents has no pure-Go interface; it is a Co
 
 Whatever is chosen, the stat-based change token (261029-xeph) is the foundation: a native watcher only says when to rescan, and FSEvents can itself ask for a rescan.
 
+Done when:
+
+- [ ] An ADR draft (`proposed`) picks the macOS watcher driver (cgo and FSEvents, `purego`, a helper binary or `fsnotify`) and settles `EventSource` authentication, branch-switch debouncing and the descriptor limits.
+- [ ] A spike or the measurement of 261029-xeph backs the choice.
+- [ ] Implementation work items are filed for the build.
+
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: Alexander leans toward FSEvents through cgo for the macOS driver when this is pulled in; the ADR should confirm after the poll measurement (261029-xeph).
+- 2026-10-30: priority set to -1 (behind the default); done-when drafted; stays raw until the 261029-xeph measurement exists.
