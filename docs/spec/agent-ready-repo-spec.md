@@ -136,7 +136,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 
 `YYMMDD-xxxx`, for example `261027-k7f2`. Width 11.
 
-- `YYMMDD` is the creation date in **UTC**, two-digit year (20YY). UTC is used so the id does not depend on whose machine minted it.
+- `YYMMDD` is the creation date, two-digit year (20YY), as the **local calendar day** of the machine that mints the id (or the `as_of` day when the request gives one), so an evening in a western time zone does not carry tomorrow's date.
 - `xxxx` is four random characters from the alphabet `0123456789abcdefghjkmnpqrstvwxyz` (Crockford's Base32 alphabet, lowercase; 32 characters; `i`, `l`, `o` omitted as lookalikes for `1` and `0`, `u` omitted to avoid accidental words; no check digit, and no decoding of lookalike or uppercase characters).
 - Pattern: `^\d{6}-[0-9a-hjkmnp-tv-z]{4}$`.
 - Collision odds: 1,048,576 suffixes per day. With 20 records created across parallel branches in one day, the chance of any collision is about 1 in 5,000. Two files with the same id and different slugs merge cleanly in git, so a collision is caught when `akmctl check` runs (rule I1). Repair it by hand: rename the later file, edit its `id`, and search for references to the old id.

@@ -19,7 +19,12 @@ const idAlphabet = "0123456789abcdefghjkmnpqrstvwxyz"
 
 var reSlug = regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`)
 
-// clock is the time of a write: as_of when given, otherwise now (UTC).
+// timeNow is the system clock; tests replace it.
+var timeNow = time.Now
+
+// clock is the time of a write: as_of when given, otherwise now in the local
+// zone, so the dates the tool writes (ids, created, updated, log lines) are the
+// local calendar day. Timestamps (claimed_at) are written in UTC.
 func clock(q Request) time.Time {
 	if s := q.str("as_of"); s != "" {
 		layout := "2006-01-02"
@@ -30,7 +35,7 @@ func clock(q Request) time.Time {
 			return t
 		}
 	}
-	return time.Now().UTC()
+	return timeNow()
 }
 
 func today(t time.Time) string { return t.Format("2006-01-02") }
@@ -630,6 +635,10 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 		if prev != who {
 			logLine = "took over from " + prev + " (" + who + ")."
+		} else if st == "active" {
+			// the same holder already holds an active item: the claim is
+			// refreshed (claimed_at) but not logged a second time
+			logLine = ""
 		}
 	}
 	set := func(k string, v frontmatter.Value) *Error {
@@ -643,12 +652,14 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 			return nil, serr
 		}
 	}
-	for _, kv := range []struct{ k, v string }{{"claimed_by", who}, {"claimed_at", now.Format("2006-01-02T15:04")}, {"updated", today(now)}} {
+	for _, kv := range []struct{ k, v string }{{"claimed_by", who}, {"claimed_at", now.UTC().Format("2006-01-02T15:04")}, {"updated", today(now)}} {
 		if serr := set(kv.k, frontmatter.NewString(kv.v)); serr != nil {
 			return nil, serr
 		}
 	}
-	e.text = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol)
+	if logLine != "" {
+		e.text = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol)
+	}
 	rec, cerr := e.commit("")
 	if cerr != nil {
 		return nil, cerr

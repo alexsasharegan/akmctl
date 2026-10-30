@@ -280,6 +280,10 @@ func TestClaimAndRelease(t *testing.T) {
 	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-2", "as_of": "2026-10-28T12:00"}, "refused", "claimed")
 	// the same holder refreshes
 	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T12:00"})
+	text = read(t, root, "docs/work/261022-e5f6-document-the-exit-codes.md")
+	if n := strings.Count(text, "claimed (agent-1)."); n != 1 || !strings.Contains(text, "claimed_at: 2026-10-28T12:00\n") {
+		t.Fatalf("same-holder re-claim must refresh claimed_at without a second log line:\n%s", text)
+	}
 	// stale: takeover without the flag
 	resp = mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-2", "as_of": "2026-10-30T12:00"})
 	if pv, _ := resp.Get("previous_holder"); pv != "agent-1" {
@@ -297,6 +301,22 @@ func TestClaimAndRelease(t *testing.T) {
 	}
 	wantCode(t, root, "release", Request{"id": e5f6}, "refused", "not_claimed")
 	wantCode(t, root, "claim", Request{"id": "261026-m1n2", "as": "x"}, "refused", "status")
+}
+
+// A claimed item that is blocked and then unblocked to active (set, then
+// claim by the same identity) keeps one 'claimed' line in its log.
+func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
+	root := copyRepo(t, "basic", "extension.claims: 1.0.0\n")
+	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
+	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "blocked", "blocked_by": []any{"waiting on review"}}, "as_of": "2026-10-28"})
+	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "active", "blocked_by": nil}, "as_of": "2026-10-29"})
+	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-29T08:00"})
+	text := read(t, root, "docs/work/261022-e5f6-document-the-exit-codes.md")
+	if n := strings.Count(text, "claimed (agent-1)."); n != 1 {
+		t.Fatalf("want one claimed line, got %d:\n%s", n, text)
+	}
+	// another identity still has to ask for a takeover
+	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-2", "as_of": "2026-10-29T08:05"}, "refused", "claimed")
 }
 
 func TestCloseClearsClaim(t *testing.T) {

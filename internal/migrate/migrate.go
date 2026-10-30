@@ -25,7 +25,7 @@ var embedded embed.FS
 
 // Step is one declarative step. Kind is one of the primitives (rename_field,
 // set_default, remove_field, copy_field, title_from_h1, goal_scaffold,
-// rename_heading, move_file, add_file, mint_ids) or "manual".
+// rename_heading, move_file, move_closed, add_file, mint_ids) or "manual".
 type Step struct {
 	ID          string   `json:"id"`
 	Kind        string   `json:"kind"`
@@ -45,6 +45,8 @@ type Step struct {
 	Statuses    []string `json:"statuses,omitempty"`   // goal_scaffold: only records with one of these statuses
 	Rename      *bool    `json:"rename,omitempty"`     // mint_ids: rename the files (default true)
 	Seed        string   `json:"seed,omitempty"`       // mint_ids: makes the id suffixes repeatable
+	SlugFrom    string   `json:"slug_from,omitempty"`  // mint_ids: name (default) or title
+	MaxSlug     int      `json:"max_slug,omitempty"`   // mint_ids: the longest slug, 1 to 100 (default 60)
 }
 
 // Rename is one file move a step planned or made, repository-relative.
@@ -273,6 +275,12 @@ func runBasic(repo *record.Repo, s Step, dry bool) ([]string, []string, error) {
 		if err != nil {
 			return files, notes, err
 		}
+	case "move_closed":
+		var err error
+		files, notes, err = moveClosed(repo, s, dry)
+		if err != nil {
+			return files, notes, err
+		}
 	case "goal_scaffold":
 		var err error
 		notes, err = goalScaffold(repo, s, write)
@@ -381,7 +389,7 @@ func toValue(v any) (frontmatter.Value, error) {
 var versionRe = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
 
 var stepKinds = map[string]bool{"rename_field": true, "set_default": true, "remove_field": true, "copy_field": true, "title_from_h1": true, "goal_scaffold": true,
-	"rename_heading": true, "move_file": true, "add_file": true, "mint_ids": true, "manual": true}
+	"rename_heading": true, "move_file": true, "add_file": true, "mint_ids": true, "move_closed": true, "manual": true}
 
 // Validate checks a migration that did not come from the embedded set: versions,
 // step ids, kinds, classes and the parameters each kind needs.
@@ -420,8 +428,14 @@ func Validate(m Migration) error {
 			need["from"], need["to"] = []string{s.From}, []string{s.To}
 		case "add_file":
 			need["path"] = []string{s.Path}
-		case "mint_ids":
+		case "mint_ids", "move_closed":
 			need["dir"] = []string{s.Dir}
+			if s.SlugFrom != "" && s.SlugFrom != "name" && s.SlugFrom != "title" {
+				return fmt.Errorf("%s: slug_from must be name or title", at)
+			}
+			if s.MaxSlug < 0 || s.MaxSlug > 100 {
+				return fmt.Errorf("%s: max_slug must be between 1 and 100", at)
+			}
 		}
 		for k, v := range need {
 			if v[0] == "" {

@@ -66,6 +66,7 @@ type logLine struct {
 	From  string   `json:"from"`
 	To    string   `json:"to"`
 	Step  string   `json:"step"`
+	Count int      `json:"count"`
 	Files []string `json:"files"`
 	Notes []string `json:"notes,omitempty"`
 }
@@ -81,7 +82,7 @@ func AppendLog(root, from, to string, results []Result, now time.Time) error {
 		if r.Status != "applied" {
 			continue
 		}
-		b, _ := json.Marshal(logLine{now.UTC().Format("2006-01-02T15:04:05Z"), from, to, r.Step.ID, r.Files, r.Notes})
+		b, _ := json.Marshal(logLine{now.UTC().Format("2006-01-02T15:04:05Z"), from, to, r.Step.ID, len(r.Files), r.Files, r.Notes})
 		if _, err := f.Write(append(b, '\n')); err != nil {
 			return err
 		}
