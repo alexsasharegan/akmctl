@@ -65,7 +65,8 @@ func (c *checker) links() {
 				if byName == nil {
 					byName = c.markdownIndex()
 				}
-				name := strings.TrimSpace(m[1])
+				// inside a table cell Obsidian writes the alias pipe as \|, so the name can end in a backslash
+				name := strings.TrimSpace(strings.TrimRight(strings.TrimSpace(m[1]), `\`))
 				if name == "" {
 					continue
 				}

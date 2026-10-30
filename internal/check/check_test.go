@@ -270,3 +270,15 @@ func TestBadManifestPathIsAnError(t *testing.T) {
 	}
 	t.Fatalf("no S3 error: %+v", res.Findings)
 }
+
+// Obsidian escapes the alias pipe inside a table cell as \|, so [[name\|alias]] names the note "name".
+func TestL2EscapedPipeInTableCell(t *testing.T) {
+	edit := map[string]func(string) string{"AGENTS.md": func(s string) string {
+		return s + "\n| a | b |\n| - | - |\n| [[AGENTS\\|the agents file]] | x |\n"
+	}}
+	for _, f := range Run(repoWith(t, edit), Options{AsOf: asOf}).Findings {
+		if f.Rule == "L2" {
+			t.Fatalf("%+v", f)
+		}
+	}
+}

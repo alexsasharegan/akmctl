@@ -13,7 +13,7 @@ summary: project and origin hold wikilinks such as Vault Views; show them as lin
 
 ## Goal
 
-In the drawer, project: [[Vault Views]] and origin: [[261025-g68j-build-pkm-workbench]] are plain text. Parse a quoted wikilink (with or without an alias, in a field or inside a list) and render it as a link. Clicking opens the target note in Obsidian, the same action as Open in Obsidian. If the target is an AKM record, offer to open it in the workbench drawer instead (open question: which is the default; Alexander asked for the Obsidian open first).
+In the drawer, project: `[[Vault Views]]` and origin: `[[261025-g68j-build-pkm-workbench]]` are plain text. Parse a quoted wikilink (with or without an alias, in a field or inside a list) and render it as a link. Clicking opens the target note in Obsidian, the same action as Open in Obsidian. If the target is an AKM record, offer to open it in the workbench drawer instead (open question: which is the default; Alexander asked for the Obsidian open first).
 
 Done when:
 

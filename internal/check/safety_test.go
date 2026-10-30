@@ -175,3 +175,21 @@ func TestSafetyCorpus(t *testing.T) {
 	})
 	t.Logf("%d files, %d lines, %d findings", files, lines, len(c.out))
 }
+
+// A record's file name and the target of a Markdown link are public by design, so SF3 skips them;
+// a random string next to them is still reported.
+func TestSF3SkipsRecordNamesAndLinkTargets(t *testing.T) {
+	for _, line := range []string{
+		"1. `init` ([261029-0gb4](done/261029-0gb4-akmctl-init-with-profiles.md)), with tests.",
+		"See [the item](../work/done/261029-0gb4-akmctl-init-with-profiles-and-more-words.md).",
+		"The file is docs/work/done/261029-0gb4-akmctl-init-with-profiles.md in the repository.",
+	} {
+		if got := safetyRules(t, withLine(line)); len(got) != 0 {
+			t.Errorf("%q: %+v", line, got)
+		}
+	}
+	got := safetyRules(t, withLine("See [the item](done/261029-0gb4-x.md) and the value "+random+"."))
+	if len(got) != 1 || got[0].Rule != "SF3" {
+		t.Fatalf("a secret beside a link must still be reported: %+v", got)
+	}
+}

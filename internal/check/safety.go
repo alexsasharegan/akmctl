@@ -39,6 +39,11 @@ var hashPrefix = regexp.MustCompile(`(?:\bh1:|\bsha(?:1|256|384|512)[-:=]|\binte
 var urlSpan = regexp.MustCompile(`https?://[^\s)>\]"']+`)
 var entropyToken = regexp.MustCompile(`[A-Za-z0-9+/=_-]{32,}`)
 
+// A repository path is public by design: the target of a Markdown link, or a record file name
+// (YYMMDD-xxxx-slug, with an optional folder prefix and .md).
+var linkTargetSpan = regexp.MustCompile(`\]\([^)\n]*\)`)
+var recordName = regexp.MustCompile(`^(?:[A-Za-z0-9_.-]+/)*[0-9]{6}-[0-9a-hjkmnp-tv-z]{4}-[0-9a-z-]+(?:\.md)?$`)
+
 type denyEntry struct {
 	n   int
 	lit string
@@ -125,9 +130,13 @@ func (c *checker) safetyLine(file string, n int, line string, deny []denyEntry) 
 	}
 	if !hit && !allowed["SF3"] {
 		urls := urlSpan.FindAllStringIndex(line, -1)
+		urls = append(urls, linkTargetSpan.FindAllStringIndex(line, -1)...)
 		for _, loc := range entropyToken.FindAllStringIndex(line, -1) {
 			if inSpan(urls, loc[0]) {
 				continue // ids in URLs (playlists, document ids) are public by design; SF1 still sees known token formats
+			}
+			if recordName.MatchString(line[loc[0]:loc[1]]) {
+				continue // a record's file name, not a secret
 			}
 			if hashPrefix.MatchString(line[:loc[0]]) {
 				continue // go.sum and package-lock integrity values are hashes
