@@ -1,5 +1,5 @@
 // Package record loads the records of an AKM repository: work items, ADRs and
-// the roadmap, from the files under docs/.
+// the roadmap, from the folders the manifest names (docs/work, docs/adr and docs/ROADMAP.md by default).
 package record
 
 import (
@@ -90,6 +90,7 @@ type Repo struct {
 	Layout   map[string]frontmatter.Value
 	Problems []Problem
 
+	metaDir                  string // folder of the manifest, relative to Root; "" means the default
 	workDir, adrDir, roadmap string // from the manifest; "" means the default
 	gitCommits               bool   // git_commits in the manifest; false when absent or invalid
 }
@@ -102,9 +103,76 @@ const (
 	DefaultWorkDir = "docs/work"
 	DefaultADRDir  = "docs/adr"
 	DefaultRoadmap = "docs/ROADMAP.md"
-	// ManifestPath is where the manifest lives; it does not move.
-	ManifestPath = "docs/.layout"
+	// DefaultMetaDir is the folder of the manifest, the deny list, the lock and
+	// the migrate log when the repository has no manifest to say otherwise.
+	DefaultMetaDir = "docs"
+	// ManifestName is the file name of the manifest inside the meta folder.
+	ManifestName = ".layout"
 )
+
+// MetaDir is the folder that holds the manifest (.layout), the deny list
+// (.akm-deny), the lock (.akm.lock) and the migrate log (.migrate-log),
+// repository-relative with /. It is docs unless discovery found a manifest
+// in another folder.
+func (r *Repo) MetaDir() string {
+	if r.metaDir != "" {
+		return r.metaDir
+	}
+	return DefaultMetaDir
+}
+
+// SetMetaDir sets the meta folder (for a repository that does not exist on disk yet).
+func (r *Repo) SetMetaDir(d string) { r.metaDir = d }
+
+// ManifestPath is the repository-relative path of the manifest.
+func (r *Repo) ManifestPath() string { return r.MetaDir() + "/" + ManifestName }
+
+// DenyPath is the repository-relative path of the deny list.
+func (r *Repo) DenyPath() string { return r.MetaDir() + "/.akm-deny" }
+
+// MigrateLogPath is the repository-relative path of the migrate log.
+func (r *Repo) MigrateLogPath() string { return r.MetaDir() + "/.migrate-log" }
+
+// Locate finds the folder of the manifest below root: docs when docs/.layout
+// exists, else the one immediate, non-hidden subdirectory (not node_modules)
+// that holds a .layout file. found is false when there is none. Two or more
+// candidates are an error that names them.
+func Locate(root string) (dir string, found bool, err error) {
+	has := func(d string) bool {
+		st, e := os.Stat(filepath.Join(root, d, ManifestName))
+		return e == nil && !st.IsDir()
+	}
+	if has(DefaultMetaDir) {
+		return DefaultMetaDir, true, nil
+	}
+	ents, e := os.ReadDir(root)
+	if e != nil {
+		return "", false, nil
+	}
+	var cands []string
+	for _, en := range ents {
+		n := en.Name()
+		if strings.HasPrefix(n, ".") || n == "node_modules" || n == DefaultMetaDir {
+			continue
+		}
+		if !en.IsDir() && en.Type()&os.ModeSymlink == 0 {
+			continue
+		}
+		if has(n) {
+			cands = append(cands, n)
+		}
+	}
+	switch len(cands) {
+	case 0:
+		return "", false, nil
+	case 1:
+		return cands[0], true, nil
+	}
+	for i, c := range cands {
+		cands[i] = c + "/" + ManifestName
+	}
+	return "", false, fmt.Errorf("more than one manifest: %s; keep one (the others may be a different project's)", strings.Join(cands, " and "))
+}
 
 // WorkDir is the folder of work items (manifest key work_dir), with /.
 func (r *Repo) WorkDir() string {
@@ -179,21 +247,24 @@ func nested(a, b string) bool {
 	return a == b || strings.HasPrefix(a, b+"/") || strings.HasPrefix(b, a+"/")
 }
 
-// FindRoot returns the nearest ancestor of dir that has docs/.layout or AGENTS.md.
+// FindRoot returns the nearest ancestor of dir that has a manifest (see Locate)
+// or AGENTS.md.
 func FindRoot(dir string) (string, error) {
 	d, err := filepath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
 	for {
-		for _, m := range []string{ManifestPath, "AGENTS.md"} {
-			if _, err := os.Stat(filepath.Join(d, filepath.FromSlash(m))); err == nil {
-				return d, nil
-			}
+		if _, err := os.Stat(filepath.Join(d, "AGENTS.md")); err == nil {
+			return d, nil
+		}
+		// an ambiguous manifest still marks the root; Load reports the error
+		if _, found, err := Locate(d); found || err != nil {
+			return d, nil
 		}
 		p := filepath.Dir(d)
 		if p == d {
-			return "", errors.New("no repository root (docs/.layout or AGENTS.md) above " + dir)
+			return "", errors.New("no repository root (a .layout manifest or AGENTS.md) above " + dir)
 		}
 		d = p
 	}
@@ -225,6 +296,13 @@ func Load(root string) (*Repo, error) {
 		return nil, errors.New("cannot read repository at " + root)
 	}
 	r := &Repo{Root: root, Layout: map[string]frontmatter.Value{}}
+	dir, found, err := Locate(root)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		r.metaDir = dir
+	}
 	r.loadLayout()
 	for _, d := range []struct{ dir, typ string }{{r.WorkDir(), Work}, {r.DoneDir(), Work}, {r.ADRDir(), ADR}} {
 		ents, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(d.dir)))
@@ -266,20 +344,20 @@ func Load(root string) (*Repo, error) {
 }
 
 func (r *Repo) loadLayout() {
-	b, err := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(ManifestPath)))
+	b, err := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(r.ManifestPath())))
 	if err != nil {
 		return
 	}
 	doc, err := frontmatter.ParseBare(b)
 	if err != nil {
-		r.Problems = append(r.Problems, Problem{ManifestPath, 0, err.Error(), ""})
+		r.Problems = append(r.Problems, Problem{r.ManifestPath(), 0, err.Error(), ""})
 		return
 	}
 	for _, e := range doc.Entries {
 		r.Layout[e.Key] = e.Value
 	}
 	bad := func(key, format string, a ...any) {
-		r.Problems = append(r.Problems, Problem{ManifestPath, doc.Line(key), fmt.Sprintf(format, a...) + "; the default is used", "S3"})
+		r.Problems = append(r.Problems, Problem{r.ManifestPath(), doc.Line(key), fmt.Sprintf(format, a...) + "; the default is used", "S3"})
 	}
 	get := func(key string, dst *string) bool {
 		v, ok := r.Layout[key]

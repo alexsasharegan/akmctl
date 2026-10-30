@@ -63,7 +63,7 @@ func (c *checker) safety() {
 }
 
 func (c *checker) denyList() []denyEntry {
-	b, err := os.ReadFile(filepath.Join(c.repo.Root, "docs", ".akm-deny"))
+	b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(c.repo.DenyPath())))
 	if err != nil {
 		return nil
 	}
@@ -77,7 +77,7 @@ func (c *checker) denyList() []denyEntry {
 			if re, err := regexp.Compile(l[3:]); err == nil {
 				out = append(out, denyEntry{n: i + 1, re: re})
 			} else {
-				c.add("SF2", "E", "docs/.akm-deny", i+1, "", "the regular expression on this line does not compile")
+				c.add("SF2", "E", c.repo.DenyPath(), i+1, "", "the regular expression on this line does not compile")
 			}
 			continue
 		}
@@ -118,7 +118,7 @@ func (c *checker) safetyLine(file string, n int, line string, deny []denyEntry) 
 	if !allowed["SF2"] {
 		for _, d := range deny {
 			if (d.re != nil && d.re.MatchString(line)) || (d.lit != "" && strings.Contains(line, d.lit)) {
-				c.add("SF2", "E", file, n, "", "matches line %d of docs/.akm-deny", d.n)
+				c.add("SF2", "E", file, n, "", "matches line %d of %s", d.n, c.repo.DenyPath())
 				hit = true
 			}
 		}

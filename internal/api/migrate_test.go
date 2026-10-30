@@ -135,7 +135,7 @@ func TestMigrateApplySafe(t *testing.T) {
 	if b, _ := os.ReadFile(filepath.Join(root, "docs/work/done/261010-j9k0-choose-a-licence.md")); !strings.Contains(string(b), "## Outcome") {
 		t.Fatal("heading not renamed")
 	}
-	logb, _ := os.ReadFile(filepath.Join(root, migrate.LogPath))
+	logb, _ := os.ReadFile(filepath.Join(root, "docs/.migrate-log"))
 	if !strings.Contains(string(logb), `"step":"rename-created"`) || strings.Count(string(logb), "\n") != 4 {
 		t.Fatalf("log:\n%s", logb)
 	}

@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-// LockRepo takes the lock by creating docs/.akm.lock exclusively and retrying;
+// LockRepo takes the lock by creating <metaDir>/.akm.lock exclusively and retrying;
 // flock is not available here.
-func LockRepo(root string) (func(), error) {
-	dir := filepath.Join(root, "docs")
+func LockRepo(root, metaDir string) (func(), error) {
+	dir := filepath.Join(root, filepath.FromSlash(metaDir))
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}

@@ -13,9 +13,6 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/fsx"
 )
 
-// LogPath is the append-only record of applied steps, relative to the root.
-const LogPath = "docs/.migrate-log"
-
 // Safeguard errors, with the reason code the API reports.
 type Refusal struct {
 	Reason  string
@@ -72,8 +69,8 @@ type logLine struct {
 }
 
 // AppendLog adds one line per applied step to the migration log.
-func AppendLog(root, from, to string, results []Result, now time.Time) error {
-	f, err := os.OpenFile(filepath.Join(root, filepath.FromSlash(LogPath)), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+func AppendLog(root, logPath, from, to string, results []Result, now time.Time) error {
+	f, err := os.OpenFile(filepath.Join(root, filepath.FromSlash(logPath)), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
@@ -91,8 +88,8 @@ func AppendLog(root, from, to string, results []Result, now time.Time) error {
 }
 
 // SetLayout writes the layout version into the manifest, keeping everything else.
-func SetLayout(root, version string) error {
-	p := filepath.Join(root, "docs", ".layout")
+func SetLayout(root, manifestPath, version string) error {
+	p := filepath.Join(root, filepath.FromSlash(manifestPath))
 	b, err := os.ReadFile(p)
 	if err != nil {
 		b = nil

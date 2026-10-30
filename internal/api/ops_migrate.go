@@ -224,7 +224,7 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 		return nil, unreadable(err)
 	}
-	unlock, lerr := fsx.LockRepo(repo.Root)
+	unlock, lerr := fsx.LockRepo(repo.Root, repo.MetaDir())
 	if lerr != nil {
 		return nil, unreadable(lerr)
 	}
@@ -239,7 +239,7 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 	if err != nil {
 		return nil, &Error{"unreadable", err.Error() + " (the backup tag " + tag + " holds the state before the migration)", O("tag", tag, "branch", branch)}
 	}
-	if err := migrate.AppendLog(repo.Root, from, to, results, clock(q)); err != nil {
+	if err := migrate.AppendLog(repo.Root, repo.MigrateLogPath(), from, to, results, clock(q)); err != nil {
 		return nil, unreadable(err)
 	}
 	manual := false
@@ -250,7 +250,7 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 	}
 	newState := "behind"
 	if !manual {
-		if err := migrate.SetLayout(repo.Root, to); err != nil {
+		if err := migrate.SetLayout(repo.Root, repo.ManifestPath(), to); err != nil {
 			return nil, unreadable(err)
 		}
 		newState = "current"

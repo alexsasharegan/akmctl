@@ -78,15 +78,15 @@ func (p *commitPlan) editsObj() []Obj {
 }
 
 func setGitCommits(repo *record.Repo, q Request, on bool) (Obj, *Error) {
-	if _, err := os.Stat(filepath.Join(repo.Root, filepath.FromSlash(record.ManifestPath))); err != nil {
-		return nil, refused("no_manifest", "there is no %s: run akmctl init or akmctl migrate first", record.ManifestPath)
+	if _, err := os.Stat(filepath.Join(repo.Root, filepath.FromSlash(repo.ManifestPath()))); err != nil {
+		return nil, refused("no_manifest", "there is no %s: run akmctl init or akmctl migrate first", repo.ManifestPath())
 	}
 	if on && !record.InGitRepo(repo.Root) {
 		return nil, refused("not_a_git_repo", "this repository is not inside a git work tree: run git init first; git commits need one")
 	}
 	dry := q.boolean("dry_run")
 	if !dry {
-		unlock, lerr := fsx.LockRepo(repo.Root)
+		unlock, lerr := fsx.LockRepo(repo.Root, repo.MetaDir())
 		if lerr != nil {
 			return nil, unreadable(lerr)
 		}
@@ -151,7 +151,7 @@ func planGitCommits(repo *record.Repo, on bool) (*commitPlan, *Error) {
 	}
 	// the key: present with the wanted value, or (off) absent
 	if v, ok := repo.Layout["git_commits"]; !ok && on || ok && (v.Kind != frontmatter.Bool || v.Bool != on) {
-		p.modify = []string{record.ManifestPath}
+		p.modify = []string{repo.ManifestPath()}
 	}
 	// a parent that is a file or a link is not ours to write through
 	for _, parent := range []string{".agents", ".agents/skills"} {
@@ -249,7 +249,7 @@ func applyGitCommits(repo *record.Repo, p *commitPlan, on bool) *Error {
 		}
 	}
 	if len(p.modify) > 0 {
-		full := filepath.Join(root, filepath.FromSlash(record.ManifestPath))
+		full := filepath.Join(root, filepath.FromSlash(repo.ManifestPath()))
 		b, err := os.ReadFile(full)
 		if err != nil {
 			return unreadable(err)

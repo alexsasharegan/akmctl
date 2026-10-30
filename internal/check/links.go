@@ -173,10 +173,10 @@ func resolveWiki(idx map[string][]string, name string) []string {
 	return out
 }
 
-// linkRoots are the folders whose Markdown the link rules read: docs/ and the
+// linkRoots are the folders whose Markdown the link rules read: the manifest folder (docs/ by default) and the
 // work and ADR folders when they are outside it.
 func (c *checker) linkRoots() []string {
-	roots := []string{"docs", c.repo.WorkDir(), c.repo.ADRDir()}
+	roots := []string{c.repo.MetaDir(), c.repo.WorkDir(), c.repo.ADRDir()}
 	var out []string
 	for _, r := range roots {
 		covered := false

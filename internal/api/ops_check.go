@@ -62,7 +62,7 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 	changed := err != nil || string(cur) != want
 	written := false
 	if changed && !q.boolean("dry_run") {
-		unlock, lerr := fsx.LockRepo(repo.Root)
+		unlock, lerr := fsx.LockRepo(repo.Root, repo.MetaDir())
 		if lerr != nil {
 			return nil, unreadable(lerr)
 		}

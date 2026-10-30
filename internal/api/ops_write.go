@@ -92,7 +92,7 @@ func openEdit(repo *record.Repo, q Request) (*edit, func(), *Error) {
 		}
 	} else {
 		var lerr error
-		if unlock, lerr = fsx.LockRepo(repo.Root); lerr != nil {
+		if unlock, lerr = fsx.LockRepo(repo.Root, repo.MetaDir()); lerr != nil {
 			return nil, nil, unreadable(lerr)
 		}
 		if lerr := repo.Reload(); lerr != nil {
@@ -217,7 +217,7 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if aerr != nil {
 		return nil, aerr
 	}
-	unlock, err := fsx.LockRepo(repo.Root)
+	unlock, err := fsx.LockRepo(repo.Root, repo.MetaDir())
 	if err != nil {
 		return nil, unreadable(err)
 	}
@@ -586,7 +586,7 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 
 func claimsOn(repo *record.Repo) *Error {
 	if !repo.Extension("claims") {
-		return refused("extension_off", "the claims extension is not enabled in %s", record.ManifestPath)
+		return refused("extension_off", "the claims extension is not enabled in %s", repo.ManifestPath())
 	}
 	return nil
 }

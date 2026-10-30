@@ -186,7 +186,7 @@ func scratchRepo(repo *record.Repo) (*record.Repo, func()) {
 		}
 		return os.WriteFile(dst, b, 0o644)
 	}
-	if err := cp(record.ManifestPath); err != nil && !os.IsNotExist(err) {
+	if err := cp(repo.ManifestPath()); err != nil && !os.IsNotExist(err) {
 		cleanup()
 		return nil, nil
 	}

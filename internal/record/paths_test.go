@@ -95,7 +95,7 @@ func TestBadManifestPathsAreProblemsAndDefaultsHold(t *testing.T) {
 				got = &r.Problems[i]
 			}
 		}
-		if got == nil || got.Path != ManifestPath || got.Line == 0 || !strings.Contains(got.Msg, c.msg) || !strings.Contains(got.Msg, c.key) {
+		if got == nil || got.Path != "docs/.layout" || got.Line == 0 || !strings.Contains(got.Msg, c.msg) || !strings.Contains(got.Msg, c.key) {
 			t.Errorf("%s: problem %+v (all %v)", c.name, got, r.Problems)
 			continue
 		}

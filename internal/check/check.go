@@ -160,7 +160,7 @@ func (c *checker) problems() {
 			c.add("WK1", "E", p.Path, p.Line, "", "%s", p.Msg)
 		case c.repo.InADR(p.Path):
 			c.add("A1", "E", p.Path, p.Line, "", "%s", p.Msg)
-		case p.Path == record.ManifestPath:
+		case p.Path == c.repo.ManifestPath():
 			c.add("S1", "W", p.Path, p.Line, "", "manifest: %s", p.Msg)
 		}
 	}
@@ -544,7 +544,7 @@ func (c *checker) commitSkill() {
 	present := err == nil
 	switch on := c.repo.GitCommits(); {
 	case on && !record.InGitRepo(c.repo.Root):
-		c.add("S4", "W", record.ManifestPath, 0, "", "git_commits is true but the repository is not inside a git work tree; run git init, or set git_commits: false")
+		c.add("S4", "W", c.repo.ManifestPath(), 0, "", "git_commits is true but the repository is not inside a git work tree; run git init, or set git_commits: false")
 	case on && !present:
 		c.add("S4", "W", dir, 0, "", "git_commits is true but the skill is not installed; run akmctl config git-commits on")
 	case !on && present:
@@ -582,15 +582,15 @@ func (c *checker) skills() {
 	}
 }
 
-// manifest is rule S1: it reconciles docs/.layout with the layout version the
+// manifest is rule S1: it reconciles the manifest (docs/.layout by default) with the layout version the
 // tool supports.
 func (c *checker) manifest() (string, []string) {
 	v, ok := c.repo.Layout["layout"]
 	if !ok {
-		if _, err := os.Stat(filepath.Join(c.repo.Root, filepath.FromSlash(record.ManifestPath))); err != nil {
-			c.add("S1", "W", record.ManifestPath, 0, "", "the manifest %s is missing", record.ManifestPath)
+		if _, err := os.Stat(filepath.Join(c.repo.Root, filepath.FromSlash(c.repo.ManifestPath()))); err != nil {
+			c.add("S1", "W", c.repo.ManifestPath(), 0, "", "the manifest %s is missing", c.repo.ManifestPath())
 		} else {
-			c.add("S1", "W", record.ManifestPath, 0, "", "the manifest has no layout key")
+			c.add("S1", "W", c.repo.ManifestPath(), 0, "", "the manifest has no layout key")
 		}
 		return "absent", nil
 	}
@@ -599,7 +599,7 @@ func (c *checker) manifest() (string, []string) {
 	case cmp == 0:
 		return "current", nil
 	case cmp > 0:
-		c.add("S1", "W", record.ManifestPath, c.manifestLine("layout"), "", "the repository is on layout %s, newer than this tool (%s): upgrade the tool", repoV, LayoutVersion)
+		c.add("S1", "W", c.repo.ManifestPath(), c.manifestLine("layout"), "", "the repository is on layout %s, newer than this tool (%s): upgrade the tool", repoV, LayoutVersion)
 		return "ahead", nil
 	default:
 		if chain, ok := migrate.Chain(repoV, LayoutVersion); ok {
@@ -607,16 +607,16 @@ func (c *checker) manifest() (string, []string) {
 			for _, st := range migrate.Steps(chain) {
 				steps = append(steps, st.ID+": "+st.Description)
 			}
-			c.add("S1", "W", record.ManifestPath, c.manifestLine("layout"), "", "the repository is on layout %s; run akmctl migrate to reach %s (%d steps)", repoV, LayoutVersion, len(steps))
+			c.add("S1", "W", c.repo.ManifestPath(), c.manifestLine("layout"), "", "the repository is on layout %s; run akmctl migrate to reach %s (%d steps)", repoV, LayoutVersion, len(steps))
 			return "behind", steps
 		}
-		c.add("S1", "W", record.ManifestPath, c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path from it", repoV, LayoutVersion)
+		c.add("S1", "W", c.repo.ManifestPath(), c.manifestLine("layout"), "", "the repository is on layout %s; this tool supports %s and has no migration path from it", repoV, LayoutVersion)
 		return "unsupported", nil
 	}
 }
 
 func (c *checker) manifestLine(key string) int {
-	b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(record.ManifestPath)))
+	b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(c.repo.ManifestPath())))
 	if err != nil {
 		return 0
 	}
