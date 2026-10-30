@@ -7,7 +7,7 @@ updated_at: 2026-10-28
 
 # AKM specification
 
-Version 1.0.0.
+Version 0.2.0 (beta). The layout and this specification follow the beta's version number while it is in beta.
 
 AKM (agent knowledge management) is a standard for a repository that keeps its own memory: its decisions, its direction and its work in flight, as Markdown records with frontmatter, so that any person or agent can pick up where work stopped. This document specifies the files, the work-item schema, the ADR and roadmap formats, and the rules of the checks. It is written for any maintainer or team, solo or not. The tool that implements it is `akmctl`; its operations and JSON are in the API spec ([akm-api-spec](akm-api-spec.md)), and a guide for adopting the standard is in [akm-guide](akm-guide.md).
 
@@ -473,10 +473,11 @@ A repo opts in by listing an extension in the manifest (for example `extension.c
 
 ## 7. Distribution and versions
 
-Two repositories, one idea each:
+One tool, one repository, no template repository. The standard, the guide, the API spec, the fixtures and the tool live together.
 
-- **The AKM template (a clone template).** The layout, the `AGENTS.md` and record templates, the skills with their instructions, and **default extensions that a repo opts into**. A new repo starts by cloning it and deleting what it does not use. It has a `VERSION` and a `CHANGELOG`.
-- **The tool (another repository).** The Go binary and UI. Released as **prebuilt binaries**, so installing needs no Go toolchain; building from source is possible. It has its own version.
+- **The tool.** The Go binary and UI, `akmctl`. Released as **prebuilt binaries**, so installing needs no Go toolchain; building from source is possible. It has its own version.
+- **New repositories.** `akmctl init --profile code|notes` writes the layout, the `AGENTS.md` and record templates, the skills with their instructions and the manifest into a new directory. It never overwrites an existing file. The `code` profile is for a software repository; the `notes` profile is for a notes repository or vault, with the records under a notes folder and the manifest keys `work_dir`, `adr_dir` and `roadmap`.
+- **Existing repositories.** `akmctl migrate` brings a repository to the layout (below). Adoption of an existing repository is the migration from layout `0.0.0`. In the 0.2.0 beta, `init` is the supported way in; `migrate` is documented but not yet supported for adoption.
 
 ### Versions, manifest and reconciliation
 
@@ -491,7 +492,7 @@ extension.work-items: 1.0.0
 stale_days: 30
 ```
 
-**Extensions.** Each extension in the template carries an `EXTENSION` file with `name`, `version` and `requires_layout` (a range such as `>=1.2.0 <2.0.0`). A repo opts in by listing the extension in its manifest.
+**Extensions.** Each extension carries an `EXTENSION` file with `name`, `version` and `requires_layout` (a range such as `>=1.2.0 <2.0.0`). A repo opts in by listing the extension in its manifest.
 
 **Version rules** (semantic versioning, for the layout and for each extension):
 
@@ -515,9 +516,9 @@ stale_days: 30
 - Refuse unless the git tree is clean; create a backup tag (`pre-migrate-<from>-to-<to>`) and work on a new branch.
 - Require an explicit acknowledgement that a backup exists and the maintainer accepts the risk of data loss.
 - Stop and ask on any ambiguity; never delete a file; show the diff before any commit.
-- The acknowledgement is a safety step, not a legal waiver. Liability is handled by the template's licence, and the wording of any disclaimer is the maintainer's call.
+- The acknowledgement is a safety step, not a legal waiver. Liability is handled by the tool's licence, and the wording of any disclaimer is the maintainer's call.
 
-The template's `VERSION` and the manifest's `layout` are the same number. A repo records any deliberate deviation from the template in its `AGENTS.md`; its `AGENTS.md` wins.
+The manifest's `layout` is the version of this specification's layout. A repo records any deliberate deviation from the layout in its `AGENTS.md`; its `AGENTS.md` wins.
 
 The tool itself is installed separately (above); `AGENTS.md` names the minimum tool version; until the tool is installed, the plain-file fallbacks apply (H6).
 

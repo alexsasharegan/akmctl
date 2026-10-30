@@ -7,7 +7,7 @@ updated_at: 2026-10-28
 
 # AKM guide: a repository that remembers and runs on rails
 
-Version 1.0.0.
+Version 0.2.0 (beta).
 
 AKM (agent knowledge management) is an opinionated standard that gives a repository a memory and rails, so any agent can pick up where work stopped. This guide is for a maintainer, solo or on a team, who works with AI coding agents and wants to adopt it. It explains what AKM is, why it exists, how it works day to day, how to adopt it, and what is not proven. The rules themselves are in the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)); the tool's operations are in the API spec ([akm-api-spec](akm-api-spec.md)).
 
@@ -19,12 +19,12 @@ AKM is the same idea as personal knowledge management (PKM), moved inside a repo
 
 It has four parts:
 
-| Part         | What it is                                                                                           |
-| ------------ | ---------------------------------------------------------------------------------------------------- |
-| The standard | A written spec: the layout, record formats, rules, ids and versions                                  |
-| The starter  | A clone template with instructions and opt-in extensions                                             |
-| The tool     | `akmctl`, a Go CLI that queries and checks the records, plus a workbench UI started with `akmctl ui` |
-| The skills   | Instructions an agent loads to follow the procedures                                                 |
+| Part         | What it is                                                                                            |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| The standard | A written spec: the layout, record formats, rules, ids and versions                                   |
+| The starter  | `akmctl init`, which writes the layout, `AGENTS.md`, record templates and skills into a new directory |
+| The tool     | `akmctl`, a Go CLI that queries and checks the records, plus a workbench UI started with `akmctl ui`  |
+| The skills   | Instructions an agent loads to follow the procedures                                                  |
 
 The tool is an accelerator, not a dependency. Everything it does can be done by reading plain files.
 
@@ -177,14 +177,16 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 
 ### A new repo
 
-1. Clone the starter and delete the extensions you do not want. The `.layout` manifest records the layout version and the extensions you kept.
+1. Run `akmctl init --profile code` (a software repository) or `--profile notes` (a notes repository or an Obsidian vault) in an empty directory. It writes the layout, `AGENTS.md`, the skills and the `.layout` manifest, and never overwrites a file.
 2. Fill in `AGENTS.md` (identity, commands, boundaries).
 3. File the first work items. Write the first ADR for the first real decision.
 4. A small repo can stay minimal: `AGENTS.md`, `docs/adr/`, a few work items, `docs/ROADMAP.md`.
 
 ### An existing repo
 
-A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 1.0.0, because 1.0.0 is the first layout: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
+The 0.2.0 beta supports new repositories only. This section describes the planned path and is not yet supported.
+
+A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 0.2.0, because 0.2.0 is the first layout: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
 
 - Make sure the working tree is clean and tag a backup.
 - Work on a branch and review every diff.
@@ -198,17 +200,17 @@ Once a repo has a manifest, `akmctl migrate` handles later layout versions: it r
 
 The files are the source of truth, so a bare agent can work:
 
-| Need                                  | Without the tool                                                                                            |
+| Need | Without the tool |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Which decisions exist                 | Read `docs/adr/README.md`                                                                                   |
-| What work is active                   | `grep -l '^status: active' docs/work/*.md`                                                                  |
-| What is blocked, and on whom          | `grep -l '^status: blocked' docs/work/*.md`, then read `blocked_by`                                         |
-| Where to resume an item               | Read its `## Next`                                                                                          |
-| Mint an id                            | `id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
-| Create a record                       | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id                                  |
-| Close an item                         | Set `status`, write `## Outcome`, set `updated` to today's UTC date, `git mv` the file to `docs/work/done/` |
-| Find a record by id                   | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'`                                                     |
-| The ADR index is stale or in conflict | Do not hand-edit it; ask the maintainer to regenerate it with the tool                                      |
+| Which decisions exist | Read `docs/adr/README.md` |
+| What work is active | `grep -l '^status: active' docs/work/*.md` |
+| What is blocked, and on whom | `grep -l '^status: blocked' docs/work/*.md`, then read `blocked_by` |
+| Where to resume an item | Read its `## Next` |
+| Mint an id | `id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
+| Create a record | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id |
+| Close an item | Set `status`, write `## Outcome`, set `updated` to today's UTC date, `git mv` the file to `docs/work/done/` |
+| Find a record by id | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'` |
+| The ADR index is stale or in conflict | Do not hand-edit it; ask the maintainer to regenerate it with the tool |
 
 This is slower and uses more tokens, but it must stay correct.
 
@@ -245,7 +247,7 @@ This is slower and uses more tokens, but it must stay correct.
 - Nothing forces an agent to run the checks; the standard asks, and the maintainer reviews.
 - Parallel work is conducive, not guaranteed: shared files such as the roadmap can still conflict.
 - Claiming an `active` item is an optional, advisory extension (never a lock), and the optional safety extension checks only known secret patterns and a deny list. Private prose and unusual secrets are not caught.
-- The migration automation has so far been exercised only on a made-up older layout, because no layout before 1.0.0 exists.
+- The migration automation has so far been exercised only on a made-up older layout, because no layout before 0.2.0 exists.
 
 ## 11. Where things are
 
