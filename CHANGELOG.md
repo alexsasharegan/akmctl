@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- `akmctl version` after `go install` reports the module version (it printed `0.0.0-dev`).
 - `check`: SF3 no longer flags record file names or Markdown link targets as secrets; L2 reads `[[name\|alias]]` inside a table cell as the note `name`.
 - Beta 0.2.0 (greenfield): `akmctl init [--docs-dir <name>] [--wikilinks] [--git-init] [--git-commits]` writes the layout, `AGENTS.md`, `CLAUDE.md`, the `akm` skills, the manifest and, in a git repository, a `.gitignore` for the lock into a new directory, never overwriting (API operation `init`, schema and fixtures). The manifest, deny list, lock and migrate log live in the docs dir, which the tool finds on its own. `akmctl config git-commits on|off` installs or removes the optional `akm-commit` skill. The layout, the extensions and the specification are versioned 0.2.0; adopting an existing repository is not supported in the beta.
 - New ids and record dates use the local calendar day (`as_of` still wins); `claimed_at` stays UTC. Re-claiming an item you hold adds no log line. `mint_ids` takes `slug_from` and `max_slug`. New `migrate` step `move_closed`.
