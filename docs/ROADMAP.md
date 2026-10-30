@@ -8,8 +8,6 @@
 
 Beta (greenfield only; adoption is not claimed). Order of work:
 
-- [261029-40gv] Replace init profiles with options; move the manifest into the docs dir
-
 ## Later
 
 1.0.0 requirements (adoption and safety):

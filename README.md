@@ -12,7 +12,7 @@ Run one command in an empty folder and you get this:
 
 ```text
 my-project/
-├── AGENTS.md              instructions an agent reads first (fill in your build and test commands)
+├── AGENTS.md              instructions an agent reads first
 ├── CLAUDE.md              points Claude Code at AGENTS.md
 ├── .agents/skills/        skills: akm, akm-work-items, akm-record-decision (and akm-commit, optional)
 └── docs/
@@ -61,48 +61,54 @@ akmctl version
 
 ## Start a project
 
-`akmctl init` needs a **profile**. Both profiles create the same kit: `AGENTS.md`, the skills and the `docs/.layout` manifest. They differ in where the records go and what is set up around them:
-
-|                                     | `--profile code`                                       | `--profile notes`                                                         |
-| ----------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
-| For                                 | a software project (a repository with source code)     | a notes folder, a knowledge base or an Obsidian vault                     |
-| Records (tasks, decisions, roadmap) | under `docs/`                                          | under `notes/`                                                            |
-| Links between records               | plain ids (`261029-6p3c`)                              | Obsidian `[[wikilinks]]`                                                  |
-| `AGENTS.md`                         | has Build, Test, Lint and Run lines for you to fill in | no build commands; it is about notes                                      |
-| `.gitignore`                        | the tool's lock file                                   | also Obsidian's per-machine files (`.obsidian/workspace.json`, `.trash/`) |
-
-Pick `code` when the folder is a project you build and test. Pick `notes` when the folder is mainly Markdown notes you read and link, whether or not you use Obsidian. You cannot switch later without moving the records by hand, so choose the one that matches the folder.
-
-### If you use Obsidian (or just want a notes folder)
-
-An Obsidian vault is any folder; Obsidian's own `.obsidian` folder is what makes it one. So:
+Make a folder (or use one you already have), go into it and run:
 
 ```sh
-mkdir my-notes && cd my-notes
-akmctl init --profile notes
+mkdir my-project && cd my-project
+akmctl init
 ```
 
-Then in Obsidian choose **Open folder as vault** and pick `my-notes`. The records live under `notes/` and link to each other with `[[wikilinks]]`, so they show up in Obsidian's links and graph. Add a first task:
+That is the whole setup with the defaults: the records go in a `docs/` folder, links between records are plain ids, and nothing is committed for you. Add a first task and look at it:
 
 ```sh
 akmctl new work first-task --title "My first task"
+akmctl ls
 akmctl ui        # optional: a board of your tasks in the browser (prints a local address)
 ```
 
-### If you have a code project
+Then point your agent at the folder; it reads `AGENTS.md` first and uses the skills in `.agents/skills/`. Add your project's own build and test commands to `AGENTS.md` yourself if you want agents to run them.
 
-```sh
-mkdir my-project && cd my-project     # or an existing folder you want to start fresh in
-akmctl init --profile code
-```
+### Options
 
-Open `AGENTS.md` and fill in the commands for building, testing and linting. Then point your agent at the folder; it reads `AGENTS.md` first and uses the skills in `.agents/skills/`.
+| Option              | What it does                                                                                              | Default   |
+| ------------------- | --------------------------------------------------------------------------------------------------------- | --------- |
+| `--docs-dir <name>` | The folder for the records: tasks, decisions, the roadmap, and the manifest. One folder name, no slashes. | `docs`    |
+| `--wikilinks`       | Write links between records as `[[wikilinks]]`, which Obsidian shows in its links and graph.              | plain ids |
+| `--git-init`        | Run `git init` if the folder is not yet a git repository.                                                 | off       |
+| `--git-commits`     | Install the `akm-commit` skill so agents commit after each step. Needs a git repository.                  | off       |
+| `--yes`             | Ask nothing; use the options you gave and the defaults for the rest.                                      |           |
 
-### Questions `init` asks
-
-Run bare `akmctl init` in a terminal and it asks a few plain questions: the profile, whether to install the optional git-commit skill, and whether to run `git init` if the folder is not yet a git repository. Answer with `y` or `n`; the capital letter is the default if you just press Enter. Flags answer them ahead of time (`--profile`, `--git-commits` or `--no-git-commits`, `--git-init` or `--no-git-init`), and `--yes` skips the questions. When there is no terminal, for example when an agent runs it, it never asks.
+Run bare `akmctl init` in a terminal and it asks about these in turn: where the records go, wikilinks, whether to run `git init` (only when needed), and the commit skill. Answer with `y` or `n`; the capital letter is the default if you just press Enter. When there is no terminal, for example when an agent runs it, it never asks. A `.gitignore` is written only in a git repository, and it adds Obsidian's per-machine files only if the folder already has an `.obsidian` folder.
 
 `init` never overwrites a file, so running it again changes nothing.
+
+### Examples
+
+An Obsidian vault is any folder; Obsidian's own `.obsidian` folder is what makes it one. To keep the records in a folder called `Meta` with wikilinks:
+
+```sh
+cd my-vault
+akmctl init --docs-dir Meta --wikilinks
+```
+
+The tool finds `Meta` on its own the next time you run it from anywhere inside the vault. In Obsidian, **Open folder as vault** on `my-vault` if you have not already.
+
+A code project that uses git and wants agents to commit as they go:
+
+```sh
+cd my-project
+akmctl init --git-init --git-commits
+```
 
 ### Settings you can change later
 

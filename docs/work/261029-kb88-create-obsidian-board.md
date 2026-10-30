@@ -12,6 +12,8 @@ updated: 2026-10-29
 
 ## Goal
 
+Build an `akmctl` subcommand to generate an Obsidian Base which presents a mirror view from what the `akmctl ui` shows.
+
 ## Log
 
 - 2026-10-29: filed.

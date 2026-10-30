@@ -1,14 +1,12 @@
 ---
 id: "261029-40gv"
 title: Replace init profiles with options; move the manifest into the docs dir
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
 priority: 1
 summary: init has --docs-dir, --wikilinks and git options instead of profiles; the manifest, deny list, lock and migrate log live in the docs dir.
-claimed_by: options-agent
-claimed_at: 2026-10-30T02:12
 ---
 
 # Replace init profiles with options; move the manifest into the docs dir
@@ -31,8 +29,13 @@ Done when:
 
 Implemented and tested on branch worktree-agent-a2559360e9e67bb44. Left for the maintainer: README, CHANGELOG and the roadmap mention profiles (not touched here), then review, tick the done-when list, write `## Outcome`, close, and accept ADR 261029-hsfd.
 
+## Outcome
+
+`init` takes `--docs-dir` (single folder name, default `docs`), `--wikilinks` and the git options; the profile is gone from the API, CLI, HTTP, schema, fixtures, spec, guide and skill references (init-9 checks that `profile` is rejected). The manifest, deny list, lock and migrate log live in the docs dir; discovery finds `docs/.layout` first, then exactly one `<name>/.layout` one level down, and two is an error naming both (`record.Locate`). A bare `init` works with no terminal. `AGENTS.md` has no build lines. `.gitignore` is written only in a git repository, with Obsidian lines only when `.obsidian/` exists (init-8). Checked by hand: `init --docs-dir Meta --wikilinks --git-init` in a folder with `.obsidian/`, then `check` clean, `new` and `ls` from a subfolder. This repository's `check` passes unchanged; `npm run schemas`: 19 schemas, 63 cases, 0 failures.
+
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: claimed (options-agent).
 - 2026-10-29: discovery (`record.Locate`, `Repo.MetaDir`), lock, deny list and migrate log follow the manifest folder; `init` takes `docs_dir`, `wikilinks`, `git_commits`, `git_init` (no `profile`); `.gitignore` only in a work tree; CLI questions in the new order; schema, fixtures (both copies, 63 cases), spec, guide and skill references updated.
+- 2026-10-29: released (options-agent).
