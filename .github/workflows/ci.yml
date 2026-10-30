@@ -24,9 +24,15 @@ jobs:
       - name: records
         if: runner.os == 'Linux'
         run: go build -o "$RUNNER_TEMP/akmctl" ./cmd/akmctl && "$RUNNER_TEMP/akmctl" check
+      - name: node tools
+        if: runner.os == 'Linux'
+        run: npm ci --no-fund --no-audit
       - name: format records
         if: runner.os == 'Linux'
-        run: npx --yes prettier@3.9.10 --check AGENTS.md CHANGELOG.md README.md "docs/**/*.md"
+        run: npm run format:check
+      - name: api schemas
+        if: runner.os == 'Linux'
+        run: npm run schemas
       - run: go test ./...
       - name: race
         if: runner.os == 'Linux'

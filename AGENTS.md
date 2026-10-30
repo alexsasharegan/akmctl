@@ -9,7 +9,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Width tables: `go generate ./internal/width` (Unicode 17.0.0 data in `internal/width/data`).
 - Release archives: `scripts/release.sh <version>`; CI runs it on a `v*` tag.
 - Records check: build the tool as above, then `/tmp/akmctl check` (this repo is its own test case; use the build of the current branch, not an installed copy).
-- Format records: `npx prettier@3.9.10 --check AGENTS.md "docs/**/*.md"`; `/tmp/akmctl index` regenerates `docs/adr/README.md`.
+- Format records and schemas: `npm ci` once, then `npm run format:check` and `npm run schemas` (Prettier 3.9.10 and Ajv 8 are dev dependencies in `package.json`); `/tmp/akmctl index` regenerates `docs/adr/README.md`.
 - Full check before a commit: the test, records check and format commands above.
 
 ## Where things live

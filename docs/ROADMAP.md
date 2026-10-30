@@ -8,7 +8,6 @@
 
 Beta (greenfield only; adoption is not claimed). Order of work:
 
-
 ## Later
 
 1.0.0 requirements (adoption and safety):

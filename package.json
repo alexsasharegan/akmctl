@@ -1,0 +1,14 @@
+{
+  "name": "akmctl-dev-tools",
+  "private": true,
+  "description": "Development tooling only: the Go tool has no JavaScript dependencies.",
+  "scripts": {
+    "format:check": "prettier --check AGENTS.md CHANGELOG.md README.md \"docs/**/*.md\"",
+    "format": "prettier --write AGENTS.md CHANGELOG.md README.md \"docs/**/*.md\"",
+    "schemas": "node docs/spec/akm-api/validate.js docs/spec/akm-api"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "prettier": "3.9.10"
+  }
+}
