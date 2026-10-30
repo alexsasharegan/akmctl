@@ -17,7 +17,7 @@ import (
 )
 
 // LayoutVersion is the layout version this tool checks against.
-const LayoutVersion = "0.2.0"
+const LayoutVersion = "0.3.0"
 
 // Finding is one rule violation.
 type Finding struct {
@@ -44,7 +44,9 @@ type Result struct {
 
 var (
 	reDate = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
-	reTS   = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$`)
+	// reCycle is the pattern of the cycle label (layout 0.3.0).
+	reCycle = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`)
+	reTS    = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$`)
 )
 
 var workStatuses = []string{"raw", "ready", "active", "blocked", "done", "dropped"}
@@ -286,6 +288,30 @@ func (c *checker) workRecord(r *record.Record) {
 	}
 	if n := len([]rune(r.Str("summary"))); n > 160 {
 		c.add("WK11", "E", r.Path, c.line(r, "summary"), r.ID, "summary is %d characters; the limit is 160", n)
+	}
+	// WK13 to WK17: closed, cycle and keep
+	if v, ok := r.Fields["closed"]; ok && v.Kind != frontmatter.Null {
+		cl := r.Str("closed")
+		switch {
+		case st != "done" && st != "dropped":
+			c.add("WK14", "E", r.Path, c.line(r, "closed"), r.ID, "an open item (status %s) has closed; only close sets it", st)
+		case !validDate(cl):
+			c.add("WK15", "E", r.Path, c.line(r, "closed"), r.ID, "closed %q is not a date (YYYY-MM-DD)", cl)
+		default:
+			if cr := r.Str("created"); validDate(cr) && cl < cr {
+				c.add("WK15", "E", r.Path, c.line(r, "closed"), r.ID, "closed %s is earlier than created %s", cl, cr)
+			}
+		}
+	} else if done {
+		c.add("WK13", "W", r.Path, 0, r.ID, "an item in %s/ has no closed date", c.repo.DoneDir())
+	}
+	if v, ok := r.Fields["cycle"]; ok && v.Kind != frontmatter.Null {
+		if v.Kind != frontmatter.String || !reCycle.MatchString(v.Str) {
+			c.add("WK16", "E", r.Path, c.line(r, "cycle"), r.ID, "cycle %s is not a label (1 to 64 characters of letters, digits, '.', '_' or '-', starting with a letter or digit)", v.String())
+		}
+	}
+	if v, ok := r.Fields["keep"]; ok && v.Kind != frontmatter.Bool && v.Kind != frontmatter.Null {
+		c.add("WK17", "E", r.Path, c.line(r, "keep"), r.ID, "keep must be true or false")
 	}
 	// WK12
 	if h := record.FirstHeading(r.Body); h != "" && r.Str("title") != "" && h != r.Str("title") {

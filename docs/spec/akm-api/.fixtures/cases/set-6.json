@@ -1,0 +1,53 @@
+{
+  "name": "pin an item with keep",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "changes": {
+      "keep": true
+    },
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261020-a2b3",
+      "changes": {
+        "keep": true
+      },
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261020-a2b3",
+      "type": "work",
+      "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+      "id_date": "2026-10-20",
+      "etag": "100f9cb5eed980be",
+      "fields": {
+        "id": "261020-a2b3",
+        "title": "Add JSON output to ls",
+        "summary": "Print ls results as JSON.",
+        "status": "active",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 2,
+        "cycle": null,
+        "keep": true,
+        "created": "2026-10-20",
+        "updated": "2026-10-28",
+        "closed": null,
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "changed": [
+      "keep"
+    ]
+  },
+  "after": {
+    "docs/work/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: active\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\nkeep: true\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Log\n- 2026-10-20: started.\n"
+  }
+}

@@ -72,6 +72,24 @@ func (d *Doc) Set(key string, v Value) error {
 	return d.reparse(apply(d.src, edits))
 }
 
+// SetAfter is Set, except that a key that is not present yet is inserted on the
+// line after the key named after (or at the end of the block when after is
+// absent too).
+func (d *Doc) SetAfter(key, after string, v Value) error {
+	a := d.entry(after)
+	if d.entry(key) != nil || a == nil {
+		return d.Set(key, v)
+	}
+	if !validKey(key) {
+		return errors.New("invalid key " + strconv.Quote(key))
+	}
+	flat, err := formatValue(v, d.eol, nil)
+	if err != nil {
+		return err
+	}
+	return d.reparse(apply(d.src, []edit{{a.end, a.end, d.eol + key + ": " + flat.inline}}))
+}
+
 // Delete removes the entry for key. It reports whether the key existed.
 func (d *Doc) Delete(key string) (bool, error) {
 	e := d.entry(key)

@@ -106,6 +106,14 @@ func TestRules(t *testing.T) {
 		{"WK11 priority text", "WK11", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: high")}},
 		{"WK11 decision not an ADR", "WK11", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\ndecisions: [261024-g7h8]")}},
 		{"WK11 long summary", "WK11", "E", map[string]func(string) string{a2b3: sub("summary: Print ls results as JSON.", "summary: "+strings.Repeat("x", 161))}},
+		{"WK13 done item without closed", "WK13", "W", map[string]func(string) string{j9k0: sub("closed: 2026-10-12\n", "")}},
+		{"WK14 open item with closed", "WK14", "E", map[string]func(string) string{e5f6: sub("updated: 2026-10-22", "updated: 2026-10-22\nclosed: 2026-10-22")}},
+		{"WK15 closed not a date", "WK15", "E", map[string]func(string) string{j9k0: sub("closed: 2026-10-12", "closed: 2026-13-45")}},
+		{"WK15 closed before created", "WK15", "E", map[string]func(string) string{j9k0: sub("closed: 2026-10-12", "closed: 2026-10-09")}},
+		{"WK16 cycle with a space", "WK16", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\ncycle: has space")}},
+		{"WK16 cycle too long", "WK16", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\ncycle: "+strings.Repeat("a", 65))}},
+		{"WK16 cycle starts with a dash", "WK16", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\ncycle: \"-x\"")}},
+		{"WK17 keep not a boolean", "WK17", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\nkeep: maybe")}},
 		{"WK12 heading differs", "WK12", "W", map[string]func(string) string{e5f6: sub("# Document the exit codes", "# Something else")}},
 		{"I1 duplicate id", "I1", "E", map[string]func(string) string{"docs/work/261022-e5f6-copy.md": func(string) string {
 			return "---\nid: 261022-e5f6\ntitle: Copy\nstatus: raw\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n# Copy\n"
@@ -126,7 +134,7 @@ func TestRules(t *testing.T) {
 		{"G3 missing script", "G3", "W", map[string]func(string) string{"AGENTS.md": sub("`akmctl check`", "`scripts/check.sh`")}},
 		{"L1 broken link", "L1", "E", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [the guide](docs/guide.md).\n" }}},
 		{"L2 unresolved wikilink", "L2", "W", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [[Nowhere]].\n" }}},
-		{"S1 behind", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 0.2.0", "layout: 0.1.0")}},
+		{"S1 behind", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 0.3.0", "layout: 0.1.0")}},
 		{"S1 missing manifest", "S1", "W", map[string]func(string) string{"docs/.layout": nil}},
 		{"S3 bad flag", "S3", "E", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: maybe\n" }}},
 		{"S4 on without the skill", "S4", "W", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: true\n" }, ".git/HEAD": func(string) string { return "ref: refs/heads/main\n" }}},
@@ -176,13 +184,13 @@ func TestCommitSkillAgrees(t *testing.T) {
 }
 
 func TestClaims(t *testing.T) {
-	r := repoWith(t, map[string]func(string) string{"docs/.layout": func(s string) string { return s + "extension.claims: 0.2.0\n" }})
+	r := repoWith(t, map[string]func(string) string{"docs/.layout": func(s string) string { return s + "extension.claims: 0.3.0\n" }})
 	res := Run(r, Options{AsOf: asOf})
 	if rules(res)["CL1"] != 2 {
 		t.Fatalf("%v", res.Findings)
 	}
 	r = repoWith(t, map[string]func(string) string{
-		"docs/.layout": func(s string) string { return s + "extension.claims: 0.2.0\n" },
+		"docs/.layout": func(s string) string { return s + "extension.claims: 0.3.0\n" },
 		a2b3:           sub("status: active", "status: active\nclaimed_by: agent-1\nclaimed_at: 2026-10-27T10:00"),
 		"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: active\nclaimed_by: agent-1\nclaimed_at: 2026-10-27T10:00"),
 	})

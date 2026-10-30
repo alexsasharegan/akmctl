@@ -39,7 +39,7 @@ func TestLocate(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			root := t.TempDir()
 			for _, f := range c.files {
-				put(t, root, f, "layout: 0.2.0\n")
+				put(t, root, f, "layout: 0.3.0\n")
 			}
 			dir, found, err := Locate(root)
 			if c.err != "" {
@@ -60,7 +60,7 @@ func TestLocate(t *testing.T) {
 
 func TestLoadFollowsTheManifestFolder(t *testing.T) {
 	root := t.TempDir()
-	put(t, root, "knowledge/.layout", "layout: 0.2.0\nwork_dir: knowledge/work\nadr_dir: knowledge/adr\nroadmap: knowledge/ROADMAP.md\n")
+	put(t, root, "knowledge/.layout", "layout: 0.3.0\nwork_dir: knowledge/work\nadr_dir: knowledge/adr\nroadmap: knowledge/ROADMAP.md\n")
 	r, err := Load(root)
 	if err != nil {
 		t.Fatal(err)
@@ -83,7 +83,7 @@ func TestLoadFollowsTheManifestFolder(t *testing.T) {
 
 func TestFindRootFromSubdirectory(t *testing.T) {
 	root := t.TempDir()
-	put(t, root, "knowledge/.layout", "layout: 0.2.0\n")
+	put(t, root, "knowledge/.layout", "layout: 0.3.0\n")
 	put(t, root, "knowledge/work/x.md", "x")
 	put(t, root, "src/deep/y.go", "x")
 	want, _ := filepath.EvalSymlinks(root)
@@ -104,8 +104,8 @@ func TestFindRootFromSubdirectory(t *testing.T) {
 	}
 	// two manifests still mark the root; Load reports them
 	two := t.TempDir()
-	put(t, two, "a/.layout", "layout: 0.2.0\n")
-	put(t, two, "b/.layout", "layout: 0.2.0\n")
+	put(t, two, "a/.layout", "layout: 0.3.0\n")
+	put(t, two, "b/.layout", "layout: 0.3.0\n")
 	put(t, two, "a/sub/z.md", "x")
 	got, err := FindRoot(filepath.Join(two, "a", "sub"))
 	if err != nil || filepath.Base(got) != filepath.Base(two) {

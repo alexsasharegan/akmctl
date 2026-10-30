@@ -34,7 +34,7 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 ## Close
 
 1. Write `## Outcome`: for each "done when" line, the test, command or file that proves it (for `dropped`, the reason).
-2. `akmctl close <id> done` (or `dropped`). It sets the status, moves the file to `docs/work/done/` and refuses an empty Outcome.
+2. `akmctl close <id> done` (or `dropped`). It sets the status and `closed` (today), moves the file to `docs/work/done/` and refuses an empty Outcome.
 3. Run `akmctl check`. Commit the work, the item and any roadmap change together.
 
 The template for a new item is `assets/work-item.md` (for use without the tool).

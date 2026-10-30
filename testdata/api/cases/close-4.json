@@ -34,8 +34,11 @@
         "parent": "261015-c4d5",
         "blocked_by": null,
         "priority": 2,
+        "cycle": null,
+        "keep": null,
         "created": "2026-10-20",
         "updated": "2026-10-28",
+        "closed": "2026-10-28",
         "authored_by": null,
         "decisions": null
       }
@@ -47,7 +50,7 @@
       "new_path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
       "hunks": [
         {
-          "header": "@@ -2,11 +2,11 @@",
+          "header": "@@ -2,11 +2,12 @@",
           "lines": [
             {
               "op": "ctx",
@@ -110,81 +113,87 @@
               "new": 9
             },
             {
+              "op": "add",
+              "text": "closed: 2026-10-28",
+              "old": null,
+              "new": 10
+            },
+            {
               "op": "ctx",
               "text": "---",
               "old": 10,
-              "new": 10
+              "new": 11
             },
             {
               "op": "ctx",
               "text": "",
               "old": 11,
-              "new": 11
+              "new": 12
             },
             {
               "op": "ctx",
               "text": "# Add JSON output to ls",
               "old": 12,
-              "new": 12
+              "new": 13
             }
           ]
         },
         {
-          "header": "@@ -21,5 +21,9 @@",
+          "header": "@@ -21,5 +22,9 @@",
           "lines": [
             {
               "op": "ctx",
               "text": "",
               "old": 21,
-              "new": 21
+              "new": 22
             },
             {
               "op": "ctx",
               "text": "Saved: 2026-10-27 18:00",
               "old": 22,
-              "new": 22
+              "new": 23
             },
             {
               "op": "ctx",
               "text": "",
               "old": 23,
-              "new": 23
+              "new": 24
             },
             {
               "op": "add",
               "text": "## Outcome",
               "old": null,
-              "new": 24
-            },
-            {
-              "op": "add",
-              "text": "",
-              "old": null,
               "new": 25
             },
             {
               "op": "add",
-              "text": "Shipped in 0.2.",
+              "text": "",
               "old": null,
               "new": 26
             },
             {
               "op": "add",
-              "text": "",
+              "text": "Shipped in 0.2.",
               "old": null,
               "new": 27
+            },
+            {
+              "op": "add",
+              "text": "",
+              "old": null,
+              "new": 28
             },
             {
               "op": "ctx",
               "text": "## Log",
               "old": 24,
-              "new": 28
+              "new": 29
             },
             {
               "op": "ctx",
               "text": "- 2026-10-20: started.",
               "old": 25,
-              "new": 29
+              "new": 30
             }
           ]
         }
@@ -192,6 +201,6 @@
     }
   },
   "would_be": {
-    "docs/work/done/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: done\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Outcome\n\nShipped in 0.2.\n\n## Log\n- 2026-10-20: started.\n"
+    "docs/work/done/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: done\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\nclosed: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Outcome\n\nShipped in 0.2.\n\n## Log\n- 2026-10-20: started.\n"
   }
 }

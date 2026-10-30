@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	workFields = []string{"id", "title", "summary", "status", "kind", "parent", "blocked_by", "priority", "created", "updated", "authored_by", "decisions"}
+	workFields = []string{"id", "title", "summary", "status", "kind", "parent", "blocked_by", "priority", "cycle", "keep", "created", "updated", "closed", "authored_by", "decisions"}
 	claimField = []string{"claimed_by", "claimed_at"}
 	adrFields  = []string{"id", "title", "summary", "status", "date", "scope", "supersedes", "superseded_by", "authored_by"}
 	workHeader = []string{"id", "title", "summary", "status", "kind", "parent", "priority", "updated"}

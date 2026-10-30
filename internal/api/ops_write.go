@@ -373,6 +373,18 @@ func fieldValue(repo *record.Repo, typ, key string, v any) (frontmatter.Value, *
 			return bad("must be one of %s", strings.Join(set, ", "))
 		}
 		return frontmatter.NewString(s), nil
+	case "cycle":
+		s, ok := v.(string)
+		if !ok || !reCycle.MatchString(s) {
+			return bad("must be a label of 1 to 64 characters: letters, digits, '.', '_' or '-', starting with a letter or digit")
+		}
+		return frontmatter.NewString(s), nil
+	case "keep":
+		b, ok := v.(bool)
+		if !ok {
+			return bad("must be true or false")
+		}
+		return frontmatter.NewBool(b), nil
 	case "priority":
 		n, ok := asInt(v)
 		if !ok {
@@ -425,7 +437,7 @@ func fieldValue(repo *record.Repo, typ, key string, v any) (frontmatter.Value, *
 // ---- set ----
 
 var setFields = map[string][]string{
-	record.Work: {"title", "summary", "status", "kind", "parent", "blocked_by", "priority", "authored_by", "decisions"},
+	record.Work: {"title", "summary", "status", "kind", "parent", "blocked_by", "priority", "cycle", "keep", "authored_by", "decisions"},
 	record.ADR:  {"title", "summary", "status", "scope", "supersedes", "superseded_by", "authored_by"},
 }
 
@@ -449,7 +461,7 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	var changed []string
 	for _, k := range keys {
 		if !contains(setFields[typ], k) {
-			return nil, invalid("changes", "changes: %q cannot be set on a %s (id, created, updated, date and claim fields are managed by the tool)", k, typ)
+			return nil, invalid("changes", "changes: %q cannot be set on a %s (id, created, updated, closed, date and claim fields are managed by the tool)", k, typ)
 		}
 		v := changes[k]
 		if v == nil && (k == "title" || k == "status" || (k == "summary" && typ == record.ADR)) {
@@ -570,7 +582,11 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	for _, k := range []string{"claimed_by", "claimed_at"} {
 		e.doc.Delete(k)
 	}
-	if serr := e.doc.Set("updated", frontmatter.NewString(today(clock(q)))); serr != nil {
+	day := today(clock(q))
+	if serr := e.doc.Set("updated", frontmatter.NewString(day)); serr != nil {
+		return nil, unreadable(serr)
+	}
+	if serr := e.doc.SetAfter("closed", "updated", frontmatter.NewString(day)); serr != nil {
 		return nil, unreadable(serr)
 	}
 	from := e.rec.Path

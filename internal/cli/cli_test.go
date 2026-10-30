@@ -126,7 +126,7 @@ func TestMigrateFlags(t *testing.T) {
 	root := t.TempDir()
 	copyDir(t, "../../testdata/api/repos/basic", root)
 	var out, errb bytes.Buffer
-	code := Run([]string{"migrate", "--mode", "handoff", "--target", "0.2.0", "--out", filepath.Join(root, "handoff.md"), "--repo", root, "--format", "json"}, &out, &errb, ".")
+	code := Run([]string{"migrate", "--mode", "handoff", "--target", "0.3.0", "--out", filepath.Join(root, "handoff.md"), "--repo", root, "--format", "json"}, &out, &errb, ".")
 	if code != 0 || !strings.Contains(out.String(), `"state":"current"`) {
 		t.Fatalf("%d %s %s", code, out.String(), errb.String())
 	}
@@ -176,7 +176,7 @@ func TestMigrationFileFlag(t *testing.T) {
 		os.MkdirAll(filepath.Dir(full), 0o755)
 		os.WriteFile(full, []byte(text), 0o644)
 	}
-	one := `{"from":"0.0.0","to":"0.2.0","steps":[{"id":"c","kind":"rename_field","class":"auto","description":"d","dir":"Vault Notes/tasks","from":"created_at","to":"created"}]}`
+	one := `{"from":"0.0.0","to":"0.3.0","steps":[{"id":"c","kind":"rename_field","class":"auto","description":"d","dir":"Vault Notes/tasks","from":"created_at","to":"created"}]}`
 	file := filepath.Join(t.TempDir(), "one-off.json")
 	os.WriteFile(file, []byte(one), 0o644)
 	var out, errb bytes.Buffer
@@ -204,7 +204,7 @@ func TestMigrationFileFlag(t *testing.T) {
 			t.Errorf("%v: code %d", args, code)
 		}
 	}
-	os.WriteFile(file, []byte(`{"from":"0.0.0","to":"0.2.0","steps":[{"id":"x","kind":"shell","class":"auto"}]}`), 0o644)
+	os.WriteFile(file, []byte(`{"from":"0.0.0","to":"0.3.0","steps":[{"id":"x","kind":"shell","class":"auto"}]}`), 0o644)
 	out.Reset()
 	if code := Run([]string{"migrate", "--migration", file, "--repo", root, "--format", "json"}, &out, &errb, "."); code != 2 || !strings.Contains(out.String(), "invalid_request") {
 		t.Fatalf("bad migration: code %d out %s", code, out.String())
