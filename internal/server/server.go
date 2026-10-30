@@ -111,6 +111,9 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request) {
 		case "/app.css":
 			s.asset(w, "web/app.css", "text/css; charset=utf-8")
 			return
+		case "/favicon.svg":
+			s.asset(w, "web/favicon.svg", "image/svg+xml")
+			return
 		}
 		if s.serveAsset(w, r) {
 			return
