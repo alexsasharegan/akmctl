@@ -29,7 +29,8 @@
 
 ## Proposed
 
-| id                                                        | title                                                                | date       | scope | summary                                                              | supersedes / superseded_by |
-| --------------------------------------------------------- | -------------------------------------------------------------------- | ---------- | ----- | -------------------------------------------------------------------- | -------------------------- |
-| [261029-6cp5](261029-6cp5-roadmap-now-next-later.md)      | The roadmap follows Now / Next / Later, with milestones inside Later | 2026-10-29 |       | The roadmap follows Now / Next / Later, with milestones inside Later |                            |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0)         | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0)         |                            |
+| id                                                        | title                                                                                       | date       | scope | summary                                                                                     | supersedes / superseded_by |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------------- | -------------------------- |
+| [261029-5pe1](261029-5pe1-date-and-time-conventions.md)   | Dates are the writer's local day; only timestamps that are compared across machines are UTC | 2026-10-29 |       | Dates are the writer's local day; only timestamps that are compared across machines are UTC |                            |
+| [261029-6cp5](261029-6cp5-roadmap-now-next-later.md)      | The roadmap follows Now / Next / Later, with milestones inside Later                        | 2026-10-29 |       | The roadmap follows Now / Next / Later, with milestones inside Later                        |                            |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0)                                | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0)                                |                            |
