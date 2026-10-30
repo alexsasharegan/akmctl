@@ -2,7 +2,7 @@
 id: "261029-nyv6"
 title: Optional skills are switched by a manifest key and akmctl config, which may remove only akm- skills
 summary: Optional skills are switched by a manifest key and akmctl config, which may remove only akm- skills
-status: proposed
+status: accepted
 date: 2026-10-29
 ---
 
@@ -21,6 +21,8 @@ The first optional skill is `akm-commit`, which tells an agent to commit after e
 ## Decision
 
 `git_commits: true|false` in `docs/.layout` is the source of truth. `akmctl init` takes it as a parameter (a bare `init` on a terminal asks; flags and `--yes` skip the question; a non-terminal never asks). `akmctl config git-commits on|off` changes it later and installs or removes `.agents/skills/akm-commit/` to match. The skill's first step is to read the key and stop if it is off, so a stale copy does nothing. A `check` rule warns when the key and the directory disagree.
+
+The key only takes effect inside a git work tree. `init` forces `git_commits` to false (and says so) when the directory is not a git repository after the optional `git init`; `config git-commits on` refuses outside a work tree; the skill's second step checks again and stops if there is no repository. Offering `git init` is allowed, running it unasked is not.
 
 Removal is the tool's first deletion outside a migration, so it is narrow: it only removes a directory under `.agents/skills/` whose name starts with `akm-` and belongs to a known optional skill; it prints the paths first and asks (or needs `--yes`, or returns the plan under `dry_run`); if the installed files differ from the shipped copy it shows the difference and asks again; it never touches anything else. Writing refuses to overwrite a path that is not ours and reports the conflict.
 

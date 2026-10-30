@@ -7,9 +7,10 @@ description: Commit after each logical step of AKM work. Use when finishing a lo
 
 The repository's `AGENTS.md` wins over this skill where they disagree.
 
-## First step: is it on?
+## First step: is it on, and is this a git repository?
 
-Read `git_commits` from `docs/.layout`: `akmctl config git-commits`, or without the tool `grep '^git_commits: true' docs/.layout`. If it is not `true`, STOP: do not commit. The maintainer commits.
+1. Read `git_commits` from `docs/.layout`: `akmctl config git-commits`, or without the tool `grep '^git_commits: true' docs/.layout`. If it is not `true`, STOP: do not commit. The maintainer commits.
+2. Check `git rev-parse --is-inside-work-tree` prints `true`. If it does not, STOP: do not commit and do not run `git init` yourself. Tell the maintainer this is not a git repository, so commits are off; offer to run `git init` and then `akmctl config git-commits on` if they want that, or `akmctl config git-commits off` to turn the option off and remove this skill.
 
 ## When to commit
 

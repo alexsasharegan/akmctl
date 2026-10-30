@@ -2,7 +2,7 @@
 id: "261029-tb3d"
 title: Tool-owned skills live under the akm- prefix, with a router skill
 summary: Tool-owned skills live under the akm- prefix, with a router skill
-status: proposed
+status: accepted
 date: 2026-10-29
 ---
 
