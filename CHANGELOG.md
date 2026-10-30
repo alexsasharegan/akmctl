@@ -2,8 +2,20 @@
 
 ## Unreleased
 
+## 0.3.1 - 2026-10-29
+
+- `ui`: toasts are reworked. They sit bottom right above the hint bar, come in four levels (success, info, warning, error) with a glyph and the level word above the message, and are ephemeral (8 seconds) or persistent (errors stay until dismissed). The top border counts down and pauses on hover and keyboard focus; each toast has a close icon, and Escape dismisses the newest persistent one.
+
+## 0.3.0 - 2026-10-29
+
 - Layout 0.3.0 (the layout, the four extensions and the specification; the API stays 1.0): work items gain three optional fields, ADR 261029-sg82. `closed` is the day the item closed (local day, `as_of` wins); only `close` writes it, for `done` and `dropped`, on the line after `updated`, and `set` refuses it. `cycle` is an opaque label matching `[A-Za-z0-9][A-Za-z0-9._-]{0,63}` and `keep` a boolean; both are set with `set` (`null` removes them), shown by `show`, `ls --fields` and the board, and `ls --cycle <label>` filters by the label. New `check` rules: WK13 (a warning: an item in `done/` has no `closed`), WK14, WK15, WK16 and WK17. Items closed earlier have no `closed` until someone backfills it. The schemas, fixtures (new cases for `close` dropped, `set` of `cycle` and `keep`, and the refused `closed`), the specification, the guide and the skill references are updated. `migrate`'s `move_closed` does not invent a date.
+
+## 0.2.1 - 2026-10-29
+
 - `akmctl version` after `go install` reports the module version (it printed `0.0.0-dev`).
+
+## 0.2.0 - 2026-10-29
+
 - `check`: SF3 no longer flags record file names or Markdown link targets as secrets; L2 reads `[[name\|alias]]` inside a table cell as the note `name`.
 - Beta 0.2.0 (greenfield): `akmctl init [--docs-dir <name>] [--wikilinks] [--git-init] [--git-commits]` writes the layout, `AGENTS.md`, `CLAUDE.md`, the `akm` skills, the manifest and, in a git repository, a `.gitignore` for the lock into a new directory, never overwriting (API operation `init`, schema and fixtures). The manifest, deny list, lock and migrate log live in the docs dir, which the tool finds on its own. `akmctl config git-commits on|off` installs or removes the optional `akm-commit` skill. The layout, the extensions and the specification are versioned 0.2.0; adopting an existing repository is not supported in the beta.
 - New ids and record dates use the local calendar day (`as_of` still wins); `claimed_at` stays UTC. Re-claiming an item you hold adds no log line. `mint_ids` takes `slug_from` and `max_slug`. New `migrate` step `move_closed`.
