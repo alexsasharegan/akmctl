@@ -177,7 +177,7 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 
 ### A new repo
 
-1. Run `akmctl init --profile code` (a software repository) or `--profile notes` (a notes repository or an Obsidian vault) in an empty directory. It writes the layout, `AGENTS.md`, the skills and the `.layout` manifest, and never overwrites a file.
+1. Run `akmctl init` in an empty directory. On a terminal it asks where the records go (default `docs`), whether to use `[[wikilinks]]` between records (for an Obsidian vault), whether to install the commit skill and whether to run `git init`; `--docs-dir`, `--wikilinks`, `--git-commits` and `--git-init` answer the same questions, and `--yes` takes the defaults without asking. It writes the layout, `AGENTS.md`, the skills and the `.layout` manifest (inside the records folder), and never overwrites a file.
 2. Fill in `AGENTS.md` (identity, commands, boundaries).
 3. File the first work items. Write the first ADR for the first real decision.
 4. A small repo can stay minimal: `AGENTS.md`, `docs/adr/`, a few work items, `docs/ROADMAP.md`.

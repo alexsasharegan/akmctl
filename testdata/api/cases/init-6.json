@@ -1,8 +1,7 @@
 {
-  "name": "git_commits writes the manifest key and installs the optional skill akm-commit",
+  "name": "git_commits writes the manifest key and installs the optional skill akm-commit; inside a work tree .gitignore is written",
   "repo": "basic",
   "request": {
-    "profile": "code",
     "dir": "with-commits",
     "git_commits": true
   },
@@ -10,12 +9,12 @@
     "api_version": "1.0",
     "operation": "init",
     "request": {
-      "profile": "code",
       "dir": "with-commits",
       "git_commits": true
     },
     "ok": true,
-    "profile": "code",
+    "docs_dir": "docs",
+    "wikilinks": false,
     "dir": "with-commits",
     "layout": "0.2.0",
     "written": [
@@ -62,6 +61,7 @@
     "git": "none"
   },
   "after": {
+    "with-commits/.gitignore": "# the advisory lock akmctl takes while it writes\ndocs/.akm.lock\n",
     "with-commits/.prettierignore": "docs/adr/README.md\n",
     "with-commits/.prettierrc.json": "{ \"embeddedLanguageFormatting\": \"off\" }\n",
     "with-commits/CLAUDE.md": "@AGENTS.md\n",
@@ -95,7 +95,6 @@
     "with-commits/.agents/skills/akm/references/show.md",
     "with-commits/.agents/skills/akm/references/version.md",
     "with-commits/.agents/skills/akm/references/when.md",
-    "with-commits/.gitignore",
     "with-commits/AGENTS.md",
     "with-commits/README.md",
     "with-commits/docs/.akm-deny",

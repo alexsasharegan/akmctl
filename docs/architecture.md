@@ -1,6 +1,6 @@
 # Architecture
 
-`akmctl` reads a repository's AKM records (work items, ADRs, the roadmap, the manifest `docs/.layout`) and offers one set of operations over them through two bindings: a command line and a loopback HTTP server. The contract is the AKM API spec in `docs/spec/akm-api-spec.md`; the fixtures in `testdata/api/` are its executable form, a copy of `docs/spec/akm-api/.fixtures` kept in step by hand (work item 261029-x4ws).
+`akmctl` reads a repository's AKM records (work items, ADRs, the roadmap, the manifest `.layout`, `docs/.layout` by default) and offers one set of operations over them through two bindings: a command line and a loopback HTTP server. The contract is the AKM API spec in `docs/spec/akm-api-spec.md`; the fixtures in `testdata/api/` are its executable form, a copy of `docs/spec/akm-api/.fixtures` kept in step by hand (work item 261029-x4ws).
 
 ## Packages
 
@@ -13,9 +13,9 @@
 | `internal/check`       | The rules WK, I, A, RM, G, L, S, CL, SF.                                                                                                                              |
 | `internal/index`       | The ADR index generator, stable under Prettier.                                                                                                                       |
 | `internal/width`       | Prettier's string-width rule; tables generated from Unicode 17.0.0 (`data/`, `gen/main.go`).                                                                          |
-| `internal/initrepo`    | `init`: the file lists of the profiles `code` and `notes`, the embedded templates and skills, the no-overwrite writer.                                                |
+| `internal/initrepo`    | `init`: the files for the options (docs dir, wikilinks, git), the embedded templates and skills, the no-overwrite writer.                                             |
 | `internal/migrate`     | Declarative layout migration steps (including `mint_ids`), safe application, handoff. No migrations are embedded yet.                                                 |
-| `internal/fsx`         | The advisory lock (`docs/.akm.lock`) and atomic writes.                                                                                                               |
+| `internal/fsx`         | The advisory lock (`.akm.lock` in the manifest folder) and atomic writes.                                                                                             |
 | `internal/server`      | The HTTP binding and the workbench page (`web/`).                                                                                                                     |
 | `internal/cli`         | Flags to request parameters; `--format json\|table\|ids`; the `ui` command.                                                                                           |
 
@@ -23,6 +23,7 @@
 
 - Standard library only in the tool; `go.yaml.in/yaml/v3` is a test oracle and never linked into the binary.
 - `init` never overwrites a file; versions in what it writes come from the tool's constants (`check.LayoutVersion`), not from templates. `internal/initrepo/templates/skills` is a copy of `.agents/skills`, kept equal by a test.
+- The manifest, `.akm-deny`, `.akm.lock` and `.migrate-log` share one folder (`docs/` by default), found by `record.Locate`: `docs/.layout`, else exactly one `<name>/.layout` among the root's immediate non-hidden subdirectories; two is an error. No code hard-codes `docs/` for them.
 - The tool never stages, commits or pushes. `close` renames; `new adr` does not regenerate the index (`index` does).
 - A write is a compare-and-swap on an etag under the repository lock, written by temp file and rename.
 - Unknown frontmatter keys, comments, quoting and line endings survive every edit byte for byte.
@@ -36,4 +37,4 @@ This repository holds the whole of AKM: the standard (`docs/spec/agent-ready-rep
 
 ## Versions
 
-The tool, the standard (layout) and the API are versioned independently: the tool is 0.x, the layout in `docs/.layout` is 0.2.0, the API is 1.0. The tool's version is stamped at build time from the git tag; there is no `VERSION` file.
+The tool, the standard (layout) and the API are versioned independently: the tool is 0.x, the layout in the manifest is 0.2.0, the API is 1.0. The tool's version is stamped at build time from the git tag; there is no `VERSION` file.

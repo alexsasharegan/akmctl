@@ -1,0 +1,22 @@
+{
+  "name": "the retired profile parameter is rejected",
+  "repo": "basic",
+  "request": {
+    "profile": "code"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "init",
+    "request": {
+      "profile": "code"
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "unknown parameter \"profile\"",
+      "details": {
+        "parameter": "profile"
+      }
+    }
+  }
+}

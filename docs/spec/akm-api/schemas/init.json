@@ -5,11 +5,12 @@
     "request": {
       "type": "object",
       "properties": {
-        "profile": {
-          "enum": [
-            "code",
-            "notes"
-          ]
+        "docs_dir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "wikilinks": {
+          "type": "boolean"
         },
         "dir": {
           "type": "string",
@@ -22,9 +23,6 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "profile"
-      ],
       "additionalProperties": false
     },
     "response": {
@@ -44,11 +42,12 @@
             "ok": {
               "const": true
             },
-            "profile": {
-              "enum": [
-                "code",
-                "notes"
-              ]
+            "docs_dir": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wikilinks": {
+              "type": "boolean"
             },
             "dir": {
               "type": "string",
@@ -93,7 +92,8 @@
             "operation",
             "request",
             "ok",
-            "profile",
+            "docs_dir",
+            "wikilinks",
             "dir",
             "layout",
             "written",

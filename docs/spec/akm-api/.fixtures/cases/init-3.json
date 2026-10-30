@@ -1,17 +1,14 @@
 {
   "name": "a file that exists is skipped, never overwritten",
   "repo": "basic",
-  "request": {
-    "profile": "code"
-  },
+  "request": {},
   "expected": {
     "api_version": "1.0",
     "operation": "init",
-    "request": {
-      "profile": "code"
-    },
+    "request": {},
     "ok": true,
-    "profile": "code",
+    "docs_dir": "docs",
+    "wikilinks": false,
     "dir": ".",
     "layout": "0.2.0",
     "written": [
@@ -38,7 +35,6 @@
       ".agents/skills/akm/references/show.md",
       ".agents/skills/akm/references/version.md",
       ".agents/skills/akm/references/when.md",
-      ".gitignore",
       ".prettierignore",
       ".prettierrc.json",
       "CLAUDE.md",
@@ -88,7 +84,6 @@
     ".agents/skills/akm/references/show.md",
     ".agents/skills/akm/references/version.md",
     ".agents/skills/akm/references/when.md",
-    ".gitignore",
     "README.md",
     "docs/.akm-deny"
   ]

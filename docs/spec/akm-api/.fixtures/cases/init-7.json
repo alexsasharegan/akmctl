@@ -2,7 +2,6 @@
   "name": "git_commits stays off outside a git work tree, and the response says so",
   "repo": "basic",
   "request": {
-    "profile": "code",
     "dir": "no-tree",
     "git_commits": true
   },
@@ -10,12 +9,12 @@
     "api_version": "1.0",
     "operation": "init",
     "request": {
-      "profile": "code",
       "dir": "no-tree",
       "git_commits": true
     },
     "ok": true,
-    "profile": "code",
+    "docs_dir": "docs",
+    "wikilinks": false,
     "dir": "no-tree",
     "layout": "0.2.0",
     "written": [
@@ -42,7 +41,6 @@
       ".agents/skills/akm/references/show.md",
       ".agents/skills/akm/references/version.md",
       ".agents/skills/akm/references/when.md",
-      ".gitignore",
       ".prettierignore",
       ".prettierrc.json",
       "AGENTS.md",
@@ -93,7 +91,6 @@
     "no-tree/.agents/skills/akm/references/show.md",
     "no-tree/.agents/skills/akm/references/version.md",
     "no-tree/.agents/skills/akm/references/when.md",
-    "no-tree/.gitignore",
     "no-tree/AGENTS.md",
     "no-tree/README.md",
     "no-tree/docs/.akm-deny",

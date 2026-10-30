@@ -1,19 +1,18 @@
 {
-  "name": "code profile in a new directory",
+  "name": "defaults in a new directory: records under docs/, no .gitignore outside a work tree",
   "repo": "basic",
   "request": {
-    "profile": "code",
     "dir": "new-project"
   },
   "expected": {
     "api_version": "1.0",
     "operation": "init",
     "request": {
-      "profile": "code",
       "dir": "new-project"
     },
     "ok": true,
-    "profile": "code",
+    "docs_dir": "docs",
+    "wikilinks": false,
     "dir": "new-project",
     "layout": "0.2.0",
     "written": [
@@ -40,7 +39,6 @@
       ".agents/skills/akm/references/show.md",
       ".agents/skills/akm/references/version.md",
       ".agents/skills/akm/references/when.md",
-      ".gitignore",
       ".prettierignore",
       ".prettierrc.json",
       "AGENTS.md",
@@ -91,7 +89,6 @@
     "new-project/.agents/skills/akm/references/show.md",
     "new-project/.agents/skills/akm/references/version.md",
     "new-project/.agents/skills/akm/references/when.md",
-    "new-project/.gitignore",
     "new-project/AGENTS.md",
     "new-project/README.md",
     "new-project/docs/.akm-deny",

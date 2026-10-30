@@ -2,14 +2,12 @@
   "name": "a directory outside the repository is rejected",
   "repo": "basic",
   "request": {
-    "profile": "code",
     "dir": "../elsewhere"
   },
   "expected": {
     "api_version": "1.0",
     "operation": "init",
     "request": {
-      "profile": "code",
       "dir": "../elsewhere"
     },
     "ok": false,

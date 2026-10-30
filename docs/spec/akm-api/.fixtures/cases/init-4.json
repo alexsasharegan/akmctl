@@ -1,21 +1,21 @@
 {
-  "name": "an unknown profile is rejected",
+  "name": "a docs_dir that is not a single folder name is rejected",
   "repo": "basic",
   "request": {
-    "profile": "wiki"
+    "docs_dir": "a/b"
   },
   "expected": {
     "api_version": "1.0",
     "operation": "init",
     "request": {
-      "profile": "wiki"
+      "docs_dir": "a/b"
     },
     "ok": false,
     "error": {
       "code": "invalid_request",
-      "message": "profile: unknown value \"wiki\"",
+      "message": "docs_dir \"a/b\" must be a single folder name, with no path separator",
       "details": {
-        "parameter": "profile"
+        "parameter": "docs_dir"
       }
     }
   }

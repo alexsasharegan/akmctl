@@ -11,4 +11,4 @@ Use `--format json` for the full object: `layout`, `extensions`, folders, `refer
 
 Files changed: none.
 
-Errors: none for the version itself; the repository part is left out when `docs/.layout` is missing.
+Errors: none for the version itself; the repository part is left out when the manifest is missing.

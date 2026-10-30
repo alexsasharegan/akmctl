@@ -1,12 +1,14 @@
 ---
 id: "261029-40gv"
 title: Replace init profiles with options; move the manifest into the docs dir
-status: ready
+status: active
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
 priority: 1
 summary: init has --docs-dir, --wikilinks and git options instead of profiles; the manifest, deny list, lock and migrate log live in the docs dir.
+claimed_by: options-agent
+claimed_at: 2026-10-30T02:12
 ---
 
 # Replace init profiles with options; move the manifest into the docs dir
@@ -27,8 +29,10 @@ Done when:
 
 ## Next
 
-Not started.
+Implemented and tested on branch worktree-agent-a2559360e9e67bb44. Left for the maintainer: README, CHANGELOG and the roadmap mention profiles (not touched here), then review, tick the done-when list, write `## Outcome`, close, and accept ADR 261029-hsfd.
 
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: claimed (options-agent).
+- 2026-10-29: discovery (`record.Locate`, `Repo.MetaDir`), lock, deny list and migrate log follow the manifest folder; `init` takes `docs_dir`, `wikilinks`, `git_commits`, `git_init` (no `profile`); `.gitignore` only in a work tree; CLI questions in the new order; schema, fixtures (both copies, 63 cases), spec, guide and skill references updated.
