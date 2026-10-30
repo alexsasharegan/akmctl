@@ -3,3 +3,4 @@ extension.adr-index: 0.3.0
 extension.work-items: 0.3.0
 extension.claims: 0.3.0
 extension.safety: 0.3.0
+git_commits: true

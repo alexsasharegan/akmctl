@@ -213,6 +213,17 @@ func TestVersionsFromConstants(t *testing.T) {
 // The embedded skills are a copy of this repository's own.
 func TestSkillsMatchRepository(t *testing.T) {
 	src := snapshot(t, "../../.agents/skills")
+	// This repository has the optional skill on (git_commits); it must match its shipped copy.
+	opt := map[string]string{}
+	for k, v := range src {
+		if rest, ok := strings.CutPrefix(k, "akm-commit/"); ok {
+			opt[rest] = v
+			delete(src, k)
+		}
+	}
+	if len(opt) > 0 && !reflect.DeepEqual(opt, snapshot(t, "templates/optional-skills/akm-commit")) {
+		t.Error("internal/initrepo/templates/optional-skills/akm-commit differs from .agents/skills/akm-commit: copy it over")
+	}
 	got := snapshot(t, "templates/skills")
 	if !reflect.DeepEqual(src, got) {
 		t.Error("internal/initrepo/templates/skills differs from .agents/skills: copy the skills over")
@@ -229,7 +240,8 @@ func TestAlwaysInstalledSkills(t *testing.T) {
 		}
 		var got []string
 		for _, e := range ents {
-			if e.IsDir() {
+			// this repository may have the optional skill installed
+			if e.IsDir() && e.Name() != "akm-commit" {
 				got = append(got, e.Name())
 			}
 		}

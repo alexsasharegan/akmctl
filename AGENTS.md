@@ -30,7 +30,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Update the item's `## Next` and `## Log` in the same commit as the code.
 - Mint ids with `akmctl new`. Without the tool: `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"`, then `ls docs/work docs/work/done docs/adr | grep "^$id-"` must print nothing.
 - Code and tests win over prose. When a document is wrong, fix it or say so.
-- This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path, one logical commit per step.
+- This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path, one logical commit per step (the `akm-commit` skill is on here). Push verified commits to origin; the skill's default of never pushing does not apply in this repository. Tags, releases and visibility changes still need the maintainer.
 - Without the tool: decisions are in `docs/adr/README.md`; `grep -lE '^status: ?"?active"?$' docs/work/*.md` lists active work (same for `ready`, `blocked`); close an item by setting `status`, writing `## Outcome`, setting `updated` and `git mv` to `docs/work/done/`. Never hand-edit the ADR index.
 - The `akmctl` binary must work on macOS and Linux. Windows is best effort and not required below 1.0.0 (ADR 261029-eegx): CI runs it without blocking.
 
