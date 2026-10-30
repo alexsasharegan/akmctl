@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/alexsasharegan/akmctl/internal/initrepo"
 )
 
 // stdinReader and interactive are variables so tests can script the terminal.
@@ -65,6 +67,22 @@ func (p *prompter) yesNo(q string, def bool) bool {
 			return false
 		}
 		fmt.Fprintln(p.out, "Please answer y or n.")
+	}
+}
+
+// docsDir asks where the records go until the answer is a valid folder name;
+// an empty answer or end of input takes docs.
+func (p *prompter) docsDir() string {
+	for {
+		a, ok := p.line("Where should the records go? (" + initrepo.DefaultDocsDir + "): ")
+		if !ok || a == "" {
+			return initrepo.DefaultDocsDir
+		}
+		err := initrepo.ValidateDocsDir(a)
+		if err == nil {
+			return a
+		}
+		fmt.Fprintf(p.out, "%q %v.\n", a, err)
 	}
 }
 

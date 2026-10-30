@@ -65,15 +65,18 @@ func TestPrompter(t *testing.T) {
 		t.Errorf("%q", out.String())
 	}
 	out.Reset()
-	p = newPrompter(strings.NewReader("wiki\nNotes\n\n"), &out)
-	if got := p.choice("Profile", []string{"code", "notes"}, "code"); got != "notes" {
+	p = newPrompter(strings.NewReader("a/b\n.x\nknowledge\n"), &out)
+	if got := p.docsDir(); got != "knowledge" {
 		t.Error(got)
 	}
-	if got := p.choice("Profile", []string{"code", "notes"}, "code"); got != "code" {
-		t.Error(got)
-	}
-	if !strings.Contains(out.String(), "Profile [code/notes] (code): ") {
+	if !strings.Contains(out.String(), "Where should the records go? (docs): ") || strings.Count(out.String(), "Where should") != 3 {
 		t.Errorf("%q", out.String())
+	}
+	if got := newPrompter(strings.NewReader("\n"), &out).docsDir(); got != "docs" {
+		t.Error(got)
+	}
+	if got := newPrompter(strings.NewReader(""), &out).docsDir(); got != "docs" {
+		t.Error(got)
 	}
 }
 
@@ -81,83 +84,100 @@ func TestAskInit(t *testing.T) {
 	var out bytes.Buffer
 	req := api.Request{}
 	askInit(newPrompter(strings.NewReader("notes\ny\nn\n"), &out), req, false)
-	if req["profile"] != "notes" || req["git_commits"] != true || req["git_init"] != false {
+	// not in a repository and git init declined: the commit skill is not asked
+	if req["docs_dir"] != "notes" || req["wikilinks"] != true || req["git_init"] != false {
+		t.Errorf("%v", req)
+	}
+	if _, ok := req["git_commits"]; ok || strings.Contains(out.String(), "akm-commit") {
+		t.Errorf("asked about commits: %q", out.String())
+	}
+	// the order: folder, wikilinks, git init, then the commit skill
+	req = api.Request{}
+	out.Reset()
+	askInit(newPrompter(strings.NewReader("\n\n\ny\n"), &out), req, false)
+	order := []string{"Where should the records go? (docs): ", "Use [[wikilinks]] between records? [y/N] ", "Run git init? [Y/n] ", "Install the akm-commit skill (agents commit after each step)? [y/N] "}
+	last := -1
+	for _, q := range order {
+		i := strings.Index(out.String(), q)
+		if i <= last {
+			t.Errorf("prompt %q out of order or missing in %q", q, out.String())
+		}
+		last = i
+	}
+	if req["docs_dir"] != "docs" || req["wikilinks"] != false || req["git_init"] != true || req["git_commits"] != true {
 		t.Errorf("%v", req)
 	}
 	// flags answer first; inside a repository git init is not asked
-	req = api.Request{"profile": "code", "git_commits": false}
+	req = api.Request{"docs_dir": "d", "wikilinks": false, "git_commits": false}
 	out.Reset()
 	askInit(newPrompter(strings.NewReader(""), &out), req, true)
-	if out.Len() != 0 || len(req) != 2 {
+	if out.Len() != 0 || len(req) != 3 {
 		t.Errorf("asked %q, req %v", out.String(), req)
 	}
-	// all defaults
-	req = api.Request{}
-	askInit(newPrompter(strings.NewReader("\n\n\n"), &out), req, false)
-	if req["profile"] != "code" || req["git_commits"] != false || req["git_init"] != true {
-		t.Errorf("%v", req)
+	// inside a repository the commit skill is asked, git init is not
+	req = api.Request{"docs_dir": "d", "wikilinks": false}
+	out.Reset()
+	askInit(newPrompter(strings.NewReader("y\n"), &out), req, true)
+	if strings.Contains(out.String(), "git init") || req["git_commits"] != true {
+		t.Errorf("%q %v", out.String(), req)
 	}
 }
 
 func TestInitAsksOnATerminalOnly(t *testing.T) {
 	// a terminal: the answers decide
-	script(t, true, "notes\ny\nn\n")
+	script(t, true, "knowledge\ny\nn\n")
 	base := t.TempDir()
 	var out, errb bytes.Buffer
 	if code := Run([]string{"init", "proj"}, &out, &errb, base); code != 0 {
 		t.Fatal(code, errb.String())
 	}
-	for _, q := range []string{"Profile [code/notes] (code): ", "Install the git-commit skill? [y/N] ", "Run git init? [Y/n] "} {
+	for _, q := range []string{"Where should the records go? (docs): ", "Use [[wikilinks]] between records? [y/N] ", "Run git init? [Y/n] "} {
 		if !strings.Contains(errb.String(), q) {
 			t.Errorf("missing prompt %q in %q", q, errb.String())
 		}
 	}
-	if !has(base, "proj/notes/work") {
-		t.Error("the profile answer was not used")
+	if !has(base, "proj/knowledge/work") || has(base, "proj/docs") {
+		t.Error("the folder answer was not used")
 	}
-	if !strings.Contains(out.String(), "not a git repository: git commits stay off (run git init, then: akmctl config git-commits on)") {
-		t.Errorf("no forced-off note: %q", out.String())
+	if b, _ := os.ReadFile(filepath.Join(base, "proj", "knowledge", ".layout")); !strings.Contains(string(b), "reference_style: wikilink") {
+		t.Error("the wikilinks answer was not used")
 	}
-	if has(base, "proj/.git") || has(base, "proj/.agents/skills/akm-commit") {
-		t.Error("git or the skill appeared")
+	if has(base, "proj/.git") || has(base, "proj/.agents/skills/akm-commit") || has(base, "proj/.gitignore") {
+		t.Error("git, the skill or .gitignore appeared")
 	}
-	// not a terminal: nothing is asked, even with input waiting; the profile is required
+	// not a terminal: nothing is asked, even with input waiting; the defaults apply
 	script(t, false, "notes\ny\ny\n")
 	out.Reset()
 	errb.Reset()
-	if code := Run([]string{"init", "other"}, &out, &errb, base); code != 2 || !strings.Contains(errb.String(), "code or notes") {
-		t.Errorf("no profile: %d %q", code, errb.String())
+	if code := Run([]string{"init", "other"}, &out, &errb, base); code != 0 || errb.Len() != 0 {
+		t.Errorf("bare init without a terminal: %d %q", code, errb.String())
 	}
-	if strings.Contains(errb.String(), "[y/N]") {
-		t.Error("asked without a terminal")
-	}
-	// not a terminal with a profile: defaults (no skill, no git init)
-	errb.Reset()
-	if code := Run([]string{"init", "--profile", "code", "other"}, &out, &errb, base); code != 0 || errb.Len() != 0 {
-		t.Errorf("%d %q", code, errb.String())
-	}
-	if has(base, "other/.git") || has(base, "other/.agents/skills/akm-commit") {
-		t.Error("defaults were not off")
+	if !has(base, "other/docs/.layout") || has(base, "other/.git") || has(base, "other/.agents/skills/akm-commit") {
+		t.Error("defaults were not used")
 	}
 	// a terminal with --yes or --no-input: not asked either
 	for _, flag := range []string{"--yes", "--no-input"} {
 		script(t, true, "notes\n")
 		errb.Reset()
-		if code := Run([]string{"init", flag, "d" + flag[2:3]}, &out, &errb, base); code != 2 {
-			t.Errorf("%s without a profile: %d", flag, code)
+		dir := "d" + flag[2:3]
+		if code := Run([]string{"init", flag, dir}, &out, &errb, base); code != 0 {
+			t.Errorf("%s: %d %q", flag, code, errb.String())
 		}
-		if strings.Contains(errb.String(), "Profile [") {
-			t.Errorf("%s asked", flag)
+		if strings.Contains(errb.String(), "Where should") || !has(base, dir+"/docs/.layout") {
+			t.Errorf("%s asked or ignored the defaults", flag)
 		}
 	}
-	// flags skip their questions: only the profile is asked
-	script(t, true, "code\n")
+	// flags skip their questions: only the folder is asked
+	script(t, true, "wiki\n")
 	errb.Reset()
-	if code := Run([]string{"init", "--no-git-commits", "--no-git-init", "flagged"}, &out, &errb, base); code != 0 {
+	if code := Run([]string{"init", "--no-wikilinks", "--no-git-commits", "--no-git-init", "flagged"}, &out, &errb, base); code != 0 {
 		t.Fatal(code, errb.String())
 	}
-	if strings.Contains(errb.String(), "git-commit skill") || strings.Contains(errb.String(), "git init?") {
+	if strings.Contains(errb.String(), "akm-commit") || strings.Contains(errb.String(), "git init?") || strings.Contains(errb.String(), "wikilinks") {
 		t.Errorf("asked what the flags answered: %q", errb.String())
+	}
+	if !has(base, "flagged/wiki/.layout") {
+		t.Error("the folder answer was not used")
 	}
 }
 
@@ -166,7 +186,7 @@ func TestInitGitCommitsFlag(t *testing.T) {
 	base := t.TempDir()
 	os.MkdirAll(filepath.Join(base, ".git"), 0o755)
 	var out, errb bytes.Buffer
-	if code := Run([]string{"init", "--profile", "code", "--git-commits", "--yes", "p"}, &out, &errb, base); code != 0 {
+	if code := Run([]string{"init", "--git-commits", "--yes", "p"}, &out, &errb, base); code != 0 {
 		t.Fatal(code, errb.String())
 	}
 	if !has(base, "p/.agents/skills/akm-commit/SKILL.md") {

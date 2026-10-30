@@ -466,10 +466,10 @@ func text(w io.Writer, op string, resp api.Obj) {
 		fmt.Fprintf(w, "%v errors, %v warnings\n", e, wn)
 	case "init":
 		dir, _ := resp.Get("dir")
-		prof, _ := resp.Get("profile")
 		wr, _ := resp.Get("written")
 		sk, _ := resp.Get("skipped")
-		fmt.Fprintf(w, "initialised %v (profile %v)\n", dir, prof)
+		docs, _ := resp.Get("docs_dir")
+		fmt.Fprintf(w, "initialised %v (records in %v/)\n", dir, docs)
 		for _, p := range wr.([]string) {
 			fmt.Fprintln(w, "  wrote   ", p)
 		}
@@ -547,7 +547,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init --profile code|notes [dir] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

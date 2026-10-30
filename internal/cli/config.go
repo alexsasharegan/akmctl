@@ -12,20 +12,16 @@ import (
 )
 
 // initQuestions completes the init request. On a terminal (and without --yes or
-// --no-input) it asks for the profile, the commit skill and git init when the
-// flags did not answer them; otherwise it asks nothing, and the profile is
-// required. It reports false after printing why the request cannot go on.
+// --no-input) it asks for what the flags left open: where the records go,
+// wikilinks, git init (outside a repository) and the commit skill. Otherwise it
+// asks nothing and the defaults apply. It reports false after printing why the
+// request cannot go on.
 func initQuestions(req api.Request, base string, yes, noInput bool, stdout, stderr io.Writer) bool {
 	target := base
 	if d, ok := req["dir"].(string); ok {
 		target = filepath.Join(base, filepath.FromSlash(d))
 	}
-	ask := !yes && !noInput && interactive(stdout)
-	if _, given := req["profile"]; !given && !ask {
-		fmt.Fprintf(stderr, "akmctl: init needs --profile (%s)\n", strings.Join(initrepo.Profiles, " or "))
-		return false
-	}
-	if ask {
+	if ask := !yes && !noInput && interactive(stdout); ask {
 		askInit(newPrompter(stdinReader, stderr), req, record.InGitRepo(target))
 	}
 	return true
@@ -33,14 +29,18 @@ func initQuestions(req api.Request, base string, yes, noInput bool, stdout, stde
 
 // askInit asks for what req leaves open; the answers are added to req.
 func askInit(p *prompter, req api.Request, inRepo bool) {
-	if _, ok := req["profile"]; !ok {
-		req["profile"] = p.choice("Profile", initrepo.Profiles, "code")
+	if _, ok := req["docs_dir"]; !ok {
+		req["docs_dir"] = p.docsDir()
 	}
-	if _, ok := req["git_commits"]; !ok {
-		req["git_commits"] = p.yesNo("Install the git-commit skill?", false)
+	if _, ok := req["wikilinks"]; !ok {
+		req["wikilinks"] = p.yesNo("Use [[wikilinks]] between records?", false)
 	}
 	if _, ok := req["git_init"]; !ok && !inRepo {
 		req["git_init"] = p.yesNo("Run git init?", true)
+	}
+	willBeRepo := inRepo || req["git_init"] == true
+	if _, ok := req["git_commits"]; !ok && willBeRepo {
+		req["git_commits"] = p.yesNo("Install the akm-commit skill (agents commit after each step)?", false)
 	}
 }
 
