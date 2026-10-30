@@ -14,9 +14,6 @@ Beta (greenfield only; adoption is not claimed). Order of work:
 - [261029-f5vn] Date new ids with the local day, not UTC
 - [261029-nf6h] mint_ids: build the slug from the title
 - [261029-dsga] Rewrite the standard's template section to describe init
-- [261029-9ep9] Put the repository name in the page title
-- [261029-btny] Center the WORKBENCH label and repository name with the title
-- [261029-4hx0] Add an SVG favicon
 - [261029-sjyg] Prettier is not run by CI
 
 ## Later

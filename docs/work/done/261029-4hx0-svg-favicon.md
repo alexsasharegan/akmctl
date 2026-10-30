@@ -1,14 +1,12 @@
 ---
 id: "261029-4hx0"
 title: Add an SVG favicon
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-30
 kind: feature
 priority: 3
 summary: The workbench has no favicon, so the browser tab shows a blank icon.
-claimed_by: ui-agent
-claimed_at: 2026-10-30T00:44
 ---
 
 # Add an SVG favicon
@@ -29,8 +27,13 @@ Done when:
 - Coordinator: look at the tab icon at 16 px in light and dark browser chrome (not done here; no browser was run). Then tick the last Done item.
 - The per-repository colour accent (optional, in the Goal) is not done.
 
+## Outcome
+
+`internal/server/web/favicon.svg` (light and dark) is linked from `index.html` and served at `/favicon.svg` as image/svg+xml; `TestFaviconIsServed` covers it. Link resolved in the built-in browser; the 16px rendering was not inspected.
+
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-30: claimed (ui-agent).
 - 2026-10-30: web/favicon.svg is a rounded tile with three bars, no text. Its colours switch with prefers-color-scheme inside the SVG. Served at `/favicon.svg` by an explicit case in server.go (image/svg+xml, same CSP, no token) and linked from index.html. TestFaviconIsServed covers the route, the type and the link.
+- 2026-10-30: released (ui-agent).

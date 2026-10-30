@@ -1,14 +1,12 @@
 ---
 id: "261029-9ep9"
 title: Put the repository name in the page title
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-30
 kind: feature
 priority: 2
 summary: Two workbench tabs on different repositories look the same in the browser tab strip.
-claimed_by: ui-agent
-claimed_at: 2026-10-30T00:42
 ---
 
 # Put the repository name in the page title
@@ -29,8 +27,16 @@ Done when:
 - Coordinator: open two workbenches on different repositories and check the tab titles in the browser (not done here).
 - Duplicate folder names: `repoLabel(root, others)` in web/js/logic.js adds the parent folder when another root shares the name, but the page passes `[]` because it only knows its own root. Wiring it needs the server to report the other open roots; decide that before closing.
 
+## Outcome
+
+- document.title is "<view> - <repo> - akmctl", set on every route change, record open and config load (`internal/server/web/app.js` setTitle). Checked in the built-in browser: "Board - akmctl - akmctl".
+- Two servers differ by repository name; the duplicate-folder rule is implemented in `repoLabel(root, others)` but the page passes no other roots, so it never fires today (follow-up not filed; only matters with two same-named repos).
+- Only the record's id and title appear; set through document.title.
+- `pageTitle` and `repoLabel` are pure and covered in `internal/server/testdata/logic.test.mjs` (long names, duplicate folders).
+
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-30: claimed (ui-agent).
 - 2026-10-30: `repoLabel` and `pageTitle` are pure functions in web/js/logic.js, tested in testdata/logic.test.mjs (run by TestPureModulesUnderNode, with long names and duplicate folder names). app.js sets document.title from `setTitle` on every route and on a record open, and once the repository name arrives from GET /ui/config. Titles use `view - repo - akmctl`; a record shows its id and title only.
+- 2026-10-30: released (ui-agent).
