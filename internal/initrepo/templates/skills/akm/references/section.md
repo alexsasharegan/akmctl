@@ -10,7 +10,7 @@ $ akmctl section 261029-atxk Goal --text "Print results as JSON.
 changed: true
 ```
 
-`--text -` reads the text from standard input. For `Log`, the mode is `append`.
+`--text -` reads the text from standard input. For `Log`, the mode is `append`: the text is added as one more line, and a first line that does not start with a list marker (`- `, `* `, `+ ` or `1. `) gets a `- ` bullet, so a bare line does not join the previous bullet. In another section, append adds the text as written.
 
 Files changed: the one record; `updated` is set to today.
 

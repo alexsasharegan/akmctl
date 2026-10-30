@@ -163,6 +163,19 @@ func AppendToSection(body, name, line, eol string) string {
 	return strings.Join(out, "\n")
 }
 
+// listItem reports whether text starts with a Markdown list marker: "- ", "* ",
+// "+ " or a number followed by "." or ")" and a space.
+func listItem(text string) bool {
+	if len(text) > 1 && strings.ContainsRune("-*+", rune(text[0])) && text[1] == ' ' {
+		return true
+	}
+	i := 0
+	for i < len(text) && text[i] >= '0' && text[i] <= '9' {
+		i++
+	}
+	return i > 0 && i+1 < len(text) && (text[i] == '.' || text[i] == ')') && text[i+1] == ' '
+}
+
 // SetSection replaces the text of the "## name" section of a body, or appends
 // lines to it, and returns the new body. The heading is matched without regard
 // to case, outside code fences. A missing section is created: before the "## Log"
@@ -177,6 +190,10 @@ func SetSection(body, name, text string, appendMode bool, eol string) string {
 	text = strings.ReplaceAll(text, "\r\n", "\n")
 	if appendMode {
 		text = strings.TrimRight(text, "\n")
+		if strings.EqualFold(name, "log") && text != "" && !listItem(text) {
+			// a bare line would join the previous bullet
+			text = "- " + text
+		}
 	} else {
 		text = strings.Trim(text, "\n")
 	}

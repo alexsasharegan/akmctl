@@ -64,7 +64,6 @@ Hardening and small rules:
 - [261029-q8z3] TestCompareAndSwapRace is flaky on Windows CI
 - [261028-jzsx] Cover the Windows path beyond CI
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
-- [261030-4d9b] section --mode append: a Log line without a bullet joins the previous bullet
 - [261028-1k0e] Say which is which in the ADR index supersedes column
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
 - [261029-2k7z] spike for shell completions

@@ -256,13 +256,13 @@ A step object may carry `notes`, an array of strings, present only when there is
 
 Replace or extend one `##` section of a record's body. `set` changes frontmatter only; this operation is how a client writes the text of a record (the goal, the next step, the outcome, a log line).
 
-| Parameter                      | Type                  | Default      | Meaning                                                                                                                   |
-| ------------------------------ | --------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `id`                           | id                    | **required** | A work item or an ADR.                                                                                                    |
-| `name`                         | string                | **required** | The text of a `##` heading, compared without regard to case, without the hashes. One line, not empty.                     |
-| `text`                         | string                | **required** | The new text. May be empty. Line endings are written as the file has them.                                                |
-| `mode`                         | `replace` or `append` | `replace`    | `replace` makes `text` the whole section. `append` adds `text` on new lines after the last non-blank line of the section. |
-| `if_match`, `dry_run`, `as_of` |                       |              | As for `set`.                                                                                                             |
+| Parameter                      | Type                  | Default      | Meaning                                                                                                                                                                                                              |
+| ------------------------------ | --------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | id                    | **required** | A work item or an ADR.                                                                                                                                                                                               |
+| `name`                         | string                | **required** | The text of a `##` heading, compared without regard to case, without the hashes. One line, not empty.                                                                                                                |
+| `text`                         | string                | **required** | The new text. May be empty. Line endings are written as the file has them.                                                                                                                                           |
+| `mode`                         | `replace` or `append` | `replace`    | `replace` makes `text` the whole section. `append` adds `text` on new lines after the last non-blank line of the section; on the Log section a first line that does not start with a list marker gets a `- ` bullet. |
+| `if_match`, `dry_run`, `as_of` |                       |              | As for `set`.                                                                                                                                                                                                        |
 
 A section that does not exist is created before `## Log`, or at the end when there is no Log, with a blank line after its heading (the form Prettier leaves unchanged); `close` with `outcome` creates `## Outcome` the same way. Response: `record` (after), `section` (`{name, text}`: the section as `show` returns it after the write, `name` in lower case), `changed` (boolean: the file text differs) and `diff` when `dry_run` is true.
 

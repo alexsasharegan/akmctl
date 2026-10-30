@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `section`: appending to `## Log` adds a `- ` bullet to a first line that has no list marker, so a bare line no longer joins the previous bullet. The API spec and the skill reference say so.
+
 ## 0.3.1 - 2026-10-29
 
 - `ui`: toasts are reworked. They sit bottom right above the hint bar, come in four levels (success, info, warning, error) with a glyph and the level word above the message, and are ephemeral (8 seconds) or persistent (errors stay until dismissed). The top border counts down and pauses on hover and keyboard focus; each toast has a close icon, and Escape dismisses the newest persistent one.
