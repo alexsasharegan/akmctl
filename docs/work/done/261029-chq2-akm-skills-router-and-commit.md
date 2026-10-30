@@ -1,14 +1,12 @@
 ---
 id: "261029-chq2"
 title: "akm- skills: rename, router with references, optional akm-commit"
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
 priority: 1
 summary: Rename skills to akm-*, add the akm router skill with one reference per command, add the optional akm-commit skill.
-claimed_by: skills-agent
-claimed_at: 2026-10-30T01:34
 ---
 
 # akm- skills: rename, router with references, optional akm-commit
@@ -28,8 +26,13 @@ Done when:
 
 All four done-when lines are met on this branch. Next: the maintainer reviews, merges, and the config work lets init install akm-commit when git_commits is on (no Go install logic exists yet). Close the item with the Outcome drafted in the agent report.
 
+## Outcome
+
+Skill directories are `akm-work-items` and `akm-record-decision` in `.agents/skills/` and in the init templates; the manifest extension keeps its name. The `akm` router skill has 18 references, one per operation, with examples run against a scratch repo; `TestEveryOperationHasReference` fails when one is missing. `akm-commit` (optional, in `internal/initrepo/templates/optional-skills/`) checks `git_commits` and the git work tree before committing; `TestOptionalCommitSkill` covers its content. `TestAlwaysInstalledSkills` and the drift test keep the templates and this repository in step.
+
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: claimed (skills-agent).
 - 2026-10-29: renamed the skills to akm-work-items and akm-record-decision; added the akm router skill with 18 references (config.md marked added in this release), the optional akm-commit skill, and tests for the references and the always-installed skills; init fixtures regenerated.
+- 2026-10-29: released (skills-agent).
