@@ -371,3 +371,16 @@ assert.equal(C.fileNote("Deep Thought/9 pkm/tasks", "call-plumber"), "File: Deep
 assert.equal(C.fileNote("docs/work", ""), "");
 assert.match(M.opLabel({ kind: "close", status: "done", outcome: "x" }, "i", { work_dir: "Deep Thought/9 pkm/tasks" }), /move the file to Deep Thought\/9 pkm\/tasks\/done\/$/);
 assert.match(M.opLabel({ kind: "close", status: "dropped" }, "i"), /move the file to docs\/work\/done\/$/);
+
+// page title: the repository's folder name, with the parent folder when another root shares it
+assert.equal(L.repoLabel("/Users/me/github.com/alexsasharegan/akmctl"), "akmctl");
+assert.equal(L.repoLabel("C:\\Users\\me\\obsidian.vaults\\"), "obsidian.vaults");
+assert.equal(L.repoLabel("/home/me/work/docs", ["/home/me/play/docs"]), "work/docs");
+assert.equal(L.repoLabel("/home/me/work/docs", ["/home/me/work/docs"]), "docs");
+assert.equal(L.repoLabel("/home/me/work/docs", ["/home/me/play/akmctl"]), "docs");
+assert.equal(L.repoLabel("docs", ["/x/docs"]), "docs");
+assert.equal(L.repoLabel(""), "");
+const longName = "a-repository-with-an-extremely-long-name-that-goes-on-and-on-for-a-while-indeed";
+assert.equal(L.pageTitle({ view: "Board", repo: longName }), "Board - " + longName + " - akmctl");
+assert.equal(L.pageTitle({ view: "Record 261029-9ep9: Name the page", repo: "akmctl" }), "Record 261029-9ep9: Name the page - akmctl - akmctl");
+assert.equal(L.pageTitle({ view: "ADRs" }), "ADRs - akmctl");

@@ -4,7 +4,7 @@
 import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, state, describeError, ApiError } from "./js/store.js";
 import { createLive, mountIndicator } from "./js/live.js";
 import { createAnimator, keepSteady } from "./js/anim.js";
-import { parseRoute, routeHref, indexById, TABLES } from "./js/logic.js";
+import { parseRoute, routeHref, indexById, TABLES, pageTitle, repoLabel } from "./js/logic.js";
 import { el, isoDate } from "./js/util.js";
 import { initUI, setPage, toast, toggleTheme, openHelp, overlayOpen, typing } from "./js/ui.js";
 import { mountBoard } from "./js/board.js";
@@ -51,13 +51,27 @@ function routeKey(r) {
 }
 
 const TITLES = { board: "Board", tables: "Tables", adrs: "ADRs", check: "Check" };
+let repoName = ""; // the repository's label in the title, from GET /ui/config
+
+/** The tab title for a route: the view, and for a record its id and title only. */
+function setTitle(r) {
+  let view = TITLES[r.name] || "";
+  if (r.name === "tables") {
+    const t = TABLES.find((x) => x.slug === r.table);
+    view = t ? t.title : "Tables";
+  } else if (r.name === "record") {
+    const t = titleOfNow(r.id);
+    view = "Record " + r.id + (t ? ": " + t : "");
+  }
+  document.title = pageTitle({ view, repo: repoName });
+}
 
 function mountBase(r, focus) {
   if (view) view.destroy();
   base = r;
   viewKey = routeKey(r);
   document.body.dataset.view = r.name;
-  document.title = TITLES[r.name] + " · akmctl workbench";
+  setTitle(r);
   for (const a of document.querySelectorAll("#nav [data-nav]")) {
     if (a.dataset.nav === r.name) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
@@ -92,6 +106,7 @@ function showProblem(title, message) {
 function route(focus) {
   if (!loaded) return;
   const r = parseRoute(location.hash);
+  setTitle(r);
   if (r.name === "record") {
     if (!view) mountBase(base, false);
     setPage({ mode: "RECORD", hints: [["Esc", "close"], ["j k", "scroll"], ["1 2 3 4", "views"], ["?", "help"]], where: r.id });
@@ -259,6 +274,8 @@ async function start() {
     const name = (c.root || "").split(/[\\/]/).filter(Boolean).pop();
     document.getElementById("repo").textContent = name || "";
     document.getElementById("repo").title = c.root || "";
+    repoName = repoLabel(c.root || "");
+    setTitle(parseRoute(location.hash));
   });
   await reload(false);
   if (loaded) live.start(state.records);
