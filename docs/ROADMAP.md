@@ -2,7 +2,6 @@
 
 ## Now
 
-- [261029-f9yh] Add closed, cycle and keep to work items (layout 0.3.0)
 - [261029-d3cp] Name the roadmap convention and define the 1.0.0 milestone
 
 ## Next
