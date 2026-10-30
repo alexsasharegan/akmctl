@@ -76,6 +76,42 @@ func slugFor(name, title string) string {
 	return "untitled"
 }
 
+// slug builds the slug of a new file name. By default it comes from the file
+// name, then the title (slugFor, at most 60 characters). With slug_from "title"
+// the title comes first, then the file name; max_slug sets the longest slug.
+func (m *mintCtx) slug(name, title string) string {
+	limit := m.maxSlug
+	if limit <= 0 {
+		limit = 60
+	}
+	if m.slugFrom != "title" && limit == 60 {
+		return slugFor(name, title)
+	}
+	base := datePrefixRe.ReplaceAllString(strings.TrimSuffix(name, path.Ext(name)), "")
+	srcs := []string{base, title}
+	if m.slugFrom == "title" {
+		srcs = []string{title, base}
+	}
+	for _, src := range srcs {
+		s := strings.Trim(slugJunkRe.ReplaceAllString(strings.ToLower(src), "-"), "-")
+		if s == "" {
+			continue
+		}
+		if len(s) > limit {
+			cut := s[:limit]
+			// end on a whole word when the limit falls inside one
+			if s[limit] != '-' {
+				if i := strings.LastIndexByte(cut, '-'); i > 0 {
+					cut = cut[:i]
+				}
+			}
+			s = strings.TrimRight(cut, "-")
+		}
+		return s
+	}
+	return "untitled"
+}
+
 // idDate gives the YYMMDD part for a date field value: a date, or an ISO
 // timestamp (read as UTC when it carries an offset).
 func idDate(v string) (string, bool) {
@@ -97,11 +133,13 @@ func idDate(v string) (string, bool) {
 }
 
 type mintCtx struct {
-	repo *record.Repo
-	root string
-	used map[string]bool
-	env  Env
-	seed string // when set, the suffix comes from a hash of seed and file, not the random source
+	repo     *record.Repo
+	root     string
+	used     map[string]bool
+	env      Env
+	seed     string // when set, the suffix comes from a hash of seed and file, not the random source
+	slugFrom string // "name" (default) or "title"
+	maxSlug  int    // the longest slug; 0 means 60
 }
 
 // mint draws an id for date. With a seed, the suffix is the first four
@@ -192,7 +230,7 @@ func mintIDs(repo *record.Repo, s Step, dry bool, env Env) (files, notes []strin
 	if field == "" {
 		field = "created"
 	}
-	m := &mintCtx{repo: repo, root: root, used: map[string]bool{}, env: env, seed: s.Seed}
+	m := &mintCtx{repo: repo, root: root, used: map[string]bool{}, env: env, seed: s.Seed, slugFrom: s.SlugFrom, maxSlug: s.MaxSlug}
 	m.collectUsed(dir, s.Recursive)
 
 	// the candidates, in path order so a seeded run is repeatable
@@ -337,7 +375,7 @@ func planOne(m *mintCtx, rel string, b []byte, field string, doRename bool) (it 
 	if e != nil {
 		return nil, rel + ": skipped, " + e.Error(), true
 	}
-	newName := id + "-" + slugFor(name, title) + ".md"
+	newName := id + "-" + m.slug(name, title) + ".md"
 	newRel := newName
 	if dirRel != "." {
 		newRel = dirRel + "/" + newName

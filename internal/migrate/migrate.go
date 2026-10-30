@@ -45,6 +45,8 @@ type Step struct {
 	Statuses    []string `json:"statuses,omitempty"`   // goal_scaffold: only records with one of these statuses
 	Rename      *bool    `json:"rename,omitempty"`     // mint_ids: rename the files (default true)
 	Seed        string   `json:"seed,omitempty"`       // mint_ids: makes the id suffixes repeatable
+	SlugFrom    string   `json:"slug_from,omitempty"`  // mint_ids: name (default) or title
+	MaxSlug     int      `json:"max_slug,omitempty"`   // mint_ids: the longest slug, 1 to 100 (default 60)
 }
 
 // Rename is one file move a step planned or made, repository-relative.
@@ -428,6 +430,12 @@ func Validate(m Migration) error {
 			need["path"] = []string{s.Path}
 		case "mint_ids", "move_closed":
 			need["dir"] = []string{s.Dir}
+			if s.SlugFrom != "" && s.SlugFrom != "name" && s.SlugFrom != "title" {
+				return fmt.Errorf("%s: slug_from must be name or title", at)
+			}
+			if s.MaxSlug < 0 || s.MaxSlug > 100 {
+				return fmt.Errorf("%s: max_slug must be between 1 and 100", at)
+			}
 		}
 		for k, v := range need {
 			if v[0] == "" {
