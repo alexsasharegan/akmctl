@@ -18,7 +18,7 @@ const ageCell = (r, today) => {
 };
 
 function columns(slug, today) {
-  const id = { head: "Id", cls: "c-id", cell: idCell };
+  const id = { head: "ID", cls: "c-id", cell: idCell };
   const status = { head: "Status", cell: statusCell };
   const pri = { head: "Pri", cls: "num", cell: priCell };
   const title = { head: "Title", cls: "c-name", cell: titleCell };

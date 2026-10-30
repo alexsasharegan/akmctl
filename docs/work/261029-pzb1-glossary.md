@@ -31,3 +31,4 @@ Alexander edits docs/glossary.md; then close.
 
 - 2026-10-29: filed.
 - 2026-10-29: claimed (claude).
+- 2026-10-29: Aliases column added; Alexander's edit spells the term ID in capitals (never Id); the two workbench column headers that said Id now say ID.

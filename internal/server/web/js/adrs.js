@@ -23,7 +23,7 @@ export function mountAdrs(host, ctx) {
   if (!adrs.length) {
     wrap.append(el("h1", { class: "pg-title", text: "ADRs" }), el("p", { class: "empty-col", text: "This repository has no ADRs." }));
   } else {
-    const head = ["Id", "Status", "Title", "Date", "Scope", "Summary"];
+    const head = ["ID", "Status", "Title", "Date", "Scope", "Summary"];
     wrap.append(
       el("h1", { class: "pg-title" }, "ADRs ", el("span", { class: "count", text: "(" + adrs.length + ")" })),
       el(
