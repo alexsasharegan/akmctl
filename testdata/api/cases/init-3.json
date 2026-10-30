@@ -1,0 +1,54 @@
+{
+  "name": "a file that exists is skipped, never overwritten",
+  "repo": "basic",
+  "request": {
+    "profile": "code"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "init",
+    "request": {
+      "profile": "code"
+    },
+    "ok": true,
+    "profile": "code",
+    "dir": ".",
+    "layout": "1.0.0",
+    "written": [
+      ".agents/skills/record-decision/SKILL.md",
+      ".agents/skills/record-decision/assets/adr.md",
+      ".agents/skills/work-items/SKILL.md",
+      ".agents/skills/work-items/assets/work-item.md",
+      ".gitignore",
+      ".prettierignore",
+      ".prettierrc.json",
+      "CLAUDE.md",
+      "README.md",
+      "docs/.akm-deny",
+      "docs/work/.gitkeep",
+      "docs/work/done/.gitkeep"
+    ],
+    "skipped": [
+      "AGENTS.md",
+      "docs/.layout",
+      "docs/ROADMAP.md",
+      "docs/adr/README.md"
+    ]
+  },
+  "after": {
+    ".prettierignore": "docs/adr/README.md\n",
+    ".prettierrc.json": "{ \"embeddedLanguageFormatting\": \"off\" }\n",
+    "CLAUDE.md": "@AGENTS.md\n",
+    "docs/work/.gitkeep": "",
+    "docs/work/done/.gitkeep": ""
+  },
+  "after_paths": [
+    ".agents/skills/record-decision/SKILL.md",
+    ".agents/skills/record-decision/assets/adr.md",
+    ".agents/skills/work-items/SKILL.md",
+    ".agents/skills/work-items/assets/work-item.md",
+    ".gitignore",
+    "README.md",
+    "docs/.akm-deny"
+  ]
+}

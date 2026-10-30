@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/init.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "enum": [
+            "code",
+            "notes"
+          ]
+        },
+        "dir": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "profile"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "init"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "profile": {
+              "enum": [
+                "code",
+                "notes"
+              ]
+            },
+            "dir": {
+              "type": "string",
+              "minLength": 1
+            },
+            "layout": {
+              "$ref": "common.json#/$defs/version"
+            },
+            "written": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/path"
+              }
+            },
+            "skipped": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/path"
+              }
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "profile",
+            "dir",
+            "layout",
+            "written",
+            "skipped"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

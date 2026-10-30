@@ -18,8 +18,11 @@ type conformanceCase struct {
 	Request  Request           `json:"request"`
 	Expected json.RawMessage   `json:"expected"`
 	After    map[string]string `json:"after"`
-	Removed  []string          `json:"removed"`
-	WouldBe  map[string]string `json:"would_be"`
+	// AfterPaths are files that must exist afterwards, content not compared
+	// (init: the wording of a template is not part of the contract).
+	AfterPaths []string          `json:"after_paths"`
+	Removed    []string          `json:"removed"`
+	WouldBe    map[string]string `json:"would_be"`
 }
 
 // TestConformance runs every fixture case of the API spec whose operation is
@@ -96,7 +99,7 @@ func TestConformance(t *testing.T) {
 			now := snapshot(t, root)
 			delete(now, "docs/.akm.lock")
 			delete(before, "docs/.akm.lock")
-			if c.After == nil && c.Removed == nil {
+			if c.After == nil && c.Removed == nil && c.AfterPaths == nil {
 				if !reflect.DeepEqual(before, now) {
 					t.Fatalf("%s: files changed but the case expects none", c.Name)
 				}
@@ -107,6 +110,11 @@ func TestConformance(t *testing.T) {
 					t.Errorf("%s: %s is\n%s\nwant\n%s", c.Name, p, now[p], want)
 				}
 			}
+			for _, p := range c.AfterPaths {
+				if _, ok := now[p]; !ok {
+					t.Errorf("%s: %s should exist", c.Name, p)
+				}
+			}
 			for _, p := range c.Removed {
 				if _, ok := now[p]; ok {
 					t.Errorf("%s: %s should be gone", c.Name, p)
@@ -114,7 +122,7 @@ func TestConformance(t *testing.T) {
 			}
 			for p := range now {
 				if _, ok := before[p]; !ok {
-					if _, expected := c.After[p]; !expected {
+					if _, expected := c.After[p]; !expected && !contains(c.AfterPaths, p) {
 						t.Errorf("%s: unexpected new file %s", c.Name, p)
 					}
 				}
