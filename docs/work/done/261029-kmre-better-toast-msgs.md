@@ -2,13 +2,12 @@
 id: "261029-kmre"
 title: "Workbench toasts: placement, levels, persistence and a countdown border"
 summary: "Rework the workbench toasts: bottom right, four levels, ephemeral and persistent flavours, a countdown border, hover pause and a close button"
-status: active
+status: done
 kind: feature
 priority: 1
 created: 2026-10-29
 updated: 2026-10-29
-claimed_by: claude
-claimed_at: 2026-10-30T06:05
+closed: 2026-10-29
 ---
 
 # Workbench toasts: placement, levels, persistence and a countdown border
@@ -47,6 +46,10 @@ Done when:
 ## Next
 
 Implemented and checked in the browser (dark and light); waiting for Alexander's review before closing. Not done: toast action buttons (261029-mj49 will add an Open action through opts.actions; the undo button is still appended by flow.js undoToast), and reduced motion was not exercised in a browser (CSS only).
+
+## Outcome
+
+Toasts reworked: bottom right above the hint bar, four levels (success, info, warning, error) with a glyph and a word, ephemeral (8 s) and persistent flavours (errors persistent by default), a top border that counts down and pauses on hover and focus, a close icon, Escape for the newest persistent toast, roles alert and status, a pure queue in js/toasts.js with unit tests, all 26 call sites migrated, the Toast row in the glossary updated. Driven in the browser in both themes; reduced motion was not exercised. No action buttons yet: see 261029-mj49.
 
 ## Log
 
