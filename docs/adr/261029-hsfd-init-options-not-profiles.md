@@ -2,7 +2,7 @@
 id: "261029-hsfd"
 title: init takes options (docs dir, wikilinks, git) instead of profiles; the manifest lives in the docs dir
 summary: init takes options (docs dir, wikilinks, git) instead of profiles; the manifest lives in the docs dir
-status: proposed
+status: accepted
 date: 2026-10-29
 ---
 
