@@ -25,6 +25,10 @@ Done when:
 - [ ] schemas, fixtures (both copies), spec, guide and skill references updated
 - [ ] this repository's done items backfilled with `closed`
 
+## Next
+
+Brief and run one implementation agent in a worktree; verify; backfill closed dates; Alexander approves the tag.
+
 ## Log
 
 - 2026-10-29: filed.
