@@ -2,8 +2,6 @@
 
 ## Now
 
-- [261030-2abz] Beta release for greenfield use (v0.2.0)
-
 ## Next
 
 Beta (greenfield only; adoption is not claimed). Order of work:
