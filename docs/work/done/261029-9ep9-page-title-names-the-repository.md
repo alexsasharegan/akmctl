@@ -4,6 +4,7 @@ title: Put the repository name in the page title
 status: done
 created: 2026-10-29
 updated: 2026-10-30
+closed: 2026-10-29
 kind: feature
 priority: 2
 summary: Two workbench tabs on different repositories look the same in the browser tab strip.

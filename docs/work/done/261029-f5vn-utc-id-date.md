@@ -4,6 +4,7 @@ title: Date new ids with the local day, not UTC
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: bug
 priority: 2
 summary: akmctl new dates ids in UTC, so an evening in a western time zone gets tomorrow's date.

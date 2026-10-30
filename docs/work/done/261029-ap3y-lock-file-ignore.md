@@ -4,6 +4,7 @@ title: Keep docs/.akm.lock out of commits
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: chore
 priority: 3
 summary: The lock file got committed by a broad git add in the vault run.

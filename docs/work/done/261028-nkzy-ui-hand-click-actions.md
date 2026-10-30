@@ -7,6 +7,7 @@ kind: chore
 priority: 1
 created: 2026-10-28
 updated: 2026-10-29
+closed: 2026-10-28
 ---
 
 # Click through the workbench actions by hand

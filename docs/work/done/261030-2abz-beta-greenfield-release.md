@@ -4,6 +4,7 @@ title: Beta release for greenfield use (v0.2.0)
 status: done
 created: 2026-10-30
 updated: 2026-10-29
+closed: 2026-10-30
 kind: feature
 priority: 1
 summary: "Ship a public beta (v0.2.0) for greenfield repositories: init, a sound task lifecycle, agent-ready files, the spec at 0.2.0. Adoption/migrate is out of scope."

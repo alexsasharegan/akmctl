@@ -4,6 +4,7 @@ title: "akm- skills: rename, router with references, optional akm-commit"
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: feature
 priority: 1
 summary: Rename skills to akm-*, add the akm router skill with one reference per command, add the optional akm-commit skill.

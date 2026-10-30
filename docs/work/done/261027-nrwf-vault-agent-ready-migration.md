@@ -5,6 +5,7 @@ status: done
 origin: 261026-m74k
 created: 2026-10-27
 updated: 2026-10-29
+closed: 2026-10-29
 authored_by: agent
 title: Migrate the vault to the agent-ready layout
 ---

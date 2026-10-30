@@ -4,6 +4,7 @@ title: Replace init profiles with options; move the manifest into the docs dir
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: feature
 priority: 1
 summary: init has --docs-dir, --wikilinks and git options instead of profiles; the manifest, deny list, lock and migrate log live in the docs dir.

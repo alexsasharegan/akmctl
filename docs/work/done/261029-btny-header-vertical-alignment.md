@@ -4,6 +4,7 @@ title: Center the WORKBENCH label and repository name with the title
 status: done
 created: 2026-10-29
 updated: 2026-10-30
+closed: 2026-10-29
 kind: bug
 priority: 3
 summary: In the header, the WORKBENCH label and the repository name sit lower than the akmctl title and are not vertically centered.

@@ -5,6 +5,7 @@ status: done
 origin: 261028-1z36
 created: 2026-10-28
 updated: 2026-10-28
+closed: 2026-10-29
 authored_by: agent
 title: Prepare a clean v1.0 spec
 ---

@@ -4,6 +4,7 @@ title: "mint_ids: build the slug from the title"
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: feature
 priority: 2
 summary: For notes whose file name is a number, mint_ids made adr-019 as the slug; offer a title-based slug with a maximum length.

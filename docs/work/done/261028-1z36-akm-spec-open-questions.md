@@ -5,6 +5,7 @@ status: done
 origin: 261026-m74k
 created: 2026-10-28
 updated: 2026-10-28
+closed: 2026-10-29
 authored_by: agent
 adr: candidate
 title: Settle the open questions in the AKM spec

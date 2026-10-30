@@ -7,6 +7,7 @@ kind: chore
 priority: 1
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Dogfood browser pass of the finished workbench

@@ -7,6 +7,7 @@ kind: feature
 priority: 2
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Add akmctl init with the profiles code and notes

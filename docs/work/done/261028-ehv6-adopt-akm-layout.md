@@ -6,6 +6,7 @@ status: done
 kind: chore
 created: 2026-10-28
 updated: 2026-10-28
+closed: 2026-10-28
 ---
 
 # Adopt the AKM layout in this repository

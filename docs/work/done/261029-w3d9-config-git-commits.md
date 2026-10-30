@@ -4,6 +4,7 @@ title: git_commits manifest key, akmctl config, init questionnaire
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: feature
 priority: 1
 summary: Add git_commits to the manifest, the config operation and command, the optional-skill install and removal, and the init questionnaire.

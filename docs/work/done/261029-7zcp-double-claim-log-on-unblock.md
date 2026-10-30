@@ -4,6 +4,7 @@ title: Unblocking a claimed item to active logs a second claim
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Unblocking a claimed item to active logs a second claim

@@ -7,6 +7,7 @@ kind: feature
 priority: 3
 created: 2026-10-28
 updated: 2026-10-29
+closed: 2026-10-28
 ---
 
 # Build the mint_ids migration step

@@ -5,6 +5,7 @@ status: done
 origin: 261025-g68j
 created: 2026-10-26
 updated: 2026-10-28
+closed: 2026-10-29
 authored_by: agent
 adr: recorded
 title: "Spike: an agent-ready repository layout"

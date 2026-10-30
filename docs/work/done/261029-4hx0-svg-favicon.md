@@ -4,6 +4,7 @@ title: Add an SVG favicon
 status: done
 created: 2026-10-29
 updated: 2026-10-30
+closed: 2026-10-29
 kind: feature
 priority: 3
 summary: The workbench has no favicon, so the browser tab shows a blank icon.

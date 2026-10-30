@@ -4,6 +4,7 @@ title: Move closed records to done/ by status in one step
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 kind: feature
 priority: 3
 summary: The vault migration generated 76 move_file steps and a 106 KB .migrate-log.

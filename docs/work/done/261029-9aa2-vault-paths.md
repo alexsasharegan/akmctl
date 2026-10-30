@@ -4,6 +4,7 @@ title: "Vault migration: manifest paths and migration steps"
 status: done
 created: 2026-10-29
 updated: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Vault migration: manifest paths and migration steps

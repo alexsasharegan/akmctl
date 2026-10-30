@@ -6,6 +6,7 @@ project: Vault Views
 origin: 261024-k2rc-local-views-server-design
 created: 2026-10-25
 updated: 2026-10-26
+closed: 2026-10-29
 authored_by: agent
 title: Build pkm-workbench, milestone one
 ---

@@ -5,6 +5,7 @@ status: done
 origin: 261027-r3hh
 created: 2026-10-28
 updated: 2026-10-28
+closed: 2026-10-29
 authored_by: agent
 title: Port the pkm-workbench UI onto the akmctl API
 ---
