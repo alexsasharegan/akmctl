@@ -52,6 +52,7 @@ Workbench and polish:
 - [261029-rmrk] Fix the card border that shows on only three sides
 - [261029-57jq] The closed table flickers on reload
 - [261029-8948] Show the claim holder on workbench cards
+- [261030-3vgb] status lifecycle graphics
 - [261029-g8x2] The review diff is against the current file, not after earlier writes
 - [261029-jm46] Restart of akmctl ui forces a new URL
 - [261026-mrdr] pkm-workbench: sort options
