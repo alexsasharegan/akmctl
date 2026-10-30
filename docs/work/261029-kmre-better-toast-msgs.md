@@ -2,11 +2,13 @@
 id: "261029-kmre"
 title: "Workbench toasts: placement, levels, persistence and a countdown border"
 summary: "Rework the workbench toasts: bottom right, four levels, ephemeral and persistent flavours, a countdown border, hover pause and a close button"
-status: ready
+status: active
 kind: feature
 priority: 1
 created: 2026-10-29
 updated: 2026-10-29
+claimed_by: claude
+claimed_at: 2026-10-30T06:05
 ---
 
 # Workbench toasts: placement, levels, persistence and a countdown border
@@ -50,3 +52,5 @@ Ready; no dependencies. Start here: it has the highest priority.
 
 - 2026-10-29: filed.
 - 2026-10-29: refined with Alexander (first cut without actions).
+- 2026-10-29: claimed (claude).
+- 2026-10-29: claimed; implementation delegated to an agent. Design note: leave room in the toast API for an actions list (see 261029-mj49, which wants an Open action after a capture).
