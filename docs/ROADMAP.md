@@ -2,8 +2,6 @@
 
 ## Now
 
-- [261029-d3cp] Name the roadmap convention and define the 1.0.0 milestone
-
 ## Next
 
 ## Later

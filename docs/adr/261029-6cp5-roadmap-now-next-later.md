@@ -2,7 +2,7 @@
 id: "261029-6cp5"
 title: The roadmap follows Now / Next / Later, with milestones inside Later
 summary: The roadmap follows Now / Next / Later, with milestones inside Later
-status: proposed
+status: accepted
 date: 2026-10-29
 ---
 

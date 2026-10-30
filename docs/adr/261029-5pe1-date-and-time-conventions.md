@@ -2,7 +2,7 @@
 id: "261029-5pe1"
 title: Dates are the writer's local day; only timestamps that are compared across machines are UTC
 summary: Dates are the writer's local day; only timestamps that are compared across machines are UTC
-status: proposed
+status: accepted
 date: 2026-10-29
 ---
 
