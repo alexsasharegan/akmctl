@@ -22,6 +22,8 @@ my-project/
     └── work/              tasks; finished ones move to work/done/
 ```
 
+`init` also writes a stub `README.md` (only if you have none; fill in its TODO), and, for tools that format Markdown, `.prettierrc.json` and `.prettierignore`: Prettier must leave record frontmatter alone and skip the generated ADR index. Ignore them if you do not use Prettier.
+
 Why bother:
 
 - **Agents pick up where the last session stopped.** Each task records its goal, its next step and its outcome, so a new session does not start from zero.
