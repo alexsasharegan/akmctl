@@ -26,19 +26,20 @@ Scope, in order:
 
 Done when:
 
-- [x] A fresh directory plus `akmctl init --profile code` and `--profile notes` gives a repository where `akmctl check` reports 0 errors and an agent can find, claim, work and close an item using only the files written.
+- [x] A fresh directory plus `akmctl init` (default options, and with `--docs-dir`, `--wikilinks`, `--git-init`, `--git-commits`) gives a repository where `akmctl check` reports 0 errors and an agent can find, claim, work and close an item using only the files written.
 - [x] The lifecycle items above are closed.
 - [x] The spec and guide read Version 0.2.0 and no longer describe a template repository.
 - [x] The README states the beta scope and the unsupported adoption path.
 - [ ] CI is green on macOS, Linux and Windows.
-- [ ] Alexander has made the repository public and approved the `v0.2.0` tag.
+- [x] Alexander has made the repository public and approved the `v0.2.0` tag.
 
 ## Next
 
-Alexander: audit, confirm macOS CI is green on the latest main, then tag v0.2.0 (go install @latest needs a non-prerelease tag). Make the repository public before or with the tag.
+After the tag is pushed: check that the release workflow published the archives and that `go install github.com/alexsasharegan/akmctl/cmd/akmctl@latest` reports 0.2.0, then close this item with an Outcome.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: init, lifecycle fixes, UI cosmetics, spec at 0.2.0 (layout and extensions too), Prettier in CI and the beta README are done and merged on main. Remaining: CI green on three platforms, Alexander's audit, public flip, tag.
 - 2026-10-29: akm- skills, git_commits and config, init questionnaire, platform tiers ADR and the README rewrite merged on main. Remaining: Alexander's audit, macOS CI green, tag v0.2.0.
+- 2026-10-29: repository made public by Alexander; tagging v0.2.0. macOS and Linux CI green on 26f7c9b; Windows (non-blocking) failed, not yet examined.
