@@ -31,13 +31,14 @@ func snapshot(t *testing.T, root string) map[string]string {
 	return m
 }
 
-func profile(t *testing.T, name string) initrepo.Profile {
-	t.Helper()
-	p, ok := initrepo.Get(name)
-	if !ok {
-		t.Fatal("no profile", name)
-	}
-	return p
+// variants are the option sets the tests walk through: the defaults and a
+// custom folder with wikilinks.
+var variants = []struct {
+	name string
+	opt  initrepo.Options
+}{
+	{"default", initrepo.Options{Gitignore: true}},
+	{"knowledge", initrepo.Options{DocsDir: "knowledge", WikiLinks: true, Gitignore: true, Obsidian: true}},
 }
 
 func run(t *testing.T, root, op string, req api.Request) api.Obj {
@@ -53,11 +54,11 @@ func run(t *testing.T, root, op string, req api.Request) api.Obj {
 	return resp
 }
 
-func TestProfilesCheckClean(t *testing.T) {
-	for _, name := range initrepo.Profiles {
-		t.Run(name, func(t *testing.T) {
+func TestOptionsCheckClean(t *testing.T) {
+	for _, v := range variants {
+		t.Run(v.name, func(t *testing.T) {
 			dir := filepath.Join(t.TempDir(), "fresh", "proj") // neither level exists
-			res, err := initrepo.Init(dir, profile(t, name))
+			res, err := initrepo.InitWith(dir, v.opt)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -72,51 +73,88 @@ func TestProfilesCheckClean(t *testing.T) {
 				}
 			}
 			repo, _ := record.Load(dir)
-			if name == "notes" {
-				if repo.WorkDir() != "notes/work" || repo.ADRDir() != "notes/adr" || repo.RoadmapPath() != "notes/ROADMAP.md" {
-					t.Errorf("notes folders: %s %s %s", repo.WorkDir(), repo.ADRDir(), repo.RoadmapPath())
-				}
-				if _, err := os.Stat(filepath.Join(dir, ".obsidian")); err == nil {
-					t.Error("init must not write .obsidian")
-				}
-				if v := repo.Layout["reference_style"]; v.Str != "wikilink" {
-					t.Errorf("reference_style = %q", v.Str)
-				}
-			} else if repo.WorkDir() != "docs/work" {
-				t.Errorf("code work dir %s", repo.WorkDir())
+			docs := v.opt.DocsDir
+			if docs == "" {
+				docs = "docs"
+			}
+			if repo.MetaDir() != docs || repo.WorkDir() != docs+"/work" || repo.ADRDir() != docs+"/adr" || repo.RoadmapPath() != docs+"/ROADMAP.md" {
+				t.Errorf("folders: %s %s %s %s", repo.MetaDir(), repo.WorkDir(), repo.ADRDir(), repo.RoadmapPath())
+			}
+			if _, err := os.Stat(filepath.Join(dir, ".obsidian")); err == nil {
+				t.Error("init must not write .obsidian")
+			}
+			if wiki := repo.Layout["reference_style"].Str == "wikilink"; wiki != v.opt.WikiLinks {
+				t.Errorf("reference_style wikilink = %v", wiki)
 			}
 			files := snapshot(t, dir)
 			if files["CLAUDE.md"] != "@AGENTS.md\n" {
 				t.Errorf("CLAUDE.md = %q", files["CLAUDE.md"])
 			}
-			if !strings.Contains(files[".gitignore"], "docs/.akm.lock") {
+			if !strings.Contains(files[".gitignore"], docs+"/.akm.lock\n") {
 				t.Errorf(".gitignore = %q", files[".gitignore"])
 			}
-			if !strings.HasPrefix(files["AGENTS.md"], "# proj\n") {
-				t.Errorf("AGENTS.md title: %q", files["AGENTS.md"][:20])
+			if got := strings.Contains(files[".gitignore"], ".obsidian/workspace.json"); got != v.opt.Obsidian {
+				t.Errorf("obsidian lines = %v in %q", got, files[".gitignore"])
 			}
-			if strings.Contains(files["AGENTS.md"], "{{") || strings.Contains(files["README.md"], "{{") {
+			ag := files["AGENTS.md"]
+			if !strings.HasPrefix(ag, "# proj\n") {
+				t.Errorf("AGENTS.md title: %q", ag[:20])
+			}
+			if strings.Contains(ag, "{{") || strings.Contains(files["README.md"], "{{") {
 				t.Error("an unreplaced marker")
 			}
-			if name == "code" && strings.Contains(files[".agents/skills/akm-work-items/SKILL.md"], "notes/") {
-				t.Error("code skill mentions notes/")
+			for _, bad := range []string{"- Build:", "- Test:", "- Lint", "- Run:"} {
+				if strings.Contains(ag, bad) {
+					t.Errorf("AGENTS.md has a %q line", bad)
+				}
 			}
-			if name == "notes" && strings.Contains(files[".agents/skills/akm-work-items/SKILL.md"], "docs/work") {
-				t.Error("notes skill still points at docs/work")
+			if !strings.Contains(ag, "--check AGENTS.md \""+docs+"/**/*.md\"") || !strings.Contains(ag, "`"+docs+"/.akm-deny`") {
+				t.Errorf("AGENTS.md does not use the docs dir %s", docs)
+			}
+			if docs != "docs" {
+				if _, err := os.Stat(filepath.Join(dir, "docs")); err == nil {
+					t.Error("a docs folder was created")
+				}
+				if strings.Contains(files[".agents/skills/akm-work-items/SKILL.md"], "docs/work") {
+					t.Error("the skill still points at docs/work")
+				}
 			}
 		})
 	}
 }
 
+func TestGitignoreOnlyWhenAsked(t *testing.T) {
+	dir := t.TempDir()
+	if _, err := initrepo.InitWith(dir, initrepo.Options{}); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := snapshot(t, dir)[".gitignore"]; ok {
+		t.Error(".gitignore written without a work tree")
+	}
+}
+
+func TestValidateDocsDir(t *testing.T) {
+	for _, ok := range []string{"docs", "knowledge", "My Notes", "notes-2", "a.b"} {
+		if err := initrepo.ValidateDocsDir(ok); err != nil {
+			t.Errorf("%q: %v", ok, err)
+		}
+	}
+	for _, bad := range []string{"", ".", "..", "a/b", "a\\b", ".hidden", "x:y", "a*", "a?", "a|b", "a\x00b", "node_modules", " a", "a ", "a.", "#a", "!a", "[a]"} {
+		if err := initrepo.ValidateDocsDir(bad); err == nil {
+			t.Errorf("%q accepted", bad)
+		}
+	}
+}
+
 func TestNoOverwriteAndIdempotent(t *testing.T) {
-	for _, name := range initrepo.Profiles {
-		t.Run(name, func(t *testing.T) {
+	for _, v := range variants {
+		t.Run(v.name, func(t *testing.T) {
 			dir := t.TempDir()
 			mine := "# mine\n\nkeep me\n"
 			if err := os.WriteFile(filepath.Join(dir, "AGENTS.md"), []byte(mine), 0o644); err != nil {
 				t.Fatal(err)
 			}
-			res, err := initrepo.Init(dir, profile(t, name))
+			res, err := initrepo.InitWith(dir, v.opt)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -127,7 +165,7 @@ func TestNoOverwriteAndIdempotent(t *testing.T) {
 			if after["AGENTS.md"] != mine {
 				t.Error("AGENTS.md was overwritten")
 			}
-			res2, err := initrepo.Init(dir, profile(t, name))
+			res2, err := initrepo.InitWith(dir, v.opt)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -144,7 +182,7 @@ func TestNoOverwriteAndIdempotent(t *testing.T) {
 func TestTargetIsAFile(t *testing.T) {
 	f := filepath.Join(t.TempDir(), "file")
 	os.WriteFile(f, []byte("x"), 0o644)
-	if _, err := initrepo.Init(f, profile(t, "code")); err == nil {
+	if _, err := initrepo.Init(f); err == nil {
 		t.Error("init into a file succeeded")
 	}
 }
@@ -164,9 +202,9 @@ func TestVersionsFromConstants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	files, _ := initrepo.Files(profile(t, "code"), "x")
+	files, _ := initrepo.Files("x")
 	for _, f := range files {
-		if f.Path == record.ManifestPath && !strings.HasPrefix(string(f.Data), "layout: "+check.LayoutVersion+"\n") {
+		if f.Path == "docs/.layout" && !strings.HasPrefix(string(f.Data), "layout: "+check.LayoutVersion+"\n") {
 			t.Errorf("manifest: %q", f.Data)
 		}
 	}
@@ -199,7 +237,7 @@ func TestAlwaysInstalledSkills(t *testing.T) {
 			t.Errorf("%s holds %v, want %v", dir, got, want)
 		}
 	}
-	files, _ := initrepo.Files(profile(t, "code"), "x")
+	files, _ := initrepo.Files("x")
 	have := map[string]bool{}
 	for _, f := range files {
 		have[f.Path] = true
@@ -250,10 +288,10 @@ func TestOptionalCommitSkill(t *testing.T) {
 
 // A cold agent can use the written files to list, claim, work and close an item.
 func TestWorkLifecycle(t *testing.T) {
-	for _, name := range initrepo.Profiles {
-		t.Run(name, func(t *testing.T) {
+	for _, v := range variants {
+		t.Run(v.name, func(t *testing.T) {
 			dir := t.TempDir()
-			if _, err := initrepo.Init(dir, profile(t, name)); err != nil {
+			if _, err := initrepo.InitWith(dir, v.opt); err != nil {
 				t.Fatal(err)
 			}
 			ls := run(t, dir, "ls", api.Request{"status": []string{"ready", "active", "blocked"}})
@@ -289,17 +327,32 @@ func TestAPIRequests(t *testing.T) {
 		req  api.Request
 		code string
 	}{
-		{"no profile", api.Request{}, "invalid_request"},
-		{"unknown profile", api.Request{"profile": "wiki"}, "invalid_request"},
-		{"dir climbs out", api.Request{"profile": "code", "dir": "../x"}, "invalid_request"},
-		{"dir is absolute", api.Request{"profile": "code", "dir": "/tmp/x"}, "invalid_request"},
-		{"unknown parameter", api.Request{"profile": "code", "force": true}, "invalid_request"},
+		{"profile is gone", api.Request{"profile": "code"}, "invalid_request"},
+		{"docs_dir empty", api.Request{"docs_dir": ""}, "invalid_request"},
+		{"docs_dir dot", api.Request{"docs_dir": "."}, "invalid_request"},
+		{"docs_dir dotdot", api.Request{"docs_dir": ".."}, "invalid_request"},
+		{"docs_dir nested", api.Request{"docs_dir": "a/b"}, "invalid_request"},
+		{"docs_dir hidden", api.Request{"docs_dir": ".notes"}, "invalid_request"},
+		{"docs_dir backslash", api.Request{"docs_dir": "a\\b"}, "invalid_request"},
+		{"docs_dir colon", api.Request{"docs_dir": "a:b"}, "invalid_request"},
+		{"docs_dir not a string", api.Request{"docs_dir": 3}, "invalid_request"},
+		{"dir climbs out", api.Request{"dir": "../x"}, "invalid_request"},
+		{"dir is absolute", api.Request{"dir": "/tmp/x"}, "invalid_request"},
+		{"unknown parameter", api.Request{"force": true}, "invalid_request"},
 	} {
-		if _, aerr := api.Run(repo, info, "init", c.req); aerr == nil || aerr.Code != c.code {
+		_, aerr := api.Run(repo, info, "init", c.req)
+		if aerr == nil || aerr.Code != c.code {
 			t.Errorf("%s: %v", c.name, aerr)
+			continue
+		}
+		if p := strings.TrimPrefix(c.name, "docs_dir"); p != c.name {
+			if d, _ := aerr.Details.Get("parameter"); d != "docs_dir" {
+				t.Errorf("%s: details.parameter = %v", c.name, d)
+			}
 		}
 	}
-	resp, aerr := api.Run(repo, info, "init", api.Request{"profile": "code", "dir": "a/b"})
+	// a bare init works
+	resp, aerr := api.Run(repo, info, "init", api.Request{"dir": "a/b"})
 	if aerr != nil {
 		t.Fatal(aerr)
 	}
@@ -310,7 +363,28 @@ func TestAPIRequests(t *testing.T) {
 		t.Error(err)
 	}
 	os.WriteFile(filepath.Join(base, "f"), []byte("x"), 0o644)
-	if _, aerr := api.Run(repo, info, "init", api.Request{"profile": "code", "dir": "f"}); aerr == nil || aerr.Code != "refused" {
+	if _, aerr := api.Run(repo, info, "init", api.Request{"dir": "f"}); aerr == nil || aerr.Code != "refused" {
 		t.Errorf("dir is a file: %v", aerr)
+	}
+}
+
+// A second init with another docs dir would make two manifests: it is refused.
+func TestSecondManifestRefused(t *testing.T) {
+	base := t.TempDir()
+	repo := &record.Repo{Root: base}
+	info := api.Info{Name: "akmctl", Version: "test"}
+	if _, aerr := api.Run(repo, info, "init", api.Request{"docs_dir": "knowledge"}); aerr != nil {
+		t.Fatal(aerr)
+	}
+	_, aerr := api.Run(repo, info, "init", api.Request{})
+	if aerr == nil || aerr.Code != "refused" {
+		t.Fatalf("second manifest: %v", aerr)
+	}
+	if r, _ := aerr.Details.Get("reason"); r != "manifest_exists" {
+		t.Errorf("reason = %v", r)
+	}
+	// the same dir again is idempotent
+	if _, aerr := api.Run(repo, info, "init", api.Request{"docs_dir": "knowledge"}); aerr != nil {
+		t.Errorf("repeat: %v", aerr)
 	}
 }

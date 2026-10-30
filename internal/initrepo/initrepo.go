@@ -1,5 +1,5 @@
-// Package initrepo creates the AKM layout in a new repository: the files of a
-// profile, written without ever overwriting one that exists.
+// Package initrepo creates the AKM layout in a new repository from a few
+// options, writing without ever overwriting a file that exists.
 package initrepo
 
 import (
@@ -25,28 +25,38 @@ import (
 //go:embed all:templates
 var templates embed.FS
 
-// Profiles lists the profile names.
-var Profiles = []string{"code", "notes"}
+// DefaultDocsDir is the folder for the records when init is given none.
+const DefaultDocsDir = "docs"
 
-// Profile is the shape of a new repository.
-type Profile struct {
-	Name                 string
-	WorkDir, ADRDir, Map string // Map is the roadmap file
-	WikiLinks            bool
-}
-
-// Get returns the profile called name.
-func Get(name string) (Profile, bool) {
-	switch name {
-	case "code":
-		return Profile{Name: "code", WorkDir: record.DefaultWorkDir, ADRDir: record.DefaultADRDir, Map: record.DefaultRoadmap}, true
-	case "notes":
-		return Profile{Name: "notes", WorkDir: "notes/work", ADRDir: "notes/adr", Map: "notes/ROADMAP.md", WikiLinks: true}, true
+// ValidateDocsDir reports why name cannot be the docs folder: it must be one
+// path segment that is safe as a folder name on macOS, Linux and Windows and
+// as a line of an ignore file.
+func ValidateDocsDir(name string) error {
+	switch {
+	case name == "":
+		return errors.New("is empty")
+	case name == "." || name == "..":
+		return errors.New("must be a folder name, not \".\" or \"..\"")
+	case strings.ContainsAny(name, "/\\"):
+		return errors.New("must be a single folder name, with no path separator")
+	case strings.HasPrefix(name, "."):
+		return errors.New("must not start with a dot (a hidden folder is not found again)")
+	case strings.HasPrefix(name, "#") || strings.HasPrefix(name, "!"):
+		return errors.New("must not start with # or !")
+	case name == "node_modules":
+		return errors.New("is reserved")
+	case name != strings.TrimSpace(name) || strings.HasSuffix(name, "."):
+		return errors.New("must not start or end with a space, or end with a dot")
 	}
-	return Profile{}, false
+	for _, c := range name {
+		if c < 0x20 || c == 0x7f || strings.ContainsRune(`:*?"<>|[]`, c) {
+			return fmt.Errorf("has a character (%q) that is not safe in a folder name", c)
+		}
+	}
+	return nil
 }
 
-// File is one file of a profile, with a path relative to the repository root.
+// File is one file of a new repository, with a path relative to the repository root.
 type File struct {
 	Path string
 	Data []byte
@@ -60,17 +70,30 @@ type Result struct {
 
 var plainName = regexp.MustCompile(`^(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9 ._-]*[A-Za-z0-9])$`)
 
-// Files returns the files of profile p for a project called name. A name that
-// would need escaping in Markdown is replaced by "project".
-func Files(p Profile, name string) ([]File, error) { return FilesWith(p, name, Options{}) }
-
-// Options are the choices of init beyond the profile.
+// Options are the choices of init.
 type Options struct {
-	GitCommits bool // write git_commits: true and install the optional skill akm-commit
+	DocsDir    string // the single folder for the records and the manifest; "" means docs
+	WikiLinks  bool   // write reference_style: wikilink
+	GitCommits bool   // write git_commits: true and install the optional skill akm-commit
+	Gitignore  bool   // write .gitignore (the target is inside a work tree)
+	Obsidian   bool   // the target has an .obsidian folder: ignore its per-machine files
 }
 
-// FilesWith is Files with options.
-func FilesWith(p Profile, name string, opt Options) ([]File, error) {
+// Files returns the files of a new repository called name with default options.
+func Files(name string) ([]File, error) { return FilesWith(name, Options{}) }
+
+// FilesWith returns the files of a new repository for a project called name. A
+// name that would need escaping in Markdown is replaced by "project". The
+// docs dir must be valid (ValidateDocsDir).
+func FilesWith(name string, opt Options) ([]File, error) {
+	if opt.DocsDir == "" {
+		opt.DocsDir = DefaultDocsDir
+	}
+	if err := ValidateDocsDir(opt.DocsDir); err != nil {
+		return nil, fmt.Errorf("docs dir %q %v", opt.DocsDir, err)
+	}
+	dir := opt.DocsDir
+	workDir, adrDir, roadmapPath := dir+"/work", dir+"/adr", dir+"/ROADMAP.md"
 	if !plainName.MatchString(name) {
 		name = "project"
 	}
@@ -78,30 +101,19 @@ func FilesWith(p Profile, name string, opt Options) ([]File, error) {
 		b, err := templates.ReadFile("templates/" + file)
 		return string(b), err
 	}
-	var commands, arch, about, extra string
-	if p.Name == "code" {
-		commands = strings.Join([]string{
-			"- Build: `<build command>`",
-			"- Test: `<test command>`",
-			"- Lint and format: `<lint command>`",
-			"- Run: `<run command>`",
-			"- Records check: `akmctl check`; `akmctl index` regenerates `" + p.ADRDir + "/README.md`.",
-			"- Format records: `npx prettier@<pinned version> --check AGENTS.md \"docs/**/*.md\"` (pin the version you use).",
-			"- Full check before a commit: the test command, `akmctl check` and the format command above.",
-		}, "\n")
-		arch = "- `docs/architecture.md`: the map of the parts and the invariants (write it once there is more than one part).\n"
-		about = "Decisions, direction and work are kept as Markdown records under `docs/`, in the AKM layout; start with [AGENTS.md](AGENTS.md)."
-	} else {
-		commands = strings.Join([]string{
-			"- Records check: `akmctl check`; `akmctl index` regenerates `" + p.ADRDir + "/README.md`.",
-			"- Format records: `npx prettier@<pinned version> --check AGENTS.md \"notes/**/*.md\"` (pin the version you use).",
-			"- Full check before a commit: `akmctl check` and the format command above.",
-		}, "\n")
-		extra = "- `docs/.layout`: the manifest. `reference_style: wikilink` makes the tool write Obsidian links; keep Obsidian's own settings out of the records.\n"
-		about = "The records (work, decisions and the roadmap) live in the AKM layout under `notes/`; start with [AGENTS.md](AGENTS.md). Open this folder as an Obsidian vault."
+	commands := strings.Join([]string{
+		"- Records check: `akmctl check`; `akmctl index` regenerates `" + adrDir + "/README.md`.",
+		"- Format records: `npx prettier@<pinned version> --check AGENTS.md \"" + dir + "/**/*.md\"` (pin the version you use).",
+		"- Full check before a commit: `akmctl check` and the format command above.",
+	}, "\n")
+	extra := "- `" + dir + "/.layout`: the manifest."
+	if opt.WikiLinks {
+		extra += " `reference_style: wikilink` makes the tool write wikilinks."
 	}
-	fill := strings.NewReplacer("{{NAME}}", name, "{{COMMANDS}}", commands, "{{ARCH}}\n", arch, "{{EXTRA}}\n", extra,
-		"{{ABOUT}}", about, "{{WORK}}", p.WorkDir, "{{ADR}}", p.ADRDir, "{{ROADMAP}}", p.Map)
+	extra += "\n"
+	about := "The records (work, decisions and the roadmap) live in the AKM layout under `" + dir + "/`; start with [AGENTS.md](AGENTS.md)."
+	fill := strings.NewReplacer("{{NAME}}", name, "{{COMMANDS}}", commands, "{{EXTRA}}\n", extra,
+		"{{ABOUT}}", about, "{{WORK}}", workDir, "{{ADR}}", adrDir, "{{ROADMAP}}", roadmapPath, "{{DOCS}}", dir)
 
 	var files []File
 	add := func(rel, text string) { files = append(files, File{rel, []byte(text)}) }
@@ -115,44 +127,46 @@ func FilesWith(p Profile, name string, opt Options) ([]File, error) {
 	readme, _ := tmpl("README.md.tmpl")
 	add("README.md", fill.Replace(readme))
 
-	gitignore := "# the advisory lock akmctl takes while it writes\ndocs/.akm.lock\n"
-	if p.WikiLinks {
-		gitignore += "\n# Obsidian state that differs per machine\n.obsidian/workspace.json\n.obsidian/workspaces.json\n.trash/\n"
+	if opt.Gitignore {
+		ignore := "# the advisory lock akmctl takes while it writes\n" + dir + "/.akm.lock\n"
+		if opt.Obsidian {
+			ignore += "\n# Obsidian state that differs per machine\n.obsidian/workspace.json\n.obsidian/workspaces.json\n.trash/\n"
+		}
+		add(".gitignore", ignore)
 	}
-	add(".gitignore", gitignore)
 	add(".prettierrc.json", "{ \"embeddedLanguageFormatting\": \"off\" }\n")
-	add(".prettierignore", p.ADRDir+"/README.md\n")
+	add(".prettierignore", adrDir+"/README.md\n")
 
 	manifest := "layout: " + check.LayoutVersion + "\n"
 	for _, ext := range []string{"adr-index", "work-items", "claims", "safety"} {
 		manifest += "extension." + ext + ": " + check.LayoutVersion + "\n"
 	}
-	if p.WorkDir != record.DefaultWorkDir {
-		manifest += "work_dir: " + p.WorkDir + "\n"
+	if workDir != record.DefaultWorkDir {
+		manifest += "work_dir: " + workDir + "\n"
 	}
-	if p.ADRDir != record.DefaultADRDir {
-		manifest += "adr_dir: " + p.ADRDir + "\n"
+	if adrDir != record.DefaultADRDir {
+		manifest += "adr_dir: " + adrDir + "\n"
 	}
-	if p.Map != record.DefaultRoadmap {
-		manifest += "roadmap: " + p.Map + "\n"
+	if roadmapPath != record.DefaultRoadmap {
+		manifest += "roadmap: " + roadmapPath + "\n"
 	}
-	if p.WikiLinks {
+	if opt.WikiLinks {
 		manifest += "reference_style: wikilink\n"
 	}
 	if opt.GitCommits {
 		manifest += "git_commits: true\n"
 	}
-	add(record.ManifestPath, manifest)
+	add(dir+"/"+record.ManifestName, manifest)
 	deny, _ := tmpl("akm-deny.tmpl")
-	add("docs/.akm-deny", deny)
+	add(dir+"/.akm-deny", deny)
 
 	roadmap, _ := tmpl("ROADMAP.md.tmpl")
-	add(p.Map, roadmap)
-	add(p.ADRDir+"/README.md", index.Generate(&record.Repo{}))
-	add(p.WorkDir+"/.gitkeep", "")
-	add(p.WorkDir+"/done/.gitkeep", "")
+	add(roadmapPath, roadmap)
+	add(adrDir+"/README.md", index.Generate(&record.Repo{}))
+	add(workDir+"/.gitkeep", "")
+	add(workDir+"/done/.gitkeep", "")
 
-	paths := strings.NewReplacer("docs/work", p.WorkDir, "docs/adr", p.ADRDir)
+	paths := strings.NewReplacer("docs/work", workDir, "docs/adr", adrDir)
 	err = fs.WalkDir(templates, "templates/skills", func(fp string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
@@ -168,7 +182,7 @@ func FilesWith(p Profile, name string, opt Options) ([]File, error) {
 		return nil, err
 	}
 	if opt.GitCommits {
-		more, err := OptionalSkillFiles(CommitSkill, p.WorkDir, p.ADRDir)
+		more, err := OptionalSkillFiles(CommitSkill, workDir, adrDir)
 		if err != nil {
 			return nil, err
 		}
@@ -178,13 +192,13 @@ func FilesWith(p Profile, name string, opt Options) ([]File, error) {
 	return files, nil
 }
 
-// Init writes the files of the profile under target, creating the directory
+// Init writes the files of a new repository under target, creating the directory
 // when it is absent. A file that exists, whatever it holds, is left alone and
 // listed as skipped.
-func Init(target string, p Profile) (Result, error) { return InitWith(target, p, Options{}) }
+func Init(target string) (Result, error) { return InitWith(target, Options{}) }
 
 // InitWith is Init with options.
-func InitWith(target string, p Profile, opt Options) (Result, error) {
+func InitWith(target string, opt Options) (Result, error) {
 	var res Result
 	if st, err := os.Stat(target); err == nil && !st.IsDir() {
 		return res, fmt.Errorf("%s exists and is not a directory", target)
@@ -193,7 +207,7 @@ func InitWith(target string, p Profile, opt Options) (Result, error) {
 	if err != nil {
 		return res, err
 	}
-	files, err := FilesWith(p, filepath.Base(abs), opt)
+	files, err := FilesWith(filepath.Base(abs), opt)
 	if err != nil {
 		return res, err
 	}

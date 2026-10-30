@@ -9,15 +9,18 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
-// opInit creates the layout of a profile in the directory dir (default: the
-// base directory itself), relative to repo.Root. It runs before any repository
-// exists, so repo only supplies the base directory. It never overwrites a file.
-// With git_init it also runs `git init` when the directory is not inside a Git
-// working tree; a failure of that is reported, not fatal.
+// opInit creates the layout in the directory dir (default: the base directory
+// itself), relative to repo.Root. It runs before any repository exists, so
+// repo only supplies the base directory. It never overwrites a file. With
+// git_init it also runs the version-control init when the directory is not
+// inside a work tree; a failure of that is reported, not fatal.
 func opInit(repo *record.Repo, q Request) (Obj, *Error) {
-	p, ok := initrepo.Get(q.str("profile"))
-	if !ok {
-		return nil, invalid("profile", "profile: unknown value %q", q.str("profile"))
+	docsDir := initrepo.DefaultDocsDir
+	if d, given := q["docs_dir"].(string); given {
+		if err := initrepo.ValidateDocsDir(d); err != nil {
+			return nil, invalid("docs_dir", "docs_dir %q %v", d, err)
+		}
+		docsDir = d
 	}
 	dir := "."
 	if d, given := q["dir"].(string); given {
@@ -35,7 +38,13 @@ func opInit(repo *record.Repo, q Request) (Obj, *Error) {
 	if st, err := os.Stat(target); err == nil && !st.IsDir() {
 		return nil, refused("not_a_directory", "%s exists and is not a directory", dir)
 	}
-	// git first: git_commits only works inside a work tree
+	// a second manifest would make discovery ambiguous
+	if have, found, err := record.Locate(target); err != nil {
+		return nil, &Error{Code: "unreadable", Message: err.Error()}
+	} else if found && have != docsDir {
+		return nil, refused("manifest_exists", "%s/%s already exists; init would make a second manifest: use docs_dir %q or remove it", have, record.ManifestName, have)
+	}
+	// the work tree first: git_commits and .gitignore need one
 	if err := os.MkdirAll(target, 0o755); err != nil {
 		return nil, unreadable(err)
 	}
@@ -49,16 +58,22 @@ func opInit(repo *record.Repo, q Request) (Obj, *Error) {
 			gitState = "initialised"
 		}
 	}
+	inTree := record.InGitRepo(target)
 	commits := q.boolean("git_commits")
-	forcedOff := commits && !record.InGitRepo(target)
+	forcedOff := commits && !inTree
 	if forcedOff {
 		commits = false
 	}
-	res, err := initrepo.InitWith(target, p, initrepo.Options{GitCommits: commits})
+	wiki := q.boolean("wikilinks")
+	obsidian := false
+	if st, err := os.Stat(filepath.Join(target, ".obsidian")); err == nil && st.IsDir() {
+		obsidian = true
+	}
+	res, err := initrepo.InitWith(target, initrepo.Options{DocsDir: docsDir, WikiLinks: wiki, GitCommits: commits, Gitignore: inTree, Obsidian: obsidian})
 	if err != nil {
 		return nil, unreadable(err)
 	}
-	out := O("profile", p.Name, "dir", dir, "layout", check.LayoutVersion, "written", nonNil(res.Written), "skipped", nonNil(res.Skipped),
+	out := O("docs_dir", docsDir, "wikilinks", wiki, "dir", dir, "layout", check.LayoutVersion, "written", nonNil(res.Written), "skipped", nonNil(res.Skipped),
 		"git_commits", commits, "git_commits_forced_off", forcedOff, "git", gitState)
 	if gitErr != "" {
 		out = append(out, KV{"git_error", gitErr})

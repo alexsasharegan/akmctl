@@ -26,9 +26,8 @@ func TestOptionalSkill(t *testing.T) {
 }
 
 func TestFilesWithGitCommits(t *testing.T) {
-	p := profile(t, "code")
-	plain, _ := initrepo.Files(p, "x")
-	with, err := initrepo.FilesWith(p, "x", initrepo.Options{GitCommits: true})
+	plain, _ := initrepo.Files("x")
+	with, err := initrepo.FilesWith("x", initrepo.Options{GitCommits: true})
 	if err != nil || len(with) <= len(plain) {
 		t.Fatal(len(with), len(plain), err)
 	}

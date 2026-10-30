@@ -256,7 +256,7 @@ func TestInitGitCommitsAndGitInit(t *testing.T) {
 	}
 	// outside a work tree: forced off, reported
 	base := t.TempDir()
-	resp := run(t, base, Request{"profile": "code", "git_commits": true})
+	resp := run(t, base, Request{"git_commits": true})
 	if f, _ := resp.Get("git_commits_forced_off"); f != true {
 		t.Error("not forced off")
 	}
@@ -266,7 +266,7 @@ func TestInitGitCommitsAndGitInit(t *testing.T) {
 	// inside one: installed
 	base = t.TempDir()
 	os.MkdirAll(filepath.Join(base, ".git"), 0o755)
-	resp = run(t, base, Request{"profile": "code", "git_commits": true, "git_init": true})
+	resp = run(t, base, Request{"git_commits": true, "git_init": true})
 	if g, _ := resp.Get("git"); g != "existing" {
 		t.Errorf("git %v", g)
 	}
@@ -278,7 +278,7 @@ func TestInitGitCommitsAndGitInit(t *testing.T) {
 		t.Skip("no git on PATH")
 	}
 	base = t.TempDir()
-	resp = run(t, base, Request{"profile": "code", "dir": "proj", "git_commits": true, "git_init": true})
+	resp = run(t, base, Request{"dir": "proj", "git_commits": true, "git_init": true})
 	if g, _ := resp.Get("git"); g != "initialised" {
 		t.Errorf("git %v", resp)
 	}
@@ -297,7 +297,7 @@ func TestInitGitInitFailureIsNotFatal(t *testing.T) {
 		t.Skip("no git on PATH")
 	}
 	t.Setenv("PATH", t.TempDir()) // git is gone
-	resp, e := Run(&record.Repo{Root: t.TempDir()}, Info{"akmctl", "test"}, "init", Request{"profile": "code", "git_init": true, "git_commits": true})
+	resp, e := Run(&record.Repo{Root: t.TempDir()}, Info{"akmctl", "test"}, "init", Request{"git_init": true, "git_commits": true})
 	if e != nil {
 		t.Fatal(e)
 	}
