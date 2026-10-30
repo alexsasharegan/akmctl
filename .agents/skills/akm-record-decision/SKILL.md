@@ -1,5 +1,5 @@
 ---
-name: record-decision
+name: akm-record-decision
 description: Draft an AKM decision record (ADR) in docs/adr/ for a hard-to-reverse choice or one that rejects a real alternative, and supersede one. Use before making such a choice.
 ---
 

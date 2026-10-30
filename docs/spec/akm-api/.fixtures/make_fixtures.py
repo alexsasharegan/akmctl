@@ -458,8 +458,11 @@ def legacy_cases(case):
 # init: the files each profile writes (paths relative to the target directory). The
 # small files are compared exactly; the others (AGENTS.md, the skills, ...) are only
 # required to exist, so the wording of a template is not part of the contract.
-INIT_COMMON = [".agents/skills/record-decision/SKILL.md", ".agents/skills/record-decision/assets/adr.md",
-    ".agents/skills/work-items/SKILL.md", ".agents/skills/work-items/assets/work-item.md",
+AKM_REFS = ["board", "check", "claim", "close", "config", "find", "index", "init", "ls", "migrate", "new",
+    "release", "search", "section", "set", "show", "version", "when"]
+INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/%s.md" % r for r in AKM_REFS] + [
+    ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",
+    ".agents/skills/akm-work-items/SKILL.md", ".agents/skills/akm-work-items/assets/work-item.md",
     ".gitignore", ".prettierignore", ".prettierrc.json", "AGENTS.md", "CLAUDE.md", "README.md", "docs/.akm-deny", "docs/.layout"]
 INIT_DIRS = {"code": ("docs/work", "docs/adr", "docs/ROADMAP.md"), "notes": ("notes/work", "notes/adr", "notes/ROADMAP.md")}
 INIT_LAYOUT = "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\nextension.claims: 0.2.0\nextension.safety: 0.2.0\n"

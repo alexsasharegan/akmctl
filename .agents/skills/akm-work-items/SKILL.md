@@ -1,5 +1,5 @@
 ---
-name: work-items
+name: akm-work-items
 description: Find, claim, work, checkpoint and close an AKM work item in docs/work/. Use at the start of a task, when stopping, and when a task finishes.
 ---
 
@@ -23,6 +23,8 @@ The repository's `AGENTS.md` wins over this skill where they disagree. Fields, s
 - Keep `## Next` as the single next concrete step. Overwrite it at each checkpoint.
 - Append dated lines to `## Log`; never rewrite old lines.
 - Update both in the same commit as the code.
+- If the `akm-commit` skill is installed (`.agents/skills/akm-commit`), follow it for commits.
+- Command details are in the `akm` skill (`.agents/skills/akm/references/`).
 - A `ready` item needs a `## Goal` with a "done when" list; an `active` or `blocked` one needs a non-empty `## Next`; a `blocked` one needs `blocked_by`.
 
 ## Stop or hand off

@@ -19,7 +19,7 @@ akmctl new work first-task --title "First task"
 akmctl ls --status raw,ready,active
 ```
 
-`init` never overwrites a file, so running it again changes nothing. It writes `AGENTS.md` (the instructions an agent reads first), `CLAUDE.md`, the `work-items` and `record-decision` skills under `.agents/skills/`, the `docs/` layout and a `.gitignore`. Fill in the commands in `AGENTS.md`, then point your agent at the repository. The work cycle is `akmctl claim <id> --as <name>`, work, then `akmctl close <id> done` after writing the `## Outcome`. Nothing stages or commits: you do.
+`init` never overwrites a file, so running it again changes nothing. It writes `AGENTS.md` (the instructions an agent reads first), `CLAUDE.md`, the `akm`, `akm-work-items` and `akm-record-decision` skills under `.agents/skills/`, the `docs/` layout and a `.gitignore`. Fill in the commands in `AGENTS.md`, then point your agent at the repository. The work cycle is `akmctl claim <id> --as <name>`, work, then `akmctl close <id> done` after writing the `## Outcome`. Nothing stages or commits: you do.
 
 ## Layout
 

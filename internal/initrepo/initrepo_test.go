@@ -98,10 +98,10 @@ func TestProfilesCheckClean(t *testing.T) {
 			if strings.Contains(files["AGENTS.md"], "{{") || strings.Contains(files["README.md"], "{{") {
 				t.Error("an unreplaced marker")
 			}
-			if name == "code" && strings.Contains(files[".agents/skills/work-items/SKILL.md"], "notes/") {
+			if name == "code" && strings.Contains(files[".agents/skills/akm-work-items/SKILL.md"], "notes/") {
 				t.Error("code skill mentions notes/")
 			}
-			if name == "notes" && strings.Contains(files[".agents/skills/work-items/SKILL.md"], "docs/work") {
+			if name == "notes" && strings.Contains(files[".agents/skills/akm-work-items/SKILL.md"], "docs/work") {
 				t.Error("notes skill still points at docs/work")
 			}
 		})
@@ -178,6 +178,73 @@ func TestSkillsMatchRepository(t *testing.T) {
 	got := snapshot(t, "templates/skills")
 	if !reflect.DeepEqual(src, got) {
 		t.Error("internal/initrepo/templates/skills differs from .agents/skills: copy the skills over")
+	}
+}
+
+// The always-installed skills are the three akm- ones, in the drift test and in what init writes.
+func TestAlwaysInstalledSkills(t *testing.T) {
+	want := []string{"akm", "akm-record-decision", "akm-work-items"}
+	for _, dir := range []string{"../../.agents/skills", "templates/skills"} {
+		ents, err := os.ReadDir(dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got []string
+		for _, e := range ents {
+			if e.IsDir() {
+				got = append(got, e.Name())
+			}
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("%s holds %v, want %v", dir, got, want)
+		}
+	}
+	files, _ := initrepo.Files(profile(t, "code"), "x")
+	have := map[string]bool{}
+	for _, f := range files {
+		have[f.Path] = true
+	}
+	for _, n := range want {
+		if p := ".agents/skills/" + n + "/SKILL.md"; !have[p] {
+			t.Errorf("init does not write %s", p)
+		}
+	}
+	if have[".agents/skills/akm-commit/SKILL.md"] {
+		t.Error("the optional skill akm-commit is installed by default")
+	}
+}
+
+// Every API operation has a reference file in the akm skill.
+func TestEveryOperationHasReference(t *testing.T) {
+	ops := api.Operations()
+	if len(ops) == 0 {
+		t.Fatal("no operations")
+	}
+	for _, op := range ops {
+		for _, dir := range []string{"../../.agents/skills/akm/references", "templates/skills/akm/references"} {
+			b, err := os.ReadFile(filepath.Join(dir, op+".md"))
+			if err != nil {
+				t.Errorf("operation %s has no reference: %v", op, err)
+				continue
+			}
+			if n := strings.Count(string(b), "\n"); n > 40 {
+				t.Errorf("%s/%s.md has %d lines, want at most 40", dir, op, n)
+			}
+		}
+	}
+}
+
+// The optional skill is shipped, checks the manifest first and never stages everything.
+func TestOptionalCommitSkill(t *testing.T) {
+	b, err := os.ReadFile("templates/optional-skills/akm-commit/SKILL.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(b)
+	for _, want := range []string{"name: akm-commit", "git_commits", "STOP", "git add -A"} {
+		if !strings.Contains(s, want) {
+			t.Errorf("akm-commit lacks %q", want)
+		}
 	}
 }
 
