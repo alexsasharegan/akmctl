@@ -46,6 +46,7 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	format, repoDir, outFile := "table", cwd, ""
 	req := api.Request{}
 	var pos []string
+	yes, noInput := false, false
 	rest := args[1:]
 	for i := 0; i < len(rest); i++ {
 		a := rest[i]
@@ -82,6 +83,17 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		case "out":
 			v, _ := value()
 			outFile = v
+			continue
+		case "yes", "no-input":
+			if op != "init" && !(op == "config" && name == "yes") {
+				fmt.Fprintf(stderr, "akmctl: --%s does not belong to %s\n", name, op)
+				return 2
+			}
+			if name == "yes" {
+				yes = true
+			} else {
+				noInput = true
+			}
 			continue
 		case "migration":
 			v, ok := value()
@@ -165,6 +177,8 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	}
 	names := positional[op]
 	switch {
+	case op == "config":
+		// positional words are read by runConfig
 	case op == "search":
 		if len(pos) > 0 {
 			req["text"] = strings.Join(pos, " ")
@@ -209,6 +223,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		} else if ok {
 			req["dir"] = filepath.ToSlash(filepath.Clean(d))
 		}
+		if !initQuestions(req, base, yes, noInput, stdout, stderr) {
+			return 2
+		}
 		resp, aerr := api.Run(&record.Repo{Root: base}, info, op, req)
 		print(stdout, stderr, format, op, resp, aerr == nil)
 		if aerr != nil {
@@ -234,6 +251,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			print(stdout, stderr, format, op, resp, false)
 			return 2
 		}
+	}
+	if op == "config" {
+		return runConfig(repo, info, pos, req, yes, format, stdout, stderr)
 	}
 	resp, aerr := api.Run(repo, info, op, req)
 	if h, ok := resp.Get("handoff"); ok && outFile != "" {
@@ -456,6 +476,18 @@ func text(w io.Writer, op string, resp api.Obj) {
 		for _, p := range sk.([]string) {
 			fmt.Fprintln(w, "  skipped ", p, "(exists)")
 		}
+		switch g, _ := resp.Get("git"); g {
+		case "initialised":
+			fmt.Fprintln(w, "  git init done")
+		case "failed":
+			ge, _ := resp.Get("git_error")
+			fmt.Fprintln(w, "  git init failed:", ge)
+		}
+		if f, _ := resp.Get("git_commits_forced_off"); f == true {
+			fmt.Fprintln(w, "not a git repository: git commits stay off (run git init, then: akmctl config git-commits on)")
+		}
+	case "config":
+		configText(w, resp)
 	case "index":
 		p, _ := resp.Get("path")
 		ch, _ := resp.Get("changed")
@@ -515,7 +547,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init --profile code|notes [dir]  (writes missing files, never overwrites)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init --profile code|notes [dir] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout
