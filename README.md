@@ -4,7 +4,7 @@ Give your project a memory that you and your AI agents share: decisions, plans a
 
 **AKM** stands for **agent knowledge management**. The kit is a standard for how those files are laid out, the `akmctl` command-line tool that creates and checks them, skills that teach an agent the routine, and an optional board in your browser. There is no database and no service: it is a folder of text files.
 
-> **Status: 0.2.0 beta, for new (greenfield) projects.** You start a fresh folder with `akmctl init`. Bringing an existing repository into AKM (`akmctl migrate`) is documented but not supported yet. Expect changes before 1.0.0. macOS and Linux are supported; Windows is best effort.
+> **Status: unstable, pre-1.0 (0.3.x), for new (greenfield) projects.** You start a fresh folder with `akmctl init`. Bringing an existing repository into AKM (`akmctl migrate`) is documented but not supported yet. Expect changes before 1.0.0: any release below it may change the layout or the tool. macOS and Linux are supported; Windows is best effort.
 
 ## What you get
 
@@ -155,9 +155,9 @@ akmctl check
 
 The file's status goes `raw`, `ready`, `active`, `done`. `close` also moves it into `docs/work/done/` and refuses if the Outcome is empty. In practice your agent runs these steps for you using the `akm-work-items` skill; you read the result.
 
-## What the beta does not do
+## What the unstable releases do not do
 
-- It does not support adding AKM to an existing repository (`migrate` is there but is not a supported path in this beta).
+- It does not support adding AKM to an existing repository (`migrate` is there but is not a supported path before 1.0.0).
 - It never stages, commits or pushes; the optional skill does the committing, only when you turn it on.
 - Windows is best effort: the tool builds and the tests run there, but a Windows-only problem does not block a release before 1.0.0.
 
