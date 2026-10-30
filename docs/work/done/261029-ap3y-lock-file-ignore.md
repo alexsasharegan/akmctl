@@ -1,7 +1,7 @@
 ---
 id: "261029-ap3y"
 title: Keep docs/.akm.lock out of commits
-status: ready
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 kind: chore
@@ -19,6 +19,10 @@ Done when:
 
 - [ ] A repository's .gitignore lists the lock file after the first write.
 - [ ] The guide says so.
+
+## Outcome
+
+`init` writes a `.gitignore` containing `docs/.akm.lock`, so repositories made by the tool keep the lock out of commits. This repository's own `.gitignore` is not changed by this item.
 
 ## Log
 

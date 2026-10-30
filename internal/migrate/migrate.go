@@ -395,7 +395,7 @@ var stepKinds = map[string]bool{"rename_field": true, "set_default": true, "remo
 // step ids, kinds, classes and the parameters each kind needs.
 func Validate(m Migration) error {
 	if !versionRe.MatchString(m.From) || !versionRe.MatchString(m.To) {
-		return fmt.Errorf("from and to must be versions like 1.0.0")
+		return fmt.Errorf("from and to must be versions like 0.2.0")
 	}
 	if len(m.Steps) == 0 {
 		return fmt.Errorf("a migration needs at least one step")

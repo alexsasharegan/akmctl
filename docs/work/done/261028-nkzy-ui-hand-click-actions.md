@@ -22,6 +22,7 @@ Done when:
 - [x] The Outcome says which browser and which actions were exercised.
 
 ## Outcome
+
 Claim, Release, Close and drag onto a lane were clicked by hand in the Claude desktop built-in browser against a scratch copy of this repository; each write was checked on disk. One finding (261029-7zcp, a duplicate claim log line) is filed.
 
 ## Log

@@ -17,7 +17,7 @@ import (
 )
 
 // LayoutVersion is the layout version this tool checks against.
-const LayoutVersion = "1.0.0"
+const LayoutVersion = "0.2.0"
 
 // Finding is one rule violation.
 type Finding struct {

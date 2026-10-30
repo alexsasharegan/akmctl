@@ -11,12 +11,12 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/migrate"
 )
 
-// mintRegistry is a migration from layout 0.9.0 whose only step mints ids for
+// mintRegistry is a migration from layout 0.1.0 whose only step mints ids for
 // the notes directory of the fixture.
 func mintRegistry(t *testing.T) {
 	t.Helper()
 	old := migrate.Registry
-	migrate.Registry = []migrate.Migration{{From: "0.9.0", To: "1.0.0", Steps: []migrate.Step{
+	migrate.Registry = []migrate.Migration{{From: "0.1.0", To: "0.2.0", Steps: []migrate.Step{
 		{ID: "mint-notes", Kind: "mint_ids", Class: "auto", Description: "give every note an id", Dir: "docs/notes"},
 	}}}
 	t.Cleanup(func() { migrate.Registry = old; migrateRand = nil })
@@ -177,10 +177,10 @@ func TestMigrateMintIDsModes(t *testing.T) {
 	if n := gitOut(t, root, "log", "--oneline"); strings.Count(n, "\n") != 0 {
 		t.Fatalf("the tool committed:\n%s", n)
 	}
-	if gitOut(t, root, "branch", "--show-current") != "migrate-0.9.0-to-1.0.0" || gitOut(t, root, "tag", "--list") != "pre-migrate-0.9.0-to-1.0.0" {
+	if gitOut(t, root, "branch", "--show-current") != "migrate-0.1.0-to-0.2.0" || gitOut(t, root, "tag", "--list") != "pre-migrate-0.1.0-to-0.2.0" {
 		t.Fatal("no branch or tag")
 	}
-	// the manifest is on 1.0.0 now, so another run has nothing to do
+	// the manifest is on 0.2.0 now, so another run has nothing to do
 	resp = mustOK(t, root, "migrate", Request{"mode": "apply_safe", "acknowledge_backup": true})
 	if c, _ := resp.Get("clean"); c != true {
 		t.Fatalf("second call: %v", resp)
@@ -198,9 +198,9 @@ func TestMigrateMintIDsTwice(t *testing.T) {
 	gitOut(t, root, "add", "-A")
 	gitOut(t, root, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "migrated")
 	// back to the old manifest on a fresh branch name, so the safeguards pass again
-	gitOut(t, root, "tag", "-d", "pre-migrate-0.9.0-to-1.0.0")
+	gitOut(t, root, "tag", "-d", "pre-migrate-0.1.0-to-0.2.0")
 	gitOut(t, root, "branch", "-m", "first-run")
-	if err := os.WriteFile(filepath.Join(root, "docs/.layout"), []byte("layout: 0.9.0\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "docs/.layout"), []byte("layout: 0.1.0\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	gitOut(t, root, "add", "docs/.layout")

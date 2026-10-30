@@ -61,7 +61,7 @@ func TestMintIDsSlugFromTitle(t *testing.T) {
 func TestMintIDsSlugOptionsAreValidated(t *testing.T) {
 	step := func(s Step) error {
 		s.ID, s.Kind, s.Class, s.Dir = "m", "mint_ids", "auto", "adr"
-		return Validate(Migration{From: "0.9.0", To: "1.0.0", Steps: []Step{s}})
+		return Validate(Migration{From: "0.1.0", To: "0.2.0", Steps: []Step{s}})
 	}
 	if err := step(Step{SlugFrom: "title", MaxSlug: 40}); err != nil {
 		t.Fatal(err)

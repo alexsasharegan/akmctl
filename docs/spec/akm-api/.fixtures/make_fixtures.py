@@ -9,7 +9,7 @@ import datetime as dt, hashlib, json, os, re, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 AS_OF = "2026-10-28"
 
-LAYOUT = "layout: 1.0.0\nextension.adr-index: 1.0.0\nextension.work-items: 1.0.0\n"
+LAYOUT = "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\n"
 AGENTS = """# Sample
 
 A small sample repository for the AKM API fixtures, used by the maintainers of the sample tool.
@@ -191,7 +191,7 @@ A2B3 = "docs/work/261020-a2b3-add-json-output-to-ls.md"
 A2B3_DONE = "docs/work/done/261020-a2b3-add-json-output-to-ls.md"
 
 def claims_layout(files):
-    files["docs/.layout"] += "extension.claims: 1.0.0\n"
+    files["docs/.layout"] += "extension.claims: 0.2.0\n"
     files[A2B3] = files[A2B3].replace("updated: 2026-10-27\n---", "updated: 2026-10-27\nclaimed_by: agent-9\nclaimed_at: 2026-10-28T08:00\n---")
 
 def closable(files):
@@ -377,9 +377,9 @@ def vault_cases(case, basic, recs, rank):
     case("check", 5, "a clean repository with moved folders", "vault", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=0, count=0, findings=[], reconcile=dict(state="current")))
     req = dict(dry_run=True, include_content=True)
     case("index", 2, "the ADR index is written in the ADR folder", "vault", req, ok("index", req, path=VA + "/README.md", changed=False, written=False, content=vault[VA + "/README.md"]))
-    repository = dict(name="vault", layout="1.0.0", extensions=["adr-index", "work-items"], reference_style="id", claim_stale_hours=24, work_dir=VW, adr_dir=VA)
+    repository = dict(name="vault", layout="0.2.0", extensions=["adr-index", "work-items"], reference_style="id", claim_stale_hours=24, work_dir=VW, adr_dir=VA)
     case("version", 3, "the folders the manifest names are reported", "vault", {},
-         ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["1.0.0"], extensions=["claims"], repository=repository))
+         ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["0.2.0"], extensions=["claims"], repository=repository))
 
 
 def vault_write_cases(case, basic):
@@ -418,7 +418,7 @@ def build_legacy(name):
 
 def legacy_migration():
     T, A = "Deep Thought/9 pkm/tasks", "Deep Thought/9 pkm/adr"
-    return {"from": "0.0.0", "to": "1.0.0", "steps": [
+    return {"from": "0.0.0", "to": "0.2.0", "steps": [
         {"id": "created", "kind": "rename_field", "class": "auto", "description": "created_at becomes created", "dir": T, "from": "created_at", "to": "created"},
         {"id": "updated", "kind": "rename_field", "class": "auto", "description": "updated_at becomes updated", "dir": T, "from": "updated_at", "to": "updated"},
         {"id": "title", "kind": "title_from_h1", "class": "auto", "description": "title from the first heading", "dir": T},
@@ -446,10 +446,10 @@ def legacy_cases(case):
     ]
     finding = dict(rule="S1", severity="W", file="docs/.layout", line=None, id=None, message="the manifest has no layout key", **{"class": "info"})
     case("migrate", 2, "a one-off migration file plans steps for a repository with no layout history", "legacy", req,
-         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="1.0.0", state="behind", steps=steps, findings=[finding], clean=False))
+         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="0.2.0", state="behind", steps=steps, findings=[finding], clean=False))
     req = dict(mode="plan")
     case("migrate", 3, "without the migrations parameter there is no path from 0.0.0", "legacy", req,
-         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="1.0.0", state="unsupported", steps=[], findings=[finding], clean=False))
+         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="0.2.0", state="unsupported", steps=[], findings=[finding], clean=False))
     bad = dict(mig, steps=[dict(mig["steps"][0], kind="run_script")])
     req = dict(mode="plan", migrations=[bad])
     case("migrate", 4, "an unknown step kind in a migration file is rejected", "legacy", req,
@@ -462,7 +462,7 @@ INIT_COMMON = [".agents/skills/record-decision/SKILL.md", ".agents/skills/record
     ".agents/skills/work-items/SKILL.md", ".agents/skills/work-items/assets/work-item.md",
     ".gitignore", ".prettierignore", ".prettierrc.json", "AGENTS.md", "CLAUDE.md", "README.md", "docs/.akm-deny", "docs/.layout"]
 INIT_DIRS = {"code": ("docs/work", "docs/adr", "docs/ROADMAP.md"), "notes": ("notes/work", "notes/adr", "notes/ROADMAP.md")}
-INIT_LAYOUT = "layout: 1.0.0\nextension.adr-index: 1.0.0\nextension.work-items: 1.0.0\nextension.claims: 1.0.0\nextension.safety: 1.0.0\n"
+INIT_LAYOUT = "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\nextension.claims: 0.2.0\nextension.safety: 0.2.0\n"
 INIT_NOTES_LAYOUT = INIT_LAYOUT + "work_dir: notes/work\nadr_dir: notes/adr\nroadmap: notes/ROADMAP.md\nreference_style: wikilink\n"
 
 def init_files(profile):
@@ -485,7 +485,7 @@ def init_cases(cases, basic):
         written = [p for p in paths if p not in existing]
         skipped = [p for p in paths if p in existing]
         pre = "" if dirname in (None, ".") else dirname + "/"
-        case(n, name, "basic", req, ok("init", req, profile=profile, dir=dirname or ".", layout="1.0.0", written=written, skipped=skipped),
+        case(n, name, "basic", req, ok("init", req, profile=profile, dir=dirname or ".", layout="0.2.0", written=written, skipped=skipped),
              after={pre + p: exact[p] for p in written if p in exact}, after_paths=[pre + p for p in written if p not in exact])
     run(1, "code profile in a new directory", "code", "new-project")
     run(2, "notes profile in a new directory: records under notes/, wikilink references", "notes", "vault")
@@ -553,11 +553,11 @@ def main():
     f.sort(key=lambda x: (x["file"], x["line"] or 0, x["rule"]))
     case("check", 2, "three errors", "broken", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=False, errors=3, warnings=0, count=3, findings=f, reconcile=dict(state="current")))
     case("check", 3, "one rule family", "broken", dict(rules=["RM"], as_of=AS_OF), ok("check", dict(rules=["RM"], as_of=AS_OF), clean=False, errors=1, warnings=0, count=1, findings=[x for x in f if x["rule"].startswith("RM")], reconcile=dict(state="current")))
-    req = dict(target="1.0.0", as_of=AS_OF)
+    req = dict(target="0.2.0", as_of=AS_OF)
     f4 = [dict(x, **{"class": "manual"}) for x in f]
     case("check", 4, "findings are classified for a target version", "broken", req, ok("check", req, clean=False, errors=3, warnings=0, count=3, findings=f4, reconcile=dict(state="current")))
     req = {}
-    case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "1.0.0"}, to="1.0.0", state="current", steps=[], findings=[], clean=True))
+    case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.2.0"}, to="0.2.0", state="current", steps=[], findings=[], clean=True))
     # find, when
     r = next(r for r in recs if r["id"] == "261022-e5f6"); req = dict(id=r["id"])
     case("find", 1, "a path from an id", "basic", req, ok("find", req, id=r["id"], type="work", path=r["path"]))
@@ -567,9 +567,9 @@ def main():
     case("index", 1, "the ADR index, dry run", "basic", req, ok("index", req, path="docs/adr/README.md", changed=False, written=False, content=basic["docs/adr/README.md"]))
     for n, repo, files in ((1, "basic", basic), (2, "claims", build("claims", claims_layout))):
         exts = sorted(l.split(":")[0][len("extension."):] for l in files["docs/.layout"].split("\n") if l.startswith("extension."))
-        repository = dict(name=repo, layout="1.0.0", extensions=exts, reference_style="id", claim_stale_hours=24, work_dir="docs/work", adr_dir="docs/adr")
+        repository = dict(name=repo, layout="0.2.0", extensions=exts, reference_style="id", claim_stale_hours=24, work_dir="docs/work", adr_dir="docs/adr")
         case("version", n, "the repository this server or tool is working on" if n == 1 else "enabled extensions are listed by name", repo, {},
-             ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["1.0.0"], extensions=["claims"], repository=repository))
+             ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["0.2.0"], extensions=["claims"], repository=repository))
     vault_cases(case, basic, recs, rank)
     legacy_cases(case)
     write_cases(cases, basic)

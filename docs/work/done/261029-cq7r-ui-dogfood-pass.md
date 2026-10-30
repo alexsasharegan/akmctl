@@ -20,6 +20,7 @@ Done when:
 - [x] Each flow is driven on a scratch copy and the findings are in the Log.
 
 ## Outcome
+
 The finished workbench was driven in the built-in browser on a scratch copy: capture, refine, claim, block, unblock, close with an ADR link, review diff and a live update from akmctl set. Obsidian open and takeover of another holder were not driven.
 
 ## Log

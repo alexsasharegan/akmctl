@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Beta 0.2.0 (greenfield): `akmctl init --profile code|notes [dir]` writes the layout, `AGENTS.md`, `CLAUDE.md`, the skills, the manifest and a `.gitignore` for the lock into a new directory, never overwriting (API operation `init`, schema and fixtures). The layout, the extensions and the specification are versioned 0.2.0; adopting an existing repository is not supported in the beta.
+- New ids and record dates use the local calendar day (`as_of` still wins); `claimed_at` stays UTC. Re-claiming an item you hold adds no log line. `mint_ids` takes `slug_from` and `max_slug`. New `migrate` step `move_closed`.
+- `ui`: the page title names the view and repository; the header is centred; an SVG favicon.
 - Manifest keys `work_dir`, `adr_dir` and `roadmap` in `docs/.layout` (repository-relative, forward slashes, no `..`) move the work, ADR and roadmap locations; `done/` is `<work_dir>/done`. Loading, `check`, `index`, `new`, `set`, `section`, `close`, `claim`, `release`, `migrate` and the workbench follow them. New rule S3 (error) reports a bad value; writes are refused while it holds. `version.repository` carries `work_dir` and `adr_dir`, which the workbench reads instead of hard-coding the paths. The manifest and `docs/.migrate-log` stay under `docs/`.
 - `migrate` steps: `title_from_h1`, `goal_scaffold`, `remove_field`, `copy_field`; `rename_field`, `set_default` and the new field steps take `dir` and then reach notes that have no id yet. `mint_ids` takes `rename: false` (write the `id`, leave the names, report `renames: [{from, to}]` on the step) and `seed` (ids repeatable between plan and apply). `plan` now applies each step on a scratch copy of the Markdown files, so a step that depends on an earlier one is planned as it will run.
 - `migrate --migration <file>` and the API parameter `migrations` run a one-off declarative migration for a repository with no layout history; the safeguards are unchanged.

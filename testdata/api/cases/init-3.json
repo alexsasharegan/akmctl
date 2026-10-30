@@ -13,7 +13,7 @@
     "ok": true,
     "profile": "code",
     "dir": ".",
-    "layout": "1.0.0",
+    "layout": "0.2.0",
     "written": [
       ".agents/skills/record-decision/SKILL.md",
       ".agents/skills/record-decision/assets/adr.md",

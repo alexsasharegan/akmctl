@@ -46,7 +46,7 @@ func oneOff() map[string]any {
 		map[string]any{"id": "ids-tasks", "kind": "mint_ids", "class": "auto", "description": "ids", "dir": oTasks, "rename": false, "seed": "t"},
 		map[string]any{"id": "ids-adrs", "kind": "mint_ids", "class": "auto", "description": "ids", "dir": oADR, "date_field": "date", "rename": false, "seed": "a"},
 	}
-	return map[string]any{"from": "0.0.0", "to": "1.0.0", "steps": steps}
+	return map[string]any{"from": "0.0.0", "to": "0.2.0", "steps": steps}
 }
 
 func stepsByID(resp Obj) map[string]Obj {
@@ -146,7 +146,7 @@ func TestOneOffMigrationApply(t *testing.T) {
 	}
 	// manifest keeps the folders and gains the layout; the log has one line per applied step
 	man := read(t, root, "docs/.layout")
-	if !strings.Contains(man, "layout: 1.0.0") || !strings.Contains(man, "work_dir: "+oTasks) {
+	if !strings.Contains(man, "layout: 0.2.0") || !strings.Contains(man, "work_dir: "+oTasks) {
 		t.Fatalf("manifest %q", man)
 	}
 	if n := strings.Count(read(t, root, "docs/.migrate-log"), "\n"); n != 7 {
@@ -154,7 +154,7 @@ func TestOneOffMigrationApply(t *testing.T) {
 	}
 	// the tag and branch exist, and nothing was committed
 	tags, _ := exec.Command("git", "-C", root, "tag", "--list").Output()
-	if strings.TrimSpace(string(tags)) != "pre-migrate-0.0.0-to-1.0.0" {
+	if strings.TrimSpace(string(tags)) != "pre-migrate-0.0.0-to-0.2.0" {
 		t.Fatalf("tags %q", tags)
 	}
 	if out, _ := exec.Command("git", "-C", root, "status", "--porcelain").Output(); len(out) == 0 {
@@ -178,7 +178,7 @@ func TestOneOffMigrationKeepsTheSafeguards(t *testing.T) {
 	os.WriteFile(filepath.Join(root, "dirty.txt"), []byte("x"), 0o644)
 	wantCode(t, root, "migrate", req, "refused", "dirty_tree")
 	os.Remove(filepath.Join(root, "dirty.txt"))
-	exec.Command("git", "-C", root, "branch", "migrate-0.0.0-to-1.0.0").Run()
+	exec.Command("git", "-C", root, "branch", "migrate-0.0.0-to-0.2.0").Run()
 	wantCode(t, root, "migrate", req, "refused", "branch_exists")
 }
 

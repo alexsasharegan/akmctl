@@ -8,9 +8,6 @@
 
 Beta (greenfield only; adoption is not claimed). Order of work:
 
-- [261029-0gb4] Add akmctl init with the profiles code and notes
-- [261029-dsga] Rewrite the standard's template section to describe init
-- [261029-sjyg] Prettier is not run by CI
 
 ## Later
 
@@ -51,6 +48,5 @@ Hardening and small rules:
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
-- [261029-ap3y] Keep docs/.akm.lock out of commits
 
 ## Dropped

@@ -15,14 +15,14 @@
       "1.0"
     ],
     "layout_versions": [
-      "1.0.0"
+      "0.2.0"
     ],
     "extensions": [
       "claims"
     ],
     "repository": {
       "name": "claims",
-      "layout": "1.0.0",
+      "layout": "0.2.0",
       "extensions": [
         "adr-index",
         "claims",

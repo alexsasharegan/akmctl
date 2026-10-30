@@ -126,7 +126,7 @@ func TestRules(t *testing.T) {
 		{"G3 missing script", "G3", "W", map[string]func(string) string{"AGENTS.md": sub("`akmctl check`", "`scripts/check.sh`")}},
 		{"L1 broken link", "L1", "E", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [the guide](docs/guide.md).\n" }}},
 		{"L2 unresolved wikilink", "L2", "W", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [[Nowhere]].\n" }}},
-		{"S1 behind", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 1.0.0", "layout: 0.9.0")}},
+		{"S1 behind", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 0.2.0", "layout: 0.1.0")}},
 		{"S1 missing manifest", "S1", "W", map[string]func(string) string{"docs/.layout": nil}},
 		{"S2 skill name", "S2", "E", map[string]func(string) string{".agents/skills/demo/SKILL.md": func(string) string { return "---\nname: other\ndescription: x\n---\n" }}},
 	}
@@ -158,13 +158,13 @@ func TestLinksThatResolve(t *testing.T) {
 }
 
 func TestClaims(t *testing.T) {
-	r := repoWith(t, map[string]func(string) string{"docs/.layout": func(s string) string { return s + "extension.claims: 1.0.0\n" }})
+	r := repoWith(t, map[string]func(string) string{"docs/.layout": func(s string) string { return s + "extension.claims: 0.2.0\n" }})
 	res := Run(r, Options{AsOf: asOf})
 	if rules(res)["CL1"] != 2 {
 		t.Fatalf("%v", res.Findings)
 	}
 	r = repoWith(t, map[string]func(string) string{
-		"docs/.layout": func(s string) string { return s + "extension.claims: 1.0.0\n" },
+		"docs/.layout": func(s string) string { return s + "extension.claims: 0.2.0\n" },
 		a2b3:           sub("status: active", "status: active\nclaimed_by: agent-1\nclaimed_at: 2026-10-27T10:00"),
 		"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: active\nclaimed_by: agent-1\nclaimed_at: 2026-10-27T10:00"),
 	})

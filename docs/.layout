@@ -1,5 +1,5 @@
-layout: 1.0.0
-extension.adr-index: 1.0.0
-extension.work-items: 1.0.0
-extension.claims: 1.0.0
-extension.safety: 1.0.0
+layout: 0.2.0
+extension.adr-index: 0.2.0
+extension.work-items: 0.2.0
+extension.claims: 0.2.0
+extension.safety: 0.2.0

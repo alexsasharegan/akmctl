@@ -265,7 +265,7 @@ func TestCloseParentWithOpenChildren(t *testing.T) {
 func TestClaimAndRelease(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-1"}, "refused", "extension_off")
-	root = copyRepo(t, "basic", "extension.claims: 1.0.0\n")
+	root = copyRepo(t, "basic", "extension.claims: 0.2.0\n")
 	resp := mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	if pv, _ := resp.Get("previous_holder"); pv != nil {
 		t.Fatalf("previous %v", pv)
@@ -306,7 +306,7 @@ func TestClaimAndRelease(t *testing.T) {
 // A claimed item that is blocked and then unblocked to active (set, then
 // claim by the same identity) keeps one 'claimed' line in its log.
 func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
-	root := copyRepo(t, "basic", "extension.claims: 1.0.0\n")
+	root := copyRepo(t, "basic", "extension.claims: 0.2.0\n")
 	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "blocked", "blocked_by": []any{"waiting on review"}}, "as_of": "2026-10-28"})
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "active", "blocked_by": nil}, "as_of": "2026-10-29"})
@@ -320,7 +320,7 @@ func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
 }
 
 func TestCloseClearsClaim(t *testing.T) {
-	root := copyRepo(t, "basic", "extension.claims: 1.0.0\n")
+	root := copyRepo(t, "basic", "extension.claims: 0.2.0\n")
 	mustOK(t, root, "claim", Request{"id": a2b3, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	p := filepath.Join(root, "docs/work/261020-a2b3-add-json-output-to-ls.md")
 	b, _ := os.ReadFile(p)

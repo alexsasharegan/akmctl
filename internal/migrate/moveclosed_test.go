@@ -83,7 +83,7 @@ func TestMoveClosedOptionsAndLogSize(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		files[fmt.Sprintf("notes/note-%03d.md", i)] = "---\nstatus: done\n---\n# N\n"
 	}
-	files["docs/.layout"] = "layout: 0.9.0\n"
+	files["docs/.layout"] = "layout: 0.1.0\n"
 	files["notes/open.md"] = "---\nstatus: active\n---\n# Open\n"
 	files["notes/README.md"] = "---\nstatus: done\n---\nindex\n"
 	repo := filesRepo(t, files)
@@ -95,14 +95,14 @@ func TestMoveClosedOptionsAndLogSize(t *testing.T) {
 	if len(res[0].Files) != 100 || !exists(repo, "notes/open.md") || !exists(repo, "notes/README.md") || !exists(repo, "archive/closed/note-042.md") {
 		t.Fatalf("%d files moved", len(res[0].Files))
 	}
-	if err := AppendLog(repo.Root, "0.9.0", "1.0.0", res, time.Date(2026, 10, 28, 9, 0, 0, 0, time.UTC)); err != nil {
+	if err := AppendLog(repo.Root, "0.1.0", "0.2.0", res, time.Date(2026, 10, 28, 9, 0, 0, 0, time.UTC)); err != nil {
 		t.Fatal(err)
 	}
 	log := readRel(t, repo, LogPath)
 	if strings.Count(log, "\n") != 1 || !strings.Contains(log, `"count":100`) || len(log) > 8000 {
 		t.Fatalf("log of %d bytes, %d lines", len(log), strings.Count(log, "\n"))
 	}
-	bad := Migration{From: "0.9.0", To: "1.0.0", Steps: []Step{{ID: "a", Kind: "move_closed", Class: "auto"}}}
+	bad := Migration{From: "0.1.0", To: "0.2.0", Steps: []Step{{ID: "a", Kind: "move_closed", Class: "auto"}}}
 	if Validate(bad) == nil {
 		t.Fatal("dir should be required")
 	}

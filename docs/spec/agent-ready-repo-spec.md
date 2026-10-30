@@ -103,7 +103,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 | `created: 2026-10-28`                              | accept: string (a date field)                                                                |
 | `created: "2026-10-28"`                            | accept: the same string                                                                      |
 | `claimed_at: 2026-10-28T14:30`                     | accept: string (a timestamp field)                                                           |
-| `layout: 1.0.0`                                    | accept: string                                                                               |
+| `layout: 0.2.0`                                    | accept: string                                                                               |
 | `layout: 1.2`                                      | reject: float (quote it)                                                                     |
 | `time: 12:30`                                      | accept: string (YAML 1.1 reads a base-60 integer)                                            |
 | `done: yes`                                        | accept: string (YAML 1.1 reads a boolean)                                                    |
@@ -466,7 +466,7 @@ Optional flat keys in `docs/.layout`, in the manifest's format. Three keys place
 
 ### Extensions in this version
 
-A repo opts in by listing an extension in the manifest (for example `extension.claims: 1.0.0`).
+A repo opts in by listing an extension in the manifest (for example `extension.claims: 0.2.0`).
 
 - `claims`: section 3, rules CL1 and CL2, commands `claim` and `release`.
 - `safety`: rules SF1 to SF4 and the deny list `docs/.akm-deny`: one entry per line, a literal substring, or a regular expression when the line starts with `re:`; `#` lines and blank lines are ignored. Files scanned: records, `AGENTS.md` and `ROADMAP.md`. SF1 knows private-key headers, cloud access key ids, GitHub, Slack, payment-provider, Google and npm token formats, JSON Web Tokens, and `password`, `secret`, `api_key` and token assignments whose value is at least 8 characters with two kinds of character and is not an obvious placeholder (`changeme`, `example`, `${...}`, `<...>`, `xxxx`). SF3 flags a run of 32 or more base64 characters with upper case, lower case, a digit and at least 4.5 bits of entropy per character, skipping all-hex strings (hashes), values after `h1:` or `sha256-` style prefixes, and anything inside a URL. Findings print the file, line and rule and the kind of pattern, never the matched text. A pass means "no known pattern", not "safe". Measured on about 15,000 lines of ordinary notes, the rules raised no finding once hashes and URLs were skipped.
@@ -486,9 +486,9 @@ A repo records which layout and which extensions it conforms to, so it can be re
 **Manifest.** `docs/.layout`, in the same simple key-value subset as frontmatter (H5), no nesting and no delimiter lines:
 
 ```text
-layout: 1.0.0
-extension.adr-index: 1.0.0
-extension.work-items: 1.0.0
+layout: 0.2.0
+extension.adr-index: 0.2.0
+extension.work-items: 0.2.0
 stale_days: 30
 ```
 

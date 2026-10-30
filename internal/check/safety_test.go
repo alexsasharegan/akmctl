@@ -21,7 +21,7 @@ var (
 func withLine(line string) map[string]func(string) string {
 	return map[string]func(string) string{
 		"AGENTS.md":    func(s string) string { return s + "\n" + line + "\n" },
-		"docs/.layout": func(s string) string { return s + "extension.safety: 1.0.0\n" },
+		"docs/.layout": func(s string) string { return s + "extension.safety: 0.2.0\n" },
 	}
 }
 
@@ -134,7 +134,7 @@ func TestSF4AllowMarkers(t *testing.T) {
 
 func TestSafetyScansRecordsAndRoadmap(t *testing.T) {
 	e := map[string]func(string) string{
-		"docs/.layout":    func(s string) string { return s + "extension.safety: 1.0.0\n" },
+		"docs/.layout":    func(s string) string { return s + "extension.safety: 0.2.0\n" },
 		"docs/ROADMAP.md": func(s string) string { return s + "\nnote " + awsKey + "\n" },
 		a2b3:              func(s string) string { return s + "\nsaved " + pemHead + "\n" },
 	}
