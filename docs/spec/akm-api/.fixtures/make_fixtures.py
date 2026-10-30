@@ -9,7 +9,7 @@ import datetime as dt, hashlib, json, os, re, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 AS_OF = "2026-10-28"
 
-LAYOUT = "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\n"
+LAYOUT = "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\n"
 AGENTS = """# Sample
 
 A small sample repository for the AKM API fixtures, used by the maintainers of the sample tool.
@@ -31,12 +31,13 @@ A small sample repository for the AKM API fixtures, used by the maintainers of t
 - Edit the body of an accepted ADR.
 """
 
-def work(id_, slug, title, status, created, updated, extra=None, sections=None, summary=None, done=False):
+def work(id_, slug, title, status, created, updated, extra=None, sections=None, summary=None, done=False, closed=None):
     fm = [("id", id_), ("title", title)]
     if summary: fm.append(("summary", summary))
     fm.append(("status", status))
     for k, v in (extra or []): fm.append((k, v))
     fm += [("created", created), ("updated", updated)]
+    if closed: fm.append(("closed", closed))
     body = "\n# %s\n\n" % title + "".join("## %s\n%s\n\n" % (h, t) for h, t in (sections or [])).rstrip("\n") + "\n"
     return ("docs/work/%s%s-%s.md" % ("done/" if done else "", id_, slug), fm, body)
 
@@ -58,7 +59,7 @@ def render(rec):
 
 GOAL = ("Goal", "Do the thing.\n\n- [ ] It is done.")
 RECS = [
-    work("261010-j9k0", "choose-a-licence", "Choose a licence", "done", "2026-10-10", "2026-10-12", done=True,
+    work("261010-j9k0", "choose-a-licence", "Choose a licence", "done", "2026-10-10", "2026-10-12", done=True, closed="2026-10-12",
          sections=[GOAL, ("Outcome", "MIT, in `LICENSE`.")]),
     work("261015-c4d5", "machine-readable-listings", "Machine-readable listings", "active", "2026-10-15", "2026-10-26",
          extra=[("kind", "feature"), ("priority", 3)], summary="Make listings available as JSON for tools.",
@@ -88,6 +89,7 @@ def parse(text):
         if v.startswith("["):
             v = [x.strip().strip('"') for x in v[1:-1].split(",") if x.strip()]
         elif re.fullmatch(r"-?\d+", v): v = int(v)
+        elif v in ("true", "false"): v = v == "true"
         else: v = v.strip('"')
         fm[k] = v
     return fm, body
@@ -133,7 +135,7 @@ def broken(files):
     files[k] = re.sub(r"## Next\n.*?\n\n(?=## Log)", "", files[k], flags=re.S)
     files["docs/ROADMAP.md"] = ROADMAP.replace("## Later\n", "## Later\n- [261099-bbbb] Ghost\n")
 
-WORK_F = ["id", "title", "summary", "status", "kind", "parent", "blocked_by", "priority", "created", "updated", "authored_by", "decisions"]
+WORK_F = ["id", "title", "summary", "status", "kind", "parent", "blocked_by", "priority", "cycle", "keep", "created", "updated", "closed", "authored_by", "decisions"]
 ADR_F = ["id", "title", "summary", "status", "date", "scope", "supersedes", "superseded_by", "authored_by"]
 
 def load(files):
@@ -191,7 +193,7 @@ A2B3 = "docs/work/261020-a2b3-add-json-output-to-ls.md"
 A2B3_DONE = "docs/work/done/261020-a2b3-add-json-output-to-ls.md"
 
 def claims_layout(files):
-    files["docs/.layout"] += "extension.claims: 0.2.0\n"
+    files["docs/.layout"] += "extension.claims: 0.3.0\n"
     files[A2B3] = files[A2B3].replace("updated: 2026-10-27\n---", "updated: 2026-10-27\nclaimed_by: agent-9\nclaimed_at: 2026-10-28T08:00\n---")
 
 def closable(files):
@@ -285,10 +287,26 @@ def write_cases(cases, basic):
     req = dict(id="261020-a2b3", status="done")
     case("close", 1, "an empty Outcome refuses", "basic", req, err("close", req, "refused", "261020-a2b3 has no ## Outcome; write it before closing", reason="empty_outcome"))
     req = dict(id="261020-a2b3", status="done", as_of="2026-10-28")
-    text = clo[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
+    text = clo[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 2, "close moves the file to done/", "closable", req,
          ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE), after={A2B3_DONE: text}, removed=[A2B3])
+    req = dict(id="261020-a2b3", status="dropped", as_of="2026-10-28")
+    text = clo[A2B3].replace("status: active\n", "status: dropped\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
+    case("close", 6, "dropping an item also writes closed", "closable", req,
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE), after={A2B3_DONE: text}, removed=[A2B3])
+    # cycle, keep and the managed closed field
+    req = dict(id="261022-e5f6", changes=dict(cycle="2026-PI3-S4"), as_of="2026-10-28")
+    text = basic[E5F6].replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\ncycle: 2026-PI3-S4\n---\n")
+    files = dict(basic); files[E5F6] = text
+    case("set", 5, "set the cycle label", "basic", req, ok("set", req, record=pub(after_rec(files, E5F6)), changed=["cycle"]), after={E5F6: text})
+    req = dict(id="261020-a2b3", changes=dict(keep=True), as_of="2026-10-28")
+    text = basic[A2B3].replace("updated: 2026-10-27\n---\n", "updated: 2026-10-28\nkeep: true\n---\n")
+    files = dict(basic); files[A2B3] = text
+    case("set", 6, "pin an item with keep", "basic", req, ok("set", req, record=pub(after_rec(files, A2B3)), changed=["keep"]), after={A2B3: text})
+    req = dict(id="261022-e5f6", changes=dict(closed="2026-10-28"))
+    case("set", 7, "closed is set only by close", "basic", req, err("set", req, "invalid_request", 'changes: "closed" cannot be set on a work (id, created, updated, closed, date and claim fields are managed by the tool)', parameter="changes"))
     # claim, release (repo with the claims extension)
     req = dict(id="261022-e5f6", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     text = clm[E5F6].replace("status: ready\n", "status: active\n").replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n")
@@ -311,7 +329,7 @@ def write_cases(cases, basic):
     case("set", 4, "dry run: the change as a diff, nothing written", "basic", req,
          ok("set", req, record=pub(rec), changed=["priority", "summary"], diff=mkdiff(E5F6, E5F6, basic[E5F6], text)), would_be={E5F6: text})
     req = dict(id="261020-a2b3", status="done", outcome="Shipped in 0.2.", dry_run=True, as_of="2026-10-28")
-    text = set_section(basic[A2B3], "Outcome", "Shipped in 0.2.").replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
+    text = set_section(basic[A2B3], "Outcome", "Shipped in 0.2.").replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = after_rec(files, A2B3_DONE); rec["etag"] = next(r for r in load(basic) if r["path"] == A2B3)["etag"]
     case("close", 4, "dry run of a close with an outcome: the diff names the new path", "basic", req,
@@ -377,15 +395,15 @@ def vault_cases(case, basic, recs, rank):
     case("check", 5, "a clean repository with moved folders", "vault", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=0, count=0, findings=[], reconcile=dict(state="current")))
     req = dict(dry_run=True, include_content=True)
     case("index", 2, "the ADR index is written in the ADR folder", "vault", req, ok("index", req, path=VA + "/README.md", changed=False, written=False, content=vault[VA + "/README.md"]))
-    repository = dict(name="vault", layout="0.2.0", extensions=["adr-index", "work-items"], reference_style="id", claim_stale_hours=24, work_dir=VW, adr_dir=VA, git_commits=False)
+    repository = dict(name="vault", layout="0.3.0", extensions=["adr-index", "work-items"], reference_style="id", claim_stale_hours=24, work_dir=VW, adr_dir=VA, git_commits=False)
     case("version", 3, "the folders the manifest names are reported", "vault", {},
-         ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["0.2.0"], extensions=["claims"], repository=repository))
+         ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["0.3.0"], extensions=["claims"], repository=repository))
 
 
 def vault_write_cases(case, basic):
     # close moves the file to done/ inside the configured work folder
     req = dict(id="261020-a2b3", status="done", outcome="Shipped in 0.2.", as_of="2026-10-28")
-    text = set_section(basic[A2B3], "Outcome", "Shipped in 0.2.").replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
+    text = set_section(basic[A2B3], "Outcome", "Shipped in 0.2.").replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = dict(next(r for r in load(files) if r["path"] == A2B3_DONE), path=relocate(A2B3_DONE))
     case("close", 5, "close moves the file to done/ under the configured work folder", "vault", req,
@@ -418,7 +436,7 @@ def build_legacy(name):
 
 def legacy_migration():
     T, A = "Deep Thought/9 pkm/tasks", "Deep Thought/9 pkm/adr"
-    return {"from": "0.0.0", "to": "0.2.0", "steps": [
+    return {"from": "0.0.0", "to": "0.3.0", "steps": [
         {"id": "created", "kind": "rename_field", "class": "auto", "description": "created_at becomes created", "dir": T, "from": "created_at", "to": "created"},
         {"id": "updated", "kind": "rename_field", "class": "auto", "description": "updated_at becomes updated", "dir": T, "from": "updated_at", "to": "updated"},
         {"id": "title", "kind": "title_from_h1", "class": "auto", "description": "title from the first heading", "dir": T},
@@ -446,10 +464,10 @@ def legacy_cases(case):
     ]
     finding = dict(rule="S1", severity="W", file="docs/.layout", line=None, id=None, message="the manifest has no layout key", **{"class": "info"})
     case("migrate", 2, "a one-off migration file plans steps for a repository with no layout history", "legacy", req,
-         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="0.2.0", state="behind", steps=steps, findings=[finding], clean=False))
+         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="0.3.0", state="behind", steps=steps, findings=[finding], clean=False))
     req = dict(mode="plan")
     case("migrate", 3, "without the migrations parameter there is no path from 0.0.0", "legacy", req,
-         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="0.2.0", state="unsupported", steps=[], findings=[finding], clean=False))
+         ok("migrate", req, mode="plan", **{"from": "0.0.0"}, to="0.3.0", state="unsupported", steps=[], findings=[finding], clean=False))
     bad = dict(mig, steps=[dict(mig["steps"][0], kind="run_script")])
     req = dict(mode="plan", migrations=[bad])
     case("migrate", 4, "an unknown step kind in a migration file is rejected", "legacy", req,
@@ -464,7 +482,7 @@ INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/
     ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",
     ".agents/skills/akm-work-items/SKILL.md", ".agents/skills/akm-work-items/assets/work-item.md",
     ".prettierignore", ".prettierrc.json", "AGENTS.md", "CLAUDE.md", "README.md"]
-INIT_LAYOUT = "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\nextension.claims: 0.2.0\nextension.safety: 0.2.0\n"
+INIT_LAYOUT = "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\nextension.claims: 0.3.0\nextension.safety: 0.3.0\n"
 
 COMMIT_SKILL = ".agents/skills/akm-commit/SKILL.md"
 
@@ -498,7 +516,7 @@ def init_cases(cases, basic):
         written = [p for p in paths if p not in existing]
         skipped = [p for p in paths if p in existing]
         pre = "" if dirname in (None, ".") else dirname + "/"
-        case(n, name, "basic", req, ok("init", req, docs_dir=docs, wikilinks=wikilinks, dir=dirname or ".", layout="0.2.0", written=written, skipped=skipped, git_commits=git_commits and not forced_off, git_commits_forced_off=forced_off, git="none"),
+        case(n, name, "basic", req, ok("init", req, docs_dir=docs, wikilinks=wikilinks, dir=dirname or ".", layout="0.3.0", written=written, skipped=skipped, git_commits=git_commits and not forced_off, git_commits_forced_off=forced_off, git="none"),
              after={pre + p: exact[p] for p in written if p in exact}, after_paths=[pre + p for p in written if p not in exact], tree=tree)
     run(1, "defaults in a new directory: records under docs/, no .gitignore outside a work tree", "new-project")
     run(2, "docs_dir and wikilinks: records and manifest under knowledge/, wikilink references", "vault", docs="knowledge", wikilinks=True)
@@ -600,7 +618,7 @@ def main():
     cols = []
     for st in ("active", "blocked", "ready"):
         s = sort_recs([r for r in recs if r["type"] == "work" and r["fields"]["status"] == st], ["roadmap", "-priority", "id"], rank)
-        cols.append(dict(status=st, count=len(s), records=[pub(r, dflt(r, ["blocked_by"])) for r in s]))
+        cols.append(dict(status=st, count=len(s), records=[pub(r, dflt(r, ["blocked_by", "cycle", "keep"])) for r in s]))
     tot = {st: sum(1 for r in recs if r["type"] == "work" and r["fields"]["status"] == st) for st in ("raw", "ready", "active", "blocked", "done", "dropped")}
     case("board", 1, "default columns", "basic", {}, ok("board", {}, columns=cols, totals=tot))
     # check
@@ -613,11 +631,11 @@ def main():
     f.sort(key=lambda x: (x["file"], x["line"] or 0, x["rule"]))
     case("check", 2, "three errors", "broken", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=False, errors=3, warnings=0, count=3, findings=f, reconcile=dict(state="current")))
     case("check", 3, "one rule family", "broken", dict(rules=["RM"], as_of=AS_OF), ok("check", dict(rules=["RM"], as_of=AS_OF), clean=False, errors=1, warnings=0, count=1, findings=[x for x in f if x["rule"].startswith("RM")], reconcile=dict(state="current")))
-    req = dict(target="0.2.0", as_of=AS_OF)
+    req = dict(target="0.3.0", as_of=AS_OF)
     f4 = [dict(x, **{"class": "manual"}) for x in f]
     case("check", 4, "findings are classified for a target version", "broken", req, ok("check", req, clean=False, errors=3, warnings=0, count=3, findings=f4, reconcile=dict(state="current")))
     req = {}
-    case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.2.0"}, to="0.2.0", state="current", steps=[], findings=[], clean=True))
+    case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.3.0"}, to="0.3.0", state="current", steps=[], findings=[], clean=True))
     # find, when
     r = next(r for r in recs if r["id"] == "261022-e5f6"); req = dict(id=r["id"])
     case("find", 1, "a path from an id", "basic", req, ok("find", req, id=r["id"], type="work", path=r["path"]))
@@ -627,9 +645,9 @@ def main():
     case("index", 1, "the ADR index, dry run", "basic", req, ok("index", req, path="docs/adr/README.md", changed=False, written=False, content=basic["docs/adr/README.md"]))
     for n, repo, files in ((1, "basic", basic), (2, "claims", build("claims", claims_layout))):
         exts = sorted(l.split(":")[0][len("extension."):] for l in files["docs/.layout"].split("\n") if l.startswith("extension."))
-        repository = dict(name=repo, layout="0.2.0", extensions=exts, reference_style="id", claim_stale_hours=24, work_dir="docs/work", adr_dir="docs/adr", git_commits=False)
+        repository = dict(name=repo, layout="0.3.0", extensions=exts, reference_style="id", claim_stale_hours=24, work_dir="docs/work", adr_dir="docs/adr", git_commits=False)
         case("version", n, "the repository this server or tool is working on" if n == 1 else "enabled extensions are listed by name", repo, {},
-             ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["0.2.0"], extensions=["claims"], repository=repository))
+             ok("version", {}, tool=dict(name="akmctl", version="0.1.0"), api_versions=["1.0"], layout_versions=["0.3.0"], extensions=["claims"], repository=repository))
     vault_cases(case, basic, recs, rank)
     legacy_cases(case)
     write_cases(cases, basic)

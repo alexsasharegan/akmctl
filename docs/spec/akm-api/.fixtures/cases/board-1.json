@@ -27,7 +27,9 @@
               "parent": null,
               "priority": 3,
               "updated": "2026-10-26",
-              "blocked_by": null
+              "blocked_by": null,
+              "cycle": null,
+              "keep": null
             }
           },
           {
@@ -45,7 +47,9 @@
               "parent": "261015-c4d5",
               "priority": 2,
               "updated": "2026-10-27",
-              "blocked_by": null
+              "blocked_by": null,
+              "cycle": null,
+              "keep": null
             }
           }
         ]
@@ -72,7 +76,9 @@
               "blocked_by": [
                 "261020-a2b3",
                 "legal review"
-              ]
+              ],
+              "cycle": null,
+              "keep": null
             }
           }
         ]
@@ -96,7 +102,9 @@
               "parent": "261015-c4d5",
               "priority": null,
               "updated": "2026-10-22",
-              "blocked_by": null
+              "blocked_by": null,
+              "cycle": null,
+              "keep": null
             }
           }
         ]

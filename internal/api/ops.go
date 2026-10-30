@@ -250,6 +250,11 @@ func matchesFilters(r *record.Record, q Request) bool {
 			return false
 		}
 	}
+	if c := q.str("cycle"); c != "" {
+		if r.Type != record.Work || r.Str("cycle") != c {
+			return false
+		}
+	}
 	if sc, ok := q["scope"]; ok {
 		if r.Type != record.ADR || !scopeMatch(r.Fields["scope"].Strings(), sc.(string)) {
 			return false
@@ -548,7 +553,7 @@ func opBoard(repo *record.Repo, q Request) (Obj, *Error) {
 		sortRecords(repo, recs, []string{"roadmap", "-priority", "id"})
 		rs := make([]Obj, 0, len(recs))
 		for _, r := range recs {
-			rs = append(rs, recordObj(repo, r, append(append([]string(nil), record.HeaderFields(record.Work)...), "blocked_by"), false))
+			rs = append(rs, recordObj(repo, r, append(append([]string(nil), record.HeaderFields(record.Work)...), "blocked_by", "cycle", "keep"), false))
 		}
 		cols = append(cols, O("status", st, "count", len(rs), "records", rs))
 	}

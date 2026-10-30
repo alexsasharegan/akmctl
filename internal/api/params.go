@@ -53,6 +53,7 @@ var (
 	reDateTS  = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$`)
 	reID      = regexp.MustCompile(`^\d{6}-[0-9a-hjkmnp-tv-z]{4}$`)
 	reVersion = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
+	reCycle   = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`)
 	reEtag    = regexp.MustCompile(`^[0-9a-f]{16}$`)
 )
 
@@ -75,7 +76,7 @@ var specs = map[string]map[string]param{
 	"version": {},
 	"ls": {
 		"type": {kind: kString, enum: []string{"work", "adr"}}, "status": {kind: kStrings, enum: anyStatus},
-		"parent": s(pat(reID)), "blocked": {kind: kBool}, "scope": s(), "since": s(pat(reDate)),
+		"parent": s(pat(reID)), "blocked": {kind: kBool}, "scope": s(), "since": s(pat(reDate)), "cycle": s(pat(reCycle)),
 		"sort": {kind: kStrings}, "fields": {kind: kStrings}, "limit": {kind: kInt, min: 1}, "offset": {kind: kInt, min: 0},
 		"count_only": {kind: kBool}, "next": {kind: kBool},
 	},

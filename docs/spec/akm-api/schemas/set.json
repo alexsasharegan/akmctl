@@ -10,7 +10,26 @@
         },
         "changes": {
           "type": "object",
-          "minProperties": 1
+          "minProperties": 1,
+          "properties": {
+            "cycle": {
+              "oneOf": [
+                {
+                  "$ref": "common.json#/$defs/cycle"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "keep": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "closed": false
+          }
         },
         "if_match": {
           "$ref": "common.json#/$defs/etag"

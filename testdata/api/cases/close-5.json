@@ -22,7 +22,7 @@
       "type": "work",
       "path": "Deep Thought/9 pkm/tasks/done/261020-a2b3-add-json-output-to-ls.md",
       "id_date": "2026-10-20",
-      "etag": "e356d7bfa0e18265",
+      "etag": "aa0d1cb90fa571a1",
       "fields": {
         "id": "261020-a2b3",
         "title": "Add JSON output to ls",
@@ -32,8 +32,11 @@
         "parent": "261015-c4d5",
         "blocked_by": null,
         "priority": 2,
+        "cycle": null,
+        "keep": null,
         "created": "2026-10-20",
         "updated": "2026-10-28",
+        "closed": "2026-10-28",
         "authored_by": null,
         "decisions": null
       }
@@ -42,7 +45,7 @@
     "moved_to": "Deep Thought/9 pkm/tasks/done/261020-a2b3-add-json-output-to-ls.md"
   },
   "after": {
-    "Deep Thought/9 pkm/tasks/done/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: done\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Outcome\n\nShipped in 0.2.\n\n## Log\n- 2026-10-20: started.\n"
+    "Deep Thought/9 pkm/tasks/done/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: done\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\nclosed: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Outcome\n\nShipped in 0.2.\n\n## Log\n- 2026-10-20: started.\n"
   },
   "removed": [
     "Deep Thought/9 pkm/tasks/261020-a2b3-add-json-output-to-ls.md"

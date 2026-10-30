@@ -28,8 +28,11 @@
         "parent": "261015-c4d5",
         "blocked_by": null,
         "priority": 2,
+        "cycle": null,
+        "keep": null,
         "created": "2026-10-20",
         "updated": "2026-10-27",
+        "closed": null,
         "authored_by": null,
         "decisions": null
       }

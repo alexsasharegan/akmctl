@@ -10,7 +10,7 @@
     "docs_dir": "docs",
     "wikilinks": false,
     "dir": ".",
-    "layout": "0.2.0",
+    "layout": "0.3.0",
     "written": [
       ".agents/skills/akm-record-decision/SKILL.md",
       ".agents/skills/akm-record-decision/assets/adr.md",

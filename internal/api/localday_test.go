@@ -14,7 +14,7 @@ func TestNewAndClaimUseTheLocalDay(t *testing.T) {
 	timeNow = func() time.Time { return time.Date(2026, 10, 29, 18, 30, 0, 0, mst) } // 2026-10-30T01:30Z
 	t.Cleanup(func() { timeNow = old })
 
-	root := copyRepo(t, "basic", "extension.claims: 0.2.0\n")
+	root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "evening-note"})
 	rec, _ := resp.Get("record")
 	id, _ := rec.(Obj).Get("id")

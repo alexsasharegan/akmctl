@@ -7,7 +7,7 @@ updated_at: 2026-10-28
 
 # AKM guide: a repository that remembers and runs on rails
 
-Version 0.2.0 (beta).
+Version 0.3.0 (beta). Layout 0.3.0 adds the optional work item fields `closed`, `cycle` and `keep` (a MINOR change: items without them stay valid, and only the manifest versions need raising).
 
 AKM (agent knowledge management) is an opinionated standard that gives a repository a memory and rails, so any agent can pick up where work stopped. This guide is for a maintainer, solo or on a team, who works with AI coding agents and wants to adopt it. It explains what AKM is, why it exists, how it works day to day, how to adopt it, and what is not proven. The rules themselves are in the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)); the tool's operations are in the API spec ([akm-api-spec](akm-api-spec.md)).
 
@@ -121,6 +121,16 @@ Write the encoder behind the existing `list` command, then add the schema test.
 
 `priority` is an optional integer (higher is sooner, default 0) that only sorts the listing; the roadmap wins. A parent can close only when all its children are done or dropped.
 
+Three more optional fields:
+
+| Field    | Values                                                              | Meaning                                                                                                                                              |
+| -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `closed` | `YYYY-MM-DD`                                                        | The day the item was closed (done or dropped), in the local day like `updated`. Only `close` writes it; `set` refuses it. Only closed items have it. |
+| `cycle`  | a label of letters, digits, `.`, `_` and `-`, at most 64 characters | The sprint, program increment or quarter the item is planned into, for example `2026-PI3-S4`. The tool treats it as an opaque label.                 |
+| `keep`   | `true` or `false`                                                   | `true` marks an item that a later compaction must never fold or archive. `false` and absence mean the same.                                          |
+
+The check rules are WK13 (a warning: an item in `done/` has no `closed`), WK14 (an open item has `closed`), WK15 (`closed` is not a date, or is earlier than `created`), WK16 (`cycle` is not a valid label) and WK17 (`keep` is not a boolean).
+
 ### Decision records (ADRs)
 
 One file per decision in `docs/adr/`, with frontmatter (`id`, `title`, `summary`, `status`, `date`, optional `scope`, `supersedes`, `superseded_by`) and the sections Context, Considered Options, Decision, Consequences, and optionally Confirmation, Review and Revert. Statuses: `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`. A maintainer accepts. An agent drafts as `proposed`. An accepted record is not edited; a change of mind adds a new record that supersedes it.
@@ -167,7 +177,7 @@ A choice that is hard to reverse, or that rejects a real alternative, gets an AD
 
 ### Close an item
 
-For each "done when" line, name the test, command or file that proves it, in `## Outcome`. Set `done`, move the file to `docs/work/done/`, and update the roadmap. A parent closes after its children.
+For each "done when" line, name the test, command or file that proves it, in `## Outcome`. Set `done`, move the file to `docs/work/done/`, and update the roadmap. A parent closes after its children. `akmctl close` also writes `closed`; by hand, set it to today's date.
 
 ### Stop or hand off
 
@@ -184,9 +194,9 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 
 ### An existing repo
 
-The 0.2.0 beta supports new repositories only. This section describes the planned path and is not yet supported.
+The 0.3.0 beta supports new repositories only. This section describes the planned path and is not yet supported.
 
-A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 0.2.0, because 0.2.0 is the first layout: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
+A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 0.3.0, because no layout before 0.2.0 was published: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
 
 - Make sure the working tree is clean and tag a backup.
 - Work on a branch and review every diff.
@@ -208,7 +218,7 @@ The files are the source of truth, so a bare agent can work:
 | Where to resume an item | Read its `## Next` |
 | Mint an id | `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
 | Create a record | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id |
-| Close an item | Set `status`, write `## Outcome`, set `updated` to today's UTC date, `git mv` the file to `docs/work/done/` |
+| Close an item | Set `status`, write `## Outcome`, set `updated` and `closed` to today's date, `git mv` the file to `docs/work/done/` |
 | Find a record by id | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'` |
 | The ADR index is stale or in conflict | Do not hand-edit it; ask the maintainer to regenerate it with the tool |
 
@@ -247,7 +257,7 @@ This is slower and uses more tokens, but it must stay correct.
 - Nothing forces an agent to run the checks; the standard asks, and the maintainer reviews.
 - Parallel work is conducive, not guaranteed: shared files such as the roadmap can still conflict.
 - Claiming an `active` item is an optional, advisory extension (never a lock), and the optional safety extension checks only known secret patterns and a deny list. Private prose and unusual secrets are not caught.
-- The migration automation has so far been exercised only on a made-up older layout, because no layout before 0.2.0 exists.
+- The migration automation has so far been exercised only on a made-up older layout, because no layout before 0.2.0 was published.
 
 ## 11. Where things are
 

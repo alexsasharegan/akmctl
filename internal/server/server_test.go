@@ -393,7 +393,7 @@ func TestSectionRoute(t *testing.T) {
 	// the version route reports the repository
 	v := do(t, ts, "GET", "/api/v1/version", "", nil)
 	repo, _ := v.body["repository"].(map[string]any)
-	if repo["layout"] != "0.2.0" || repo["reference_style"] != "id" {
+	if repo["layout"] != "0.3.0" || repo["reference_style"] != "id" {
 		t.Fatalf("version: %v", v.body)
 	}
 }

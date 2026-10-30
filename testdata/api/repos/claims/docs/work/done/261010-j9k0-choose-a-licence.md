@@ -4,6 +4,7 @@ title: Choose a licence
 status: done
 created: 2026-10-10
 updated: 2026-10-12
+closed: 2026-10-12
 ---
 
 # Choose a licence

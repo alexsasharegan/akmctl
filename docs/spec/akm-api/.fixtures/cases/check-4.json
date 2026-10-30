@@ -2,14 +2,14 @@
   "name": "findings are classified for a target version",
   "repo": "broken",
   "request": {
-    "target": "0.2.0",
+    "target": "0.3.0",
     "as_of": "2026-10-28"
   },
   "expected": {
     "api_version": "1.0",
     "operation": "check",
     "request": {
-      "target": "0.2.0",
+      "target": "0.3.0",
       "as_of": "2026-10-28"
     },
     "ok": true,

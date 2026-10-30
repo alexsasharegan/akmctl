@@ -29,6 +29,9 @@
         "scope": {
           "type": "string"
         },
+        "cycle": {
+          "$ref": "common.json#/$defs/cycle"
+        },
         "since": {
           "$ref": "common.json#/$defs/date"
         },

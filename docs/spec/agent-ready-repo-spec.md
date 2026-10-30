@@ -7,7 +7,7 @@ updated_at: 2026-10-28
 
 # AKM specification
 
-Version 0.2.0 (beta). The layout and this specification follow the beta's version number while it is in beta.
+Version 0.3.0 (beta). The layout and this specification follow the beta's version number while it is in beta. Layout 0.3.0 adds the optional work item fields `closed`, `cycle` and `keep` (section 4, "Frontmatter") and the rules WK13 to WK17; an item that has none of them stays valid.
 
 AKM (agent knowledge management) is a standard for a repository that keeps its own memory: its decisions, its direction and its work in flight, as Markdown records with frontmatter, so that any person or agent can pick up where work stopped. This document specifies the files, the work-item schema, the ADR and roadmap formats, and the rules of the checks. It is written for any maintainer or team, solo or not. The tool that implements it is `akmctl`; its operations and JSON are in the API spec ([akm-api-spec](akm-api-spec.md)), and a guide for adopting the standard is in [akm-guide](akm-guide.md).
 
@@ -103,7 +103,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 | `created: 2026-10-28`                              | accept: string (a date field)                                                                |
 | `created: "2026-10-28"`                            | accept: the same string                                                                      |
 | `claimed_at: 2026-10-28T14:30`                     | accept: string (a timestamp field)                                                           |
-| `layout: 0.2.0`                                    | accept: string                                                                               |
+| `layout: 0.3.0`                                    | accept: string                                                                               |
 | `layout: 1.2`                                      | reject: float (quote it)                                                                     |
 | `time: 12:30`                                      | accept: string (YAML 1.1 reads a base-60 integer)                                            |
 | `done: yes`                                        | accept: string (YAML 1.1 reads a boolean)                                                    |
@@ -215,19 +215,19 @@ Required rules (in the Rules part):
 
 Plain-file fallbacks (H6), which the `AGENTS.md` template carries:
 
-| Need                                 | Without the tool                                                                                                       |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Which decisions exist                | Read `docs/adr/README.md` (committed, generated).                                                                      |
-| What work is active                  | `grep -lE '^status: ?"?active"?$' docs/work/*.md`                                                                      |
-| What work is ready                   | `grep -lE '^status: ?"?ready"?$' docs/work/*.md`                                                                       |
-| What is blocked, and on whom         | `grep -lE '^status: ?"?blocked"?$' docs/work/*.md`, then read `blocked_by` in each.                                    |
-| Where to resume an item              | Read its `## Next` section.                                                                                            |
-| Mint an id                           | The recipe below.                                                                                                      |
-| Create a record                      | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id.                                            |
-| Close an item                        | Set `status`, write `## Outcome`, set `updated` to today's date, and move the file to `docs/work/done/` with `git mv`. |
-| Claim an item (claims extension)     | Make the first `## Log` line `claimed (where)`.                                                                        |
-| Find a record by id                  | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'`                                                                |
-| The ADR index is stale or conflicted | Do not edit it by hand; tell the maintainer to regenerate it with the tool.                                            |
+| Need                                 | Without the tool                                                                                                                    |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Which decisions exist                | Read `docs/adr/README.md` (committed, generated).                                                                                   |
+| What work is active                  | `grep -lE '^status: ?"?active"?$' docs/work/*.md`                                                                                   |
+| What work is ready                   | `grep -lE '^status: ?"?ready"?$' docs/work/*.md`                                                                                    |
+| What is blocked, and on whom         | `grep -lE '^status: ?"?blocked"?$' docs/work/*.md`, then read `blocked_by` in each.                                                 |
+| Where to resume an item              | Read its `## Next` section.                                                                                                         |
+| Mint an id                           | The recipe below.                                                                                                                   |
+| Create a record                      | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id.                                                         |
+| Close an item                        | Set `status`, write `## Outcome`, set `updated` and `closed` to today's date, and move the file to `docs/work/done/` with `git mv`. |
+| Claim an item (claims extension)     | Make the first `## Log` line `claimed (where)`.                                                                                     |
+| Find a record by id                  | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'`                                                                             |
+| The ADR index is stale or conflicted | Do not edit it by hand; tell the maintainer to regenerate it with the tool.                                                         |
 
 The id recipe, which `AGENTS.md` carries. It mints the same form as the tool; run it again if the second command prints a match:
 
@@ -250,22 +250,27 @@ A work item is the one unit of in-flight work: an issue, a task, a feature, a pr
 
 ### Frontmatter
 
-| Field         | Type        | Req          | Values and default                                                                                                     |
-| ------------- | ----------- | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `id`          | string      | yes          | The id part of the filename: `YYMMDD-xxxx`.                                                                            |
-| `title`       | string      | yes          | Imperative or noun phrase; matches the first heading.                                                                  |
-| `summary`     | string      | no           | One sentence, up to 160 characters: what this is and why it matters. Shown in listings so the body need not be opened. |
-| `status`      | enum        | yes          | `raw`, `ready`, `active`, `blocked`, `done`, `dropped`                                                                 |
-| `kind`        | enum        | no           | `feature`, `bug`, `chore`, `spike`. Default `chore`.                                                                   |
-| `parent`      | string      | no           | Reference to another item (an `id` or a wikilink to it). Absent for a top-level item.                                  |
-| `blocked_by`  | list        | if `blocked` | Entries are item ids (matching the id pattern) or free text naming a person, role or outside dependency.               |
-| `priority`    | integer     | no           | Higher is sooner. Absent counts as 0. Sorts the listing only; the roadmap supersedes it.                               |
-| `created`     | date        | yes          | The local date, `YYYY-MM-DD`, a plain string (YAML-lite).                                                              |
-| `updated`     | date        | yes          | The local date, `YYYY-MM-DD`; set whenever the file changes.                                                           |
-| `authored_by` | string      | no           | `agent` while a maintainer has not reviewed it; removed on review (C11).                                               |
-| `decisions`   | list of ids | no           | ADR ids that constrain or result from this item.                                                                       |
+| Field         | Type        | Req          | Values and default                                                                                                                                                                                                                                                                                                           |
+| ------------- | ----------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | string      | yes          | The id part of the filename: `YYMMDD-xxxx`.                                                                                                                                                                                                                                                                                  |
+| `title`       | string      | yes          | Imperative or noun phrase; matches the first heading.                                                                                                                                                                                                                                                                        |
+| `summary`     | string      | no           | One sentence, up to 160 characters: what this is and why it matters. Shown in listings so the body need not be opened.                                                                                                                                                                                                       |
+| `status`      | enum        | yes          | `raw`, `ready`, `active`, `blocked`, `done`, `dropped`                                                                                                                                                                                                                                                                       |
+| `kind`        | enum        | no           | `feature`, `bug`, `chore`, `spike`. Default `chore`.                                                                                                                                                                                                                                                                         |
+| `parent`      | string      | no           | Reference to another item (an `id` or a wikilink to it). Absent for a top-level item.                                                                                                                                                                                                                                        |
+| `blocked_by`  | list        | if `blocked` | Entries are item ids (matching the id pattern) or free text naming a person, role or outside dependency.                                                                                                                                                                                                                     |
+| `priority`    | integer     | no           | Higher is sooner. Absent counts as 0. Sorts the listing only; the roadmap supersedes it.                                                                                                                                                                                                                                     |
+| `created`     | date        | yes          | The local date, `YYYY-MM-DD`, a plain string (YAML-lite).                                                                                                                                                                                                                                                                    |
+| `updated`     | date        | yes          | The local date, `YYYY-MM-DD`; set whenever the file changes.                                                                                                                                                                                                                                                                 |
+| `closed`      | date        | no           | The local date, `YYYY-MM-DD`, on which the item was closed. Set only by `close`, for `done` and `dropped` alike; `set` cannot change it. Present only on a closed item (WK13 to WK15).                                                                                                                                       |
+| `cycle`       | string      | no           | The cycle (sprint, program increment, quarter) the item is planned into, for example `2026-PI3-S4`: 1 to 64 characters of `A-Z`, `a-z`, `0-9`, `.`, `_` and `-`, starting with a letter or digit (WK16). The tool treats it as an opaque label: it sets, shows, lists and filters by it, and does not order or interpret it. |
+| `keep`        | boolean     | no           | `true` marks the item as never to be folded or archived by a later compaction; `false` and absence mean the same (WK17).                                                                                                                                                                                                     |
+| `authored_by` | string      | no           | `agent` while a maintainer has not reviewed it; removed on review (C11).                                                                                                                                                                                                                                                     |
+| `decisions`   | list of ids | no           | ADR ids that constrain or result from this item.                                                                                                                                                                                                                                                                             |
 
 Unknown fields are allowed and ignored (a team MAY add its own). An item MUST NOT use a status outside the enum.
+
+`closed`, `cycle` and `keep` are a MINOR addition, made in layout 0.3.0 (ADR 261029-sg82): an item without them is valid, so no item of a 0.2.0 repository needs a change (only its manifest versions, which the maintainer raises). `closed` is the day the item closed, in the local day like `updated` (`as_of` wins); an item closed before 0.3.0 has none until someone backfills it (rule WK13 warns). A calendar of cycles, a check of `cycle` against one, and compaction of closed work are not part of this version.
 
 ### Statuses
 
@@ -398,8 +403,8 @@ The tool is `akmctl`: one Go binary with subcommands, with a stable JSON output 
 | `akmctl board`                                  | A text Kanban by status; the JSON of `ls` is what a UI consumes.                                                                                                                                                                       |
 | `akmctl index`                                  | Regenerate `docs/adr/README.md`.                                                                                                                                                                                                       |
 | `akmctl migrate`                                | Reconcile a repo with a target layout version: `--mode report\|plan\|apply-safe\|handoff` (section 7).                                                                                                                                 |
-| `akmctl set <id> field=value`                   | Change a field and refresh `updated`.                                                                                                                                                                                                  |
-| `akmctl close <id> done\|dropped`               | Set the status, move the file to `done/`, refresh `updated`; refuses an empty `## Outcome`.                                                                                                                                            |
+| `akmctl set <id> field=value`                   | Change a field and refresh `updated` (not `closed`, which only `close` sets).                                                                                                                                                          |
+| `akmctl close <id> done\|dropped`               | Set the status, move the file to `done/`, refresh `updated` and set `closed`; refuses an empty `## Outcome`.                                                                                                                           |
 | `akmctl claim <id> --as <name>`, `release <id>` | Claims extension (section 3).                                                                                                                                                                                                          |
 | `akmctl new work\|adr <slug>`, `find`, `when`   | The identifier commands of section 0.                                                                                                                                                                                                  |
 | `akmctl ui`                                     | Start the workbench UI.                                                                                                                                                                                                                |
@@ -434,6 +439,11 @@ Severity: **E** error (exit 1), **W** warning (printed, exit 0). Rule ids: `WK` 
 | WK10 | W   | `active` item with `updated` older than 30 days (configurable).                                                                                                                                                                                                                                                                  |
 | WK11 | E   | Field types: `kind` is in its enum, `priority` is an integer, `blocked_by` and `decisions` are lists, every `decisions` entry resolves to an ADR, `summary` is at most 160 characters.                                                                                                                                           |
 | WK12 | W   | `title` matches the first heading.                                                                                                                                                                                                                                                                                               |
+| WK13 | W   | An item in `docs/work/done/` has no `closed`.                                                                                                                                                                                                                                                                                    |
+| WK14 | E   | An item whose `status` is not `done` or `dropped` has `closed`.                                                                                                                                                                                                                                                                  |
+| WK15 | E   | `closed` is a valid date (`YYYY-MM-DD`) and is not earlier than `created`.                                                                                                                                                                                                                                                       |
+| WK16 | E   | `cycle` matches `[A-Za-z0-9][A-Za-z0-9._-]{0,63}`.                                                                                                                                                                                                                                                                               |
+| WK17 | E   | `keep` is `true` or `false`.                                                                                                                                                                                                                                                                                                     |
 | A1   | E   | ADR files parse; frontmatter within the simple subset (H5); `id` equals the filename's id part and matches the id pattern; `title`, `summary`, `status`, `date` present; `summary` is at most 160 characters.                                                                                                                    |
 | A2   | E   | ADR `status` is in the enum; `date` valid.                                                                                                                                                                                                                                                                                       |
 | A3   | E   | `superseded` has `superseded_by`; the target exists, is an ADR, and is not itself; if the target has `supersedes`, it points back. `supersedes` and `superseded_by` resolve to ADRs.                                                                                                                                             |
@@ -470,7 +480,7 @@ Optional flat keys in the manifest (`docs/.layout`), in the manifest's format. T
 
 ### Extensions in this version
 
-A repo opts in by listing an extension in the manifest (for example `extension.claims: 0.2.0`).
+A repo opts in by listing an extension in the manifest (for example `extension.claims: 0.3.0`).
 
 - `claims`: section 3, rules CL1 and CL2, commands `claim` and `release`.
 - `safety`: rules SF1 to SF4 and the deny list `docs/.akm-deny`: one entry per line, a literal substring, or a regular expression when the line starts with `re:`; `#` lines and blank lines are ignored. Files scanned: records, `AGENTS.md` and `ROADMAP.md`. SF1 knows private-key headers, cloud access key ids, GitHub, Slack, payment-provider, Google and npm token formats, JSON Web Tokens, and `password`, `secret`, `api_key` and token assignments whose value is at least 8 characters with two kinds of character and is not an obvious placeholder (`changeme`, `example`, `${...}`, `<...>`, `xxxx`). SF3 flags a run of 32 or more base64 characters with upper case, lower case, a digit and at least 4.5 bits of entropy per character, skipping all-hex strings (hashes), values after `h1:` or `sha256-` style prefixes, and anything inside a URL. Findings print the file, line and rule and the kind of pattern, never the matched text. A pass means "no known pattern", not "safe". Measured on about 15,000 lines of ordinary notes, the rules raised no finding once hashes and URLs were skipped.
@@ -481,7 +491,7 @@ One tool, one repository, no template repository. The standard, the guide, the A
 
 - **The tool.** The Go binary and UI, `akmctl`. Released as **prebuilt binaries**, so installing needs no Go toolchain; building from source is possible. It has its own version.
 - **New repositories.** `akmctl init` writes the layout, the `AGENTS.md` and record templates, the skills with their instructions and the manifest into a new directory. It never overwrites an existing file. Its options are `--docs-dir <name>` (a single folder name, default `docs`: the folder that holds the records, the roadmap and the manifest; a name other than `docs` is written to the manifest as `work_dir`, `adr_dir` and `roadmap`), `--wikilinks` (writes `reference_style: wikilink`), `--git-commits` and `--git-init`. It writes a `.gitignore` only when the directory is, or becomes, a git work tree: it lists the lock file, and Obsidian's per-machine files (`.obsidian/workspace.json`, `.obsidian/workspaces.json`, `.trash/`) only when an `.obsidian/` folder already exists. The `AGENTS.md` it writes has no build, test, lint or run lines for the maintainer to fill in. It refuses to create a second manifest next to an existing one in another folder.
-- **Existing repositories.** `akmctl migrate` brings a repository to the layout (below). Adoption of an existing repository is the migration from layout `0.0.0`. In the 0.2.0 beta, `init` is the supported way in; `migrate` is documented but not yet supported for adoption.
+- **Existing repositories.** `akmctl migrate` brings a repository to the layout (below). Adoption of an existing repository is the migration from layout `0.0.0`. In the 0.3.0 beta, `init` is the supported way in; `migrate` is documented but not yet supported for adoption.
 
 ### Versions, manifest and reconciliation
 
@@ -490,9 +500,9 @@ A repo records which layout and which extensions it conforms to, so it can be re
 **Manifest.** `docs/.layout`, in the same simple key-value subset as frontmatter (H5), no nesting and no delimiter lines:
 
 ```text
-layout: 0.2.0
-extension.adr-index: 0.2.0
-extension.work-items: 0.2.0
+layout: 0.3.0
+extension.adr-index: 0.3.0
+extension.work-items: 0.3.0
 stale_days: 30
 ```
 

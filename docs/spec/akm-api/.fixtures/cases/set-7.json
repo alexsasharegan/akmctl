@@ -1,0 +1,28 @@
+{
+  "name": "closed is set only by close",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "closed": "2026-10-28"
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261022-e5f6",
+      "changes": {
+        "closed": "2026-10-28"
+      }
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "changes: \"closed\" cannot be set on a work (id, created, updated, closed, date and claim fields are managed by the tool)",
+      "details": {
+        "parameter": "changes"
+      }
+    }
+  }
+}

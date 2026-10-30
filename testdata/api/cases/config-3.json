@@ -40,7 +40,7 @@
     ]
   },
   "after": {
-    "docs/.layout": "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\ngit_commits: true\n"
+    "docs/.layout": "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\ngit_commits: true\n"
   },
   "after_paths": [
     ".agents/skills/akm-commit/SKILL.md"

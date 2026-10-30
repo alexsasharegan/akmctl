@@ -1,6 +1,6 @@
-layout: 0.2.0
-extension.adr-index: 0.2.0
-extension.work-items: 0.2.0
+layout: 0.3.0
+extension.adr-index: 0.3.0
+extension.work-items: 0.3.0
 work_dir: Deep Thought/9 pkm/tasks
 adr_dir: Deep Thought/9 pkm/adr
 roadmap: Deep Thought/9 pkm/ROADMAP.md

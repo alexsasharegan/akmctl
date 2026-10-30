@@ -38,7 +38,7 @@
     ]
   },
   "after": {
-    "docs/.layout": "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\ngit_commits: false\n"
+    "docs/.layout": "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\ngit_commits: false\n"
   },
   "git_work_tree": true
 }

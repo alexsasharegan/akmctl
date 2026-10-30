@@ -572,6 +572,13 @@ func parseFieldValue(key, raw string) any {
 		if n, err := strconv.Atoi(raw); err == nil {
 			return n
 		}
+	case "keep":
+		switch raw {
+		case "true":
+			return true
+		case "false":
+			return false
+		}
 	}
 	return raw
 }

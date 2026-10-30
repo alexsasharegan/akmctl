@@ -270,7 +270,7 @@ func TestVersionRepository(t *testing.T) {
 		t.Fatalf("repository: %#v", r)
 	}
 	b, _ := Marshal(ro)
-	want := `{"name":"` + filepath.Base(root) + `","layout":"0.2.0","extensions":["adr-index","claims","work-items"],"reference_style":"wikilink","claim_stale_hours":6,"work_dir":"docs/work","adr_dir":"docs/adr","git_commits":false}`
+	want := `{"name":"` + filepath.Base(root) + `","layout":"0.3.0","extensions":["adr-index","claims","work-items"],"reference_style":"wikilink","claim_stale_hours":6,"work_dir":"docs/work","adr_dir":"docs/adr","git_commits":false}`
 	if string(b) != want {
 		t.Fatalf("got  %s\nwant %s", b, want)
 	}

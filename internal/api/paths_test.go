@@ -74,7 +74,7 @@ func TestWritesFollowTheManifestFolders(t *testing.T) {
 }
 
 func TestClaimsFollowTheManifestFolders(t *testing.T) {
-	root := copyRepo(t, "vault", "extension.claims: 0.2.0\n")
+	root := copyRepo(t, "vault", "extension.claims: 0.3.0\n")
 	resp := mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	rec, _ := resp.Get("record")
 	if p, _ := rec.(Obj).Get("path"); p != vWork+"/261022-e5f6-document-the-exit-codes.md" {
