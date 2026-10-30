@@ -126,8 +126,7 @@ export function toast(msg, opts) {
     "div",
     { class: "toast " + spec.level + (spec.persistent ? " persistent" : ""), role: roleFor(spec.level), "data-toast": String(id) },
     el("span", { class: "toast-glyph", "aria-hidden": "true", text: GLYPH[spec.level] }),
-    el("span", { class: "toast-level", text: LABEL[spec.level] + ": " }),
-    el("span", { class: "toast-body", text: spec.msg }),
+    el("div", { class: "toast-main" }, el("span", { class: "toast-level", text: LABEL[spec.level] }), el("span", { class: "toast-body", text: spec.msg })),
     close,
   );
   box.style.setProperty("--toast-ms", spec.ms + "ms");
