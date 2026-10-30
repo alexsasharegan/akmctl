@@ -1,12 +1,14 @@
 ---
 id: "261029-w3d9"
 title: git_commits manifest key, akmctl config, init questionnaire
-status: ready
+status: active
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
 priority: 1
 summary: Add git_commits to the manifest, the config operation and command, the optional-skill install and removal, and the init questionnaire.
+claimed_by: config-agent
+claimed_at: 2026-10-30T01:36
 ---
 
 # git_commits manifest key, akmctl config, init questionnaire
@@ -29,3 +31,4 @@ Not started.
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: claimed (config-agent).
