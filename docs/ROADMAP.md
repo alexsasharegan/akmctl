@@ -25,6 +25,8 @@ Beta (greenfield only; adoption is not claimed). Order of work:
 
 Workbench and polish:
 
+- [261029-95f2] Replace the init questionnaire with a Bubble Tea wizard
+
 - [261029-30my] Filter the board and tables by project
 - [261029-ctzc] Make wikilinks in drawer fields clickable and open them in Obsidian
 - [261029-paw7] Show a record's frontmatter as a typed table in the drawer
