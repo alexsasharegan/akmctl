@@ -1,0 +1,23 @@
+{
+  "name": "a value needs a key",
+  "repo": "basic",
+  "request": {
+    "value": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "value": true
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "value needs a key",
+      "details": {
+        "parameter": "key"
+      }
+    }
+  },
+  "git_work_tree": true
+}

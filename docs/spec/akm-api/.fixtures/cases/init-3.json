@@ -52,7 +52,10 @@
       "docs/.layout",
       "docs/ROADMAP.md",
       "docs/adr/README.md"
-    ]
+    ],
+    "git_commits": false,
+    "git_commits_forced_off": false,
+    "git": "none"
   },
   "after": {
     ".prettierignore": "docs/adr/README.md\n",

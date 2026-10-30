@@ -1,0 +1,45 @@
+{
+  "name": "dry run: the plan, nothing written",
+  "repo": "basic",
+  "request": {
+    "key": "git_commits",
+    "value": true,
+    "dry_run": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": true,
+      "dry_run": true
+    },
+    "ok": true,
+    "key": "git_commits",
+    "value": true,
+    "changed": true,
+    "applied": false,
+    "needs_confirmation": false,
+    "plan": {
+      "write": [
+        ".agents/skills/akm-commit/SKILL.md"
+      ],
+      "remove": [],
+      "modify": [
+        "docs/.layout"
+      ]
+    },
+    "edits": [],
+    "settings": [
+      {
+        "key": "git_commits",
+        "value": false,
+        "paths": [
+          ".agents/skills/akm-commit"
+        ],
+        "description": "Install the akm-commit skill, which tells an agent to commit after each logical step. Off: the skill is not installed."
+      }
+    ]
+  },
+  "git_work_tree": true
+}

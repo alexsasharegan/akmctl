@@ -1,0 +1,49 @@
+{
+  "name": "on: the key is written and the skill installed",
+  "repo": "basic",
+  "request": {
+    "key": "git_commits",
+    "value": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": true
+    },
+    "ok": true,
+    "key": "git_commits",
+    "value": true,
+    "changed": true,
+    "applied": true,
+    "needs_confirmation": false,
+    "plan": {
+      "write": [
+        ".agents/skills/akm-commit/SKILL.md"
+      ],
+      "remove": [],
+      "modify": [
+        "docs/.layout"
+      ]
+    },
+    "edits": [],
+    "settings": [
+      {
+        "key": "git_commits",
+        "value": true,
+        "paths": [
+          ".agents/skills/akm-commit"
+        ],
+        "description": "Install the akm-commit skill, which tells an agent to commit after each logical step. Off: the skill is not installed."
+      }
+    ]
+  },
+  "after": {
+    "docs/.layout": "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\ngit_commits: true\n"
+  },
+  "after_paths": [
+    ".agents/skills/akm-commit/SKILL.md"
+  ],
+  "git_work_tree": true
+}

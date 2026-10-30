@@ -1,12 +1,14 @@
 ---
 id: "261029-w3d9"
 title: git_commits manifest key, akmctl config, init questionnaire
-status: ready
+status: active
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
 priority: 1
 summary: Add git_commits to the manifest, the config operation and command, the optional-skill install and removal, and the init questionnaire.
+claimed_by: config-agent
+claimed_at: 2026-10-30T01:36
 ---
 
 # git_commits manifest key, akmctl config, init questionnaire
@@ -24,8 +26,10 @@ Done when:
 
 ## Next
 
-Not started.
+Built and tested; not closed. Left for the maintainer: review the draft Outcome, replace the placeholder `internal/initrepo/templates/optional-skills/akm-commit/SKILL.md` with the real text (if the skill gains files, update the `write` lists of fixtures config-3 and config-4 and init-6 through `make_fixtures.py`), then close.
 
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: claimed (config-agent).
+- 2026-10-29: manifest key git_commits, operation config (plan, conflict, confirm, edits), init params git_commits and git_init, rule S4, CLI questionnaire and `config` command, HTTP `/config`; git_commits stays off outside a git work tree. Tests and fixtures config-1..10, init-6..7 in both copies.

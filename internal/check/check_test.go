@@ -128,6 +128,10 @@ func TestRules(t *testing.T) {
 		{"L2 unresolved wikilink", "L2", "W", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + "\nSee [[Nowhere]].\n" }}},
 		{"S1 behind", "S1", "W", map[string]func(string) string{"docs/.layout": sub("layout: 0.2.0", "layout: 0.1.0")}},
 		{"S1 missing manifest", "S1", "W", map[string]func(string) string{"docs/.layout": nil}},
+		{"S3 bad flag", "S3", "E", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: maybe\n" }}},
+		{"S4 on without the skill", "S4", "W", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: true\n" }, ".git/HEAD": func(string) string { return "ref: refs/heads/main\n" }}},
+		{"S4 on outside a work tree", "S4", "W", map[string]func(string) string{"docs/.layout": func(s string) string { return s + "git_commits: true\n" }, ".agents/skills/akm-commit/SKILL.md": func(string) string { return "---\nname: akm-commit\ndescription: x\n---\n" }}},
+		{"S4 off with the skill", "S4", "W", map[string]func(string) string{".agents/skills/akm-commit/SKILL.md": func(string) string { return "---\nname: akm-commit\ndescription: x\n---\n" }}},
 		{"S2 skill name", "S2", "E", map[string]func(string) string{".agents/skills/demo/SKILL.md": func(string) string { return "---\nname: other\ndescription: x\n---\n" }}},
 	}
 	for _, c := range cases {
@@ -154,6 +158,20 @@ func TestLinksThatResolve(t *testing.T) {
 	}), Options{AsOf: asOf})
 	if len(res.Findings) != 0 {
 		t.Fatalf("%+v", res.Findings)
+	}
+}
+
+func TestCommitSkillAgrees(t *testing.T) {
+	skill := func(string) string { return "---\nname: akm-commit\ndescription: x\n---\n" }
+	on := func(s string) string { return s + "git_commits: true\n" }
+	for name, edits := range map[string]map[string]func(string) string{
+		"absent and absent": {},
+		"false and absent":  {"docs/.layout": func(s string) string { return s + "git_commits: false\n" }},
+		"true and present":  {"docs/.layout": on, ".agents/skills/akm-commit/SKILL.md": skill, ".git/HEAD": func(string) string { return "x\n" }},
+	} {
+		if got := rules(Run(repoWith(t, edits), Options{AsOf: asOf})); got["S4"] != 0 || got["S3"] != 0 {
+			t.Errorf("%s: %v", name, got)
+		}
 	}
 }
 

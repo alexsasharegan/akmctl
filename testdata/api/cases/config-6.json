@@ -1,0 +1,39 @@
+{
+  "name": "off when it is already off changes nothing",
+  "repo": "basic",
+  "request": {
+    "key": "git_commits",
+    "value": false
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": false
+    },
+    "ok": true,
+    "key": "git_commits",
+    "value": false,
+    "changed": false,
+    "applied": false,
+    "needs_confirmation": false,
+    "plan": {
+      "write": [],
+      "remove": [],
+      "modify": []
+    },
+    "edits": [],
+    "settings": [
+      {
+        "key": "git_commits",
+        "value": false,
+        "paths": [
+          ".agents/skills/akm-commit"
+        ],
+        "description": "Install the akm-commit skill, which tells an agent to commit after each logical step. Off: the skill is not installed."
+      }
+    ]
+  },
+  "git_work_tree": true
+}

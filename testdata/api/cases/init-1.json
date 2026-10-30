@@ -53,7 +53,10 @@
       "docs/work/.gitkeep",
       "docs/work/done/.gitkeep"
     ],
-    "skipped": []
+    "skipped": [],
+    "git_commits": false,
+    "git_commits_forced_off": false,
+    "git": "none"
   },
   "after": {
     "new-project/.prettierignore": "docs/adr/README.md\n",

@@ -53,7 +53,10 @@
       "notes/work/.gitkeep",
       "notes/work/done/.gitkeep"
     ],
-    "skipped": []
+    "skipped": [],
+    "git_commits": false,
+    "git_commits_forced_off": false,
+    "git": "none"
   },
   "after": {
     "vault/.prettierignore": "notes/adr/README.md\n",

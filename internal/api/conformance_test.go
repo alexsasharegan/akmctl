@@ -23,6 +23,9 @@ type conformanceCase struct {
 	AfterPaths []string          `json:"after_paths"`
 	Removed    []string          `json:"removed"`
 	WouldBe    map[string]string `json:"would_be"`
+	// GitWorkTree makes the copy a work tree of the version control system
+	// (an empty .git directory).
+	GitWorkTree bool `json:"git_work_tree"`
 }
 
 // TestConformance runs every fixture case of the API spec whose operation is
@@ -53,6 +56,11 @@ func TestConformance(t *testing.T) {
 			// the directory is named like the fixture repository: version reports it
 			root := filepath.Join(t.TempDir(), c.Repo)
 			copyTree(t, filepath.Join("../../testdata/api/repos", c.Repo), root)
+			if c.GitWorkTree {
+				if err := os.MkdirAll(filepath.Join(root, ".git"), 0o755); err != nil {
+					t.Fatal(err)
+				}
+			}
 			before := snapshot(t, root)
 			repo, err := record.Load(root)
 			if err != nil {

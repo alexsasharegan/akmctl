@@ -91,7 +91,11 @@ type Repo struct {
 	Problems []Problem
 
 	workDir, adrDir, roadmap string // from the manifest; "" means the default
+	gitCommits               bool   // git_commits in the manifest; false when absent or invalid
 }
+
+// GitCommits reports the manifest key git_commits (false when absent).
+func (r *Repo) GitCommits() bool { return r.gitCommits }
 
 // Default locations, relative to the repository root.
 const (
@@ -292,6 +296,13 @@ func (r *Repo) loadLayout() {
 		}
 		*dst = v.Str
 		return true
+	}
+	if v, ok := r.Layout["git_commits"]; ok {
+		if v.Kind == frontmatter.Bool {
+			r.gitCommits = v.Bool
+		} else {
+			bad("git_commits", "git_commits must be true or false")
+		}
 	}
 	get("work_dir", &r.workDir)
 	get("adr_dir", &r.adrDir)

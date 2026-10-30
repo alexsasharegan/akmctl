@@ -260,6 +260,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op = "index"
 	case len(seg) == 1 && seg[0] == "init" && m == "POST":
 		op = "init"
+	case len(seg) == 1 && seg[0] == "config" && (m == "GET" || m == "POST"):
+		op = "config"
 	case len(seg) == 1 && seg[0] == "migrate" && m == "POST":
 		op = "migrate"
 	case len(seg) == 2 && seg[0] == "records" && m == "GET":
