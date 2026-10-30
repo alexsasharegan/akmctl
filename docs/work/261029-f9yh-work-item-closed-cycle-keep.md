@@ -27,9 +27,10 @@ Done when:
 
 ## Next
 
-Brief and run one implementation agent in a worktree; verify; backfill closed dates; Alexander approves the tag.
+Verify and merge the branch, then backfill `closed` on this repository's done items (from the history, once) and raise `docs/.layout` to 0.3.0 in the same step; Alexander approves the tag. Open: whether the README status line should read 0.3.0, and whether to embed a 0.2.0-to-0.3.0 migration (today a 0.2.0 manifest gets the S1 "no migration path" warning).
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: claimed (claude).
+- 2026-10-29: implemented on a worktree branch: closed/cycle/keep in close, set, ls (--cycle), show and the board; check rules WK13 to WK17; layout and extensions 0.3.0; schemas, fixtures (both copies), spec, guide, API spec, skill references, changelog. Backfill of done items not done.
