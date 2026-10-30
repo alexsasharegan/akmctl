@@ -8,6 +8,9 @@
 
 Beta (greenfield only; adoption is not claimed). Order of work:
 
+- [261029-chq2] akm- skills: rename, router with references, optional akm-commit
+- [261029-w3d9] git_commits manifest key, akmctl config, init questionnaire
+
 ## Later
 
 1.0.0 requirements (adoption and safety):
