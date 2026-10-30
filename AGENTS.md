@@ -31,7 +31,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Code and tests win over prose. When a document is wrong, fix it or say so.
 - This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path, one logical commit per step.
 - Without the tool: decisions are in `docs/adr/README.md`; `grep -lE '^status: ?"?active"?$' docs/work/*.md` lists active work (same for `ready`, `blocked`); close an item by setting `status`, writing `## Outcome`, setting `updated` and `git mv` to `docs/work/done/`. Never hand-edit the ADR index.
-- The `akmctl` binary must work on macOS, Linux and Windows; CI covers all three.
+- The `akmctl` binary must work on macOS and Linux. Windows is best effort and not required below 1.0.0 (ADR 261029-eegx): CI runs it without blocking.
 
 ## Do not, without asking
 
