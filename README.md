@@ -30,23 +30,48 @@ Why bother:
 
 ## Install
 
-Pick one.
+Pick one method.
+
+### Go install
 
 ```sh
 go install github.com/alexsasharegan/akmctl/cmd/akmctl@latest
 ```
 
-Needs Go 1.27 or later. This puts `akmctl` in `$(go env GOBIN)`, or `$(go env GOPATH)/bin` if `GOBIN` is not set; make sure that folder is on your `PATH`.
+Needs Go 1.27 or later. The binary lands in `$(go env GOBIN)`, or in `$(go env GOPATH)/bin` when `GOBIN` is not set; make sure that folder is on your `PATH`.
 
-Or download a release archive for your system from the [Releases](https://github.com/alexsasharegan/akmctl/releases) page, unpack it and put `akmctl` on your `PATH`. Or build from a clone: `go build -o akmctl ./cmd/akmctl`.
+### Download a release
 
-Check it worked:
+Download the archive for your system from the [Releases](https://github.com/alexsasharegan/akmctl/releases) page (`akmctl_<version>_<os>_<arch>.tar.gz`, or `.zip` for Windows), unpack it and put `akmctl` on your `PATH`. The binaries are not code-signed, so macOS may block one that a browser downloaded; fetching it with `curl` avoids that, or use Go install.
+
+### Build from source
+
+```sh
+git clone https://github.com/alexsasharegan/akmctl && cd akmctl
+go build -o akmctl ./cmd/akmctl
+```
+
+Then move `akmctl` onto your `PATH`.
+
+### Check it worked
 
 ```sh
 akmctl version
 ```
 
 ## Start a project
+
+`akmctl init` needs a **profile**. Both profiles create the same kit: `AGENTS.md`, the skills and the `docs/.layout` manifest. They differ in where the records go and what is set up around them:
+
+|                                     | `--profile code`                                       | `--profile notes`                                                         |
+| ----------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| For                                 | a software project (a repository with source code)     | a notes folder, a knowledge base or an Obsidian vault                     |
+| Records (tasks, decisions, roadmap) | under `docs/`                                          | under `notes/`                                                            |
+| Links between records               | plain ids (`261029-6p3c`)                              | Obsidian `[[wikilinks]]`                                                  |
+| `AGENTS.md`                         | has Build, Test, Lint and Run lines for you to fill in | no build commands; it is about notes                                      |
+| `.gitignore`                        | the tool's lock file                                   | also Obsidian's per-machine files (`.obsidian/workspace.json`, `.trash/`) |
+
+Pick `code` when the folder is a project you build and test. Pick `notes` when the folder is mainly Markdown notes you read and link, whether or not you use Obsidian. You cannot switch later without moving the records by hand, so choose the one that matches the folder.
 
 ### If you use Obsidian (or just want a notes folder)
 
