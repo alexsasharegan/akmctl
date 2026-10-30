@@ -126,6 +126,24 @@ func TestFontsInCSSAreServed(t *testing.T) {
 	}
 }
 
+// The favicon is an SVG served with its own type and no token, under the same CSP as the page.
+func TestFaviconIsServed(t *testing.T) {
+	ts, _ := setup(t)
+	res, b := get(t, ts, "/favicon.svg", nil)
+	if res.StatusCode != 200 || !strings.HasPrefix(res.Header.Get("Content-Type"), "image/svg+xml") {
+		t.Fatalf("/favicon.svg: %d %q", res.StatusCode, res.Header.Get("Content-Type"))
+	}
+	if !strings.HasPrefix(string(b), "<svg") || strings.Contains(string(b), token) {
+		t.Fatal("/favicon.svg is not a plain svg")
+	}
+	if csp := res.Header.Get("Content-Security-Policy"); strings.Contains(csp, "unsafe") {
+		t.Fatalf("csp %q", csp)
+	}
+	if !strings.Contains(readWeb(t, "index.html"), `<link rel="icon" type="image/svg+xml" href="/favicon.svg">`) {
+		t.Fatal("index.html does not link the favicon")
+	}
+}
+
 func TestCSSMotionOnlyWhenAllowed(t *testing.T) {
 	css := readWeb(t, "app.css")
 	const open = "@media (prefers-reduced-motion:no-preference){"

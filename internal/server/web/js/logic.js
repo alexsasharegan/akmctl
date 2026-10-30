@@ -257,3 +257,31 @@ export function obsidianUrl(cfg, path) {
   const abs = root.replace(/[\\/]+$/, "") + sep + rel.split("/").join(sep);
   return "obsidian://open?path=" + encodeURIComponent(abs);
 }
+
+/**
+ * The repository's label in the page title: the last folder of its root path, the name the header
+ * shows. Two open repositories with the same folder name are told apart by the parent folder, as
+ * "parent/name", when `others` (the other roots the page knows of) holds a root with that name and
+ * a different path. The page only knows its own root, so it passes [] today and the label is the
+ * folder name.
+ */
+export function repoLabel(root, others = []) {
+  const split = (p) => String(p || "").split(/[\\/]/).filter(Boolean);
+  const parts = split(root);
+  const name = parts[parts.length - 1] || "";
+  if (!name) return "";
+  const full = parts.join("/");
+  const clash = others.some((o) => {
+    const p = split(o);
+    return p[p.length - 1] === name && p.join("/") !== full;
+  });
+  return clash && parts.length > 1 ? parts[parts.length - 2] + "/" + name : name;
+}
+
+/**
+ * The document title: "<view> - <repository> - akmctl". `view` is a view name ("Board", "ADRs"...),
+ * or for a record "Record <id>: <title>". Only the record's id and title appear; no other record text.
+ */
+export function pageTitle({ view, repo = "" }) {
+  return [view, repo, "akmctl"].filter(Boolean).join(" - ");
+}
