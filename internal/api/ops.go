@@ -511,7 +511,8 @@ func opWhen(q Request) (Obj, *Error) {
 	if err != nil {
 		return nil, invalid("id", "id %q does not hold a valid date", id)
 	}
-	asOf := time.Now().UTC().Truncate(24 * time.Hour)
+	y, m, dd := time.Now().Date()
+	asOf := time.Date(y, m, dd, 0, 0, 0, 0, time.UTC) // the local day
 	if s := q.str("as_of"); s != "" {
 		asOf, err = time.Parse("2006-01-02", s)
 		if err != nil {

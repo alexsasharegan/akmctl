@@ -63,7 +63,7 @@ type Record struct {
 	Text   []byte
 }
 
-// IDDate is the UTC date part of the id as YYYY-MM-DD.
+// IDDate is the date part of the id as YYYY-MM-DD.
 func (r *Record) IDDate() string { return IDDate(r.ID) }
 
 // IDDate converts the YYMMDD prefix of an id to YYYY-MM-DD.

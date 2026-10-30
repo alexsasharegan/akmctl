@@ -452,6 +452,7 @@
             "move_file",
             "add_file",
             "mint_ids",
+            "move_closed",
             "manual"
           ]
         },
@@ -529,6 +530,17 @@
         },
         "seed": {
           "type": "string"
+        },
+        "slug_from": {
+          "enum": [
+            "name",
+            "title"
+          ]
+        },
+        "max_slug": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
         }
       },
       "required": [

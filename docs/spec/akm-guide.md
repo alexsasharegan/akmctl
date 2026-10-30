@@ -206,7 +206,7 @@ The files are the source of truth, so a bare agent can work:
 | What work is active | `grep -l '^status: active' docs/work/*.md` |
 | What is blocked, and on whom | `grep -l '^status: blocked' docs/work/*.md`, then read `blocked_by` |
 | Where to resume an item | Read its `## Next` |
-| Mint an id | `id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
+| Mint an id | `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
 | Create a record | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id |
 | Close an item | Set `status`, write `## Outcome`, set `updated` to today's UTC date, `git mv` the file to `docs/work/done/` |
 | Find a record by id | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'` |

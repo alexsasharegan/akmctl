@@ -1,7 +1,7 @@
 ---
 id: "261029-f5vn"
 title: Date new ids with the local day, not UTC
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 kind: bug
@@ -24,6 +24,10 @@ Done when:
 ## Next
 
 Review the local-day change (clock in internal/api/ops_write.go, Env.now in internal/migrate/mintids.go). Other UTC wording remains (spec section on dates and fields, API spec dates, the date -u shell recipe, id_date, when, WK2) and needs a follow-up decision. Then close with the drafted Outcome.
+
+## Outcome
+
+`new`, `mint_ids`, `updated` and log dates use the local calendar day, or `as_of` when given; `claimed_at` stays UTC. Tests: `internal/api/localday_test.go`, `internal/migrate/localday_test.go`. The spec, API spec, AGENTS.md, guide recipes (`date +%y%m%d`) and `when` now say local day.
 
 ## Log
 

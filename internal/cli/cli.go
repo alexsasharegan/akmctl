@@ -444,7 +444,7 @@ func text(w io.Writer, op string, resp api.Obj) {
 		d, _ := resp.Get("date")
 		wd, _ := resp.Get("weekday")
 		age, _ := resp.Get("age_days")
-		fmt.Fprintf(w, "%v (UTC) %v, %v days ago\n", d, wd, age)
+		fmt.Fprintf(w, "%v %v, %v days ago\n", d, wd, age)
 	case "version":
 		t, _ := resp.Get("tool")
 		n, _ := t.(api.Obj).Get("name")

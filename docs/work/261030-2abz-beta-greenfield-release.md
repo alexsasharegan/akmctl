@@ -18,7 +18,7 @@ Alexander wants a public beta tomorrow (2026-10-30) so a colleague can try AKM i
 Scope, in order:
 
 1. `akmctl init` ([261029-0gb4](261029-0gb4-akmctl-init-with-profiles.md)), with schema, fixtures and tests.
-2. The task lifecycle: claim, work, close ([261029-7zcp](261029-7zcp-double-claim-log-on-unblock.md), [261029-yj59](261029-yj59-status-based-done-move.md), [261029-f5vn](261029-f5vn-utc-id-date.md), [261029-nf6h](261029-nf6h-mint-ids-slug-from-title.md)).
+2. The task lifecycle: claim, work, close ([261029-7zcp](done/261029-7zcp-double-claim-log-on-unblock.md), [261029-yj59](done/261029-yj59-status-based-done-move.md), [261029-f5vn](done/261029-f5vn-utc-id-date.md), [261029-nf6h](done/261029-nf6h-mint-ids-slug-from-title.md)).
 3. Agent-ready output: `AGENTS.md`, `CLAUDE.md`, the `work-items` and `record-decision` skills that `init` writes.
 4. The spec and guide at 0.2.0, with the template section describing `init` ([261029-dsga](261029-dsga-spec-template-section-describes-init.md)).
 5. Cosmetics tied to the workbench: page title, header centring, favicon.

@@ -1,7 +1,7 @@
 ---
 id: "261029-7zcp"
 title: Unblocking a claimed item to active logs a second claim
-status: raw
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 ---
@@ -15,6 +15,10 @@ Moving a blocked item that already has a claim to active makes the claim op run 
 ## Next
 
 Review the claim change in internal/api/ops_write.go; then close with the drafted Outcome.
+
+## Outcome
+
+Re-claiming an active item you already hold refreshes `claimed_at` and adds no log line; another holder still needs `takeover`. Test in `internal/api/write_test.go`.
 
 ## Log
 

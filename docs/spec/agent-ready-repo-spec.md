@@ -86,7 +86,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 - Double-quoted: the only escapes are `\"` and `\\`; any other backslash is an error. Single-quoted: `''` is one quote.
 - Plain: non-empty text that does not start with `,` `[` `]` `{` `}` `#` `&` `*` `!` `|` `>` `%` `@` or a backtick; does not start with `-`, `?` or `:` followed by a space or the end of the line; does not contain `: ` and does not end with `:`; and does not contain ` #` (a space then `#` starts a comment). Inside an inline list a plain scalar also cannot contain `,` `[` `]` `{` `}`.
 - Typing: `-?(0|[1-9][0-9]*)` is an integer; `true` and `false` are booleans; `null`, `~` and the empty value are null; any other unquoted text is a string, unless it is one of the number forms or capitalised spellings listed as errors above. A quoted value is always a string. Version strings such as `1.0.0` and ids such as `261027-m3qz` are ordinary strings; `1.2` is a float and needs quotes.
-- Fields of type date hold `YYYY-MM-DD` as a plain string, and timestamps hold `YYYY-MM-DDTHH:MM`, both UTC. The tool writes them unquoted, as Obsidian does.
+- Fields of type date hold `YYYY-MM-DD` as a plain string, the local calendar day of the machine that writes it, and timestamps hold `YYYY-MM-DDTHH:MM` in UTC. The tool writes them unquoted, as Obsidian does.
 - A list is an inline list on one line, `[` scalars separated by commas (no empty items, an optional trailing comma) `]`; or block form: the key with no value, followed by lines `- scalar`, all indented by the same number of spaces (zero or more).
 - An entry with no value and no list items is empty (null) and counts as absent.
 
@@ -151,16 +151,16 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 
 ### Minting and utilities
 
-| Command                  | Does                                                                         |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| `akmctl new work <slug>` | Mint an id, write the file from the work-item template, print the path.      |
-| `akmctl new adr <slug>`  | Same for an ADR, status `proposed`.                                          |
-| `akmctl find <id>`       | Print the path of the record.                                                |
-| `akmctl when <id>`       | Print the id's date as `YYYY-MM-DD (UTC)`, the weekday, and the age in days. |
+| Command                  | Does                                                                    |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `akmctl new work <slug>` | Mint an id, write the file from the work-item template, print the path. |
+| `akmctl new adr <slug>`  | Same for an ADR, status `proposed`.                                     |
+| `akmctl find <id>`       | Print the path of the record.                                           |
+| `akmctl when <id>`       | Print the id's date as `YYYY-MM-DD`, the weekday, and the age in days.  |
 
 There is no command to renumber a record. Repair a collision by hand, as above.
 
-Listings (`akmctl ls`, the ADR index) show the expanded date next to the id, so a reader never has to decode `261027` by eye. The id's date is a UTC calendar day; it is not a timestamp, and in some time zones the local date differs by one.
+Listings (`akmctl ls`, the ADR index) show the expanded date next to the id, so a reader never has to decode `261027` by eye. The id's date is the local calendar day of the machine that minted it; it is not a timestamp.
 
 ## 1. Layout
 
@@ -212,24 +212,24 @@ Required rules (in the Rules part):
 
 Plain-file fallbacks (H6), which the `AGENTS.md` template carries:
 
-| Need                                 | Without the tool                                                                                                           |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| Which decisions exist                | Read `docs/adr/README.md` (committed, generated).                                                                          |
-| What work is active                  | `grep -lE '^status: ?"?active"?$' docs/work/*.md`                                                                          |
-| What work is ready                   | `grep -lE '^status: ?"?ready"?$' docs/work/*.md`                                                                           |
-| What is blocked, and on whom         | `grep -lE '^status: ?"?blocked"?$' docs/work/*.md`, then read `blocked_by` in each.                                        |
-| Where to resume an item              | Read its `## Next` section.                                                                                                |
-| Mint an id                           | The recipe below.                                                                                                          |
-| Create a record                      | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id.                                                |
-| Close an item                        | Set `status`, write `## Outcome`, set `updated` to today's UTC date, and move the file to `docs/work/done/` with `git mv`. |
-| Claim an item (claims extension)     | Make the first `## Log` line `claimed (where)`.                                                                            |
-| Find a record by id                  | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'`                                                                    |
-| The ADR index is stale or conflicted | Do not edit it by hand; tell the maintainer to regenerate it with the tool.                                                |
+| Need                                 | Without the tool                                                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Which decisions exist                | Read `docs/adr/README.md` (committed, generated).                                                                      |
+| What work is active                  | `grep -lE '^status: ?"?active"?$' docs/work/*.md`                                                                      |
+| What work is ready                   | `grep -lE '^status: ?"?ready"?$' docs/work/*.md`                                                                       |
+| What is blocked, and on whom         | `grep -lE '^status: ?"?blocked"?$' docs/work/*.md`, then read `blocked_by` in each.                                    |
+| Where to resume an item              | Read its `## Next` section.                                                                                            |
+| Mint an id                           | The recipe below.                                                                                                      |
+| Create a record                      | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id.                                            |
+| Close an item                        | Set `status`, write `## Outcome`, set `updated` to today's date, and move the file to `docs/work/done/` with `git mv`. |
+| Claim an item (claims extension)     | Make the first `## Log` line `claimed (where)`.                                                                        |
+| Find a record by id                  | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'`                                                                |
+| The ADR index is stale or conflicted | Do not edit it by hand; tell the maintainer to regenerate it with the tool.                                            |
 
 The id recipe, which `AGENTS.md` carries. It mints the same form as the tool; run it again if the second command prints a match:
 
 ```sh
-id="$(date -u +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"
+id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"
 ls docs/work docs/work/done docs/adr | grep "^$id-"
 ```
 
@@ -257,8 +257,8 @@ A work item is the one unit of in-flight work: an issue, a task, a feature, a pr
 | `parent`      | string      | no           | Reference to another item (an `id` or a wikilink to it). Absent for a top-level item.                                  |
 | `blocked_by`  | list        | if `blocked` | Entries are item ids (matching the id pattern) or free text naming a person, role or outside dependency.               |
 | `priority`    | integer     | no           | Higher is sooner. Absent counts as 0. Sorts the listing only; the roadmap supersedes it.                               |
-| `created`     | date        | yes          | The UTC date, `YYYY-MM-DD`, a plain string (YAML-lite).                                                                |
-| `updated`     | date        | yes          | The UTC date, `YYYY-MM-DD`; set whenever the file changes.                                                             |
+| `created`     | date        | yes          | The local date, `YYYY-MM-DD`, a plain string (YAML-lite).                                                              |
+| `updated`     | date        | yes          | The local date, `YYYY-MM-DD`; set whenever the file changes.                                                           |
 | `authored_by` | string      | no           | `agent` while a maintainer has not reviewed it; removed on review (C11).                                               |
 | `decisions`   | list of ids | no           | ADR ids that constrain or result from this item.                                                                       |
 
@@ -333,7 +333,7 @@ Every field the index and a routing read need is here (H1):
 | `title`         | yes             | Short statement of the decision.                                                                                                                                   |
 | `summary`       | yes             | One sentence, up to 160 characters: what was decided and when to read this record. The index shows it.                                                             |
 | `status`        | yes             | `proposed`, `accepted`, `rejected`, `deprecated`, `superseded`                                                                                                     |
-| `date`          | yes             | The date of the last status change (UTC), `YYYY-MM-DD`.                                                                                                            |
+| `date`          | yes             | The date of the last status change, `YYYY-MM-DD`.                                                                                                                  |
 | `scope`         | no              | List of paths, globs or topic words this decision applies to (for example `[src/store/, cli]`). Lets a reader working in an area find the records that bear on it. |
 | `supersedes`    | no              | ADR id.                                                                                                                                                            |
 | `superseded_by` | if `superseded` | ADR id.                                                                                                                                                            |
@@ -419,7 +419,7 @@ Severity: **E** error (exit 1), **W** warning (printed, exit 0). Rule ids: `WK` 
 | ID   | Sev | Rule                                                                                                                                                                                                                                                                                                                             |
 | ---- | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | WK1  | E   | Every work file parses; frontmatter present and within the simple subset (H5); `id` equals the filename's id part and matches the id pattern.                                                                                                                                                                                    |
-| WK2  | W   | The date part of the id is a valid date and equals `created` (both UTC).                                                                                                                                                                                                                                                         |
+| WK2  | W   | The date part of the id is a valid date and equals `created`.                                                                                                                                                                                                                                                                    |
 | I1   | E   | Ids are unique across `docs/work/`, `docs/work/done/` and `docs/adr/` together (R1).                                                                                                                                                                                                                                             |
 | WK3  | E   | `status` is in the enum; required fields (`title`, `created`, `updated`) present; dates are valid.                                                                                                                                                                                                                               |
 | WK4  | E   | `parent`, if present, resolves to an existing item and is not the item itself; no parent cycles.                                                                                                                                                                                                                                 |

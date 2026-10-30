@@ -1,7 +1,7 @@
 ---
 id: "261029-yj59"
 title: Move closed records to done/ by status in one step
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
@@ -24,6 +24,10 @@ Done when:
 ## Next
 
 Review move_closed (internal/migrate/steps.go); the schema enum and API spec step list do not name it yet (spec edits were out of scope). Then close with the drafted Outcome.
+
+## Outcome
+
+New migrate step `move_closed` (`dir`, `to`, `statuses`, `recursive`) moves closed records to done/ in one step; never overwrites, idempotent; `.migrate-log` stays one line under 8 KB for 100 moves. Tests: `internal/migrate/moveclosed_test.go`. Documented in the API spec step list and the schema enum.
 
 ## Log
 

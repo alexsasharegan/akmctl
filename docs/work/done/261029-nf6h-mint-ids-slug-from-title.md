@@ -1,7 +1,7 @@
 ---
 id: "261029-nf6h"
 title: "mint_ids: build the slug from the title"
-status: active
+status: done
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
@@ -24,6 +24,10 @@ Done when:
 ## Next
 
 Review slug_from and max_slug (internal/migrate/mintids.go). The step list in the API spec and schemas/common.json do not name the new options yet (spec edits were out of scope); adr_slugs.py is kept as migration history. Then close with the drafted Outcome.
+
+## Outcome
+
+`mint_ids` takes `slug_from` (`name` or `title`) and `max_slug` (1 to 100, default 60; a cut ends on a whole word). Tests: `internal/migrate/slugfrom_test.go`. Documented in the API spec and schema.
 
 ## Log
 

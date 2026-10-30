@@ -9,10 +9,6 @@
 Beta (greenfield only; adoption is not claimed). Order of work:
 
 - [261029-0gb4] Add akmctl init with the profiles code and notes
-- [261029-7zcp] Unblocking a claimed item to active logs a second claim
-- [261029-yj59] Move closed records to done/ by status in one step
-- [261029-f5vn] Date new ids with the local day, not UTC
-- [261029-nf6h] mint_ids: build the slug from the title
 - [261029-dsga] Rewrite the standard's template section to describe init
 - [261029-sjyg] Prettier is not run by CI
 
