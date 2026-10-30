@@ -13,7 +13,7 @@ summary: "Ship a public beta (v0.2.0) for greenfield repositories: init, a sound
 
 ## Goal
 
-Alexander wants a public beta tomorrow (2026-10-30) so a colleague can try AKM in a fresh directory: `akmctl init` makes a new repository (and Obsidian vault) that is agent-ready. The beta supports greenfield use only; adoption of an existing repository (`migrate`, discovery) is not claimed and is a 1.0.0 requirement. The beta is tagged `v0.2.0-beta.1`; `v1.0.0` stays reserved. The spec, guide and layout are versioned `0.2.0` to match the beta and keep that number through beta updates.
+Alexander wants a public beta tomorrow (2026-10-30) so a colleague can try AKM in a fresh directory: `akmctl init` makes a new repository (and Obsidian vault) that is agent-ready. The beta supports greenfield use only; adoption of an existing repository (`migrate`, discovery) is not claimed and is a 1.0.0 requirement. The beta is tagged `v0.2.0`; `v1.0.0` stays reserved. The spec, guide and layout are versioned `0.2.0` to match the beta and keep that number through beta updates.
 
 Scope, in order:
 
@@ -31,13 +31,14 @@ Done when:
 - [x] The spec and guide read Version 0.2.0 and no longer describe a template repository.
 - [x] The README states the beta scope and the unsupported adoption path.
 - [ ] CI is green on macOS, Linux and Windows.
-- [ ] Alexander has made the repository public and approved the `v0.2.0-beta.1` tag.
+- [ ] Alexander has made the repository public and approved the `v0.2.0` tag.
 
 ## Next
 
-Alexander: audit the repository, make it public, and approve the tag. Then tag `v0.2.0-beta.1` (the release workflow builds archives). Check CI is green on all three platforms first.
+Alexander: audit, confirm macOS CI is green on the latest main, then tag v0.2.0 (go install @latest needs a non-prerelease tag). Make the repository public before or with the tag.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: init, lifecycle fixes, UI cosmetics, spec at 0.2.0 (layout and extensions too), Prettier in CI and the beta README are done and merged on main. Remaining: CI green on three platforms, Alexander's audit, public flip, tag.
+- 2026-10-29: akm- skills, git_commits and config, init questionnaire, platform tiers ADR and the README rewrite merged on main. Remaining: Alexander's audit, macOS CI green, tag v0.2.0.
