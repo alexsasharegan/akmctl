@@ -1,12 +1,14 @@
 ---
 id: "261029-chq2"
 title: "akm- skills: rename, router with references, optional akm-commit"
-status: ready
+status: active
 created: 2026-10-29
 updated: 2026-10-29
 kind: feature
 priority: 1
 summary: Rename skills to akm-*, add the akm router skill with one reference per command, add the optional akm-commit skill.
+claimed_by: skills-agent
+claimed_at: 2026-10-30T01:34
 ---
 
 # akm- skills: rename, router with references, optional akm-commit
@@ -29,3 +31,4 @@ Not started.
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-29: claimed (skills-agent).
