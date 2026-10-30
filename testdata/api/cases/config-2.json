@@ -1,0 +1,26 @@
+{
+  "name": "read one setting",
+  "repo": "commits",
+  "request": {
+    "key": "git_commits"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits"
+    },
+    "ok": true,
+    "settings": [
+      {
+        "key": "git_commits",
+        "value": true,
+        "paths": [
+          ".agents/skills/akm-commit"
+        ],
+        "description": "Install the akm-commit skill, which tells an agent to commit after each logical step. Off: the skill is not installed."
+      }
+    ]
+  },
+  "git_work_tree": true
+}

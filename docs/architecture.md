@@ -4,20 +4,20 @@
 
 ## Packages
 
-| Package                | Role                                                                                                                                                           |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cmd/akmctl`           | The binary; calls `internal/cli`.                                                                                                                              |
-| `internal/frontmatter` | The YAML-lite parser and the byte-splice editor. Fixtures: `testdata/yaml-lite.json`.                                                                          |
-| `internal/record`      | The loader: records, roadmap, manifest, sections, etags, wikilink-to-id resolution.                                                                            |
-| `internal/api`         | Every operation (`version ls search show board find when check index new set close claim release migrate init`), request validation and the response envelope. |
-| `internal/check`       | The rules WK, I, A, RM, G, L, S, CL, SF.                                                                                                                       |
-| `internal/index`       | The ADR index generator, stable under Prettier.                                                                                                                |
-| `internal/width`       | Prettier's string-width rule; tables generated from Unicode 17.0.0 (`data/`, `gen/main.go`).                                                                   |
-| `internal/initrepo`    | `init`: the file lists of the profiles `code` and `notes`, the embedded templates and skills, the no-overwrite writer.                                         |
-| `internal/migrate`     | Declarative layout migration steps (including `mint_ids`), safe application, handoff. No migrations are embedded yet.                                          |
-| `internal/fsx`         | The advisory lock (`docs/.akm.lock`) and atomic writes.                                                                                                        |
-| `internal/server`      | The HTTP binding and the workbench page (`web/`).                                                                                                              |
-| `internal/cli`         | Flags to request parameters; `--format json\|table\|ids`; the `ui` command.                                                                                    |
+| Package                | Role                                                                                                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/akmctl`           | The binary; calls `internal/cli`.                                                                                                                                     |
+| `internal/frontmatter` | The YAML-lite parser and the byte-splice editor. Fixtures: `testdata/yaml-lite.json`.                                                                                 |
+| `internal/record`      | The loader: records, roadmap, manifest, sections, etags, wikilink-to-id resolution.                                                                                   |
+| `internal/api`         | Every operation (`version ls search show board find when check index new set close claim release migrate init config`), request validation and the response envelope. |
+| `internal/check`       | The rules WK, I, A, RM, G, L, S, CL, SF.                                                                                                                              |
+| `internal/index`       | The ADR index generator, stable under Prettier.                                                                                                                       |
+| `internal/width`       | Prettier's string-width rule; tables generated from Unicode 17.0.0 (`data/`, `gen/main.go`).                                                                          |
+| `internal/initrepo`    | `init`: the file lists of the profiles `code` and `notes`, the embedded templates and skills, the no-overwrite writer.                                                |
+| `internal/migrate`     | Declarative layout migration steps (including `mint_ids`), safe application, handoff. No migrations are embedded yet.                                                 |
+| `internal/fsx`         | The advisory lock (`docs/.akm.lock`) and atomic writes.                                                                                                               |
+| `internal/server`      | The HTTP binding and the workbench page (`web/`).                                                                                                                     |
+| `internal/cli`         | Flags to request parameters; `--format json\|table\|ids`; the `ui` command.                                                                                           |
 
 ## Invariants
 

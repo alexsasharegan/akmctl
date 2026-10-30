@@ -1,0 +1,24 @@
+{
+  "name": "on outside a git work tree is refused",
+  "repo": "basic",
+  "request": {
+    "key": "git_commits",
+    "value": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": true
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "this repository is not inside a git work tree: run git init first; git commits need one",
+      "details": {
+        "reason": "not_a_git_repo"
+      }
+    }
+  }
+}

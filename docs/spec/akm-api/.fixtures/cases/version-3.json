@@ -30,7 +30,8 @@
       "reference_style": "id",
       "claim_stale_hours": 24,
       "work_dir": "Deep Thought/9 pkm/tasks",
-      "adr_dir": "Deep Thought/9 pkm/adr"
+      "adr_dir": "Deep Thought/9 pkm/adr",
+      "git_commits": false
     }
   }
 }

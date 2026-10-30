@@ -95,6 +95,9 @@
                     },
                     "adr_dir": {
                       "$ref": "common.json#/$defs/path"
+                    },
+                    "git_commits": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -104,7 +107,8 @@
                     "reference_style",
                     "claim_stale_hours",
                     "work_dir",
-                    "adr_dir"
+                    "adr_dir",
+                    "git_commits"
                   ],
                   "additionalProperties": false
                 }

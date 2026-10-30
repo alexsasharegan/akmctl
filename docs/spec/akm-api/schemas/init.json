@@ -14,6 +14,12 @@
         "dir": {
           "type": "string",
           "minLength": 1
+        },
+        "git_commits": {
+          "type": "boolean"
+        },
+        "git_init": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -62,6 +68,24 @@
               "items": {
                 "$ref": "common.json#/$defs/path"
               }
+            },
+            "git_commits": {
+              "type": "boolean"
+            },
+            "git": {
+              "enum": [
+                "none",
+                "initialised",
+                "existing",
+                "failed"
+              ]
+            },
+            "git_error": {
+              "type": "string",
+              "minLength": 1
+            },
+            "git_commits_forced_off": {
+              "type": "boolean"
             }
           },
           "required": [
@@ -73,7 +97,10 @@
             "dir",
             "layout",
             "written",
-            "skipped"
+            "skipped",
+            "git_commits",
+            "git",
+            "git_commits_forced_off"
           ],
           "additionalProperties": false
         },

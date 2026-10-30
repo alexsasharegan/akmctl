@@ -31,7 +31,8 @@
       "reference_style": "id",
       "claim_stale_hours": 24,
       "work_dir": "docs/work",
-      "adr_dir": "docs/adr"
+      "adr_dir": "docs/adr",
+      "git_commits": false
     }
   }
 }

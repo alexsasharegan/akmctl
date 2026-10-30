@@ -1,0 +1,28 @@
+{
+  "name": "a path that is not the tool's own is a conflict and nothing is written",
+  "repo": "conflict",
+  "request": {
+    "key": "git_commits",
+    "value": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": true
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "not overwriting what is not the tool's own: .agents/skills/akm-commit",
+      "details": {
+        "reason": "conflict",
+        "paths": [
+          ".agents/skills/akm-commit"
+        ]
+      }
+    }
+  },
+  "git_work_tree": true
+}

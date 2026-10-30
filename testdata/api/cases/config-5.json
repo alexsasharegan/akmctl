@@ -1,0 +1,44 @@
+{
+  "name": "off with no skill directory: only the key changes, no confirmation",
+  "repo": "commits",
+  "request": {
+    "key": "git_commits",
+    "value": false
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": false
+    },
+    "ok": true,
+    "key": "git_commits",
+    "value": false,
+    "changed": true,
+    "applied": true,
+    "needs_confirmation": false,
+    "plan": {
+      "write": [],
+      "remove": [],
+      "modify": [
+        "docs/.layout"
+      ]
+    },
+    "edits": [],
+    "settings": [
+      {
+        "key": "git_commits",
+        "value": false,
+        "paths": [
+          ".agents/skills/akm-commit"
+        ],
+        "description": "Install the akm-commit skill, which tells an agent to commit after each logical step. Off: the skill is not installed."
+      }
+    ]
+  },
+  "after": {
+    "docs/.layout": "layout: 0.2.0\nextension.adr-index: 0.2.0\nextension.work-items: 0.2.0\ngit_commits: false\n"
+  },
+  "git_work_tree": true
+}

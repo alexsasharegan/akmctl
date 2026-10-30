@@ -56,6 +56,8 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opMigrate(repo, req)
 	case "init":
 		body, err = opInit(repo, req)
+	case "config":
+		body, err = opConfig(repo, req)
 	case "new":
 		body, err = opNew(repo, req)
 	case "set":
@@ -141,7 +143,7 @@ func repositoryObj(repo *record.Repo) any {
 		style = "wikilink"
 	}
 	return O("name", filepath.Base(repo.Root), "layout", layout, "extensions", exts, "reference_style", style, "claim_stale_hours", claimStaleHours(repo),
-		"work_dir", repo.WorkDir(), "adr_dir", repo.ADRDir())
+		"work_dir", repo.WorkDir(), "adr_dir", repo.ADRDir(), "git_commits", repo.GitCommits())
 }
 
 // fieldsObj renders the frontmatter of r for the chosen field list. A nil list

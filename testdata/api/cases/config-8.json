@@ -1,0 +1,25 @@
+{
+  "name": "an unknown key is rejected",
+  "repo": "basic",
+  "request": {
+    "key": "color",
+    "value": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "color",
+      "value": true
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "key: unknown value \"color\"",
+      "details": {
+        "parameter": "key"
+      }
+    }
+  },
+  "git_work_tree": true
+}

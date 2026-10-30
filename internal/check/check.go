@@ -89,6 +89,7 @@ func Run(repo *record.Repo, opt Options) Result {
 	c.agents()
 	c.links()
 	c.skills()
+	c.commitSkill()
 	if repo.Extension("claims") {
 		c.claims()
 	}
@@ -532,6 +533,22 @@ func (c *checker) claims() {
 				c.add("CL2", "W", r.Path, c.line(r, "claimed_by"), r.ID, "%s holds %d active items", by, len(rs))
 			}
 		}
+	}
+}
+
+// commitSkill is rule S4: the manifest key git_commits and the optional skill
+// directory .agents/skills/akm-commit must agree.
+func (c *checker) commitSkill() {
+	const dir = ".agents/skills/akm-commit"
+	_, err := os.Lstat(filepath.Join(c.repo.Root, filepath.FromSlash(dir)))
+	present := err == nil
+	switch on := c.repo.GitCommits(); {
+	case on && !record.InGitRepo(c.repo.Root):
+		c.add("S4", "W", record.ManifestPath, 0, "", "git_commits is true but the repository is not inside a git work tree; run git init, or set git_commits: false")
+	case on && !present:
+		c.add("S4", "W", dir, 0, "", "git_commits is true but the skill is not installed; run akmctl config git-commits on")
+	case !on && present:
+		c.add("S4", "W", dir, 0, "", "git_commits is not true but the skill is installed; run akmctl config git-commits off, or set git_commits: true")
 	}
 }
 

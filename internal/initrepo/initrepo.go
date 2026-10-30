@@ -62,7 +62,15 @@ var plainName = regexp.MustCompile(`^(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9 ._-]*[
 
 // Files returns the files of profile p for a project called name. A name that
 // would need escaping in Markdown is replaced by "project".
-func Files(p Profile, name string) ([]File, error) {
+func Files(p Profile, name string) ([]File, error) { return FilesWith(p, name, Options{}) }
+
+// Options are the choices of init beyond the profile.
+type Options struct {
+	GitCommits bool // write git_commits: true and install the optional skill akm-commit
+}
+
+// FilesWith is Files with options.
+func FilesWith(p Profile, name string, opt Options) ([]File, error) {
 	if !plainName.MatchString(name) {
 		name = "project"
 	}
@@ -131,6 +139,9 @@ func Files(p Profile, name string) ([]File, error) {
 	if p.WikiLinks {
 		manifest += "reference_style: wikilink\n"
 	}
+	if opt.GitCommits {
+		manifest += "git_commits: true\n"
+	}
 	add(record.ManifestPath, manifest)
 	deny, _ := tmpl("akm-deny.tmpl")
 	add("docs/.akm-deny", deny)
@@ -156,6 +167,13 @@ func Files(p Profile, name string) ([]File, error) {
 	if err != nil {
 		return nil, err
 	}
+	if opt.GitCommits {
+		more, err := OptionalSkillFiles(CommitSkill, p.WorkDir, p.ADRDir)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, more...)
+	}
 	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
 	return files, nil
 }
@@ -163,7 +181,10 @@ func Files(p Profile, name string) ([]File, error) {
 // Init writes the files of the profile under target, creating the directory
 // when it is absent. A file that exists, whatever it holds, is left alone and
 // listed as skipped.
-func Init(target string, p Profile) (Result, error) {
+func Init(target string, p Profile) (Result, error) { return InitWith(target, p, Options{}) }
+
+// InitWith is Init with options.
+func InitWith(target string, p Profile, opt Options) (Result, error) {
 	var res Result
 	if st, err := os.Stat(target); err == nil && !st.IsDir() {
 		return res, fmt.Errorf("%s exists and is not a directory", target)
@@ -172,7 +193,7 @@ func Init(target string, p Profile) (Result, error) {
 	if err != nil {
 		return res, err
 	}
-	files, err := Files(p, filepath.Base(abs))
+	files, err := FilesWith(p, filepath.Base(abs), opt)
 	if err != nil {
 		return res, err
 	}

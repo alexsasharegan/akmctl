@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/config.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "enum": [
+            "git_commits"
+          ]
+        },
+        "value": {
+          "type": "boolean"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "confirm": {
+          "type": "boolean"
+        },
+        "confirm_edited": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "config"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "settings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "enum": [
+                      "git_commits"
+                    ]
+                  },
+                  "value": {
+                    "type": "boolean"
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "paths": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "common.json#/$defs/path"
+                    }
+                  }
+                },
+                "required": [
+                  "key",
+                  "value",
+                  "description",
+                  "paths"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "key": {
+              "enum": [
+                "git_commits"
+              ]
+            },
+            "value": {
+              "type": "boolean"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "applied": {
+              "type": "boolean"
+            },
+            "needs_confirmation": {
+              "type": "boolean"
+            },
+            "plan": {
+              "type": "object",
+              "properties": {
+                "write": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "common.json#/$defs/path"
+                  }
+                },
+                "remove": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "common.json#/$defs/path"
+                  }
+                },
+                "modify": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "common.json#/$defs/path"
+                  }
+                }
+              },
+              "required": [
+                "write",
+                "remove",
+                "modify"
+              ],
+              "additionalProperties": false
+            },
+            "edits": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/diff"
+              }
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "settings"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}
