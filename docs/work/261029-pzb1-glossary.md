@@ -1,14 +1,12 @@
 ---
 id: "261029-pzb1"
 title: Write the glossary and require every new feature to register its terms
-status: active
+status: ready
 created: 2026-10-29
 updated: 2026-10-29
 kind: chore
 priority: 2
 summary: docs/glossary.md defines the kit's terms (record, work item, workbench and its parts, Obsidian Bases); AGENTS.md requires new features to register their terms
-claimed_by: claude
-claimed_at: 2026-10-30T05:19
 ---
 
 # Write the glossary and require every new feature to register its terms
@@ -32,3 +30,4 @@ Alexander edits docs/glossary.md; then close.
 - 2026-10-29: filed.
 - 2026-10-29: claimed (claude).
 - 2026-10-29: Aliases column added; Alexander's edit spells the term ID in capitals (never Id); the two workbench column headers that said Id now say ID.
+- 2026-10-29: released (claude).
