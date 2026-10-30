@@ -31,5 +31,6 @@ Pushing a `v*` tag is the trigger. The `release` workflow (`.github/workflows/re
 
 ## If it goes wrong
 
-- The workflow fails after the tag is pushed: fix forward and release the next dot version. Do not move or delete a pushed tag; `go install` and the module proxy cache it.
+- The `publish` step fails with an HTTP 5xx from GitHub and no release exists (`gh release view v<version>` says not found): re-run the failed job (`gh run rerun <id> --failed`). It reuses the same tag; v0.3.2 needed this once.
+- The workflow fails for another reason after the tag is pushed: fix forward and release the next dot version. Do not move or delete a pushed tag; `go install` and the module proxy cache it.
 - A push of the tag fails with `Permission denied (publickey)`: the SSH agent needs unlocking or approving; nothing has been published.

@@ -2,7 +2,6 @@
 
 ## Now
 
-- [261030-hfsx] Release v0.3.2 with the Log append fix
 - [261029-pzb1] Write the glossary and require every new feature to register its terms
 
 ## Next
