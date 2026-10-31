@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Writes are durable: every record, index and manifest write flushes the temporary file before the rename and the folder after it. Before, a power loss between the rename and the data reaching the disk could leave a short or empty record. The API spec (section 7) says so.
+
 - `new`, `claim`, `release`, `close` and a `set` that changes a work item's `status` return a `commit` object (`step`, `item`, `detail`, `paths`, `message`): the subject `<id>(<step>): <detail>` and the trailers `AKM-Step` and `AKM-Item`, for the caller to commit with. The tool still never stages or commits (ADR 261030-tbkh, proposed). The CLI prints the message and the paths to stage. The API spec, schemas, fixtures (new case `set-8`) and the `akm-commit` skill are updated; `akmctl commits [--range <revs>] [--limit <n>]` is new: it reads `git log` and checks each commit that claims to be an AKM step. CM1 the subject, CM2 the two trailers, CM3 the diff (a `close` moves the file into `done/`, a `claim` leaves it active and claimed, and so on). Read-only, exit 1 when a commit fails; `GET /commits` over HTTP; schema `commits.json`; no fixture cases, since a fixture directory cannot hold a git history (tested against repositories the tests build with `git`).
 
 - `close` returns `dependents`: the open work items (`raw`, `ready`, `active`, `blocked`) whose `blocked_by` names the closed item, for `done` and `dropped` and in a dry run. It only reports and never refuses; the CLI lists them after the move, and a close with none is unchanged. The API spec (section 4.12), `close.json`, the `close` fixtures and the `akm-work-items` and `akm` skills are updated. A `check` rule for a stale blocker was considered and left out (it would bump the layout).
