@@ -6,9 +6,8 @@
 
 ## Next
 
-Naming, before the skills installer is built:
+The skills installer, now on the final names:
 
-- [261030-p7r1] Skill names and file-name grammar
 - [261030-8d8t] skills install and update command
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):

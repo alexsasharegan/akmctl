@@ -149,7 +149,7 @@ func TestOneOffMigrationApply(t *testing.T) {
 	if !strings.Contains(man, "layout: 0.3.0") || !strings.Contains(man, "work_dir: "+oTasks) {
 		t.Fatalf("manifest %q", man)
 	}
-	if n := strings.Count(read(t, root, "docs/.migrate-log"), "\n"); n != 7 {
+	if n := strings.Count(read(t, root, "docs/.akm-migrate-log"), "\n"); n != 7 {
 		t.Fatalf("log lines %d", n)
 	}
 	// the tag and branch exist, and nothing was committed

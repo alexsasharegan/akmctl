@@ -111,7 +111,7 @@ const (
 )
 
 // MetaDir is the folder that holds the manifest (.layout), the deny list
-// (.akm-deny), the lock (.akm.lock) and the migrate log (.migrate-log),
+// (.akm-deny), the lock (.akm.lock) and the migrate log (.akm-migrate-log),
 // repository-relative with /. It is docs unless discovery found a manifest
 // in another folder.
 func (r *Repo) MetaDir() string {
@@ -131,7 +131,10 @@ func (r *Repo) ManifestPath() string { return r.MetaDir() + "/" + ManifestName }
 func (r *Repo) DenyPath() string { return r.MetaDir() + "/.akm-deny" }
 
 // MigrateLogPath is the repository-relative path of the migrate log.
-func (r *Repo) MigrateLogPath() string { return r.MetaDir() + "/.migrate-log" }
+func (r *Repo) MigrateLogPath() string { return r.MetaDir() + "/.akm-migrate-log" }
+
+// LegacyMigrateLogPath is the name the migrate log had before ADR 261030-1wj5.
+func (r *Repo) LegacyMigrateLogPath() string { return r.MetaDir() + "/.migrate-log" }
 
 // Locate finds the folder of the manifest below root: docs when docs/.layout
 // exists, else the one immediate, non-hidden subdirectory (not node_modules)

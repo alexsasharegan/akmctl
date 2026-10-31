@@ -492,7 +492,7 @@ AKM_REFS = ["board", "check", "claim", "close", "commits", "config", "find", "in
     "release", "search", "section", "set", "show", "version", "when"]
 INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/%s.md" % r for r in AKM_REFS] + [
     ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",
-    ".agents/skills/akm-work-items/SKILL.md", ".agents/skills/akm-work-items/assets/work-item.md",
+    ".agents/skills/akm-track-work/SKILL.md", ".agents/skills/akm-track-work/assets/work-item.md",
     ".prettierignore", ".prettierrc.json", "AGENTS.md", "CLAUDE.md", "README.md"]
 INIT_LAYOUT = "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\nextension.claims: 0.3.0\nextension.safety: 0.3.0\n"
 

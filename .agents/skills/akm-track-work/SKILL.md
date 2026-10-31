@@ -1,9 +1,9 @@
 ---
-name: akm-work-items
+name: akm-track-work
 description: Find, claim, work, checkpoint and close an AKM work item in docs/work/. Use at the start of a task, when stopping, and when a task finishes.
 ---
 
-# Work items
+# Track work
 
 The repository's `AGENTS.md` wins over this skill where they disagree. Fields, statuses and rules are in the AKM specification; this is the procedure.
 

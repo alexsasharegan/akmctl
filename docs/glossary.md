@@ -83,6 +83,16 @@ Register every new view, control and message here when it is added. Names are as
 | **Toast**               | notification; avoid: alert, snackbar                 | A short message in the workbench's bottom right corner. Four levels: success, info, warning, error. Two flavours: ephemeral (clears after 8 seconds; a thick top border counts down and pauses on hover or focus) and persistent (stays until dismissed with its close icon or Escape; errors are persistent by default). |
 | **Palette**             | search box                                           | The search box (`⌘K`).                                                                                                                                                                                                                                                                                                    |
 
+## Skill and file vocabulary
+
+How the project names things (ADRs 261029-tb3d, 261030-1wj5 and 261030-wsqb).
+
+**Skills.** The router is `akm`. Every other skill is `akm-<verb>[-<object>]`, an imperative an agent can read as an instruction, in lower-case words joined by hyphens: `akm-record-decision`, `akm-track-work`, `akm-commit`. The prefix marks what the tool owns. The manifest extension `work-items` keeps its name; the skill was `akm-work-items` until 0.3.2 and is `akm-track-work` after (the old name stays in accepted ADRs and closed work items as written).
+
+**Files.** A file a person opens, edits or recognises has a plain name: the manifest `.layout`, the docs folder and its records, `ROADMAP.md`, the ADR index, `AGENTS.md`. A file the CLI keeps for itself is hidden and starts `.akm`: `.akm-deny`, `.akm.lock`, `.akm-migrate-log`, `.akm-skill.json`, `.akm-*.tmp`. Files in the user's cache folder sit in an `akmctl` folder and start `akm-`. The test: would the maintainer open it or reason about it? Then it is plain.
+
+**Verbs.** Operations are lower-case verbs or short nouns (`new`, `set`, `close`, `check`, `commits`); a step in a commit subject is one of nine words (`file`, `ready`, `start`, `block`, `unblock`, `claim`, `release`, `close`, `drop`); a record is any file with an id and a work item is a record of type `work`.
+
 ## Obsidian
 
 | Term               | Aliases             | Meaning                                                                                                                                                                   |

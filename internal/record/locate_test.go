@@ -65,7 +65,7 @@ func TestLoadFollowsTheManifestFolder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if r.MetaDir() != "knowledge" || r.ManifestPath() != "knowledge/.layout" || r.DenyPath() != "knowledge/.akm-deny" || r.MigrateLogPath() != "knowledge/.migrate-log" {
+	if r.MetaDir() != "knowledge" || r.ManifestPath() != "knowledge/.layout" || r.DenyPath() != "knowledge/.akm-deny" || r.MigrateLogPath() != "knowledge/.akm-migrate-log" {
 		t.Errorf("paths: %s %s %s", r.ManifestPath(), r.DenyPath(), r.MigrateLogPath())
 	}
 	if r.WorkDir() != "knowledge/work" {

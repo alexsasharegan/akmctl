@@ -182,14 +182,14 @@ docs/
   .layout                  manifest: layout and extension versions (section 7)
   .akm-deny                the deny list of the safety extension (section 6)
   .akm.lock                advisory lock the tool takes while it writes; not committed (list it in .gitignore)
-  .migrate-log             one JSON line per migration step applied (section 7)
+  .akm-migrate-log         one JSON line per migration step applied (section 7)
 .agents/skills/
   <skill>/                 shared skill copy: SKILL.md, scripts/, assets/
 ```
 
 - The minimal tier (section 8) is the smallest set of these files.
 - **Moved locations.** The work folder, the ADR folder and the roadmap file sit at `docs/work/`, `docs/adr/` and `docs/ROADMAP.md` unless the manifest says otherwise: the keys `work_dir`, `adr_dir` and `roadmap` (section 6, "Settings") move them, for a repository that keeps its records inside another structure, such as a notes vault. `done/` is always `<work_dir>/done/`; the rules below name the default paths and apply to the configured ones.
-- **The manifest folder.** The manifest `.layout`, the deny list `.akm-deny`, the lock `.akm.lock` and the migration log `.migrate-log` live together in one folder, `docs/` unless the repository chose another name (`akmctl init --docs-dir`). A tool finds it from the repository root, which is the nearest ancestor of the working directory that has a manifest or an `AGENTS.md`: first `docs/.layout`; if that is absent, the one immediate subdirectory of the root, not hidden and not `node_modules`, that holds a `.layout` file. Two or more such subdirectories are an error that names them; none means the repository has no manifest. The folder name is a single path segment, so discovery looks one level deep. Where this specification says `docs/.layout`, `docs/.akm-deny`, `docs/.akm.lock` or `docs/.migrate-log`, it means that file in the manifest folder.
+- **The manifest folder.** The manifest `.layout`, the deny list `.akm-deny`, the lock `.akm.lock` and the migration log `.akm-migrate-log` (named `.migrate-log` before 2026-10-30; a tool that finds the old name renames it before it appends) live together in one folder, `docs/` unless the repository chose another name (`akmctl init --docs-dir`). A tool finds it from the repository root, which is the nearest ancestor of the working directory that has a manifest or an `AGENTS.md`: first `docs/.layout`; if that is absent, the one immediate subdirectory of the root, not hidden and not `node_modules`, that holds a `.layout` file. Two or more such subdirectories are an error that names them; none means the repository has no manifest. The folder name is a single path segment, so discovery looks one level deep. Where this specification says `docs/.layout`, `docs/.akm-deny`, `docs/.akm.lock` or `docs/.migrate-log`, it means that file in the manifest folder.
 - Long policies (privacy, publishing, deployment) live in named docs under `docs/` and are linked from the Do-not list of `AGENTS.md`.
 
 ## 2. `AGENTS.md` contract

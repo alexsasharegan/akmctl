@@ -1,8 +1,8 @@
 ---
 id: "261030-1wj5"
 title: Files the tool keeps for itself carry the akm namespace; files a person recognises do not
-summary: System files the CLI maintains are hidden and named .akm-*; the files a person recognises (.layout, records, roadmap) are plain; .migrate-log is grandfathered.
-status: proposed
+summary: System files the CLI keeps are hidden and named .akm-*; files a person recognises (.layout, records, roadmap) are plain; .migrate-log becomes .akm-migrate-log.
+status: accepted
 date: 2026-10-30
 ---
 
@@ -29,26 +29,26 @@ There are two classes of file.
 
 Skills keep the rule of ADR 261029-tb3d (`akm` and `akm-<name>`); a skill is read by an agent and is not a system file in this sense.
 
-Existing names stay: `.akm-deny` (a list a person may edit, but only meaningful to this tool's safety extension), `.akm.lock` (documented and listed in `.gitignore` templates) and `.migrate-log`. They are grandfathered, not examples. `.migrate-log` is the one that breaks the rule; it moves to `.akm-migrate-log` at the next layout version, with a migration step, and until then the tool reads and writes only the old name.
+Existing names stay, with one rename: `.akm-deny` (a list a person may edit, but only meaningful to this tool's safety extension) and `.akm.lock` (documented and listed in `.gitignore` templates) are kept as they are. `.migrate-log` breaks the rule, and is renamed to `.akm-migrate-log` now, with no layout bump: a tool that finds the old name renames it before it appends, so an existing log keeps its history. The layout version records the new name at its next change.
 
 The test for a new file: would the maintainer open it or reason about it? Then it is user-facing. Is it written and read only by the CLI? Then it is a system file and takes the prefix.
 
 ## Consequences
 
 - New system files have a name decided in advance; reviewers can point at this record.
-- Nothing is renamed now. One rename is scheduled, with the layout bump that carries it.
+- One file is renamed now, `.migrate-log` to `.akm-migrate-log`; the tool carries an existing log over on the next migration write.
 - `.layout` stays unprefixed, so a person still recognises it, and the standard keeps a plain name for the file other tools may read.
 - The glossary lists the two classes.
 - A person looking at a repository can tell from the name what is safe to ignore and what to read.
 
 ## Confirmation
 
-A test lists the dotfiles the tool writes in a repository made by `init` and a run of the write operations, and fails if one is neither `.layout` nor starts with `.akm`, except the grandfathered `.migrate-log` named in the test.
+A test lists the dotfiles the tool writes in a repository made by `init` and a run of the write operations, and fails if one is neither `.layout` nor starts with `.akm`.
 
 ## Review
 
-Proposed 2026-10-30 after the maintainer asked whether a record states the namespace rule and described the two classes. The grandfathering of `.migrate-log` is my recommendation; the maintainer may prefer to rename it now.
+Proposed 2026-10-30 after the maintainer asked whether a record states the namespace rule and described the two classes. Accepted by the maintainer on 2026-10-30, who also chose to rename `.migrate-log` now rather than at the next layout version.
 
 ## Revert
 
-Delete this record. Nothing depends on it; new files would again be named case by case.
+Rename `.akm-migrate-log` back and delete this record; new files would again be named case by case.

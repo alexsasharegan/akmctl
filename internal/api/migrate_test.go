@@ -135,7 +135,7 @@ func TestMigrateApplySafe(t *testing.T) {
 	if b, _ := os.ReadFile(filepath.Join(root, "docs/work/done/261010-j9k0-choose-a-licence.md")); !strings.Contains(string(b), "## Outcome") {
 		t.Fatal("heading not renamed")
 	}
-	logb, _ := os.ReadFile(filepath.Join(root, "docs/.migrate-log"))
+	logb, _ := os.ReadFile(filepath.Join(root, "docs/.akm-migrate-log"))
 	if !strings.Contains(string(logb), `"step":"rename-created"`) || strings.Count(string(logb), "\n") != 4 {
 		t.Fatalf("log:\n%s", logb)
 	}
@@ -220,5 +220,21 @@ func TestCheckReportsBehindWithSteps(t *testing.T) {
 	steps, _ := rec.(Obj).Get("steps")
 	if s, _ := rec.(Obj).Get("state"); s != "behind" || len(steps.([]string)) != 5 {
 		t.Fatalf("reconcile %v", rec)
+	}
+}
+
+func TestMigrateLogKeepsHistoryUnderTheOldName(t *testing.T) {
+	fakeRegistry(t)
+	root := oldRepo(t)
+	old := filepath.Join(root, "docs/.migrate-log")
+	os.WriteFile(old, []byte("{\"step\":\"earlier\"}\n"), 0o644)
+	gitRepo(t, root)
+	mustOK(t, root, "migrate", Request{"mode": "apply_safe", "acknowledge_backup": true, "as_of": "2026-10-28T10:00"})
+	if _, err := os.Stat(old); err == nil {
+		t.Error("the old log name is still there")
+	}
+	b, _ := os.ReadFile(filepath.Join(root, "docs/.akm-migrate-log"))
+	if !strings.HasPrefix(string(b), "{\"step\":\"earlier\"}\n") || !strings.Contains(string(b), `"step":"rename-created"`) {
+		t.Errorf("history lost: %q", b)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -115,7 +116,7 @@ func TestOptionsCheckClean(t *testing.T) {
 				if _, err := os.Stat(filepath.Join(dir, "docs")); err == nil {
 					t.Error("a docs folder was created")
 				}
-				if strings.Contains(files[".agents/skills/akm-work-items/SKILL.md"], "docs/work") {
+				if strings.Contains(files[".agents/skills/akm-track-work/SKILL.md"], "docs/work") {
 					t.Error("the skill still points at docs/work")
 				}
 			}
@@ -232,7 +233,7 @@ func TestSkillsMatchRepository(t *testing.T) {
 
 // The always-installed skills are the three akm- ones, in the drift test and in what init writes.
 func TestAlwaysInstalledSkills(t *testing.T) {
-	want := []string{"akm", "akm-record-decision", "akm-work-items"}
+	want := []string{"akm", "akm-record-decision", "akm-track-work"}
 	for _, dir := range []string{"../../.agents/skills", "templates/skills"} {
 		ents, err := os.ReadDir(dir)
 		if err != nil {
@@ -398,5 +399,22 @@ func TestSecondManifestRefused(t *testing.T) {
 	// the same dir again is idempotent
 	if _, aerr := api.Run(repo, info, "init", api.Request{"docs_dir": "knowledge"}); aerr != nil {
 		t.Errorf("repeat: %v", aerr)
+	}
+}
+
+// Skill names follow the grammar of ADR 261030-wsqb: the router is akm, every
+// other skill is akm-<verb>[-<object>] in lower-case words.
+func TestSkillNamesFollowTheGrammar(t *testing.T) {
+	re := regexp.MustCompile(`^akm(-[a-z]+)+$`)
+	for _, root := range []string{"../../.agents/skills", "templates/skills", "templates/optional-skills"} {
+		entries, err := os.ReadDir(root)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, e := range entries {
+			if e.IsDir() && e.Name() != "akm" && !re.MatchString(e.Name()) {
+				t.Errorf("%s/%s is not akm or akm-<verb>[-<object>]", root, e.Name())
+			}
+		}
 	}
 }

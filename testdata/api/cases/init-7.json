@@ -20,8 +20,8 @@
     "written": [
       ".agents/skills/akm-record-decision/SKILL.md",
       ".agents/skills/akm-record-decision/assets/adr.md",
-      ".agents/skills/akm-work-items/SKILL.md",
-      ".agents/skills/akm-work-items/assets/work-item.md",
+      ".agents/skills/akm-track-work/SKILL.md",
+      ".agents/skills/akm-track-work/assets/work-item.md",
       ".agents/skills/akm/SKILL.md",
       ".agents/skills/akm/references/board.md",
       ".agents/skills/akm/references/check.md",
@@ -71,8 +71,8 @@
   "after_paths": [
     "no-tree/.agents/skills/akm-record-decision/SKILL.md",
     "no-tree/.agents/skills/akm-record-decision/assets/adr.md",
-    "no-tree/.agents/skills/akm-work-items/SKILL.md",
-    "no-tree/.agents/skills/akm-work-items/assets/work-item.md",
+    "no-tree/.agents/skills/akm-track-work/SKILL.md",
+    "no-tree/.agents/skills/akm-track-work/assets/work-item.md",
     "no-tree/.agents/skills/akm/SKILL.md",
     "no-tree/.agents/skills/akm/references/board.md",
     "no-tree/.agents/skills/akm/references/check.md",

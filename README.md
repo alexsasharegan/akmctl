@@ -14,7 +14,7 @@ Run one command in an empty folder and you get this:
 my-project/
 ├── AGENTS.md              instructions an agent reads first
 ├── CLAUDE.md              points Claude Code at AGENTS.md
-├── .agents/skills/        skills: akm, akm-work-items, akm-record-decision (and akm-commit, optional)
+├── .agents/skills/        skills: akm, akm-track-work, akm-record-decision (and akm-commit, optional)
 └── docs/
     ├── .layout            the manifest: layout version and settings
     ├── ROADMAP.md         the order of work
@@ -155,7 +155,7 @@ akmctl check
 # 0 errors, 0 warnings
 ```
 
-The file's status goes `raw`, `ready`, `active`, `done`. `close` also moves it into `docs/work/done/` and refuses if the Outcome is empty. In practice your agent runs these steps for you using the `akm-work-items` skill; you read the result.
+The file's status goes `raw`, `ready`, `active`, `done`. `close` also moves it into `docs/work/done/` and refuses if the Outcome is empty. In practice your agent runs these steps for you using the `akm-track-work` skill; you read the result.
 
 ## What the unstable releases do not do
 
@@ -170,7 +170,7 @@ The file's status goes `raw`, `ready`, `active`, `done`. `close` also moves it i
 Read the repository's `AGENTS.md` first; it wins over everything below. The skills in `.agents/skills/` are the procedures:
 
 - `akm`: a routing table of every `akmctl` command with a reference file for each; read the reference before the first use of a command.
-- `akm-work-items`: find, claim, work, checkpoint and close a work item.
+- `akm-track-work`: find, claim, work, checkpoint and close a work item.
 - `akm-record-decision`: write an ADR for a hard-to-reverse choice.
 - `akm-commit` (only when `git_commits` is `true` in `docs/.layout` and the folder is a git repository): commit after each logical step.
 

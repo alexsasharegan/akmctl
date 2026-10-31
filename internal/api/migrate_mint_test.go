@@ -170,7 +170,7 @@ func TestMigrateMintIDsModes(t *testing.T) {
 	if b, _ := os.ReadFile(filepath.Join(root, "docs/notes/261022-2222-alpha-note.md")); !strings.HasPrefix(string(b), "---\nid: \"261022-2222\"\ntitle: Alpha note\n") {
 		t.Fatalf("alpha:\n%s", b)
 	}
-	logb, _ := os.ReadFile(filepath.Join(root, "docs/.migrate-log"))
+	logb, _ := os.ReadFile(filepath.Join(root, "docs/.akm-migrate-log"))
 	if !strings.Contains(string(logb), `"step":"mint-notes"`) || !strings.Contains(string(logb), "alpha-note.md -\\u003e docs/notes/261022-2222-alpha-note.md") {
 		t.Fatalf("log:\n%s", logb)
 	}
@@ -219,7 +219,7 @@ func TestMigrateMintIDsTwice(t *testing.T) {
 	after := snap(t, root)
 	for p, v := range after {
 		switch p {
-		case "docs/.layout", "docs/.migrate-log":
+		case "docs/.layout", "docs/.akm-migrate-log":
 			continue
 		}
 		if w, ok := before[p]; !ok || w != v {

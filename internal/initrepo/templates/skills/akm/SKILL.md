@@ -7,7 +7,7 @@ description: Use the akmctl tool to read and change AKM records (work items, ADR
 
 AKM keeps a repository's decisions, direction and work as Markdown records. `akmctl` reads, writes and checks them; it never stages, commits or pushes.
 
-The repository's `AGENTS.md` wins over this skill. The procedures are in `akm-work-items` and `akm-record-decision`.
+The repository's `AGENTS.md` wins over this skill. The procedures are in `akm-track-work` and `akm-record-decision`.
 
 If `akmctl` is not installed (`akmctl version` fails), tell the maintainer and use the plain-file fallbacks in `AGENTS.md`. Do not invent ids or hand-edit the ADR index.
 

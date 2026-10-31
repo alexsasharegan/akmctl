@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/check"
@@ -238,6 +240,10 @@ func opMigrate(repo *record.Repo, q Request) (Obj, *Error) {
 	results, err := migrate.ApplyEnv(repo, steps, env)
 	if err != nil {
 		return nil, &Error{"unreadable", err.Error() + " (the backup tag " + tag + " holds the state before the migration)", O("tag", tag, "branch", branch)}
+	}
+	// A log written under the old name keeps its history: it takes the new name first.
+	if _, err := os.Stat(filepath.Join(repo.Root, filepath.FromSlash(repo.MigrateLogPath()))); os.IsNotExist(err) {
+		os.Rename(filepath.Join(repo.Root, filepath.FromSlash(repo.LegacyMigrateLogPath())), filepath.Join(repo.Root, filepath.FromSlash(repo.MigrateLogPath())))
 	}
 	if err := migrate.AppendLog(repo.Root, repo.MigrateLogPath(), from, to, results, clock(q)); err != nil {
 		return nil, unreadable(err)
