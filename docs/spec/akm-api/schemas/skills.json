@@ -204,6 +204,13 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [

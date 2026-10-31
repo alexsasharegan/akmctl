@@ -27,6 +27,9 @@ func skillPath(root, rel string) string { return filepath.Join(root, filepath.Fr
 func TestSkillsInstallStatusUpdate(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "skills", Request{})
+	if n, _ := resp.Get("notes"); n == nil || !strings.Contains(n.([]string)[0], "git-commits on") {
+		t.Fatalf("no note about akm-commit: %v", resp)
+	}
 	if c, _ := resp.Get("clean"); c != false || skillState(t, resp, "akm") != "missing" {
 		t.Fatalf("a bare repo has no skills: %v", resp)
 	}

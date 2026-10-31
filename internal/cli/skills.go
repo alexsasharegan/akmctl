@@ -90,6 +90,11 @@ func skillsText(w io.Writer, resp api.Obj) {
 			fmt.Fprintf(w, "           %v\n", note)
 		}
 	}
+	if ns, has := resp.Get("notes"); has {
+		for _, n := range ns.([]string) {
+			fmt.Fprintln(w, "note:", n)
+		}
+	}
 	plan, ok := resp.Get("plan")
 	if !ok {
 		return

@@ -23,7 +23,7 @@ Before filing, read what `ls --status raw,ready,active,blocked` shows. `akmctl n
 - Keep `## Next` as the single next concrete step. Overwrite it at each checkpoint.
 - Append dated lines to `## Log`; never rewrite old lines.
 - Update both in the same commit as the code.
-- If the `akm-commit` skill is installed (`.agents/skills/akm-commit`), follow it for commits.
+- Commit one step at a time (file, ready, start, claim, release, close, ...). Each command that changes an item prints a commit message: use it as given, never your own subject. If the `akm-commit` skill is installed (`.agents/skills/akm-commit`), it has the rest.
 - Command details are in the `akm` skill (`.agents/skills/akm/references/`).
 - A `ready` item needs a `## Goal` with a "done when" list; an `active` or `blocked` one needs a non-empty `## Next`; a `blocked` one needs `blocked_by`.
 
@@ -37,6 +37,6 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 2. Ask whether the work made a choice that is hard to reverse or that rejected a real alternative. If yes, draft an ADR with `akm-record-decision` (or find the one that already records it) and list its id in the item's `decisions` field. If no, end the Outcome with `Decision: none`. The tool does not check this; the answer is yours to give.
 3. `akmctl close <id> done` (or `dropped`). It sets the status and `closed` (today), moves the file to `docs/work/done/` and refuses an empty Outcome.
 4. Read the list of open items it prints (`dependents`): they named this item in `blocked_by`. For each, unblock it (`set status=ready`, and remove the entry from `blocked_by`) or re-point `blocked_by` at what it still waits on. The tool lists them and edits none.
-5. Run `akmctl check`. Commit the work, the item and any roadmap change together.
+5. Run `akmctl check`. Commit with the message `close` printed, staging the work, the moved item and any roadmap change with it.
 
 The template for a new item is `assets/work-item.md` (for use without the tool).

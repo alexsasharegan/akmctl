@@ -22,7 +22,7 @@ Read the list: if an item covers the work, add to it. `new` never refuses becaus
 
 A work item starts `raw`, an ADR `proposed`. The slug is lowercase kebab-case, at most 60 characters; `--title` overrides the title. Fill the file with `set` and `section`.
 
-Returns a `commit` (message and paths to stage) for the commit; the optional `akm-commit` skill says how to use it.
+Returns a `commit` (message and paths to stage). Use `commit.message` as the commit message exactly as given, with its `AKM-Step` and `AKM-Item` trailers, and stage `commit.paths` with the code that belongs to the step. Do not write your own subject. One commit per step.
 
 Files changed: one new file in the work or ADR folder.
 

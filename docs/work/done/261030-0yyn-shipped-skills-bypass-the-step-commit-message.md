@@ -2,13 +2,12 @@
 id: "261030-0yyn"
 title: The shipped skills let an agent skip the step commit message
 summary: A vault agent ignored the printed commit message because the skills defer to the optional akm-commit and tell it to commit work and item together.
-status: active
+status: done
 kind: bug
 priority: 2
 created: 2026-10-30
 updated: 2026-10-30
-claimed_by: claude
-claimed_at: 2026-10-31T06:17
+closed: 2026-10-30
 ---
 
 # The shipped skills let an agent skip the step commit message
@@ -28,14 +27,18 @@ Fix: state the rule in the always-installed skills (use `commit.message` as give
 
 Done when:
 
-- [ ] The `akm` references that return a `commit` say to use `commit.message` as given and stage `commit.paths` with the code, with no need for `akm-commit`.
-- [ ] `akm-track-work` no longer says to commit the whole task together; it says one commit per step, built from the returned message.
-- [ ] `skills status` says that `akm-commit` is not installed while `git_commits` is off, and how to turn it on.
-- [ ] Both skill copies are equal, the specification, schema and fixtures follow, and the changelog says so.
+- [x] The `akm` references that return a `commit` say to use `commit.message` as given and stage `commit.paths` with the code, with no need for `akm-commit`.
+- [x] `akm-track-work` no longer says to commit the whole task together; it says one commit per step, built from the returned message.
+- [x] `skills status` says that `akm-commit` is not installed while `git_commits` is off, and how to turn it on.
+- [x] Both skill copies are equal, the specification, schema and fixtures follow, and the changelog says so.
 
 ## Next
 
 Wait for the maintainer to say which fix to take; then reword the skills in `internal/initrepo/templates/skills` and `.agents/skills` together (a drift test requires equal copies).
+
+## Outcome
+
+The akm references new, claim, close and release now say to use commit.message as given and stage commit.paths, one commit per step, with no need for akm-commit (both skill copies; the drift test passes). akm-track-work says to commit one step at a time and close to commit with the message close printed. skills status and install print a note when akm-commit is not installed and git_commits is off (notes member, schema, spec 4.20, test). akm-commit stays optional (ADR 261030-tbkh); the full check passes: vet, tests, records check, Prettier, schemas. Not verified: that an agent now follows the message; the vault thread will show it. Decision: none.
 
 ## Log
 

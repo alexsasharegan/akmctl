@@ -108,8 +108,16 @@ func opSkills(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 		reports = append(reports, r.obj())
 		clean = false
 	}
+	var notes []string
+	if !repo.GitCommits() {
+		notes = append(notes, "the optional skill akm-commit is not installed (git_commits is off): it tells an agent to commit one step at a time; akmctl config git-commits on installs it")
+	}
 	if !write {
-		return O("mode", mode, "clean", clean, "skills", reports), nil
+		out := O("mode", mode, "clean", clean, "skills", reports)
+		if len(notes) > 0 {
+			out = append(out, KV{"notes", notes})
+		}
+		return out, nil
 	}
 
 	confirmEdited := q.boolean("confirm_edited")
@@ -227,6 +235,9 @@ func opSkills(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 	}
 	out := O("mode", mode, "clean", clean, "skills", reports, "plan", planObjs, "applied", apply && (len(written)+len(replaced)+len(removed)) > 0,
 		"needs_confirmation", pending && !apply, "written", nonNil(written), "replaced", nonNil(replaced), "removed", nonNil(removed), "skipped", nonNilObj(skipped))
+	if len(notes) > 0 {
+		out = append(out, KV{"notes", notes})
+	}
 	return out, nil
 }
 

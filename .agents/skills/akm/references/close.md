@@ -21,7 +21,7 @@ open items that were waiting on this one (unblock or re-point each):
 
 `close` never edits them: unblock or re-point each with `set`, in the same commit.
 
-Returns a `commit` (message and paths to stage) for the commit; the optional `akm-commit` skill says how to use it.
+Returns a `commit` (message and paths to stage). Use `commit.message` as the commit message exactly as given, with its `AKM-Step` and `AKM-Item` trailers, and stage `commit.paths` with the code that belongs to the step. Do not write your own subject. One commit per step.
 
 Files changed: the record, renamed into `done/`; `updated` and `closed` are set to today.
 
