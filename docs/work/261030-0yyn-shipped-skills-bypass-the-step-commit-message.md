@@ -2,11 +2,13 @@
 id: "261030-0yyn"
 title: The shipped skills let an agent skip the step commit message
 summary: A vault agent ignored the printed commit message because the skills defer to the optional akm-commit and tell it to commit work and item together.
-status: ready
+status: active
 kind: bug
 priority: 2
 created: 2026-10-30
 updated: 2026-10-30
+claimed_by: claude
+claimed_at: 2026-10-31T06:17
 ---
 
 # The shipped skills let an agent skip the step commit message
@@ -38,3 +40,4 @@ Wait for the maintainer to say which fix to take; then reword the skills in `int
 ## Log
 
 - 2026-10-30: filed.
+- 2026-10-30: claimed (claude).
