@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.3 - 2026-10-31
+
 - `close <parent> dropped` is refused (`open_children`, WK8) while a child is open, as for `done`, and `check` applies WK8 to a `dropped` parent and to open descendants below a settled child. Before, the spec's rule for dropping a parent was not enforced and the open child was left under a closed parent. A repository that already has such a parent now fails `check`: drop or re-parent the open children (work item 261031-6c5n).
 
 - `new` is refused (WK18) when its `fields` give a `parent` and a `blocked_by` that close a dependency cycle, such as a child blocked by its own parent. This was reachable through the API and the workbench capture form. Fixtures `new-1` and `close-7` in both copies (work item 261031-btdz).

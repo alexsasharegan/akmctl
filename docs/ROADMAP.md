@@ -2,7 +2,9 @@
 
 ## Now
 
-The fixes that stop nested records reaching an invalid state are merged (WK4 loops, WK8, WK18); the patch release that carries them is the maintainer's to tag, together with the WK19 warning and the "Gate hand edits" guide section.
+Cut v0.3.3, which carries the nested-record fixes (WK4 loops, WK8, WK18, WK19, the "Gate hand edits" guide section):
+
+- [261031-nep4] release v0 3 3
 
 ## Next
 
