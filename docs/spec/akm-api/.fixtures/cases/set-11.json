@@ -1,0 +1,33 @@
+{
+  "name": "a blocked_by entry that closes a cycle is refused",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "changes": {
+      "blocked_by": [
+        "261024-g7h8"
+      ]
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261020-a2b3",
+      "changes": {
+        "blocked_by": [
+          "261024-g7h8"
+        ]
+      }
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "blocked_by 261024-g7h8 would make a dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3",
+      "details": {
+        "reason": "rule",
+        "rule": "WK18"
+      }
+    }
+  }
+}

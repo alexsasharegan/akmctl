@@ -114,6 +114,12 @@ func TestRules(t *testing.T) {
 		{"WK16 cycle too long", "WK16", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\ncycle: "+strings.Repeat("a", 65))}},
 		{"WK16 cycle starts with a dash", "WK16", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\ncycle: \"-x\"")}},
 		{"WK17 keep not a boolean", "WK17", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\nkeep: maybe")}},
+		{"WK18 mutual block", "WK18", "E", map[string]func(string) string{a2b3: sub("priority: 2", "priority: 2\nblocked_by: [261024-g7h8]")}},
+		{"WK18 grandchild chain back to its parent", "WK18", "E", map[string]func(string) string{
+			e5f6: sub("parent: 261015-c4d5", "parent: 261015-c4d5\nblocked_by: [261024-g7h8]"),
+			g7h8: sub("261020-a2b3,", "261015-c4d5, 261020-a2b3,"),
+		}},
+		{"WK18 child blocked by its parent", "WK18", "E", map[string]func(string) string{e5f6: sub("parent: 261015-c4d5", "parent: 261015-c4d5\nblocked_by: [261015-c4d5]")}},
 		{"WK12 heading differs", "WK12", "W", map[string]func(string) string{e5f6: sub("# Document the exit codes", "# Something else")}},
 		{"I1 duplicate id", "I1", "E", map[string]func(string) string{"docs/work/261022-e5f6-copy.md": func(string) string {
 			return "---\nid: 261022-e5f6\ntitle: Copy\nstatus: raw\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n# Copy\n"
@@ -289,5 +295,50 @@ func TestL2EscapedPipeInTableCell(t *testing.T) {
 		if f.Rule == "L2" {
 			t.Fatalf("%+v", f)
 		}
+	}
+}
+
+func count(res Result, rule string) []Finding {
+	var out []Finding
+	for _, f := range res.Findings {
+		if f.Rule == rule {
+			out = append(out, f)
+		}
+	}
+	return out
+}
+
+func TestDependencyCycleIsReportedOncePerCycle(t *testing.T) {
+	// a2b3 <-> g7h8, and e5f6 waits for both: one finding, naming the cycle in order
+	res := Run(repoWith(t, map[string]func(string) string{
+		a2b3: sub("priority: 2", "priority: 2\nblocked_by: [261024-g7h8]"),
+		e5f6: sub("parent: 261015-c4d5", "parent: 261015-c4d5\nblocked_by: [261020-a2b3, 261024-g7h8]"),
+	}), Options{AsOf: asOf})
+	got := count(res, "WK18")
+	if len(got) != 1 || !strings.Contains(got[0].Message, "261020-a2b3 -> 261024-g7h8 -> 261020-a2b3") || got[0].ID != "261020-a2b3" {
+		t.Fatalf("%+v", got)
+	}
+}
+
+func TestParentLoopIsReportedOnceAsWK4(t *testing.T) {
+	// c4d5 -> a2b3 -> c4d5 is a parent loop (a2b3 is already a child of c4d5); e5f6 only leads into it
+	res := Run(repoWith(t, map[string]func(string) string{
+		"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: active\nparent: 261020-a2b3"),
+	}), Options{AsOf: asOf})
+	if got := count(res, "WK4"); len(got) != 1 || !strings.Contains(got[0].Message, "261015-c4d5 -> 261020-a2b3 -> 261015-c4d5") {
+		t.Fatalf("%+v", got)
+	}
+	if got := count(res, "WK18"); len(got) != 0 {
+		t.Fatalf("a parent-only loop is WK4: %+v", got)
+	}
+}
+
+func TestParentListingItsChildInBlockedByIsNotACycle(t *testing.T) {
+	// a parent already waits for its children, so the entry is redundant, not circular
+	res := Run(repoWith(t, map[string]func(string) string{
+		"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: active\nblocked_by: [261022-e5f6]"),
+	}), Options{AsOf: asOf})
+	if got := count(res, "WK18"); len(got) != 0 {
+		t.Fatalf("%+v", got)
 	}
 }

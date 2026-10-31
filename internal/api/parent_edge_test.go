@@ -76,3 +76,69 @@ func TestClosedItemMayJoinAClosedParent(t *testing.T) {
 	mustOK(t, root, "set", Request{"id": x, "changes": map[string]any{"parent": doneItem}})
 	clean(t, root)
 }
+
+func block(t *testing.T, root, id string, by ...string) *Error {
+	t.Helper()
+	list := make([]any, len(by))
+	for i, b := range by {
+		list[i] = b
+	}
+	_, err := call(t, root, "set", Request{"id": id, "changes": map[string]any{"blocked_by": list}})
+	return err
+}
+
+func TestSetRefusesBlockedByCycles(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	a := newItem(t, root, "item-a", "")
+	b := newItem(t, root, "item-b", "")
+	c := newItem(t, root, "item-c", "")
+	if err := block(t, root, a, b); err != nil {
+		t.Fatal(err)
+	}
+	if err := block(t, root, b, c); err != nil {
+		t.Fatal(err)
+	}
+	wantRule(t, block(t, root, a, a), "WK18", a)                 // itself
+	wantRule(t, block(t, root, b, a), "WK18", a, b)              // mutual
+	wantRule(t, block(t, root, c, a), "WK18", a, b, c)           // longer loop, named in order
+	if err := block(t, root, a, b, "legal review"); err != nil { // free text and an entry already there
+		t.Fatal(err)
+	}
+	clean(t, root)
+}
+
+func TestBlockedByCyclesThroughTheParentTree(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	p := newItem(t, root, "project", "")
+	c := newItem(t, root, "child", p)
+	g := newItem(t, root, "grandchild", c)
+	other := newItem(t, root, "other", "")
+	// a parent waits for its children, so a child cannot wait for the parent, at any depth
+	wantRule(t, block(t, root, c, p), "WK18", p, c)
+	wantRule(t, block(t, root, g, p), "WK18", p, g)
+	// through a third item that waits for the project
+	if err := block(t, root, other, p); err != nil {
+		t.Fatal(err)
+	}
+	wantRule(t, block(t, root, g, other), "WK18", other, g)
+	// a parent listing its own child is redundant, not circular
+	if err := block(t, root, p, c); err != nil {
+		t.Fatal(err)
+	}
+	clean(t, root)
+}
+
+func TestParentEdgeCannotCompleteADependencyCycle(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	p := newItem(t, root, "project", "")
+	c := newItem(t, root, "stray", "")
+	if err := block(t, root, c, p); err != nil { // c waits for p: fine while unrelated
+		t.Fatal(err)
+	}
+	_, err := call(t, root, "set", Request{"id": c, "changes": map[string]any{"parent": p}})
+	wantRule(t, err, "WK18", p, c)
+	// moving a child away from the parent it waits on is allowed
+	q := newItem(t, root, "elsewhere", "")
+	mustOK(t, root, "set", Request{"id": c, "changes": map[string]any{"parent": q}})
+	clean(t, root)
+}

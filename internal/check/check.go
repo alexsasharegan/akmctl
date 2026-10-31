@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexsasharegan/akmctl/internal/depgraph"
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/index"
 	"github.com/alexsasharegan/akmctl/internal/migrate"
@@ -181,6 +182,27 @@ func (c *checker) work() {
 		}
 		c.workRecord(r)
 	}
+	c.parentLoops()
+	c.dependencyCycles()
+}
+
+// parentLoops reports each loop in the parent links once (WK4), at its lowest id.
+// An item that only leads into a loop is not part of it and is not reported.
+func (c *checker) parentLoops() {
+	for _, cyc := range depgraph.Build(c.repo).ParentLinks().Cycles(false) {
+		r := c.ref(cyc[0])
+		c.add("WK4", "E", r.Path, c.line(r, "parent"), r.ID, "parent chain forms a cycle: %s", strings.Join(cyc, " -> "))
+	}
+}
+
+// dependencyCycles reports each cycle of blocked_by entries and parent-to-child
+// links once (WK18), at its lowest id. Loops of parent links alone are WK4.
+func (c *checker) dependencyCycles() {
+	g := depgraph.Build(c.repo)
+	for _, cyc := range g.Cycles(true) {
+		r := c.ref(cyc[0])
+		c.add("WK18", "E", r.Path, c.line(r, "blocked_by"), r.ID, "dependency cycle: %s", strings.Join(cyc, " -> "))
+	}
 }
 
 func (c *checker) workRecord(r *record.Record) {
@@ -218,8 +240,6 @@ func (c *checker) workRecord(r *record.Record) {
 			c.add("WK4", "E", r.Path, c.line(r, "parent"), r.ID, "parent %s does not resolve to an existing item", record.RefID(p))
 		case pr.ID == r.ID:
 			c.add("WK4", "E", r.Path, c.line(r, "parent"), r.ID, "an item cannot be its own parent")
-		case c.cycle(r):
-			c.add("WK4", "E", r.Path, c.line(r, "parent"), r.ID, "parent chain forms a cycle")
 		}
 	}
 	// WK5
@@ -324,22 +344,6 @@ func (c *checker) workRecord(r *record.Record) {
 }
 
 func hasSection(names []string, n string) bool { return in(names, n) }
-
-func (c *checker) cycle(r *record.Record) bool {
-	seen := map[string]bool{r.ID: true}
-	cur := r
-	for {
-		p := c.ref(cur.Str("parent"))
-		if p == nil || p.Type != record.Work {
-			return false
-		}
-		if seen[p.ID] {
-			return true
-		}
-		seen[p.ID] = true
-		cur = p
-	}
-}
 
 func (c *checker) adrs() {
 	for _, r := range c.repo.Records {

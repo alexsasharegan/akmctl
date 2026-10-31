@@ -1,0 +1,33 @@
+{
+  "name": "a dependency cycle is one finding",
+  "repo": "cyclic",
+  "request": {
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "check",
+    "request": {
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "clean": false,
+    "errors": 1,
+    "warnings": 0,
+    "count": 1,
+    "findings": [
+      {
+        "rule": "WK18",
+        "severity": "E",
+        "file": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "line": 7,
+        "id": "261020-a2b3",
+        "message": "dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3",
+        "class": null
+      }
+    ],
+    "reconcile": {
+      "state": "current"
+    }
+  }
+}

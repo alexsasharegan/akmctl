@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexsasharegan/akmctl/internal/depgraph"
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/fsx"
 	"github.com/alexsasharegan/akmctl/internal/record"
@@ -448,6 +449,36 @@ func fieldValue(repo *record.Repo, typ, key string, v any) (frontmatter.Value, *
 	return bad("is not a field that can be set")
 }
 
+// blockedByRule refuses a blocked_by entry that would close a dependency cycle
+// (WK18): the item would wait for target while target already waits, directly or
+// through its children and its own blockers, for the item.
+func blockedByRule(repo *record.Repo, id string, entries []frontmatter.Value, had []frontmatter.Value) *Error {
+	known := map[string]bool{}
+	for _, it := range had {
+		known[record.RefID(it.Str)] = true
+	}
+	var g *depgraph.Graph
+	for _, it := range entries {
+		target := record.RefID(it.Str)
+		if it.Kind != frontmatter.String || !record.ValidID(target) || known[target] {
+			continue
+		}
+		if t := repo.ByID(target); len(t) == 0 || t[0].Type != record.Work {
+			continue
+		}
+		if target == id {
+			return refusedRule("WK18", "%s cannot be blocked by itself", id)
+		}
+		if g == nil {
+			g = depgraph.Build(repo)
+		}
+		if path := g.Path(target, id); path != nil {
+			return refusedRule("WK18", "blocked_by %s would make a dependency cycle: %s -> %s", target, id, strings.Join(path, " -> "))
+		}
+	}
+	return nil
+}
+
 // parentEdgeRule refuses a new parent edge from the item id (status st; id is
 // empty for an item being filed) to parentID when the edge would close a loop
 // (WK4) or put an open item under a closed parent (WK8). The parent chain is
@@ -469,6 +500,15 @@ func parentEdgeRule(repo *record.Repo, id, st, parentID string) *Error {
 				break
 			}
 			cur = record.RefID(t[0].Str("parent"))
+		}
+	}
+	if id != "" {
+		g := depgraph.Build(repo)
+		if old := record.RefID(repo.ByID(id)[0].Str("parent")); old != "" {
+			g = g.Without(old, id)
+		}
+		if path := g.Path(id, parentID); path != nil {
+			return refusedRule("WK18", "parent %s would make a dependency cycle: %s -> %s", parentID, strings.Join(path, " -> "), id)
 		}
 	}
 	if t := repo.ByID(parentID); len(t) > 0 && (t[0].Status() == "done" || t[0].Status() == "dropped") && st != "done" && st != "dropped" {
@@ -527,6 +567,11 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 			return nil, refusedRule("WK4", "an item cannot be its own parent")
 		}
 		cur, has := e.rec.Fields[k]
+		if k == "blocked_by" && typ == record.Work && fv.Kind == frontmatter.List && !(has && sameValue(k, cur, fv)) {
+			if rerr := blockedByRule(repo, e.rec.ID, fv.Items, cur.Items); rerr != nil {
+				return nil, rerr
+			}
+		}
 		if k == "parent" && fv.Kind == frontmatter.String && !(has && sameValue(k, cur, fv)) {
 			if rerr := parentEdgeRule(repo, e.rec.ID, e.rec.Status(), record.RefID(fv.Str)); rerr != nil {
 				return nil, rerr

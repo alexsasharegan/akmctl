@@ -135,6 +135,10 @@ def broken(files):
     files[k] = re.sub(r"## Next\n.*?\n\n(?=## Log)", "", files[k], flags=re.S)
     files["docs/ROADMAP.md"] = ROADMAP.replace("## Later\n", "## Later\n- [261099-bbbb] Ghost\n")
 
+def cyclic(files):
+    k = "docs/work/261020-a2b3-add-json-output-to-ls.md"
+    files[k] = files[k].replace("priority: 2\n", "blocked_by: [261024-g7h8]\npriority: 2\n", 1)
+
 WORK_F = ["id", "title", "summary", "status", "kind", "parent", "blocked_by", "priority", "cycle", "keep", "created", "updated", "closed", "authored_by", "decisions"]
 ADR_F = ["id", "title", "summary", "status", "date", "scope", "supersedes", "superseded_by", "authored_by"]
 
@@ -323,6 +327,8 @@ def write_cases(cases, basic):
     case("set", 9, "a parent edge that closes a loop is refused", "basic", req, err("set", req, "refused", "parent 261022-e5f6 would make a loop: 261015-c4d5 -> 261022-e5f6 -> 261015-c4d5", reason="rule", rule="WK4"))
     req = dict(id="261022-e5f6", changes=dict(parent="261010-j9k0"))
     case("set", 10, "an open item cannot take a closed parent", "basic", req, err("set", req, "refused", "261010-j9k0 is done, so 261022-e5f6 cannot be its child while open", reason="rule", rule="WK8"))
+    req = dict(id="261020-a2b3", changes=dict(blocked_by=["261024-g7h8"]))
+    case("set", 11, "a blocked_by entry that closes a cycle is refused", "basic", req, err("set", req, "refused", "blocked_by 261024-g7h8 would make a dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3", reason="rule", rule="WK18"))
     # claim, release (repo with the claims extension)
     req = dict(id="261022-e5f6", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     text = clm[E5F6].replace("status: ready\n", "status: active\n").replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n")
@@ -652,6 +658,10 @@ def main():
     req = dict(target="0.3.0", as_of=AS_OF)
     f4 = [dict(x, **{"class": "manual"}) for x in f]
     case("check", 4, "findings are classified for a target version", "broken", req, ok("check", req, clean=False, errors=3, warnings=0, count=3, findings=f4, reconcile=dict(state="current")))
+    cyc = build("cyclic", cyclic)
+    p = "docs/work/261020-a2b3-add-json-output-to-ls.md"
+    f6 = [dict(rule="WK18", severity="E", file=p, line=line_of(cyc, p, "blocked_by:"), id="261020-a2b3", message="dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3", **{"class": None})]
+    case("check", 6, "a dependency cycle is one finding", "cyclic", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=False, errors=1, warnings=0, count=1, findings=f6, reconcile=dict(state="current")))
     req = {}
     case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.3.0"}, to="0.3.0", state="current", steps=[], findings=[], clean=True))
     # find, when

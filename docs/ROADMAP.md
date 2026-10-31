@@ -2,9 +2,7 @@
 
 ## Now
 
-Close the gaps that let nested records reach an invalid state in the current release, then cut a patch release (the maintainer tags):
-
-- [261031-z50q] Check blocked_by cycles and parent-child deadlocks
+The fixes that stop nested records reaching an invalid state are merged (WK4 loops, WK8, WK18); the patch release that carries them is the maintainer's to tag.
 
 ## Next
 
