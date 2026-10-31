@@ -36,7 +36,7 @@ The words used here are defined in [glossary.md](glossary.md).
 
 ## Where the standard lives
 
-This repository holds the whole of AKM: the standard (`docs/spec/agent-ready-repo-spec.md`), the guide (`docs/spec/akm-guide.md`), the API spec (`docs/spec/akm-api-spec.md`) with its schemas, validator and fixtures (`docs/spec/akm-api/`), the decisions that shaped them (`docs/adr/`, `docs/design/agent-ready-repo-decision-log.md`) and the closed work (`docs/work/done/`). There is no template repository; `akmctl init` and `akmctl migrate` are the way in (ADR 261029-j0d0). `scripts/vault-migration/` is the history of the first migration, kept as the seed of the `migrate` discovery phase.
+This repository holds the whole of AKM: the standard (`docs/spec/agent-ready-repo-spec.md`), the guide (`docs/spec/akm-guide.md`), the API spec (`docs/spec/akm-api-spec.md`) with its schemas, validator and fixtures (`docs/spec/akm-api/`), the decisions that shaped them (`docs/adr/`, `docs/design/agent-ready-repo-decision-log.md`) and the closed work (`docs/work/done/`). `docs/ideas/` holds ideas that are not part of AKM (not records; `check` skips them). There is no template repository; `akmctl init` and `akmctl migrate` are the way in (ADR 261029-j0d0). `scripts/vault-migration/` is the history of the first migration, kept as the seed of the `migrate` discovery phase.
 
 ## Versions
 
