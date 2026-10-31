@@ -6,10 +6,6 @@
 
 ## Next
 
-The skills installer, now on the final names:
-
-- [261030-8d8t] skills install and update command
-
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
 
 - [261029-kb33] Workbench form controls: a custom select and a summary text area with a counter

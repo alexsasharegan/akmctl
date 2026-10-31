@@ -1,15 +1,14 @@
 ---
 id: "261030-8d8t"
 title: skills install and update command
-status: active
+status: done
 created: 2026-10-30
 updated: 2026-10-30
+closed: 2026-10-30
 kind: feature
 priority: 3
 decisions: [261030-h6t7]
 summary: A command installs, checks and updates the akm skills packaged in the binary, in a repository that was not made by init.
-claimed_by: claude
-claimed_at: 2026-10-31T05:14
 ---
 
 # skills install and update command
@@ -30,11 +29,15 @@ Done when:
 - [x] A status view, or a `check` rule, reports a skill whose installed version differs from the shipped one, and an optional skill whose key and directory disagree.
 - [x] `update` shows the diff for a changed skill before replacing it.
 - [x] The API schema, fixtures, specification, guide, glossary and changelog are updated; a test covers a repository made by an older tool version.
-- [ ] Run in the maintainer's vault, it installs the three skills and `akmctl check` reports no new warnings.
+- [x] Run in the maintainer's vault, it installs the three skills and `akmctl check` reports no new warnings.
 
 ## Next
 
 Only the last check remains: run `akmctl skills install` in the maintainer's vault and confirm `akmctl check` reports no new warnings. That is the maintainer's repository, so it is left to them.
+
+## Outcome
+
+akmctl skills status|install|update ships (ADR 261030-h6t7), with a marker per skill folder and one code path shared with init and config git-commits. Verified in the maintainer's Obsidian vault: install wrote 28 files, status was clean, and akmctl check was unchanged (0 errors, 128 warnings). That vault's task 261030-wf9z (outside this repository, in the vault under 9 pkm/tasks/done/) then retired its task-lifecycle skill for akm-track-work. Not exercised on a real folder: the akm-work-items rename (the vault never had it), covered by API tests. One follow-up fix came from the vault run: the text output now says whether a plan was applied.
 
 ## Log
 
