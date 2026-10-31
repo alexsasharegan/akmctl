@@ -1,12 +1,14 @@
 ---
 id: "261030-8d8t"
 title: skills install and update command
-status: ready
+status: active
 created: 2026-10-30
 updated: 2026-10-30
 kind: feature
 priority: 3
 summary: A command installs, checks and updates the akm skills packaged in the binary, in a repository that was not made by init.
+claimed_by: claude
+claimed_at: 2026-10-31T04:43
 ---
 
 # skills install and update command
@@ -33,3 +35,4 @@ Done when:
 
 - 2026-10-30: filed.
 - 2026-10-30: filed from the vault migration review; the vault has the records but not the skills.
+- 2026-10-30: claimed (claude).
