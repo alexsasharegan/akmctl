@@ -14,9 +14,8 @@ Workbench polish and the Obsidian Bases file, in order (the styling freeze is li
 - [261028-esyt] Show and edit a record's fields in the drawer
 - [261029-kb88] Generate an Obsidian Bases file that mirrors the workbench
 
-Agent-flow guardrails from the vault migration review, in order:
+Agent-flow guardrails from the vault migration review, in order (261030-1xdy is done):
 
-- [261030-1xdy] close asks whether a decision was made
 - [261030-akc4] search before creating an item
 - [261030-dw71] close reports dependents
 
