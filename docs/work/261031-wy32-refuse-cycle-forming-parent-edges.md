@@ -1,10 +1,11 @@
 ---
 id: "261031-wy32"
 title: refuse cycle forming parent edges
-status: raw
+status: ready
 created: 2026-10-31
 updated: 2026-10-31
 summary: set and new refuse a parent edge that closes a cycle at any depth
+priority: 10
 ---
 
 # refuse cycle forming parent edges

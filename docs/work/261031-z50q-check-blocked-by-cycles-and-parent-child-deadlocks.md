@@ -1,10 +1,11 @@
 ---
 id: "261031-z50q"
 title: check blocked by cycles and parent child deadlocks
-status: raw
+status: ready
 created: 2026-10-31
 updated: 2026-10-31
 summary: check rule for blocked_by cycles and for a parent blocked by its descendant
+priority: 10
 ---
 
 # check blocked by cycles and parent child deadlocks

@@ -1,10 +1,11 @@
 ---
 id: "261031-xprq"
 title: specify recursive closable and blocked
-status: raw
+status: ready
 created: 2026-10-31
 updated: 2026-10-31
 summary: Define closable and blocked as recursive predicates over parent and blocked_by
+priority: 10
 ---
 
 # specify recursive closable and blocked
