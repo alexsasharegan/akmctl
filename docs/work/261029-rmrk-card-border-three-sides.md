@@ -1,12 +1,14 @@
 ---
 id: "261029-rmrk"
 title: Fix the card border that shows on only three sides
-status: ready
+status: active
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-31
 kind: bug
 priority: 3
 summary: In the Ready lane the first card draws its border on three of the four sides.
+claimed_by: claude
+claimed_at: 2026-10-31T07:05
 ---
 
 # Fix the card border that shows on only three sides
@@ -24,3 +26,4 @@ Done when:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-31: claimed (claude).
