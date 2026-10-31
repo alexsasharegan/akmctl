@@ -1,9 +1,10 @@
 ---
 id: "261030-1xdy"
 title: close asks whether a decision was made
-status: ready
+status: done
 created: 2026-10-30
 updated: 2026-10-30
+closed: 2026-10-30
 kind: chore
 priority: 1
 summary: The akm-work-items Close step asks whether the work made a hard-to-reverse choice, and links the ADR in decisions.
@@ -19,11 +20,22 @@ Why: `akm-record-decision` says to draft before making the choice, but an item c
 
 Done when:
 
-- [ ] The Close section of `akm-work-items` and the "When" section of `akm-record-decision` are changed in both copies (`.agents/skills/` and `internal/initrepo/templates/skills/`), and the skill drift test passes.
-- [ ] The step names the `decisions` field and the `Decision: none` line, and does not claim the tool checks it.
+- [x] The Close section of `akm-work-items` and the "When" section of `akm-record-decision` are changed in both copies (`.agents/skills/` and `internal/initrepo/templates/skills/`), and the skill drift test passes.
+- [x] The step names the `decisions` field and the `Decision: none` line, and does not claim the tool checks it.
 - [ ] This repository closes one item with the new step as a trial, and the Log records whether it was usable.
+
+## Outcome
+
+- Close in `akm-work-items` (both copies) has a new step 2: ask about a hard-to-reverse choice, list the ADR in `decisions`, or write `Decision: none`; it says the tool does not check it.
+- `akm-record-decision` "When" (both copies) adds the choice noticed at close.
+- Drift test: `go test ./...` passes; `akmctl check` 0 errors, 0 warnings; `npm run format:check` clean.
+- Trial: this item closes with the new step. The step was usable: one question, one line in the Outcome, no friction.
+
+Decision: none.
 
 ## Log
 
 - 2026-10-30: filed.
 - 2026-10-30: filed from the vault migration review (task-lifecycle adr-check compared with akm-record-decision).
+- 2026-10-30: claimed (claude).
+- 2026-10-30: skills edited in both copies; closed as the trial of the new step.

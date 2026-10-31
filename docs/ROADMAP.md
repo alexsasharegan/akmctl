@@ -14,6 +14,12 @@ Workbench polish and the Obsidian Bases file, in order (the styling freeze is li
 - [261028-esyt] Show and edit a record's fields in the drawer
 - [261029-kb88] Generate an Obsidian Bases file that mirrors the workbench
 
+Agent-flow guardrails from the vault migration review, in order:
+
+- [261030-1xdy] close asks whether a decision was made
+- [261030-akc4] search before creating an item
+- [261030-dw71] close reports dependents
+
 ## Later
 
 ### 1.0.0
@@ -29,6 +35,7 @@ Exit criteria (draft, for Alexander to edit). The layout, the API and the spec a
 Items:
 
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest
+- [261030-8d8t] skills install and update command
 - [261029-47m0] migrate plan: simulate move_file steps
 - [261029-m0vm] move_file: report the inbound links it leaves broken
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback

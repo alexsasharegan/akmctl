@@ -11,6 +11,8 @@ The repository's `AGENTS.md` wins over this skill where they disagree.
 
 A choice that is hard to reverse, or that rejects a real alternative, needs an ADR. A reversible detail does not. If unsure, ask.
 
+Draft before making the choice. If you notice at close that the work already made one, draft the ADR then (`akm-work-items` Close asks), and list it in the item's `decisions`.
+
 ## Draft
 
 1. Look first: read `docs/adr/README.md` (the generated index) and the records whose `scope` matches your area. Do not re-decide a settled question.
