@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ui`: a card shows who holds a claim and for how long (`held by claude, 2 days`). The snapshot now reads `claimed_by` and `claimed_at`; a record with no claim shows nothing (work item 261029-8948).
+
 - `akmctl skills [status|install|update]` is new (ADR 261030-h6t7, accepted): it reports, installs and updates the skills the tool manages, in a repository `init` did not make. Each managed skill folder carries a marker `.akm-skill.json` (tool version and file hashes), so `update` can tell an older shipped copy from an edit; an edited skill is left unless `confirm_edited`, and the retired `akm-work-items` folder is removed by `update` (an unmarked one needs `confirm_edited`). `init` and `config git-commits` write the same markers through the same code. The API spec (section 4.20), the schema `skills.json`, `GET`/`POST /skills`, the `init` and `config` fixtures, the `akm` skill reference `skills.md` and the glossary are updated. Not committed by the tool.
 
 - The skills tell an agent to commit one step at a time with the `commit.message` the tool returns, as given, without needing the optional `akm-commit` skill (work item 261030-0yyn; found when a vault agent ignored the printed message). `akm-track-work` no longer says to commit a whole task together. `skills` adds `notes`, which says when `akm-commit` is not installed and how to turn it on.

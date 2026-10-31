@@ -120,7 +120,7 @@ async function call(method, path, { query, body, etag, timeout } = {}) {
 // ---- the snapshot ----
 
 // What the board, tables, ADR list and palette need from `ls`.
-export const SNAPSHOT_FIELDS = ["id", "title", "summary", "status", "kind", "parent", "priority", "created", "updated", "blocked_by", "date", "scope"];
+export const SNAPSHOT_FIELDS = ["id", "title", "summary", "status", "kind", "parent", "priority", "created", "updated", "blocked_by", "claimed_by", "claimed_at", "date", "scope"];
 
 export const state = {
   records: [], // work and ADRs, work in roadmap order

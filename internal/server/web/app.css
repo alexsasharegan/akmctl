@@ -132,6 +132,7 @@ body[data-view=board] #view{overflow-x:auto;overflow-y:hidden}
 .chip{display:inline-flex;align-items:center;font-size:var(--fs-xs);line-height:1.5;padding:0 .4em;border:1px solid var(--line-strong);border-radius:var(--r-sm);color:var(--text-2);overflow-wrap:anywhere}
 .chip.pri{font-weight:700;color:var(--text)}
 .chip.wait{border-style:dashed}
+.chip.claim{font-weight:600;color:var(--text)}
 .chip.age.stale{font-weight:700;color:var(--warn-fg);background:var(--warn-bg);border-color:var(--warn-fg)}
 .stat{display:inline-flex;align-items:center;gap:.3em;font-size:var(--fs-sm);white-space:nowrap}
 .stat::before{content:"";width:.6em;height:.6em;border:2px solid currentColor;border-radius:50%;flex:none}

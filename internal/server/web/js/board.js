@@ -1,7 +1,7 @@
 // The board: four lanes of work items (raw, ready, active, blocked), each with
 // its own scroll, driven by the keyboard. Focus is a card id that survives a
 // reload and a visit to another view.
-import { el, ageText, text } from "./util.js";
+import { el, ageText, ageDays, text } from "./util.js";
 import { lanes, locate, firstLoc, step, field, priorityOf, blockedBy, staleness } from "./logic.js";
 
 const FOCUS_KEY = "akm-board-focus";
@@ -41,6 +41,11 @@ export function cardNode(r, byId, today) {
     meta.push(el("span", { class: "chip", title: p ? text(field(p, "title")) : "not in this repository", text: "parent " + parent }));
   }
   if (waits.length) meta.push(el("span", { class: "chip wait", text: "waits on " + waits.join(", ") }));
+  const holder = field(r, "claimed_by");
+  if (holder) {
+    const held = ageDays(String(field(r, "claimed_at") || "").slice(0, 10), today);
+    meta.push(el("span", { class: "chip claim", title: "claimed by " + holder, text: "held by " + holder + (held !== null ? ", " + ageText(held) : "") }));
+  }
   if (days !== null) meta.push(el("span", { class: "chip age" + (stale ? " stale" : ""), text: (stale ? "stale " : "") + ageText(days) }));
   const detail = field(r, "summary");
   return el(
