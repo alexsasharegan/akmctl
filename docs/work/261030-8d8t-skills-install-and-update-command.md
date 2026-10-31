@@ -6,6 +6,7 @@ created: 2026-10-30
 updated: 2026-10-30
 kind: feature
 priority: 3
+decisions: [261030-h6t7]
 summary: A command installs, checks and updates the akm skills packaged in the binary, in a repository that was not made by init.
 claimed_by: claude
 claimed_at: 2026-10-31T04:43
@@ -23,7 +24,7 @@ Constraints already decided (ADR 261029-nyv6, ADR 261029-tb3d): the tool owns on
 
 Done when:
 
-- [ ] An ADR (`proposed`) records the command shape, how the installed version is recorded (a manifest key, or a marker in each skill directory), and the new API operation, since it adds to the 1.0 API.
+- [x] An ADR (`proposed`, 261030-h6t7) records the command shape, how the installed version is recorded (a manifest key, or a marker in each skill directory), and the new API operation, since it adds to the 1.0 API.
 - [ ] The command installs the missing skills from the binary into a repository with a layout and no skills, and leaves a repository that already has them unchanged.
 - [ ] It refuses to overwrite a skill directory that is not ours, and `--dry-run` and `--yes` work as for `config`.
 - [ ] A status view, or a `check` rule, reports a skill whose installed version differs from the shipped one, and an optional skill whose key and directory disagree.
@@ -31,8 +32,13 @@ Done when:
 - [ ] The API schema, fixtures, specification, guide, glossary and changelog are updated; a test covers a repository made by an older tool version.
 - [ ] Run in the maintainer's vault, it installs the three skills and `akmctl check` reports no new warnings.
 
+## Next
+
+The maintainer reviews ADR 261030-h6t7 and accepts it. Then build `internal/skills` (status, plan, install, update, markers), route `init` and `config git-commits` through it, add the `skills` operation (params, schema, fixtures), the CLI command and `GET /skills`, then the spec, guide, glossary and changelog.
+
 ## Log
 
 - 2026-10-30: filed.
 - 2026-10-30: filed from the vault migration review; the vault has the records but not the skills.
 - 2026-10-30: claimed (claude).
+- 2026-10-30: ADR 261030-h6t7 drafted (`proposed`) after the maintainer chose `skills install|status|update`, a marker file per skill folder and one code path with `init`.
