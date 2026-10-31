@@ -457,3 +457,31 @@ assert.equal(L.pageTitle({ view: "ADRs" }), "ADRs - akmctl");
   assert.deepEqual(q.clear().sort(), [t, pe].sort());
   assert.deepEqual(q.ids(), []);
 }
+
+// project filter
+assert.equal(L.projectTarget('[[Vault Views]]'), "Vault Views");
+assert.equal(L.projectTarget("[[AEI Fabrication|AEI]]"), "AEI Fabrication");
+assert.equal(L.projectTarget("[[Notes#Plan]]"), "Notes");
+assert.equal(L.projectTarget("  plain  "), "plain");
+assert.equal(L.projectTarget(null), "");
+assert.equal(L.projectTarget("[[]]"), "");
+{
+  const rs = [work("a", { project: "[[AEI Fabrication]]" }), work("b", { project: "[[AEI Fabrication|AEI]]" }), work("c", { project: "[[Vault Views]]" }), work("d", {}), adr("z", {})];
+  const c = L.projectCounts(rs);
+  assert.deepEqual(c.list, [{ target: "AEI Fabrication", count: 2 }, { target: "Vault Views", count: 1 }]);
+  assert.equal(c.none, 1);
+  assert.equal(L.hasProjects(rs), true);
+  assert.equal(L.hasProjects([work("d", {}), adr("z", {})]), false);
+  assert.deepEqual(L.filterByProject(rs, null), rs);
+  assert.deepEqual(L.filterByProject(rs, "AEI Fabrication").map((r) => r.id), ["a", "b", "z"]);
+  assert.deepEqual(L.filterByProject(rs, L.NO_PROJECT).map((r) => r.id), ["d", "z"]);
+  assert.deepEqual(L.filterByProject(rs, "Nope").map((r) => r.id), ["z"]);
+}
+assert.equal(L.projectFromHash("#/board?project=Vault%20Views"), "Vault Views");
+assert.equal(L.projectFromHash("#/board"), null);
+assert.equal(L.projectFromHash("#/board?project="), null);
+assert.equal(L.projectFromHash("#/tables/blocked?project=~"), "~");
+assert.equal(L.withProject("#/board", "Vault Views"), "#/board?project=Vault%20Views");
+assert.equal(L.withProject("#/board?project=x", null), "#/board");
+assert.deepEqual(L.parseRoute("#/tables/blocked?project=x"), { name: "tables", table: "blocked" });
+assert.deepEqual(L.parseRoute("#/record/261020-a2b3?project=x"), { name: "record", id: "261020-a2b3" });

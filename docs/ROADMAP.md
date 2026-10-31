@@ -45,7 +45,6 @@ Workbench and polish:
 - [261029-xeph] Measure the workbench poll, then add a conditional poll with a change token
 - [261029-12sx] Push updates to the workbench with a watcher, keeping polling as the fallback
 
-- [261029-30my] Filter the board and tables by project
 - [261029-ctzc] Make wikilinks in drawer fields clickable and open them in Obsidian
 - [261029-rmrk] Fix the card border that shows on only three sides
 - [261030-3vgb] status lifecycle graphics

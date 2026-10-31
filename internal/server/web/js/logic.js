@@ -209,6 +209,7 @@ export const isId = (s) => IDS.test(String(s));
 /** A hash such as "#/tables/blocked" as { name, ... }. Unknown hashes are the board. */
 export function parseRoute(hash) {
   const parts = String(hash || "")
+    .replace(/\?.*$/, "")
     .replace(/^#\/?/, "")
     .split("/")
     .filter(Boolean)
@@ -284,4 +285,66 @@ export function repoLabel(root, others = []) {
  */
 export function pageTitle({ view, repo = "" }) {
   return [view, repo, "akmctl"].filter(Boolean).join(" - ");
+}
+
+// ---- project filter ----
+
+/** The selection that means "work with no project". */
+export const NO_PROJECT = "~";
+
+/**
+ * The note a project value points at. A wikilink `[[Target]]`, `[[Target|alias]]`
+ * or `[[Target#heading]]` gives `Target` (an alias is ignored); any other text
+ * is itself, trimmed. Empty and null give "".
+ */
+export function projectTarget(v) {
+  const s = String(v == null ? "" : v).trim();
+  const m = /^\[\[([^\]]*)\]\]$/.exec(s);
+  const inner = m ? m[1] : s;
+  return inner.split("|")[0].split("#")[0].trim();
+}
+
+/** Work records that have the project field set to something, as targets with counts: most first, then by name. */
+export function projectCounts(records) {
+  const n = new Map();
+  let none = 0;
+  for (const r of records) {
+    if (!isWork(r)) continue;
+    const t = projectTarget(field(r, "project"));
+    if (t) n.set(t, (n.get(t) || 0) + 1);
+    else none++;
+  }
+  const list = [...n].map(([target, count]) => ({ target, count })).sort((a, b) => b.count - a.count || a.target.localeCompare(b.target));
+  return { list, none };
+}
+
+/** Whether a repository uses the project field at all (so the control is worth showing). */
+export const hasProjects = (records) => projectCounts(records).list.length > 0;
+
+/**
+ * Narrow the work records to one project. `sel` is null for all, NO_PROJECT
+ * for work without a project, or a target. Records that are not work (ADRs)
+ * always pass.
+ */
+export function filterByProject(records, sel) {
+  if (sel === null || sel === undefined) return records;
+  return records.filter((r) => {
+    if (!isWork(r)) return true;
+    const t = projectTarget(field(r, "project"));
+    return sel === NO_PROJECT ? t === "" : t === sel;
+  });
+}
+
+/** The project in a hash such as "#/board?project=Vault%20Views", or null. */
+export function projectFromHash(hash) {
+  const q = String(hash || "").split("?")[1];
+  if (q === undefined) return null;
+  const v = new URLSearchParams(q).get("project");
+  return v === null || v === "" ? null : v;
+}
+
+/** `href` with the project selection in its query (none for all). */
+export function withProject(href, sel) {
+  const base = String(href).replace(/\?.*$/, "");
+  return sel === null || sel === undefined ? base : base + "?project=" + encodeURIComponent(sel);
 }

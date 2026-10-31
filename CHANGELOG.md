@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ui`: a project filter in the header narrows the board, the tables and the palette to one project, from the extra frontmatter field `project` (a wikilink; the link target is matched, an alias is ignored). The select shows counts per project and a no-project choice, and is hidden when no work item has the field. The choice is in the URL (`#/board?project=Vault%20Views`, `~` for no project) and is remembered per repository; the palette has a "Show all projects" action. It filters on the client, so the API is unchanged (work item 261029-30my).
+
 - `ui`: the "Recently closed" table no longer flashes when the records reload (`r`). The list is kept across reloads, drawn again at once, and redrawn only if it changed (work item 261029-57jq).
 
 - `ui`: a card shows who holds a claim and for how long (`held by claude, 2 days`). The snapshot now reads `claimed_by` and `claimed_at`; a record with no claim shows nothing (work item 261029-8948).

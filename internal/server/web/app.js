@@ -4,7 +4,8 @@
 import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, state, describeError, ApiError } from "./js/store.js";
 import { createLive, mountIndicator } from "./js/live.js";
 import { createAnimator, keepSteady } from "./js/anim.js";
-import { parseRoute, routeHref, indexById, TABLES, pageTitle, repoLabel } from "./js/logic.js";
+import { parseRoute, routeHref, indexById, TABLES, pageTitle, repoLabel, filterByProject, projectFromHash, withProject } from "./js/logic.js";
+import { mountProjectFilter, recall } from "./js/project.js";
 import { el, isoDate } from "./js/util.js";
 import { initUI, setPage, toast, toggleTheme, openHelp, overlayOpen, typing } from "./js/ui.js";
 import { mountBoard } from "./js/board.js";
@@ -25,8 +26,16 @@ let view = null; // the mounted view: { keys, focus, destroy }
 let viewKey = "";
 let base = { name: "board" }; // the last route that was not a record
 
+let project = null; // the project filter: null for all, NO_PROJECT, or a note name
+let filteredCache = null;
+/** The loaded records narrowed to the chosen project (ADRs always pass). */
+const shown = () => {
+  if (!filteredCache || filteredCache.src !== state.records || filteredCache.sel !== project) filteredCache = { src: state.records, sel: project, list: filterByProject(state.records, project) };
+  return filteredCache.list;
+};
+
 const go = (route) => {
-  location.hash = routeHref(route);
+  location.hash = withProject(routeHref(route), project);
 };
 
 const drawer = createDrawer(drawerEl, host, {
@@ -36,7 +45,7 @@ const drawer = createDrawer(drawerEl, host, {
 });
 
 const viewCtx = {
-  records: () => state.records,
+  records: shown,
   byId: () => byIdCache,
   today: () => isoDate(),
   setPage,
@@ -106,6 +115,7 @@ function showProblem(title, message) {
 /** Draw what the hash says. `focus` is true after a key or a click, false for the first draw. */
 function route(focus) {
   if (!loaded) return;
+  syncProjectFromHash();
   const r = parseRoute(location.hash);
   setTitle(r);
   if (r.name === "record") {
@@ -122,11 +132,39 @@ function route(focus) {
   }
 }
 
+/** The hash names the project when it has one; without one the current choice goes back into it. */
+function syncProjectFromHash() {
+  const p = projectFromHash(location.hash);
+  if (p !== null && p !== project) {
+    project = p;
+    projectFilter.refresh();
+    if (view) {
+      viewKey = "";
+      mountBase(base, false);
+    }
+  } else if (p === null && project !== null) {
+    history.replaceState(null, "", location.pathname + location.search + withProject(location.hash || "#/board", project));
+  }
+}
+
+function chooseProject(sel) {
+  project = sel;
+  history.replaceState(null, "", location.pathname + location.search + withProject(location.hash || "#/board", project));
+  projectFilter.refresh();
+  if (view) {
+    viewKey = "";
+    mountBase(base, false);
+  }
+  const n = shown().filter((r) => r.type === "work").length;
+  toast(sel === null ? "Showing all projects." : "Showing " + (sel === "~" ? "work with no project" : sel) + ": " + n + " items.");
+}
+
 async function reload(announce) {
   try {
     await loadSnapshot();
     byIdCache = indexById(state.records);
     loaded = true;
+    projectFilter.refresh();
     live.rebase(state.records);
     if (view) {
       viewKey = "";
@@ -171,6 +209,12 @@ const anim = createAnimator({
   busy: () => overlayOpen() || typing(document.activeElement),
 });
 
+const projectFilter = mountProjectFilter(document.querySelector(".top-actions"), {
+  records: () => state.records,
+  root: () => state.config.root,
+  get: () => project,
+  onChange: chooseProject,
+});
 const setLiveStatus = mountIndicator(document.querySelector(".top-actions"));
 const live = createLive({
   onStatus: setLiveStatus,
@@ -178,6 +222,7 @@ const live = createLive({
     titleMemory = new Map(state.records.map((r) => [r.id, r.fields && r.fields.title ? String(r.fields.title) : ""]));
     await loadSnapshot(); // throws on a hiccup: live.js then offers the same events again
     byIdCache = indexById(state.records);
+    projectFilter.refresh();
     anim.push(events);
   },
 });
@@ -210,6 +255,7 @@ const actions = () => [
   { label: "Go to ADRs", keys: ["3"], run: () => go({ name: "adrs" }) },
   { label: "Go to Check", keys: ["4"], run: () => go({ name: "check" }) },
   ...flowActions(currentId),
+  { label: "Show all projects", keys: [], run: () => project !== null && chooseProject(null) },
   { label: "Reload the records", keys: ["r"], run: () => reload(true) },
   { label: "Switch light and dark", keys: ["t"], run: toggleTheme },
   { label: "Show keyboard shortcuts", keys: ["?"], run: openHelp },
@@ -255,7 +301,7 @@ document.querySelector(".skip").addEventListener("click", (e) => {
 });
 
 initFlow({ host, reload: () => reload(false), byId: () => byIdCache, records: () => state.records, focusView: () => view && !drawer.isOpen() && view.focus() });
-initUI({ records: () => state.records, actions, onKey, help, openRecord: (id) => go({ name: "record", id }) });
+initUI({ records: shown, actions, onKey, help, openRecord: (id) => go({ name: "record", id }) });
 window.addEventListener("hashchange", () => {
   // a new #token= on an open page (a second akmctl ui, a pasted URL): take it and start again
   if (parseToken(location.hash)) {
@@ -278,9 +324,11 @@ async function start() {
     repoName = repoLabel(c.root || "");
     setTitle(parseRoute(location.hash));
   });
+  await cfg;
+  // the hash wins over what was remembered for this repository
+  project = projectFromHash(location.hash) !== null ? projectFromHash(location.hash) : recall(state.config.root);
   await reload(false);
   if (loaded) live.start(state.records);
-  await cfg;
   if (!location.hash) history.replaceState(null, "", location.pathname + location.search + routeHref(base));
 }
 
