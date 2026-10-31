@@ -1,0 +1,19 @@
+{
+  "name": "a path from a note name that is a record",
+  "repo": "basic",
+  "request": {
+    "name": "261022-e5f6-document-the-exit-codes"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "find",
+    "request": {
+      "name": "261022-e5f6-document-the-exit-codes"
+    },
+    "ok": true,
+    "name": "261022-e5f6-document-the-exit-codes",
+    "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+    "id": "261022-e5f6",
+    "type": "work"
+  }
+}

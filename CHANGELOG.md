@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `find` takes `name` as well as `id`: the target of a wikilink (`Vault Views`, or `Projects/Vault Views`) resolves to the one Markdown file with that name under the repository root, ignoring case and hidden folders, with `not_found` and `ambiguous` as for an id. `akmctl find --name <note>`, `GET /find?name=`; `find.json`, the API spec (4.8), three fixture cases and the `akm` reference are updated. `ui`: wikilinks in the drawer's fields, alone or in a list, are links. They open the note in Obsidian, show the alias, offer a "here" link when the note is a record, and read as unresolved (not clickable) when no note has the name (work item 261029-ctzc).
+
 - `ui`: a card shows a complete border on all four sides when idle or hovered. The left edge was `3px solid transparent`, so only the other three sides drew a line (work item 261029-rmrk).
 
 - `ui`: a project filter in the header narrows the board, the tables and the palette to one project, from the extra frontmatter field `project` (a wikilink; the link target is matched, an alias is ignored). The select shows counts per project and a no-project choice, and is hidden when no work item has the field. The choice is in the URL (`#/board?project=Vault%20Views`, `~` for no project) and is remembered per repository; the palette has a "Show all projects" action. It filters on the client, so the API is unchanged (work item 261029-30my).

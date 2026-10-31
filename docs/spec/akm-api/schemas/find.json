@@ -7,11 +7,13 @@
       "properties": {
         "id": {
           "$ref": "common.json#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": [],
       "additionalProperties": false
     },
     "response": {
@@ -39,6 +41,10 @@
             },
             "path": {
               "$ref": "common.json#/$defs/path"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -46,8 +52,6 @@
             "operation",
             "request",
             "ok",
-            "id",
-            "type",
             "path"
           ],
           "additionalProperties": false

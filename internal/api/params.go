@@ -86,7 +86,7 @@ var specs = map[string]map[string]param{
 	},
 	"show":    {"id": s(req, pat(reID)), "section": s()},
 	"board":   {"statuses": {kind: kStrings, enum: workStatus}},
-	"find":    {"id": s(req, pat(reID))},
+	"find":    {"id": s(pat(reID)), "name": s()},
 	"when":    {"id": s(req, pat(reID)), "as_of": s(pat(reDate))},
 	"check":   {"target": s(pat(reVersion)), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS))},
 	"skills":  {"mode": {kind: kString, enum: []string{"status", "install", "update"}}, "dry_run": {kind: kBool}, "confirm": {kind: kBool}, "confirm_edited": {kind: kBool}},

@@ -272,6 +272,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op, id = "show", seg[1]
 	case len(seg) == 2 && seg[0] == "records" && m == "PATCH":
 		op, id = "set", seg[1]
+	case len(seg) == 1 && seg[0] == "find" && m == "GET":
+		op = "find"
 	case len(seg) == 2 && seg[0] == "find" && m == "GET":
 		op, id = "find", seg[1]
 	case len(seg) == 2 && seg[0] == "when" && m == "GET":

@@ -510,14 +510,6 @@ func opShow(repo *record.Repo, q Request) (Obj, *Error) {
 	return append(out, KV{"body", r.Body}), nil
 }
 
-func opFind(repo *record.Repo, q Request) (Obj, *Error) {
-	r, err := lookup(repo, q.str("id"))
-	if err != nil {
-		return nil, err
-	}
-	return O("id", r.ID, "type", r.Type, "path", r.Path), nil
-}
-
 func opWhen(q Request) (Obj, *Error) {
 	id := q.str("id")
 	d, err := time.Parse("2006-01-02", record.IDDate(id))

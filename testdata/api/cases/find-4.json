@@ -1,0 +1,24 @@
+{
+  "name": "id and name together are rejected",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "name": "x"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "find",
+    "request": {
+      "id": "261022-e5f6",
+      "name": "x"
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "give id or name, not both",
+      "details": {
+        "parameter": "name"
+      }
+    }
+  }
+}

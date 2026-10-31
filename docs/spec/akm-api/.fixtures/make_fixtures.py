@@ -653,6 +653,12 @@ def main():
     # find, when
     r = next(r for r in recs if r["id"] == "261022-e5f6"); req = dict(id=r["id"])
     case("find", 1, "a path from an id", "basic", req, ok("find", req, id=r["id"], type="work", path=r["path"]))
+    req = dict(name="261022-e5f6-document-the-exit-codes")
+    case("find", 2, "a path from a note name that is a record", "basic", req, ok("find", req, name=req["name"], path=r["path"], id=r["id"], type="work"))
+    req = dict(name="No Such Note")
+    case("find", 3, "an unknown note name", "basic", req, err("find", req, "not_found", "no note named No Such Note"))
+    req = dict(id="261022-e5f6", name="x")
+    case("find", 4, "id and name together are rejected", "basic", req, err("find", req, "invalid_request", "give id or name, not both", parameter="name"))
     req = dict(id="261022-e5f6", as_of=AS_OF)
     case("when", 1, "the date of an id", "basic", req, ok("when", req, id="261022-e5f6", date="2026-10-22", weekday=dt.date(2026, 10, 22).strftime("%A"), age_days=(dt.date(2026, 10, 28) - dt.date(2026, 10, 22)).days))
     req = dict(dry_run=True, include_content=True)

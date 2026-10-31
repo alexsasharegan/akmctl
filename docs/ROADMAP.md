@@ -45,7 +45,6 @@ Workbench and polish:
 - [261029-xeph] Measure the workbench poll, then add a conditional poll with a change token
 - [261029-12sx] Push updates to the workbench with a watcher, keeping polling as the fallback
 
-- [261029-ctzc] Make wikilinks in drawer fields clickable and open them in Obsidian
 - [261030-3vgb] status lifecycle graphics
 - [261029-g8x2] The review diff is against the current file, not after earlier writes
 - [261029-jm46] Restart of akmctl ui forces a new URL

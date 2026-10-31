@@ -348,3 +348,25 @@ export function withProject(href, sel) {
   const base = String(href).replace(/\?.*$/, "");
   return sel === null || sel === undefined ? base : base + "?project=" + encodeURIComponent(sel);
 }
+
+// ---- wikilinks in field values ----
+
+/**
+ * A value that is one wikilink as { target, alias, heading }, or null.
+ * `[[Target]]`, `[[Target|alias]]` and `[[Target#heading|alias]]`; the value may
+ * be quoted by the YAML reader already. Text around the link, an empty target
+ * and anything that is not a string give null.
+ */
+export function wikilinkParts(v) {
+  if (typeof v !== "string") return null;
+  const m = /^\[\[([^\[\]]*)\]\]$/.exec(v.trim());
+  if (!m) return null;
+  const [left, ...rest] = m[1].split("|");
+  const [target, ...h] = left.split("#");
+  const t = target.trim();
+  if (!t) return null;
+  return { target: t, alias: rest.join("|").trim(), heading: h.join("#").trim() };
+}
+
+/** What a wikilink shows: its alias, else its target. */
+export const wikilinkLabel = (w) => w.alias || w.target;

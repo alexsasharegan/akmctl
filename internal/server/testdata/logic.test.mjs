@@ -485,3 +485,16 @@ assert.equal(L.withProject("#/board", "Vault Views"), "#/board?project=Vault%20V
 assert.equal(L.withProject("#/board?project=x", null), "#/board");
 assert.deepEqual(L.parseRoute("#/tables/blocked?project=x"), { name: "tables", table: "blocked" });
 assert.deepEqual(L.parseRoute("#/record/261020-a2b3?project=x"), { name: "record", id: "261020-a2b3" });
+
+// wikilinks in field values
+assert.deepEqual(L.wikilinkParts("[[Vault Views]]"), { target: "Vault Views", alias: "", heading: "" });
+assert.deepEqual(L.wikilinkParts("[[AEI Fabrication|AEI]]"), { target: "AEI Fabrication", alias: "AEI", heading: "" });
+assert.deepEqual(L.wikilinkParts("[[Notes#Plan|the plan]]"), { target: "Notes", alias: "the plan", heading: "Plan" });
+assert.deepEqual(L.wikilinkParts(" [[261025-g68j-build-pkm-workbench]] "), { target: "261025-g68j-build-pkm-workbench", alias: "", heading: "" });
+assert.equal(L.wikilinkParts("see [[A]]"), null);
+assert.equal(L.wikilinkParts("[[]]"), null);
+assert.equal(L.wikilinkParts("[[a]] [[b]]"), null);
+assert.equal(L.wikilinkParts(5), null);
+assert.equal(L.wikilinkParts(null), null);
+assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A|b]]")), "b");
+assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");

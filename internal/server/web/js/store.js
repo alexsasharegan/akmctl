@@ -135,6 +135,7 @@ export async function loadSnapshot() {
   const data = await api("GET", "records", { query: { fields: SNAPSHOT_FIELDS, sort: ["roadmap", "-priority", "id"] } });
   state.records = data.records;
   state.loadedAt = new Date();
+  noteCache.clear();
   return state.records;
 }
 
@@ -157,6 +158,27 @@ export async function loadClosed(days = 30) {
   const data = await api("GET", "records", { query: { type: "work", status: ["done", "dropped"], since: daysBefore(days, isoDate()), fields: SNAPSHOT_FIELDS, sort: ["-updated", "-id"] } });
   state.closed = data.records;
   return state.closed;
+}
+
+const noteCache = new Map(); // lower-cased note name to a promise of { path, id } or null
+
+/** The file a wikilink target names, from the API: { path, id? } or null when no note has the name. Remembered until the records reload. */
+export function findNote(name) {
+  const k = String(name).toLowerCase();
+  if (!noteCache.has(k)) {
+    noteCache.set(
+      k,
+      api("GET", "find", { query: { name } }).then(
+        (d) => ({ path: d.path, id: d.id || "" }),
+        (e) => {
+          if (e instanceof ApiError && (e.code === "not_found" || e.code === "ambiguous")) return null;
+          noteCache.delete(k); // a hiccup is not an answer: ask again next time
+          throw e;
+        },
+      ),
+    );
+  }
+  return noteCache.get(k);
 }
 
 export const show = (id, section) => api("GET", "records/" + encodeURIComponent(id), { query: { section } });

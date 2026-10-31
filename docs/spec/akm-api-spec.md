@@ -168,7 +168,12 @@ Response: `path`, `changed` (the generated text differs from the file), `written
 
 ### 4.8 `find`
 
-`id` (**required**) to `{id, type, path}`. `not_found` if no file; `ambiguous` if several.
+Gives the path of a record by `id`, or of a note by `name`. Exactly one of the two is needed.
+
+- `id` returns `{id, type, path}`. `not_found` if no file has it; `ambiguous` if several do.
+- `name` is the target of a wikilink: a file name without `.md`, optionally with the folders it sits in (`Projects/Vault Views`). The tool looks at every Markdown file under the repository root, skipping hidden folders (`.git`, `.obsidian`, `.trash`, `.agents`) and `node_modules`, and never follows a link. The match ignores case and takes a trailing run of folders. It returns `{name, path}`, and `id` and `type` as well when the file is a record. `not_found` if no note has the name; `ambiguous` (`details.paths`) if several do. A name that is empty or holds `..` or a backslash is `invalid_request`.
+
+`id` and `name` together are `invalid_request`. CLI: `akmctl find <id>` and `akmctl find --name <note>`. HTTP: `GET /find/{id}` and `GET /find?name=<note>`.
 
 ### 4.9 `when`
 
@@ -393,6 +398,7 @@ Side effect: writes files in a write mode with `confirm` and without `dry_run`. 
 | `GET /check`                        | `check`            | query: `target`, `rules`, `as_of`                                                                                               |
 | `GET /`                             | the workbench page | no token                                                                                                                        |
 | `GET /find/{id}`                    | `find`             |                                                                                                                                 |
+| `GET /find?name=`                   | `find`             | query: `name` (a note name; the path form is `GET /find/{id}`)                                                                  |
 | `GET /when/{id}`                    | `when`             | query: `as_of`                                                                                                                  |
 | `POST /records`                     | `new`              | JSON body: the request object                                                                                                   |
 | `PATCH /records/{id}`               | `set`              | JSON body: `changes` (and `if_match`, `dry_run`)                                                                                |

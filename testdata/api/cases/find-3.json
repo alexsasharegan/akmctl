@@ -1,0 +1,19 @@
+{
+  "name": "an unknown note name",
+  "repo": "basic",
+  "request": {
+    "name": "No Such Note"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "find",
+    "request": {
+      "name": "No Such Note"
+    },
+    "ok": false,
+    "error": {
+      "code": "not_found",
+      "message": "no note named No Such Note"
+    }
+  }
+}

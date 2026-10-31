@@ -337,3 +337,6 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
   .card.anim-settle,tr.row.anim-settle{animation:settle 900ms var(--ease)}
   @keyframes settle{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--sh-sm)}}
 }
+
+.wikilink.unresolved{color:var(--text-2);text-decoration:underline dotted;cursor:default}
+.wikilink-here{font-size:var(--fs-xs)}

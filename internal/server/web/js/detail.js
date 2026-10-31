@@ -1,8 +1,8 @@
 // The record drawer: the fields of one record, what points at it, and its
 // sections read from the API one at a time. Body text is shown as text.
 import { el, text } from "./util.js";
-import { field, isId, childrenOf, obsidianUrl } from "./logic.js";
-import { show, describeError, state } from "./store.js";
+import { field, isId, childrenOf, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
+import { show, findNote, describeError, state } from "./store.js";
 import { claimControls } from "./flow.js";
 
 // Sections that start collapsed (everything else starts open).
@@ -12,10 +12,40 @@ const COLLAPSED = new Set(["log"]);
 // ({ open: Map name to bool, text: Map name to shown text }), so nothing jumps.
 let keep = null;
 
-/** A value as nodes: ids that are in the repository become links. */
+/**
+ * A wikilink value as a node. It is plain text at first; the API says which
+ * note it names, and then it becomes a link that opens the note in Obsidian
+ * (and, when the note is a record, a second link that opens it here), or is
+ * marked unresolved and is not clickable.
+ */
+function wikilinkNode(w, byId) {
+  const node = el("span", { class: "wikilink", text: wikilinkLabel(w), title: "[[" + w.target + "]]" });
+  findNote(w.target)
+    .then((hit) => {
+      if (!node.isConnected) return;
+      const url = hit ? obsidianUrl(state.config, hit.path) : "";
+      if (!hit || !url) {
+        node.classList.add("unresolved");
+        node.title = "No note named " + w.target + " was found";
+        return;
+      }
+      const link = el("a", { class: "wikilink", href: url, text: wikilinkLabel(w), title: "Open " + hit.path + " in Obsidian" });
+      const nodes = [link];
+      if (hit.id && byId.has(hit.id)) nodes.push(" ", el("a", { class: "rowlink wikilink-here", href: "#/record/" + encodeURIComponent(hit.id), title: "Open " + hit.id + " here", text: "here" }));
+      node.replaceWith(...nodes);
+    })
+    .catch(() => {
+      node.title = "The note could not be looked up";
+    });
+  return node;
+}
+
+/** A value as nodes: ids that are in the repository become links, wikilinks resolve through the API. */
 export function valueNodes(v, byId) {
   const one = (x) => {
     const s = String(x);
+    const w = wikilinkParts(s);
+    if (w) return wikilinkNode(w, byId);
     return isId(s) && byId.has(s) ? el("a", { class: "rowlink", href: "#/record/" + encodeURIComponent(s), text: s }) : s;
   };
   if (Array.isArray(v)) return v.flatMap((x, i) => (i ? [", ", one(x)] : [one(x)]));
