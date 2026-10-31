@@ -1,12 +1,14 @@
 ---
 id: "261029-ctzc"
 title: Make wikilinks in drawer fields clickable and open them in Obsidian
-status: ready
+status: active
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-31
 kind: feature
 priority: 2
 summary: project and origin hold wikilinks such as Vault Views; show them as links that open the target in Obsidian.
+claimed_by: claude
+claimed_at: 2026-10-31T07:12
 ---
 
 # Make wikilinks in drawer fields clickable and open them in Obsidian
@@ -25,3 +27,4 @@ Done when:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-31: claimed (claude).
