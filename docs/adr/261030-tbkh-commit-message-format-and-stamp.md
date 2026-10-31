@@ -2,7 +2,7 @@
 id: "261030-tbkh"
 title: AKM step commits use one subject and trailers, returned by the tool as a commit object
 summary: AKM step commits use one subject and AKM-Step and AKM-Item trailers; the tool returns them as a commit object and still never commits.
-status: proposed
+status: accepted
 date: 2026-10-30
 ---
 
@@ -46,7 +46,7 @@ The conformance fixtures for `claim`, `release` and `close` carry the `commit` o
 
 ## Review
 
-Proposed 2026-10-30 after a design discussion with the maintainer; accepted when the maintainer merges or sets `accepted`.
+Proposed 2026-10-30 after a design discussion with the maintainer. Accepted by the maintainer on 2026-10-30, after the `commit` object and the `commits` operation (CM1 to CM3) were built and tested.
 
 ## Revert
 
