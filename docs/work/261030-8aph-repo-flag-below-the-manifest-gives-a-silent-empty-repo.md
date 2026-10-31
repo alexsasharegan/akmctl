@@ -2,11 +2,11 @@
 id: "261030-8aph"
 title: --repo pointing inside a repository is read as an empty one, with no warning
 summary: --repo takes the folder as the root and does not look upward for the manifest, so a folder inside a repository reads as one with default folders.
-status: raw
+status: ready
 kind: bug
 priority: 3
 created: 2026-10-30
-updated: 2026-10-30
+updated: 2026-10-31
 ---
 
 # --repo pointing inside a repository is read as an empty one, with no warning
