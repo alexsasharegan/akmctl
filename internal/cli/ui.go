@@ -60,6 +60,12 @@ func runUI(args []string, stderr io.Writer, cwd string) int {
 			return 2
 		}
 	}
+	if flagGiven(args, "--repo") {
+		if err := insideRepository("ui", root); err != nil {
+			fmt.Fprintln(stderr, "akmctl ui:", err)
+			return 2
+		}
+	}
 	if _, err := record.Load(root); err != nil {
 		fmt.Fprintln(stderr, "akmctl ui:", err)
 		return 2

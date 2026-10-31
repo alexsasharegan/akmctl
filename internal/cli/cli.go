@@ -237,6 +237,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	if err == nil {
 		if flagGiven(args, "--repo") {
 			root, err = repoDir, nil
+			if e := insideRepository(op, repoDir); e != nil {
+				err = e
+			}
 		}
 	}
 	var repo *record.Repo
@@ -602,7 +605,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nskills: akmctl skills [status|install|update] [--yes] [--dry-run]  (install adds missing skills, update refreshes them and retires renamed ones)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir> (the root as given: it must hold the manifest; leave it out to find the root from the working directory)  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nskills: akmctl skills [status|install|update] [--yes] [--dry-run]  (install adds missing skills, update refreshes them and retires renamed ones)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout
@@ -636,4 +639,21 @@ func parseFieldValue(key, raw string) any {
 		}
 	}
 	return raw
+}
+
+// insideRepository explains an explicit --repo that names a folder with no
+// manifest while an ancestor has one: --repo is the root as given, so every
+// command would see an empty repository. migrate and version work without a
+// manifest and are left alone.
+func insideRepository(op, dir string) error {
+	if op == "migrate" || op == "version" {
+		return nil
+	}
+	if _, found, err := record.Locate(dir); found || err != nil {
+		return nil
+	}
+	if above, ok := record.ManifestAbove(dir); ok {
+		return fmt.Errorf("%s has no manifest, but %s does: use --repo %s, or leave --repo out to find it from the working directory", dir, above, above)
+	}
+	return nil
 }

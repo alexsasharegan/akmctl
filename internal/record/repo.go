@@ -273,6 +273,26 @@ func FindRoot(dir string) (string, error) {
 	}
 }
 
+// ManifestAbove returns the nearest ancestor of dir (not dir itself) that has a
+// manifest, and whether there is one. It is for telling someone that the folder
+// they named sits inside a repository.
+func ManifestAbove(dir string) (string, bool) {
+	d, err := filepath.Abs(dir)
+	if err != nil {
+		return "", false
+	}
+	for {
+		p := filepath.Dir(d)
+		if p == d {
+			return "", false
+		}
+		d = p
+		if _, found, err := Locate(d); found || err != nil {
+			return d, found || err != nil
+		}
+	}
+}
+
 // FromText builds a record from the text of its file: rel is the path relative
 // to the repository root, typ is Work or ADR and id is the leading id of the
 // file name.

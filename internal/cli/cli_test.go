@@ -235,3 +235,36 @@ func TestClosePrintsDependents(t *testing.T) {
 		t.Fatalf("%d %s %s", code, out.String(), errb.String())
 	}
 }
+
+func TestRepoInsideARepositoryIsRefused(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	inner := filepath.Join(root, "notes", "deeper")
+	os.MkdirAll(inner, 0o755)
+	var out, errb bytes.Buffer
+	code := Run([]string{"ls", "--repo", inner, "--format", "json"}, &out, &errb, ".")
+	if code != 2 || !strings.Contains(out.String(), "has no manifest, but "+root+" does") {
+		t.Fatalf("%d %s", code, out.String())
+	}
+	// leaving --repo out climbs from the working directory, as before
+	out.Reset()
+	if code := Run([]string{"ls", "--format", "json"}, &out, &errb, inner); code != 0 || !strings.Contains(out.String(), `"ok":true`) {
+		t.Fatalf("climb: %d %s", code, out.String())
+	}
+	// the repository itself, and migrate on the inner folder, are not refused
+	out.Reset()
+	if code := Run([]string{"ls", "--repo", root, "--format", "json"}, &out, &errb, "."); code != 0 {
+		t.Fatalf("root: %d %s", code, out.String())
+	}
+	out.Reset()
+	Run([]string{"migrate", "--repo", inner, "--format", "json"}, &out, &errb, ".")
+	if strings.Contains(out.String(), "has no manifest, but") {
+		t.Fatalf("migrate was refused: %s", out.String())
+	}
+	// a folder with no manifest anywhere above stays literal
+	out.Reset()
+	Run([]string{"ls", "--repo", t.TempDir(), "--format", "json"}, &out, &errb, ".")
+	if strings.Contains(out.String(), "has no manifest, but") {
+		t.Fatalf("no ancestor: %s", out.String())
+	}
+}

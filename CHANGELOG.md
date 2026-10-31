@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `--repo <dir>` naming a folder that has no manifest while a folder above it does is now an error that names the ancestor, for every command but `migrate` and `version`. Before, the tool read that folder as an empty repository with default folders and gave wrong answers without a warning (`commits` reported a false CM3 on correct commits). `--repo` still never climbs: it is the root as given. The same check applies to `akmctl ui --repo` (work item 261030-8aph).
+
 - `find` takes `name` as well as `id`: the target of a wikilink (`Vault Views`, or `Projects/Vault Views`) resolves to the one Markdown file with that name under the repository root, ignoring case and hidden folders, with `not_found` and `ambiguous` as for an id. `akmctl find --name <note>`, `GET /find?name=`; `find.json`, the API spec (4.8), three fixture cases and the `akm` reference are updated. `ui`: wikilinks in the drawer's fields, alone or in a list, are links. They open the note in Obsidian, show the alias, offer a "here" link when the note is a record, and read as unresolved (not clickable) when no note has the name (work item 261029-ctzc).
 
 - `ui`: a card shows a complete border on all four sides when idle or hovered. The left edge was `3px solid transparent`, so only the other three sides drew a line (work item 261029-rmrk).
