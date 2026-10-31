@@ -515,6 +515,15 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if p, ok := resp.Get("moved_to"); ok {
 			fmt.Fprintln(w, "moved to", p)
 		}
+		if dv, ok := resp.Get("dependents"); ok {
+			fmt.Fprintln(w, "open items that were waiting on this one (unblock or re-point each):")
+			for _, o := range dv.([]api.Obj) {
+				id, _ := o.Get("id")
+				st, _ := o.Get("status")
+				ti, _ := o.Get("title")
+				fmt.Fprintf(w, "  %v\t%v\t%v\n", id, st, ti)
+			}
+		}
 		if c, ok := resp.Get("changed"); ok {
 			fmt.Fprintln(w, "changed:", c)
 		}

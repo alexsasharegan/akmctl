@@ -191,6 +191,8 @@ def err(op, req, code, msg, **d):
 E5F6 = "docs/work/261022-e5f6-document-the-exit-codes.md"
 A2B3 = "docs/work/261020-a2b3-add-json-output-to-ls.md"
 A2B3_DONE = "docs/work/done/261020-a2b3-add-json-output-to-ls.md"
+# the open item that names a2b3 in blocked_by: close reports it as a dependent
+A2B3_DEPENDENTS = [dict(id="261024-g7h8", status="blocked", title="Publish the first release", path="docs/work/261024-g7h8-publish-the-first-release.md")]
 
 def claims_layout(files):
     files["docs/.layout"] += "extension.claims: 0.3.0\n"
@@ -290,12 +292,12 @@ def write_cases(cases, basic):
     text = clo[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 2, "close moves the file to done/", "closable", req,
-         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE), after={A2B3_DONE: text}, removed=[A2B3])
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS), after={A2B3_DONE: text}, removed=[A2B3])
     req = dict(id="261020-a2b3", status="dropped", as_of="2026-10-28")
     text = clo[A2B3].replace("status: active\n", "status: dropped\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 6, "dropping an item also writes closed", "closable", req,
-         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE), after={A2B3_DONE: text}, removed=[A2B3])
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS), after={A2B3_DONE: text}, removed=[A2B3])
     # cycle, keep and the managed closed field
     req = dict(id="261022-e5f6", changes=dict(cycle="2026-PI3-S4"), as_of="2026-10-28")
     text = basic[E5F6].replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\ncycle: 2026-PI3-S4\n---\n")
@@ -333,12 +335,12 @@ def write_cases(cases, basic):
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = after_rec(files, A2B3_DONE); rec["etag"] = next(r for r in load(basic) if r["path"] == A2B3)["etag"]
     case("close", 4, "dry run of a close with an outcome: the diff names the new path", "basic", req,
-         ok("close", req, record=pub(rec), moved_from=A2B3, moved_to=A2B3_DONE, diff=mkdiff(A2B3, A2B3_DONE, basic[A2B3], text)), would_be={A2B3_DONE: text})
+         ok("close", req, record=pub(rec), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, diff=mkdiff(A2B3, A2B3_DONE, basic[A2B3], text)), would_be={A2B3_DONE: text})
     # close with outcome
     req = dict(id="261020-a2b3", status="done", outcome="Shipped in 0.2.", as_of="2026-10-28")
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 3, "close writes the outcome in the same write", "basic", req,
-         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE), after={A2B3_DONE: text}, removed=[A2B3])
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS), after={A2B3_DONE: text}, removed=[A2B3])
     vault_write_cases(case, basic)
     # section
     def sec(n, name, repo, req, newtext, path, secname, sectext, changed=True, dryrun=False):
@@ -407,7 +409,7 @@ def vault_write_cases(case, basic):
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = dict(next(r for r in load(files) if r["path"] == A2B3_DONE), path=relocate(A2B3_DONE))
     case("close", 5, "close moves the file to done/ under the configured work folder", "vault", req,
-         ok("close", req, record=pub(rec), moved_from=relocate(A2B3), moved_to=relocate(A2B3_DONE)), after={relocate(A2B3_DONE): text}, removed=[relocate(A2B3)])
+         ok("close", req, record=pub(rec), moved_from=relocate(A2B3), moved_to=relocate(A2B3_DONE), dependents=[dict(d, path=relocate(d["path"])) for d in A2B3_DEPENDENTS]), after={relocate(A2B3_DONE): text}, removed=[relocate(A2B3)])
 
 ALPHABET = "0123456789abcdefghjkmnpqrstvwxyz"
 

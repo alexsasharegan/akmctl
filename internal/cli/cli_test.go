@@ -225,3 +225,13 @@ func TestNewPrintsSimilarItems(t *testing.T) {
 		t.Fatalf("no match printed similar: %d %s", code, out.String())
 	}
 }
+
+func TestClosePrintsDependents(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/closable", root)
+	var out, errb bytes.Buffer
+	code := Run([]string{"close", "261020-a2b3", "dropped", "--outcome", "Not needed.", "--repo", root, "--format", "table"}, &out, &errb, ".")
+	if code != 0 || !strings.Contains(out.String(), "waiting on this one") || !strings.Contains(out.String(), "261024-g7h8") {
+		t.Fatalf("%d %s %s", code, out.String(), errb.String())
+	}
+}

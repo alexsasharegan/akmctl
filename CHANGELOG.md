@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `close` returns `dependents`: the open work items (`raw`, `ready`, `active`, `blocked`) whose `blocked_by` names the closed item, for `done` and `dropped` and in a dry run. It only reports and never refuses; the CLI lists them after the move, and a close with none is unchanged. The API spec (section 4.12), `close.json`, the `close` fixtures and the `akm-work-items` and `akm` skills are updated. A `check` rule for a stale blocker was considered and left out (it would bump the layout).
+
 - `new work` returns `similar`: up to five open work items (`raw`, `ready`, `active`, `blocked`) that share at least two words with the slug and title, most shared first. It never refuses, and a response with no match is unchanged. The CLI prints them under the new path. The API spec (section 4.10) states the matching rule, `new.json` has the member, and the `akm-work-items` and `akm` skills tell the agent to add to a match instead of filing a duplicate.
 
 ## 0.3.2 - 2026-10-30

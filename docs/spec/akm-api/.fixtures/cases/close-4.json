@@ -45,6 +45,14 @@
     },
     "moved_from": "docs/work/261020-a2b3-add-json-output-to-ls.md",
     "moved_to": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+    "dependents": [
+      {
+        "id": "261024-g7h8",
+        "status": "blocked",
+        "title": "Publish the first release",
+        "path": "docs/work/261024-g7h8-publish-the-first-release.md"
+      }
+    ],
     "diff": {
       "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
       "new_path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",

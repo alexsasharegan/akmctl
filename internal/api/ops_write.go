@@ -599,11 +599,40 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	}
 	from := e.rec.Path
 	to := repo.DoneDir() + "/" + path.Base(from)
+	deps := dependents(repo, e.rec.ID)
 	rec, cerr := e.commit(to)
 	if cerr != nil {
 		return nil, cerr
 	}
-	return e.finish(O("record", recordObj(repo, rec, nil, true), "moved_from", from, "moved_to", rec.Path)), nil
+	out := O("record", recordObj(repo, rec, nil, true), "moved_from", from, "moved_to", rec.Path)
+	if len(deps) > 0 {
+		out = append(out, KV{"dependents", deps})
+	}
+	return e.finish(out), nil
+}
+
+// dependents lists the open work items whose blocked_by names id, in id order:
+// the items that were waiting on the one being closed. The tool reports them
+// and edits none (section 4.12 of the API spec).
+func dependents(repo *record.Repo, id string) []Obj {
+	var out []Obj
+	for _, r := range repo.Records {
+		if r.Type != record.Work || r.ID == id || !similarOpen[r.Status()] {
+			continue
+		}
+		for _, it := range r.Fields["blocked_by"].Items {
+			if it.Kind == frontmatter.String && record.RefID(it.Str) == id {
+				out = append(out, O("id", r.ID, "status", r.Status(), "title", r.Str("title"), "path", r.Path))
+				break
+			}
+		}
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		a, _ := out[i].Get("id")
+		b, _ := out[j].Get("id")
+		return a.(string) < b.(string)
+	})
+	return out
 }
 
 // ---- claim and release ----
