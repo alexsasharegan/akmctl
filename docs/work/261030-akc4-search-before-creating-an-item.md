@@ -1,12 +1,14 @@
 ---
 id: "261030-akc4"
 title: search before creating an item
-status: ready
+status: active
 created: 2026-10-30
 updated: 2026-10-30
 kind: feature
 priority: 1
 summary: Creating an item first looks for open items with similar titles, so the agent adds to one instead of filing a duplicate.
+claimed_by: claude
+claimed_at: 2026-10-31T03:41
 ---
 
 # search before creating an item
@@ -25,7 +27,13 @@ Done when:
 - [ ] `akm-work-items` ("No item fits") and the `akm` reference for `new` are updated in both copies (`.agents/skills/` and `internal/initrepo/templates/skills/`), and the skill drift test passes.
 - [ ] Glossary and changelog are updated.
 
+## Next
+
+Read how `new work` is built (internal/cli and internal/api), then write the matching rule in the specification before the code.
+
 ## Log
 
 - 2026-10-30: filed.
 - 2026-10-30: filed from the vault migration review.
+- 2026-10-30: claimed (claude).
+- 2026-10-30: claimed.

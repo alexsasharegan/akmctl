@@ -6,7 +6,7 @@ created: 2026-10-30
 updated: 2026-10-30
 kind: feature
 priority: 2
-summary: A standard commit subject and AKM-* trailers for status-changing steps, returned by the tool as a commit object, so a commit shows that an AKM step made it and a check can verify it.
+summary: A standard commit subject and AKM-* trailers for status steps, returned by the tool as a commit object and checked against the diff.
 ---
 
 # commit message format and stamp
