@@ -2,11 +2,13 @@
 id: "261030-25ts"
 title: writeatomic sync before rename
 summary: WriteAtomic renames an unsynced temp file over the record, so a power loss can leave a short file; sync the file before the rename and the folder after.
-status: ready
+status: active
 kind: bug
 priority: 1
 created: 2026-10-30
 updated: 2026-10-30
+claimed_by: claude
+claimed_at: 2026-10-31T04:44
 ---
 
 # writeatomic sync before rename
@@ -25,6 +27,11 @@ Done when:
 - [ ] The other direct writers are looked at and the Log says what was decided: `migrate`'s scratch copy (`internal/migrate/migrate.go`) and the `--out` handoff file (`internal/cli/cli.go`) are not records and stay as they are, unless the look finds a reason.
 - [ ] The API spec's Atomicity bullet says the file is flushed before the rename; the changelog has a line.
 
+## Next
+
+Add `syncFile` and `syncDir` package variables in `internal/fsx/write.go`, call them in `WriteAtomic`, then the order and failure tests.
+
 ## Log
 
 - 2026-10-30: filed, from the maintainer's question about the write path.
+- 2026-10-30: claimed (claude).
