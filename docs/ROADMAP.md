@@ -2,6 +2,7 @@
 
 ## Now
 
+- [261030-25ts] writeatomic sync before rename
 - [261029-pzb1] Write the glossary and require every new feature to register its terms
 
 ## Next
