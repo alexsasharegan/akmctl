@@ -139,6 +139,10 @@ def cyclic(files):
     k = "docs/work/261020-a2b3-add-json-output-to-ls.md"
     files[k] = files[k].replace("priority: 2\n", "blocked_by: [261024-g7h8]\npriority: 2\n", 1)
 
+def redundant(files):
+    k = "docs/work/261015-c4d5-machine-readable-listings.md"
+    files[k] = files[k].replace("kind: feature\n", "kind: feature\nblocked_by: [261022-e5f6]\n", 1)
+
 WORK_F = ["id", "title", "summary", "status", "kind", "parent", "blocked_by", "priority", "cycle", "keep", "created", "updated", "closed", "authored_by", "decisions"]
 ADR_F = ["id", "title", "summary", "status", "date", "scope", "supersedes", "superseded_by", "authored_by"]
 
@@ -662,6 +666,10 @@ def main():
     p = "docs/work/261020-a2b3-add-json-output-to-ls.md"
     f6 = [dict(rule="WK18", severity="E", file=p, line=line_of(cyc, p, "blocked_by:"), id="261020-a2b3", message="dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3", **{"class": None})]
     case("check", 6, "a dependency cycle is one finding", "cyclic", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=False, errors=1, warnings=0, count=1, findings=f6, reconcile=dict(state="current")))
+    red = build("redundant", redundant)
+    p = "docs/work/261015-c4d5-machine-readable-listings.md"
+    f7 = [dict(rule="WK19", severity="W", file=p, line=line_of(red, p, "blocked_by:"), id="261015-c4d5", message="blocked_by 261022-e5f6 is a descendant; a parent already waits for its children", **{"class": None})]
+    case("check", 7, "a warning does not make the repository unclean", "redundant", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=1, count=1, findings=f7, reconcile=dict(state="current")))
     req = {}
     case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.3.0"}, to="0.3.0", state="current", steps=[], findings=[], clean=True))
     # find, when

@@ -184,6 +184,42 @@ func (c *checker) work() {
 	}
 	c.parentLoops()
 	c.dependencyCycles()
+	c.redundantBlockers()
+}
+
+// redundantBlockers warns (WK19) about a blocked_by entry that names one of the
+// item's own descendants: a parent already waits for its children.
+func (c *checker) redundantBlockers() {
+	for _, r := range c.repo.Records {
+		if r.Type != record.Work {
+			continue
+		}
+		for _, it := range r.Fields["blocked_by"].Items {
+			t := c.ref(it.Str)
+			if it.Kind != frontmatter.String || t == nil || t.Type != record.Work || t.ID == r.ID {
+				continue
+			}
+			if c.descends(t, r.ID) {
+				c.add("WK19", "W", r.Path, c.line(r, "blocked_by"), r.ID, "blocked_by %s is a descendant; a parent already waits for its children", t.ID)
+			}
+		}
+	}
+}
+
+// descends reports whether the item has the ancestor id on its parent chain.
+func (c *checker) descends(item *record.Record, ancestor string) bool {
+	seen := map[string]bool{item.ID: true}
+	for cur := item; ; {
+		p := c.ref(cur.Str("parent"))
+		if p == nil || p.Type != record.Work || seen[p.ID] {
+			return false
+		}
+		if p.ID == ancestor {
+			return true
+		}
+		seen[p.ID] = true
+		cur = p
+	}
 }
 
 // parentLoops reports each loop in the parent links once (WK4), at its lowest id.

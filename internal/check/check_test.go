@@ -120,6 +120,7 @@ func TestRules(t *testing.T) {
 			g7h8: sub("261020-a2b3,", "261015-c4d5, 261020-a2b3,"),
 		}},
 		{"WK18 child blocked by its parent", "WK18", "E", map[string]func(string) string{e5f6: sub("parent: 261015-c4d5", "parent: 261015-c4d5\nblocked_by: [261015-c4d5]")}},
+		{"WK19 blocked_by a child", "WK19", "W", map[string]func(string) string{"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: active\nblocked_by: [261022-e5f6]")}},
 		{"WK12 heading differs", "WK12", "W", map[string]func(string) string{e5f6: sub("# Document the exit codes", "# Something else")}},
 		{"I1 duplicate id", "I1", "E", map[string]func(string) string{"docs/work/261022-e5f6-copy.md": func(string) string {
 			return "---\nid: 261022-e5f6\ntitle: Copy\nstatus: raw\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n# Copy\n"
@@ -340,5 +341,27 @@ func TestParentListingItsChildInBlockedByIsNotACycle(t *testing.T) {
 	}), Options{AsOf: asOf})
 	if got := count(res, "WK18"); len(got) != 0 {
 		t.Fatalf("%+v", got)
+	}
+}
+
+func TestRedundantBlockerRule(t *testing.T) {
+	c4d5 := "docs/work/261015-c4d5-machine-readable-listings.md"
+	// the parent names a child: warned, and not a cycle
+	res := Run(repoWith(t, map[string]func(string) string{c4d5: sub("status: active", "status: active\nblocked_by: [261022-e5f6]")}), Options{AsOf: asOf})
+	if got := count(res, "WK19"); len(got) != 1 || got[0].ID != "261015-c4d5" || len(count(res, "WK18")) != 0 {
+		t.Fatalf("%+v", res.Findings)
+	}
+	// a sibling is a plain dependency: a2b3 and e5f6 are both children of c4d5
+	res = Run(repoWith(t, map[string]func(string) string{e5f6: sub("parent: 261015-c4d5", "parent: 261015-c4d5\nblocked_by: [261020-a2b3]")}), Options{AsOf: asOf})
+	if got := count(res, "WK19"); len(got) != 0 {
+		t.Fatalf("a sibling is not a descendant: %+v", got)
+	}
+	// a grandchild named by the grandparent counts
+	res = Run(repoWith(t, map[string]func(string) string{
+		e5f6: sub("parent: 261015-c4d5", "parent: 261020-a2b3"),
+		c4d5: sub("status: active", "status: active\nblocked_by: [261022-e5f6]"),
+	}), Options{AsOf: asOf})
+	if got := count(res, "WK19"); len(got) != 1 {
+		t.Fatalf("%+v", res.Findings)
 	}
 }

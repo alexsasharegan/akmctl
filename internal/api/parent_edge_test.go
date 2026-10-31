@@ -3,6 +3,9 @@ package api
 import (
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/check"
+	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
 const doneItem = "261010-j9k0"
@@ -125,7 +128,11 @@ func TestBlockedByCyclesThroughTheParentTree(t *testing.T) {
 	if err := block(t, root, p, c); err != nil {
 		t.Fatal(err)
 	}
-	clean(t, root)
+	repo, _ := record.Load(root)
+	res := check.Run(repo, check.Options{})
+	if len(res.Findings) != 1 || res.Findings[0].Rule != "WK19" {
+		t.Fatalf("want the WK19 warning only: %+v", res.Findings)
+	}
 }
 
 func TestParentEdgeCannotCompleteADependencyCycle(t *testing.T) {

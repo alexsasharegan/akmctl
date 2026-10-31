@@ -1,0 +1,33 @@
+{
+  "name": "a warning does not make the repository unclean",
+  "repo": "redundant",
+  "request": {
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "check",
+    "request": {
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "clean": true,
+    "errors": 0,
+    "warnings": 1,
+    "count": 1,
+    "findings": [
+      {
+        "rule": "WK19",
+        "severity": "W",
+        "file": "docs/work/261015-c4d5-machine-readable-listings.md",
+        "line": 7,
+        "id": "261015-c4d5",
+        "message": "blocked_by 261022-e5f6 is a descendant; a parent already waits for its children",
+        "class": null
+      }
+    ],
+    "reconcile": {
+      "state": "current"
+    }
+  }
+}

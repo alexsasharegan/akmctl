@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `check` warns (rule WK19) when an item lists one of its own descendants in `blocked_by`: a parent already waits for its children, so the entry is redundant. It is a warning and not a cycle. Fixture `check-7` in both copies (work item 261031-pbws).
+
 - `check` reports a dependency cycle (rule WK18): items that wait for each other through `blocked_by` entries and parent-to-child links, for example two items blocked on each other, a longer loop, or a child blocked by its own parent or grandparent. One finding per cycle, naming the items in order. A loop in the `parent` links alone is now one WK4 finding per loop, at its lowest id, instead of one per item that leads into it. `set` refuses a `blocked_by` entry or a `parent` that would close such a cycle (WK18). A parent that lists its own child in `blocked_by` is redundant, not a cycle, and is accepted. New package `internal/depgraph` (Tarjan's algorithm, O(items + edges)); fixtures `check-6` and `set-11` in both copies (work item 261031-z50q).
 
 - `set` and `new` refuse a `parent` that would close a loop at any depth (WK4, with the chain in the message) or that would put an open item under a `done` or `dropped` parent (WK8). Before, both were accepted and left the repository failing `check`. A violation that is already present does not block an unrelated change. Two fixture cases (`set-9`, `set-10`) in both copies (work item 261031-wy32).

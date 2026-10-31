@@ -129,7 +129,7 @@ Three more optional fields:
 | `cycle`  | a label of letters, digits, `.`, `_` and `-`, at most 64 characters | The sprint, program increment or quarter the item is planned into, for example `2026-PI3-S4`. The tool treats it as an opaque label.                 |
 | `keep`   | `true` or `false`                                                   | `true` marks an item that a later compaction must never fold or archive. `false` and absence mean the same.                                          |
 
-The check rules are WK13 (a warning: an item in `done/` has no `closed`), WK14 (an open item has `closed`), WK15 (`closed` is not a date, or is earlier than `created`), WK16 (`cycle` is not a valid label), WK17 (`keep` is not a boolean) and WK18 (the dependency graph, `blocked_by` plus parent-to-child links, has a cycle).
+The check rules are WK13 (a warning: an item in `done/` has no `closed`), WK14 (an open item has `closed`), WK15 (`closed` is not a date, or is earlier than `created`), WK16 (`cycle` is not a valid label), WK17 (`keep` is not a boolean) WK18 (the dependency graph, `blocked_by` plus parent-to-child links, has a cycle) and WK19 (a warning: `blocked_by` names one of the item's own descendants, which a parent already waits for).
 
 ### Decision records (ADRs)
 
@@ -227,6 +227,23 @@ This is slower and uses more tokens, but it must stay correct.
 ### With the tool
 
 `akmctl` is one Go binary with subcommands: `check`, `ls`, `search`, `show`, `board`, `index`, `new`, `set`, `close`, `commits`, `find`, `when`, `migrate` and `ui`, plus `claim` and `release` for the optional claims extension. (There is no `renumber` command; the specification documents the manual repair.) `akmctl ui` starts a workbench page, a Kanban over the records, on the loopback interface. The tool has a stable JSON output and an API spec with a CLI binding and an HTTP binding, so other implementations can be written against the same contract. It ships as prebuilt binaries for macOS, Linux and Windows; building from source is possible.
+
+### Gate hand edits
+
+`set` and `new` refuse a `parent` or `blocked_by` that would close a loop (WK4, WK18), but nothing can stop a person or an agent from writing a loop into a file by hand. `akmctl check` finds it (WK4 for a loop of `parent` links, WK18 for any dependency cycle) and exits non-zero on an error, so run it where a hand edit passes through. A git pre-commit hook in `.git/hooks/pre-commit`:
+
+```sh
+#!/bin/sh
+exec akmctl check
+```
+
+and a step in CI:
+
+```yaml
+- run: akmctl check
+```
+
+The tool does not install either; this repository's own CI runs the check on every push.
 
 ## 8. Versions, upgrades and extensions
 
