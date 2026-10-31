@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/fsx"
@@ -41,7 +42,7 @@ func settingsObj(repo *record.Repo, only string) []Obj {
 // opConfig lists the settings (no key), reads one (key) or changes one (key and
 // value). Changing git_commits writes the manifest key and installs or removes
 // the optional skill akm-commit.
-func opConfig(repo *record.Repo, q Request) (Obj, *Error) {
+func opConfig(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 	_, hasKey := q["key"]
 	_, hasVal := q["value"]
 	if hasVal && !hasKey {
@@ -55,7 +56,7 @@ func opConfig(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 		return O("settings", settingsObj(repo, q.str("key"))), nil
 	}
-	return setGitCommits(repo, q, q["value"].(bool))
+	return setGitCommits(repo, q, q["value"].(bool), info.Version)
 }
 
 // commitPlan is what turning git_commits on or off would do.
@@ -77,7 +78,7 @@ func (p *commitPlan) editsObj() []Obj {
 	return p.edits
 }
 
-func setGitCommits(repo *record.Repo, q Request, on bool) (Obj, *Error) {
+func setGitCommits(repo *record.Repo, q Request, on bool, tool string) (Obj, *Error) {
 	if _, err := os.Stat(filepath.Join(repo.Root, filepath.FromSlash(repo.ManifestPath()))); err != nil {
 		return nil, refused("no_manifest", "there is no %s: run akmctl init or akmctl migrate first", repo.ManifestPath())
 	}
@@ -95,7 +96,7 @@ func setGitCommits(repo *record.Repo, q Request, on bool) (Obj, *Error) {
 	if lerr := repo.Reload(); lerr != nil {
 		return nil, unreadable(lerr)
 	}
-	plan, err := planGitCommits(repo, on)
+	plan, err := planGitCommits(repo, on, tool)
 	if err != nil {
 		return nil, err
 	}
@@ -140,14 +141,23 @@ func joinPaths(l []string) string {
 }
 
 // planGitCommits works out the changes from what is on disk. It writes nothing.
-func planGitCommits(repo *record.Repo, on bool) (*commitPlan, *Error) {
+func planGitCommits(repo *record.Repo, on bool, tool string) (*commitPlan, *Error) {
 	root := repo.Root
 	skillDir := initrepo.SkillDir(initrepo.CommitSkill)
 	abs := func(rel string) string { return filepath.Join(root, filepath.FromSlash(rel)) }
 	p := &commitPlan{}
-	shipped, serr := initrepo.OptionalSkillFiles(initrepo.CommitSkill, repo.WorkDir(), repo.ADRDir())
+	if tool == "" {
+		tool = "dev"
+	}
+	managed, serr := initrepo.Managed(repo.WorkDir(), repo.ADRDir(), true)
 	if serr != nil {
 		return nil, &Error{Code: "internal", Message: serr.Error()}
+	}
+	var shipped []initrepo.File
+	for _, sk := range managed {
+		if sk.Name == initrepo.CommitSkill {
+			shipped = sk.RepoFiles(tool)
+		}
 	}
 	// the key: present with the wanted value, or (off) absent
 	if v, ok := repo.Layout["git_commits"]; !ok && on || ok && (v.Kind != frontmatter.Bool || v.Bool != on) {
@@ -216,6 +226,9 @@ func planGitCommits(repo *record.Repo, on bool) (*commitPlan, *Error) {
 			return err
 		}
 		p.remove = append(p.remove, rel)
+		if strings.HasSuffix(rel, "/"+initrepo.MarkerName) {
+			return nil // the marker is the tool's own record, never an edit
+		}
 		if w, known := want[rel]; !known || w != string(b) {
 			p.edits = append(p.edits, Diff(rel, rel, w, string(b)))
 		}

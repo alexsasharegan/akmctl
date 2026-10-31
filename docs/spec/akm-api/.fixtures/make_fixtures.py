@@ -489,19 +489,21 @@ def legacy_cases(case):
 # small files are compared exactly; the others (AGENTS.md, the skills, ...) are only
 # required to exist, so the wording of a template is not part of the contract.
 AKM_REFS = ["board", "check", "claim", "close", "commits", "config", "find", "index", "init", "ls", "migrate", "new",
-    "release", "search", "section", "set", "show", "version", "when"]
+    "release", "search", "section", "set", "show", "skills", "version", "when"]
 INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/%s.md" % r for r in AKM_REFS] + [
     ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",
     ".agents/skills/akm-track-work/SKILL.md", ".agents/skills/akm-track-work/assets/work-item.md",
+    ".agents/skills/akm/.akm-skill.json", ".agents/skills/akm-record-decision/.akm-skill.json", ".agents/skills/akm-track-work/.akm-skill.json",
     ".prettierignore", ".prettierrc.json", "AGENTS.md", "CLAUDE.md", "README.md"]
 INIT_LAYOUT = "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\nextension.claims: 0.3.0\nextension.safety: 0.3.0\n"
 
 COMMIT_SKILL = ".agents/skills/akm-commit/SKILL.md"
+COMMIT_MARKER = ".agents/skills/akm-commit/.akm-skill.json"
 
 def init_files(docs="docs", wikilinks=False, git_commits=False, tree=False):
     work, adr, road = docs + "/work", docs + "/adr", docs + "/ROADMAP.md"
     paths = INIT_COMMON + [docs + "/.akm-deny", docs + "/.layout", road, adr + "/README.md", work + "/.gitkeep", work + "/done/.gitkeep"]
-    paths += ([COMMIT_SKILL] if git_commits else []) + ([".gitignore"] if tree else [])
+    paths += ([COMMIT_SKILL, COMMIT_MARKER] if git_commits else []) + ([".gitignore"] if tree else [])
     layout = INIT_LAYOUT
     if docs != "docs": layout += "work_dir: %s\nadr_dir: %s\nroadmap: %s\n" % (work, adr, road)
     if wikilinks: layout += "reference_style: wikilink\n"
@@ -565,13 +567,13 @@ def config_cases(cases, basic):
         return ok("config", req, key="git_commits", value=value, changed=bool(plan["write"] or plan["remove"] or plan["modify"]), applied=applied,
                   needs_confirmation=False, plan=plan, edits=[], settings=[config_setting(settings_value)])
     none = dict(write=[], remove=[], modify=[])
-    on_plan = dict(write=[COMMIT_SKILL], remove=[], modify=["docs/.layout"])
+    on_plan = dict(write=[COMMIT_MARKER, COMMIT_SKILL], remove=[], modify=["docs/.layout"])
     case(1, "list the settings", "basic", {}, ok("config", {}, settings=[config_setting(False)]))
     req = dict(key="git_commits")
     case(2, "read one setting", "commits", req, ok("config", req, settings=[config_setting(True)]))
     req = dict(key="git_commits", value=True)
     case(3, "on: the key is written and the skill installed", "basic", req, done(req, True, True, on_plan, True),
-         after={"docs/.layout": basic["docs/.layout"] + "git_commits: true\n"}, after_paths=[COMMIT_SKILL])
+         after={"docs/.layout": basic["docs/.layout"] + "git_commits: true\n"}, after_paths=[COMMIT_MARKER, COMMIT_SKILL])
     req = dict(key="git_commits", value=True, dry_run=True)
     case(4, "dry run: the plan, nothing written", "basic", req, done(req, True, False, on_plan, False))
     req = dict(key="git_commits", value=False)

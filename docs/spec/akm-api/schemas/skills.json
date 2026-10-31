@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/skills.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "status",
+            "install",
+            "update"
+          ]
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "confirm": {
+          "type": "boolean"
+        },
+        "confirm_edited": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "skills"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "mode": {
+              "enum": [
+                "status",
+                "install",
+                "update"
+              ]
+            },
+            "clean": {
+              "type": "boolean"
+            },
+            "skills": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "path": {
+                    "$ref": "common.json#/$defs/path"
+                  },
+                  "state": {
+                    "enum": [
+                      "missing",
+                      "current",
+                      "outdated",
+                      "edited",
+                      "unmarked",
+                      "conflict",
+                      "renamed"
+                    ]
+                  },
+                  "marker": {
+                    "type": "boolean"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "state": {
+                          "enum": [
+                            "missing",
+                            "current",
+                            "outdated",
+                            "edited"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "state"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "stale": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "replaced_by": {
+                    "type": "string"
+                  },
+                  "unedited": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name",
+                  "path",
+                  "state"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "plan": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "skill": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "enum": [
+                      "write",
+                      "replace",
+                      "marker",
+                      "remove"
+                    ]
+                  },
+                  "path": {
+                    "$ref": "common.json#/$defs/path"
+                  },
+                  "needs_confirm_edited": {
+                    "type": "boolean"
+                  },
+                  "diff": {
+                    "$ref": "common.json#/$defs/diff"
+                  }
+                },
+                "required": [
+                  "skill",
+                  "action",
+                  "path",
+                  "needs_confirm_edited"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "applied": {
+              "type": "boolean"
+            },
+            "needs_confirmation": {
+              "type": "boolean"
+            },
+            "written": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/path"
+              }
+            },
+            "replaced": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/path"
+              }
+            },
+            "removed": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/path"
+              }
+            },
+            "skipped": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "skill": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "skill",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "mode",
+            "clean",
+            "skills"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

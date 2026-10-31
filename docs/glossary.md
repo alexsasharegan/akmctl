@@ -45,14 +45,16 @@ The words this project uses, and the ones it avoids. Every new feature, command 
 
 ## Format and versions
 
-| Term                | Aliases                             | Meaning                                                                                                                                           |
-| ------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Manifest**        | avoid: layout file, config file     | The file `docs/.layout` (in the docs dir): the layout version, the extension versions and the settings. Not "the layout file".                    |
-| **Layout**          | avoid: template                     | The folder structure and rules a repository follows, identified by a version (`layout: 0.3.0`). Say "manifest" for the file.                      |
-| **Extension**       | avoid for a file extension          | An optional rule set the manifest switches on: `adr-index`, `work-items`, `claims`, `safety`. Not a file extension.                               |
-| **Rule**            | check rule; its result is a finding | One check with an id such as `WK9`, a severity (error or warning) and a message. `akmctl check` reports **findings**.                             |
-| **Skill**           | none                                | A procedure folder an agent reads, under `.agents/skills/`. Ours start with `akm-`; `akm` is the **router** skill with a reference per operation. |
-| **Reference style** | link style                          | How records link to each other: by `id` (plain) or `wikilink`.                                                                                    |
+| Term                | Aliases                             | Meaning                                                                                                                                            |
+| ------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Manifest**        | avoid: layout file, config file     | The file `docs/.layout` (in the docs dir): the layout version, the extension versions and the settings. Not "the layout file".                     |
+| **Layout**          | avoid: template                     | The folder structure and rules a repository follows, identified by a version (`layout: 0.3.0`). Say "manifest" for the file.                       |
+| **Extension**       | avoid for a file extension          | An optional rule set the manifest switches on: `adr-index`, `work-items`, `claims`, `safety`. Not a file extension.                                |
+| **Rule**            | check rule; its result is a finding | One check with an id such as `WK9`, a severity (error or warning) and a message. `akmctl check` reports **findings**.                              |
+| **Skill**           | none                                | A procedure folder an agent reads, under `.agents/skills/`. Ours start with `akm-`; `akm` is the **router** skill with a reference per operation.  |
+| **Skill marker**    | avoid: lock file, version file      | The file `.akm-skill.json` in a managed skill folder: the tool version and the hash of each file as written. `skills` compares with it.            |
+| **Skill state**     | none                                | What `akmctl skills` says of one skill: `missing`, `current`, `outdated` (older tool text, unedited), `edited`, `unmarked`, `conflict`, `renamed`. |
+| **Reference style** | link style                          | How records link to each other: by `id` (plain) or `wikilink`.                                                                                     |
 
 ## Operations
 

@@ -20,7 +20,7 @@ import (
 var Version = "0.0.0-dev"
 
 // positional names the parameter that takes the positional arguments.
-var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "init": {"dir"}, "set": {"id"}, "section": {"id", "name"}}
+var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "init": {"dir"}, "set": {"id"}, "section": {"id", "name"}, "skills": {"mode"}}
 
 // Run executes one command line and returns the exit code.
 func Run(args []string, stdout, stderr io.Writer, cwd string) int {
@@ -85,7 +85,7 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			outFile = v
 			continue
 		case "yes", "no-input":
-			if op != "init" && !(op == "config" && name == "yes") {
+			if op != "init" && !((op == "config" || op == "skills") && name == "yes") {
 				fmt.Fprintf(stderr, "akmctl: --%s does not belong to %s\n", name, op)
 				return 2
 			}
@@ -177,8 +177,8 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	}
 	names := positional[op]
 	switch {
-	case op == "config":
-		// positional words are read by runConfig
+	case op == "config", op == "skills":
+		// positional words are read by runConfig and runSkills
 	case op == "search":
 		if len(pos) > 0 {
 			req["text"] = strings.Join(pos, " ")
@@ -251,6 +251,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			print(stdout, stderr, format, op, resp, false)
 			return 2
 		}
+	}
+	if op == "skills" {
+		return runSkills(repo, info, pos, req, yes, format, stdout, stderr)
 	}
 	if op == "config" {
 		return runConfig(repo, info, pos, req, yes, format, stdout, stderr)
@@ -509,6 +512,8 @@ func text(w io.Writer, op string, resp api.Obj) {
 		}
 	case "config":
 		configText(w, resp)
+	case "skills":
+		skillsText(w, resp)
 	case "index":
 		p, _ := resp.Get("path")
 		ch, _ := resp.Get("changed")
@@ -597,7 +602,7 @@ func writeDiff(w io.Writer, d api.Obj) {
 func usage(w io.Writer) {
 	ops := append(api.Operations(), "ui")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir>  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nskills: akmctl skills [status|install|update] [--yes] [--dry-run]  (install adds missing skills, update refreshes them and retires renamed ones)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

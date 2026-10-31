@@ -25,16 +25,16 @@ Constraints already decided (ADR 261029-nyv6, ADR 261029-tb3d): the tool owns on
 Done when:
 
 - [x] An ADR (`proposed`, 261030-h6t7) records the command shape, how the installed version is recorded (a manifest key, or a marker in each skill directory), and the new API operation, since it adds to the 1.0 API.
-- [ ] The command installs the missing skills from the binary into a repository with a layout and no skills, and leaves a repository that already has them unchanged.
-- [ ] It refuses to overwrite a skill directory that is not ours, and `--dry-run` and `--yes` work as for `config`.
-- [ ] A status view, or a `check` rule, reports a skill whose installed version differs from the shipped one, and an optional skill whose key and directory disagree.
-- [ ] `update` shows the diff for a changed skill before replacing it.
-- [ ] The API schema, fixtures, specification, guide, glossary and changelog are updated; a test covers a repository made by an older tool version.
+- [x] The command installs the missing skills from the binary into a repository with a layout and no skills, and leaves a repository that already has them unchanged.
+- [x] It refuses to overwrite a skill directory that is not ours, and `--dry-run` and `--yes` work as for `config`.
+- [x] A status view, or a `check` rule, reports a skill whose installed version differs from the shipped one, and an optional skill whose key and directory disagree.
+- [x] `update` shows the diff for a changed skill before replacing it.
+- [x] The API schema, fixtures, specification, guide, glossary and changelog are updated; a test covers a repository made by an older tool version.
 - [ ] Run in the maintainer's vault, it installs the three skills and `akmctl check` reports no new warnings.
 
 ## Next
 
-ADR 261030-h6t7 is accepted. Build after 261030-p7r1 (skill names), so the installer ships with the final names. Then build `internal/skills` (status, plan, install, update, markers), route `init` and `config git-commits` through it, add the `skills` operation (params, schema, fixtures), the CLI command and `GET /skills`, then the spec, guide, glossary and changelog.
+Only the last check remains: run `akmctl skills install` in the maintainer's vault and confirm `akmctl check` reports no new warnings. That is the maintainer's repository, so it is left to them.
 
 ## Log
 
@@ -45,3 +45,4 @@ ADR 261030-h6t7 is accepted. Build after 261030-p7r1 (skill names), so the insta
 - 2026-10-30: released (claude).
 - 2026-10-30: ADR 261030-h6t7 accepted by the maintainer. Sequenced after 261030-p7r1 (the rename of akm-work-items and the naming grammar).
 - 2026-10-30: claimed (claude).
+- 2026-10-30: built `akmctl skills status|install|update`: `internal/initrepo/skills.go` (managed set, markers, renames), `internal/api/ops_skills.go`, the CLI and `GET`/`POST /skills`, schema `skills.json`, spec 4.20, the `akm` reference `skills.md`, glossary and changelog. `init` and `config git-commits` write markers through the same code. Deviation from ADR 261030-h6t7: an unmarked folder under a retired name is treated as edited (needs `confirm_edited`), because the files the 0.3.x init wrote are not embedded to compare with.

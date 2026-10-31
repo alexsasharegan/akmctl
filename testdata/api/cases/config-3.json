@@ -20,6 +20,7 @@
     "needs_confirmation": false,
     "plan": {
       "write": [
+        ".agents/skills/akm-commit/.akm-skill.json",
         ".agents/skills/akm-commit/SKILL.md"
       ],
       "remove": [],
@@ -43,6 +44,7 @@
     "docs/.layout": "layout: 0.3.0\nextension.adr-index: 0.3.0\nextension.work-items: 0.3.0\ngit_commits: true\n"
   },
   "after_paths": [
+    ".agents/skills/akm-commit/.akm-skill.json",
     ".agents/skills/akm-commit/SKILL.md"
   ],
   "git_work_tree": true

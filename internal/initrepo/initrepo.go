@@ -77,6 +77,7 @@ type Options struct {
 	GitCommits bool   // write git_commits: true and install the optional skill akm-commit
 	Gitignore  bool   // write .gitignore (the target is inside a work tree)
 	Obsidian   bool   // the target has an .obsidian folder: ignore its per-machine files
+	Tool       string // the tool version recorded in each skill's marker; "" means dev
 }
 
 // Files returns the files of a new repository called name with default options.
@@ -88,6 +89,9 @@ func Files(name string) ([]File, error) { return FilesWith(name, Options{}) }
 func FilesWith(name string, opt Options) ([]File, error) {
 	if opt.DocsDir == "" {
 		opt.DocsDir = DefaultDocsDir
+	}
+	if opt.Tool == "" {
+		opt.Tool = "dev"
 	}
 	if err := ValidateDocsDir(opt.DocsDir); err != nil {
 		return nil, fmt.Errorf("docs dir %q %v", opt.DocsDir, err)
@@ -166,27 +170,12 @@ func FilesWith(name string, opt Options) ([]File, error) {
 	add(workDir+"/.gitkeep", "")
 	add(workDir+"/done/.gitkeep", "")
 
-	paths := strings.NewReplacer("docs/work", workDir, "docs/adr", adrDir)
-	err = fs.WalkDir(templates, "templates/skills", func(fp string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		b, err := templates.ReadFile(fp)
-		if err != nil {
-			return err
-		}
-		add(".agents/"+strings.TrimPrefix(fp, "templates/"), paths.Replace(string(b)))
-		return nil
-	})
+	skills, err := Managed(workDir, adrDir, opt.GitCommits)
 	if err != nil {
 		return nil, err
 	}
-	if opt.GitCommits {
-		more, err := OptionalSkillFiles(CommitSkill, workDir, adrDir)
-		if err != nil {
-			return nil, err
-		}
-		files = append(files, more...)
+	for _, sk := range skills {
+		files = append(files, sk.RepoFiles(opt.Tool)...)
 	}
 	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
 	return files, nil

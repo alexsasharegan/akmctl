@@ -264,6 +264,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op = "init"
 	case len(seg) == 1 && seg[0] == "config" && (m == "GET" || m == "POST"):
 		op = "config"
+	case len(seg) == 1 && seg[0] == "skills" && (m == "GET" || m == "POST"):
+		op = "skills"
 	case len(seg) == 1 && seg[0] == "migrate" && m == "POST":
 		op = "migrate"
 	case len(seg) == 2 && seg[0] == "records" && m == "GET":
@@ -291,6 +293,9 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		kinds := api.Params(op)
 		for k, vs := range q {
 			req[k] = queryValue(kinds[k], vs)
+		}
+		if mode, _ := req["mode"].(string); op == "skills" && mode != "" && mode != "status" {
+			return "", nil, false, &api.Error{Code: "invalid_request", Message: "a GET reads only: use POST for install and update", Details: api.O("parameter", "mode")}
 		}
 	} else if m != "DELETE" || r.ContentLength > 0 {
 		if m != "DELETE" && !strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "application/json") && r.ContentLength != 0 {

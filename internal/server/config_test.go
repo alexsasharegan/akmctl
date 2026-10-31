@@ -46,3 +46,22 @@ func TestConfigRoutes(t *testing.T) {
 		t.Fatalf("unknown key: %d", r.status)
 	}
 }
+
+func TestSkillsRoutes(t *testing.T) {
+	ts, root := setup(t)
+	r := do(t, ts, "GET", "/api/v1/skills", "", nil)
+	if r.status != 200 || r.body["operation"] != "skills" || r.body["clean"] != false {
+		t.Fatalf("status: %d %v", r.status, r.body)
+	}
+	r = do(t, ts, "GET", "/api/v1/skills?mode=install", "", nil)
+	if r.status != 400 || errCode(r) != "invalid_request" {
+		t.Fatalf("a GET must not write: %d %v", r.status, r.body)
+	}
+	r = do(t, ts, "POST", "/api/v1/skills", `{"mode":"install","confirm":true}`, nil)
+	if r.status != 200 || r.body["applied"] != true {
+		t.Fatalf("install: %d %v", r.status, r.body)
+	}
+	if _, err := os.Stat(filepath.Join(root, ".agents/skills/akm/.akm-skill.json")); err != nil {
+		t.Fatal("marker not written")
+	}
+}

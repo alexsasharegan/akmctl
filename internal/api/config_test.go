@@ -113,7 +113,7 @@ func TestConfigOnOffIdempotent(t *testing.T) {
 	}
 	// dry-run off: the plan, nothing removed, no confirm needed for a dry run
 	resp = cfgOK(t, root, Request{"key": "git_commits", "value": false, "dry_run": true})
-	if got := planOf(resp, "remove"); len(got) == 0 || got[0] != skillFile {
+	if got := planOf(resp, "remove"); len(got) != 2 || got[1] != skillFile {
 		t.Errorf("remove plan %v", got)
 	}
 	if nc, _ := resp.Get("needs_confirmation"); nc != true {

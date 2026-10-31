@@ -14,7 +14,7 @@ import (
 // repo only supplies the base directory. It never overwrites a file. With
 // git_init it also runs the version-control init when the directory is not
 // inside a work tree; a failure of that is reported, not fatal.
-func opInit(repo *record.Repo, q Request) (Obj, *Error) {
+func opInit(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 	docsDir := initrepo.DefaultDocsDir
 	if d, given := q["docs_dir"].(string); given {
 		if err := initrepo.ValidateDocsDir(d); err != nil {
@@ -69,7 +69,7 @@ func opInit(repo *record.Repo, q Request) (Obj, *Error) {
 	if st, err := os.Stat(filepath.Join(target, ".obsidian")); err == nil && st.IsDir() {
 		obsidian = true
 	}
-	res, err := initrepo.InitWith(target, initrepo.Options{DocsDir: docsDir, WikiLinks: wiki, GitCommits: commits, Gitignore: inTree, Obsidian: obsidian})
+	res, err := initrepo.InitWith(target, initrepo.Options{DocsDir: docsDir, WikiLinks: wiki, GitCommits: commits, Gitignore: inTree, Obsidian: obsidian, Tool: info.Version})
 	if err != nil {
 		return nil, unreadable(err)
 	}

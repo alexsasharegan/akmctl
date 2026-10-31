@@ -36,6 +36,7 @@ Read the reference before the first use of a command.
 | Check or upgrade a repository's layout   | `akmctl migrate`           | `references/migrate.md` |
 | Start a new AKM repository               | `akmctl init`              | `references/init.md`    |
 | Read or change repository settings       | `akmctl config`            | `references/config.md`  |
+| Check or refresh the AKM skills          | `akmctl skills`            | `references/skills.md`  |
 
 ## Habits
 

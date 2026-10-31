@@ -52,14 +52,16 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opCheck(repo, req)
 	case "commits":
 		body, err = opCommits(repo, req)
+	case "skills":
+		body, err = opSkills(repo, req, info)
 	case "index":
 		body, err = opIndex(repo, req)
 	case "migrate":
 		body, err = opMigrate(repo, req)
 	case "init":
-		body, err = opInit(repo, req)
+		body, err = opInit(repo, req, info)
 	case "config":
-		body, err = opConfig(repo, req)
+		body, err = opConfig(repo, req, info)
 	case "new":
 		body, err = opNew(repo, req)
 	case "set":

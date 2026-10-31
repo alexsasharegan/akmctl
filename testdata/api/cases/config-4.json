@@ -22,6 +22,7 @@
     "needs_confirmation": false,
     "plan": {
       "write": [
+        ".agents/skills/akm-commit/.akm-skill.json",
         ".agents/skills/akm-commit/SKILL.md"
       ],
       "remove": [],
