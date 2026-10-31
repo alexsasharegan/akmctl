@@ -74,6 +74,7 @@ Hardening and small rules:
 - [261028-1k0e] Say which is which in the ADR index supersedes column
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
 - [261029-2k7z] spike for shell completions
+- [261030-55cs] akmctl self update
 - [261030-43jw] Evaluate and potentially migrate to Oxc toolchain (oxlint / oxfmt)
 
 ## Dropped

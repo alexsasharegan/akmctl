@@ -30,6 +30,7 @@ This item evaluates their compatibility with `akmctl`'s current rule sets and me
 - [ ] **Format comparison:** `oxfmt` ran over that same file set, and the Log records its diff against `prettier --check` (the drift, or "none"). It also records whether `oxfmt` formats Markdown at all.
 - [ ] **Lint comparison:** `oxlint` ran over the repository's JavaScript (the workbench UI and `docs/spec/akm-api/validate.js`), and the Log lists the rules it covers and any it lacks.
 - [ ] **Decision:** the Outcome records migrate, partial or stay, with the evidence. A migrate or partial decision files follow-up work items, and an ADR draft (`proposed`) is written if Prettier is rejected.
+- [ ] **Skills in the format path:** the Log records the case for and against formatting the skills (`.agents/skills/**/*.md` and their embedded copy in `internal/initrepo/templates/skills/`), for Prettier and for `oxfmt`, and the Outcome decides it. The maintainer leans toward including them: an AST-based formatter that fails to round-trip a file often surfaces a real Markdown or frontmatter error, and the skills are the text agents read. If included, AGENTS.md gets the rule "after editing a skill, run `npm run format`", and the format scripts and `.prettierignore` cover both copies (the drift test needs them byte-equal).
 - [ ] **Benchmark (optional):** cold and cached timings for both setups are in the Log.
 
 ### Implementation steps (if approved)
@@ -42,6 +43,8 @@ This item evaluates their compatibility with `akmctl`'s current rule sets and me
 
 ### Notes and considerations
 
+- **Skills are outside the format path today.** `format` and `format:check` cover `AGENTS.md`, `CHANGELOG.md`, `README.md` and `docs/**/*.md` only, and `.prettierignore` skips `internal/`, so neither skill copy is checked. Running Prettier over `.agents/skills` on 2026-10-30 reported drift in `akm/SKILL.md` alone (table alignment), so including the skills costs one reformat. `TestSkillsMatchRepository` requires the two copies to be equal, so a formatted skill must be copied to the embedded set in the same commit.
+
 - **Type-aware rules:** `oxlint` parses natively, but if we rely heavily on ESLint's `type-checked` rules we may need to run `tsc --noEmit` alongside it.
 - **Prettier plugins:** if non-standard files are formatted with Node-based Prettier plugins, `oxfmt` may not support them natively.
 - **Fallback:** if the two are a clean switch, keep Prettier and ESLint as fallbacks for when the Vite stack is unavailable to a user (for example company-quarantined mirrors).
@@ -51,3 +54,4 @@ This item evaluates their compatibility with `akmctl`'s current rule sets and me
 - 2026-10-30: filed.
 - 2026-10-30: scope note for the audit: `package.json` has only `prettier` (checks Markdown records) and `ajv`; no ESLint, husky or lint-staged yet, so the audit starts from that.
 - 2026-10-30: done-when rewritten as a spike (audit, format and lint comparison, decision); marked ready.
+- 2026-10-30: added the skills-in-format-path question (maintainer inclined to include them and to say so in AGENTS.md), prompted by a Prettier run over `.agents/skills` that reformatted `akm/SKILL.md`.
