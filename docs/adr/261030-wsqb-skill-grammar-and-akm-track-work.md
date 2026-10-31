@@ -2,7 +2,7 @@
 id: "261030-wsqb"
 title: Skills are named akm-verb-object, and akm-work-items becomes akm-track-work
 summary: Skill names are an imperative, akm-<verb>[-<object>]; akm-work-items is renamed akm-track-work, and skills update retires the old folder when it is unedited.
-status: proposed
+status: accepted
 date: 2026-10-30
 ---
 
@@ -41,7 +41,7 @@ The skill drift test and `TestEveryOperationHasReference` keep both copies equal
 
 ## Review
 
-Proposed 2026-10-30. The maintainer chose the name `akm-track-work` on 2026-10-30 after the lifecycle argument; this record is for the maintainer to accept.
+Proposed 2026-10-30. The maintainer chose the name `akm-track-work` on 2026-10-30 after the lifecycle argument, and accepted this record on 2026-10-30.
 
 ## Revert
 
