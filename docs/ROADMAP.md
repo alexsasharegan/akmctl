@@ -18,6 +18,7 @@ Agent-flow guardrails from the vault migration review, in order (261030-1xdy is 
 
 - [261030-akc4] search before creating an item
 - [261030-dw71] close reports dependents
+- [261030-q03z] commit message format and stamp
 
 ## Later
 
