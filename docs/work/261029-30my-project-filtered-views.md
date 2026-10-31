@@ -1,12 +1,14 @@
 ---
 id: "261029-30my"
 title: Filter the board and tables by project
-status: ready
+status: active
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-31
 kind: feature
 priority: 2
 summary: A vault with many projects (for example AEI Fabrication) needs the board and tables narrowed to one project.
+claimed_by: claude
+claimed_at: 2026-10-31T07:02
 ---
 
 # Filter the board and tables by project
@@ -28,3 +30,4 @@ Done when:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-31: claimed (claude).
