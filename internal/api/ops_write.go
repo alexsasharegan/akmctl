@@ -317,6 +317,8 @@ func newRecordText(repo *record.Repo, kind, title string, f map[string]any, now 
 	day := today(now)
 	if kind == record.Work {
 		set("status", frontmatter.NewString("raw"))
+		var parentID string
+		var blockers []frontmatter.Value
 		for _, k := range []string{"kind", "parent", "priority", "blocked_by", "decisions"} {
 			v, ok := f[k]
 			if !ok {
@@ -330,10 +332,17 @@ func newRecordText(repo *record.Repo, kind, title string, f map[string]any, now 
 				if rerr := parentEdgeRule(repo, "", "raw", record.RefID(fv.Str)); rerr != nil {
 					return "", "", rerr
 				}
+				parentID = record.RefID(fv.Str)
+			}
+			if k == "blocked_by" && fv.Kind == frontmatter.List {
+				blockers = fv.Items
 			}
 			if err := set(k, fv); err != nil {
 				return "", "", err
 			}
+		}
+		if rerr := newItemCycle(repo, parentID, blockers); rerr != nil {
+			return "", "", rerr
 		}
 		set("created", frontmatter.NewString(day))
 		set("updated", frontmatter.NewString(day))
@@ -474,6 +483,36 @@ func blockedByRule(repo *record.Repo, id string, entries []frontmatter.Value, ha
 		}
 		if path := g.Path(target, id); path != nil {
 			return refusedRule("WK18", "blocked_by %s would make a dependency cycle: %s -> %s", target, id, strings.Join(path, " -> "))
+		}
+	}
+	return nil
+}
+
+// newItemCycle refuses (WK18) a new item whose parent already waits, directly or
+// through its own blockers and children, for something the new item would wait
+// for: the parent waits for the new item (its child), which would wait for the
+// blocker, which waits for the parent.
+func newItemCycle(repo *record.Repo, parentID string, blockers []frontmatter.Value) *Error {
+	if parentID == "" {
+		return nil
+	}
+	var g *depgraph.Graph
+	for _, it := range blockers {
+		target := record.RefID(it.Str)
+		if it.Kind != frontmatter.String || !record.ValidID(target) {
+			continue
+		}
+		if t := repo.ByID(target); len(t) == 0 || t[0].Type != record.Work {
+			continue
+		}
+		if target == parentID {
+			return refusedRule("WK18", "blocked_by %s would make a dependency cycle: new item -> %s -> new item", target, parentID)
+		}
+		if g == nil {
+			g = depgraph.Build(repo)
+		}
+		if path := g.Path(target, parentID); path != nil {
+			return refusedRule("WK18", "blocked_by %s would make a dependency cycle: new item -> %s -> new item", target, strings.Join(path, " -> "))
 		}
 	}
 	return nil
@@ -684,7 +723,7 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	if strings.TrimSpace(text["outcome"]) == "" {
 		return nil, refused("empty_outcome", "%s has no ## Outcome; write it before closing", e.rec.ID)
 	}
-	if status == "done" {
+	if status == "done" || status == "dropped" {
 		for _, ch := range repo.Records {
 			if ch.Type == record.Work && record.RefID(ch.Str("parent")) == e.rec.ID && ch.Status() != "done" && ch.Status() != "dropped" {
 				return nil, &Error{"refused", "child " + ch.ID + " is not done or dropped", O("reason", "open_children", "rule", "WK8")}

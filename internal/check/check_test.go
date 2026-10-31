@@ -100,6 +100,7 @@ func TestRules(t *testing.T) {
 		{"WK7 no goal", "WK7", "E", map[string]func(string) string{e5f6: sub("## Goal", "## Aim")}},
 		{"WK7 empty outcome", "WK7", "E", map[string]func(string) string{j9k0: sub("MIT, in `LICENSE`.", "")}},
 		{"WK8 done parent with open child", "WK8", "E", map[string]func(string) string{"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: done")}},
+		{"WK8 dropped parent with open child", "WK8", "E", map[string]func(string) string{"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: dropped")}},
 		{"WK9 finished item outside done", "WK9", "E", map[string]func(string) string{e5f6: sub("status: ready", "status: dropped")}},
 		{"WK10 stale", "WK10", "W", map[string]func(string) string{a2b3: sub("updated: 2026-10-27", "updated: 2026-08-01")}},
 		{"WK11 bad kind", "WK11", "E", map[string]func(string) string{"docs/work/261015-c4d5-machine-readable-listings.md": sub("kind: feature", "kind: epic")}},

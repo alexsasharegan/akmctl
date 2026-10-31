@@ -119,7 +119,7 @@ Write the encoder behind the existing `list` command, then add the schema test.
 | `done`    | Finished; `## Outcome` gives evidence for each "done when" line                                    |
 | `dropped` | Decided against; `## Outcome` gives the reason                                                     |
 
-`priority` is an optional integer (higher is sooner, default 0) that only sorts the listing; the roadmap wins. A parent can close only when it is closable: every child is done or dropped, and so on down the tree.
+`priority` is an optional integer (higher is sooner, default 0) that only sorts the listing; the roadmap wins. A parent can close, `done` or `dropped`, only when it is closable: every child is done or dropped, and so on down the tree.
 
 Three more optional fields:
 

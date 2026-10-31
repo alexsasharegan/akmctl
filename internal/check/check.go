@@ -206,6 +206,26 @@ func (c *checker) redundantBlockers() {
 	}
 }
 
+// openIn returns the item itself when it is open, else the first open
+// descendant (children in id order), else nil. seen guards against parent loops.
+func (c *checker) openIn(r *record.Record, seen map[string]bool) *record.Record {
+	if r.Status() != "done" && r.Status() != "dropped" {
+		return r
+	}
+	if seen[r.ID] {
+		return nil
+	}
+	seen[r.ID] = true
+	for _, ch := range c.repo.Records {
+		if ch.Type == record.Work && record.RefID(ch.Str("parent")) == r.ID {
+			if o := c.openIn(ch, seen); o != nil {
+				return o
+			}
+		}
+	}
+	return nil
+}
+
 // descends reports whether the item has the ancestor id on its parent chain.
 func (c *checker) descends(item *record.Record, ancestor string) bool {
 	seen := map[string]bool{item.ID: true}
@@ -302,11 +322,18 @@ func (c *checker) workRecord(r *record.Record) {
 	if (st == "done" || st == "dropped") && strings.TrimSpace(text["outcome"]) == "" {
 		c.add("WK7", "E", r.Path, 0, r.ID, "status %s requires a non-empty ## Outcome", st)
 	}
-	// WK8
-	if st == "done" {
+	// WK8: a done or dropped item is closable (spec): every child is complete
+	if st == "done" || st == "dropped" {
 		for _, ch := range c.repo.Records {
-			if ch.Type == record.Work && record.RefID(ch.Str("parent")) == r.ID && ch.Status() != "done" && ch.Status() != "dropped" {
-				c.add("WK8", "E", r.Path, c.line(r, "status"), r.ID, "done parent has open child %s", ch.ID)
+			if ch.Type != record.Work || record.RefID(ch.Str("parent")) != r.ID {
+				continue
+			}
+			if open := c.openIn(ch, map[string]bool{r.ID: true}); open != nil {
+				kind := "child"
+				if open.ID != ch.ID {
+					kind = "descendant"
+				}
+				c.add("WK8", "E", r.Path, c.line(r, "status"), r.ID, "%s parent has open %s %s", st, kind, open.ID)
 			}
 		}
 	}

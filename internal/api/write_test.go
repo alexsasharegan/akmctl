@@ -259,7 +259,7 @@ func TestCloseParentWithOpenChildren(t *testing.T) {
 	b, _ := os.ReadFile(p)
 	os.WriteFile(p, append(b, []byte("\n## Outcome\nDone.\n")...), 0o644)
 	wantCode(t, root, "close", Request{"id": c4d5, "status": "done"}, "refused", "open_children")
-	mustOK(t, root, "close", Request{"id": c4d5, "status": "dropped"})
+	wantCode(t, root, "close", Request{"id": c4d5, "status": "dropped"}, "refused", "open_children")
 }
 
 func TestClaimAndRelease(t *testing.T) {

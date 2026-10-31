@@ -314,7 +314,7 @@ For `dropped`: the reason.
 ### Parent and child
 
 - A child names its parent with `parent`. Children are found by search, not listed in the parent's frontmatter (one source of truth).
-- A parent MUST NOT be `done` while it is not closable (below): every child is `done` or `dropped`, and so on down the tree. A parent MAY be `dropped` only if every open child is dropped or re-parented first.
+- A parent MUST NOT be `done` or `dropped` while it is not closable (below): every child is `done` or `dropped`, and so on down the tree. To drop a parent, drop or re-parent its open children first.
 - Depth is unlimited by the schema; the skill recommends two levels.
 
 ### Closable, blocked and the dependency graph
@@ -447,7 +447,7 @@ Severity: **E** error (exit 1), **W** warning (printed, exit 0). Rule ids: `WK` 
 | WK5  | E   | `status: blocked` has a non-empty `blocked_by`; every `blocked_by` entry that matches the id pattern resolves to an item; other entries are free text and are not checked.                                                                                                                                                       |
 | WK6  | E   | `status: active` or `blocked` has a non-empty `## Next`.                                                                                                                                                                                                                                                                         |
 | WK7  | E   | `ready`, `active`, `blocked` or `done` has a `## Goal`; `done` or `dropped` has a non-empty `## Outcome`.                                                                                                                                                                                                                        |
-| WK8  | E   | An item with `status: done` is closable: every child is complete (settled, with every child complete in turn).                                                                                                                                                                                                                   |
+| WK8  | E   | An item with `status: done` or `dropped` is closable: every child is complete (settled, with every child complete in turn).                                                                                                                                                                                                      |
 | WK9  | E   | An item in `docs/work/done/` has status `done` or `dropped`; a `done` or `dropped` item is in `done/`.                                                                                                                                                                                                                           |
 | WK10 | W   | `active` item with `updated` older than 30 days (configurable).                                                                                                                                                                                                                                                                  |
 | WK11 | E   | Field types: `kind` is in its enum, `priority` is an integer, `blocked_by` and `decisions` are lists, every `decisions` entry resolves to an ADR, `summary` is at most 160 characters.                                                                                                                                           |

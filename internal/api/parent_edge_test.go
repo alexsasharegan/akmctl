@@ -149,3 +149,37 @@ func TestParentEdgeCannotCompleteADependencyCycle(t *testing.T) {
 	mustOK(t, root, "set", Request{"id": c, "changes": map[string]any{"parent": q}})
 	clean(t, root)
 }
+
+func TestCloseDroppedRefusesOpenChildren(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	p := newItem(t, root, "project", "")
+	c := newItem(t, root, "child", p)
+	mustOK(t, root, "section", Request{"id": p, "name": "Outcome", "text": "Not needed."})
+	_, err := call(t, root, "close", Request{"id": p, "status": "dropped"})
+	if err == nil || err.Code != "refused" || !strings.Contains(err.Message, c) {
+		t.Fatalf("%v", err)
+	}
+	if got, _ := err.Details.Get("reason"); got != "open_children" {
+		t.Fatalf("reason %v", got)
+	}
+	mustOK(t, root, "section", Request{"id": c, "name": "Outcome", "text": "Dropped with its parent."})
+	mustOK(t, root, "close", Request{"id": c, "status": "dropped"})
+	mustOK(t, root, "close", Request{"id": p, "status": "dropped"})
+	clean(t, root)
+}
+
+func TestNewRefusesACycleFromParentAndBlockedBy(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	p := newItem(t, root, "project", "")
+	x := newItem(t, root, "other", "")
+	mustOK(t, root, "set", Request{"id": x, "changes": map[string]any{"blocked_by": []any{p}}})
+	for _, by := range []string{p, x} {
+		_, err := call(t, root, "new", Request{"kind": "work", "slug": "kid", "fields": map[string]any{"parent": p, "blocked_by": []any{by}}})
+		wantRule(t, err, "WK18", p)
+	}
+	// free text and an unrelated blocker are fine, and so is a blocker without a parent
+	free := map[string]any{"parent": p, "blocked_by": []any{"legal review", newItem(t, root, "unrelated", "")}}
+	mustOK(t, root, "new", Request{"kind": "work", "slug": "fine", "fields": free})
+	mustOK(t, root, "new", Request{"kind": "work", "slug": "fine-too", "fields": map[string]any{"blocked_by": []any{p}}})
+	clean(t, root)
+}

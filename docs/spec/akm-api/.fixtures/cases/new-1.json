@@ -1,0 +1,37 @@
+{
+  "name": "a new item that would wait for its own parent is refused",
+  "repo": "basic",
+  "request": {
+    "kind": "work",
+    "slug": "late-child",
+    "fields": {
+      "parent": "261015-c4d5",
+      "blocked_by": [
+        "261015-c4d5"
+      ]
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "new",
+    "request": {
+      "kind": "work",
+      "slug": "late-child",
+      "fields": {
+        "parent": "261015-c4d5",
+        "blocked_by": [
+          "261015-c4d5"
+        ]
+      }
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "blocked_by 261015-c4d5 would make a dependency cycle: new item -> 261015-c4d5 -> new item",
+      "details": {
+        "reason": "rule",
+        "rule": "WK18"
+      }
+    }
+  }
+}

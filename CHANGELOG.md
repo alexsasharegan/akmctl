@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `close <parent> dropped` is refused (`open_children`, WK8) while a child is open, as for `done`, and `check` applies WK8 to a `dropped` parent and to open descendants below a settled child. Before, the spec's rule for dropping a parent was not enforced and the open child was left under a closed parent. A repository that already has such a parent now fails `check`: drop or re-parent the open children (work item 261031-6c5n).
+
+- `new` is refused (WK18) when its `fields` give a `parent` and a `blocked_by` that close a dependency cycle, such as a child blocked by its own parent. This was reachable through the API and the workbench capture form. Fixtures `new-1` and `close-7` in both copies (work item 261031-btdz).
+
 - `check` warns (rule WK19) when an item lists one of its own descendants in `blocked_by`: a parent already waits for its children, so the entry is redundant. It is a warning and not a cycle. Fixture `check-7` in both copies (work item 261031-pbws).
 
 - `check` reports a dependency cycle (rule WK18): items that wait for each other through `blocked_by` entries and parent-to-child links, for example two items blocked on each other, a longer loop, or a child blocked by its own parent or grandparent. One finding per cycle, naming the items in order. A loop in the `parent` links alone is now one WK4 finding per loop, at its lowest id, instead of one per item that leads into it. `set` refuses a `blocked_by` entry or a `parent` that would close such a cycle (WK18). A parent that lists its own child in `blocked_by` is redundant, not a cycle, and is accepted. New package `internal/depgraph` (Tarjan's algorithm, O(items + edges)); fixtures `check-6` and `set-11` in both copies (work item 261031-z50q).

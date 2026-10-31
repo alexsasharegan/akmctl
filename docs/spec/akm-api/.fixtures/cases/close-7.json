@@ -1,0 +1,27 @@
+{
+  "name": "dropping a parent with an open child is refused",
+  "repo": "basic",
+  "request": {
+    "id": "261015-c4d5",
+    "status": "dropped",
+    "outcome": "Not needed."
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "close",
+    "request": {
+      "id": "261015-c4d5",
+      "status": "dropped",
+      "outcome": "Not needed."
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "child 261020-a2b3 is not done or dropped",
+      "details": {
+        "reason": "open_children",
+        "rule": "WK8"
+      }
+    }
+  }
+}
