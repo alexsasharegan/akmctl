@@ -123,8 +123,8 @@ body[data-view=board] #view{overflow-x:auto;overflow-y:hidden}
 .empty-col{padding:var(--s-4);color:var(--text-2);font:var(--fs-sm) var(--font-note);border:1px dashed var(--line-strong);border-radius:var(--r-md)}
 
 /* card */
-.card{display:block;position:relative;min-width:0;padding:var(--s-3) var(--s-3) var(--s-3) 14px;background:var(--surface);color:var(--text);text-decoration:none;border:1px solid var(--line);border-left:3px solid transparent;border-radius:var(--r-lg);box-shadow:var(--sh-sm),var(--card-hi)}
-.card:hover{border-color:var(--line-strong);border-left-color:transparent}
+.card{display:block;position:relative;min-width:0;padding:var(--s-3) var(--s-3) var(--s-3) 14px;background:var(--surface);color:var(--text);text-decoration:none;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-sm),var(--card-hi)}
+.card:hover{border-color:var(--line-strong)}
 .card.is-stale{border-left:3px dotted var(--text-2)}
 .card:focus{outline:var(--focus-w) solid var(--focus);outline-offset:-3px;border-left:3px solid var(--accent);z-index:1}
 .card-head{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-1) var(--s-2)}
