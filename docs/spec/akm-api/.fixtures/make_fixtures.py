@@ -488,7 +488,7 @@ def legacy_cases(case):
 # init: the files a run writes (paths relative to the target directory). The
 # small files are compared exactly; the others (AGENTS.md, the skills, ...) are only
 # required to exist, so the wording of a template is not part of the contract.
-AKM_REFS = ["board", "check", "claim", "close", "config", "find", "index", "init", "ls", "migrate", "new",
+AKM_REFS = ["board", "check", "claim", "close", "commits", "config", "find", "index", "init", "ls", "migrate", "new",
     "release", "search", "section", "set", "show", "version", "when"]
 INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/%s.md" % r for r in AKM_REFS] + [
     ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",

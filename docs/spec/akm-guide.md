@@ -226,7 +226,7 @@ This is slower and uses more tokens, but it must stay correct.
 
 ### With the tool
 
-`akmctl` is one Go binary with subcommands: `check`, `ls`, `search`, `show`, `board`, `index`, `new`, `set`, `close`, `find`, `when`, `migrate` and `ui`, plus `claim` and `release` for the optional claims extension. (There is no `renumber` command; the specification documents the manual repair.) `akmctl ui` starts a workbench page, a Kanban over the records, on the loopback interface. The tool has a stable JSON output and an API spec with a CLI binding and an HTTP binding, so other implementations can be written against the same contract. It ships as prebuilt binaries for macOS, Linux and Windows; building from source is possible.
+`akmctl` is one Go binary with subcommands: `check`, `ls`, `search`, `show`, `board`, `index`, `new`, `set`, `close`, `commits`, `find`, `when`, `migrate` and `ui`, plus `claim` and `release` for the optional claims extension. (There is no `renumber` command; the specification documents the manual repair.) `akmctl ui` starts a workbench page, a Kanban over the records, on the loopback interface. The tool has a stable JSON output and an API spec with a CLI binding and an HTTP binding, so other implementations can be written against the same contract. It ships as prebuilt binaries for macOS, Linux and Windows; building from source is possible.
 
 ## 8. Versions, upgrades and extensions
 

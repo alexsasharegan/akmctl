@@ -25,6 +25,7 @@ Read the reference before the first use of a command.
 | Get the file path of an id               | `akmctl find <id>`         | `references/find.md`    |
 | Read the date inside an id               | `akmctl when <id>`         | `references/when.md`    |
 | Validate the records                     | `akmctl check`             | `references/check.md`   |
+| Check step commits against their diff    | `akmctl commits`           | `references/commits.md` |
 | Regenerate the ADR index                 | `akmctl index`             | `references/index.md`   |
 | Create a work item or ADR draft          | `akmctl new <kind> <slug>` | `references/new.md`     |
 | Change status, priority or other fields  | `akmctl set <id> k=v`      | `references/set.md`     |

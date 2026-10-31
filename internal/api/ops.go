@@ -50,6 +50,8 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opWhen(req)
 	case "check":
 		body, err = opCheck(repo, req)
+	case "commits":
+		body, err = opCommits(repo, req)
 	case "index":
 		body, err = opIndex(repo, req)
 	case "migrate":

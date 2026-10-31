@@ -89,6 +89,7 @@ var specs = map[string]map[string]param{
 	"find":    {"id": s(req, pat(reID))},
 	"when":    {"id": s(req, pat(reID)), "as_of": s(pat(reDate))},
 	"check":   {"target": s(pat(reVersion)), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS))},
+	"commits": {"range": s(), "limit": {kind: kInt, min: 1}},
 	"new":     {"kind": {kind: kString, enum: []string{"work", "adr"}, required: true}, "slug": s(req), "title": s(), "fields": {kind: kObject}, "as_of": s(pat(reDateTS))},
 	"set":     {"id": s(req, pat(reID)), "changes": {kind: kObject, required: true}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"section": {"id": s(req, pat(reID)), "name": s(req), "text": s(req, empty), "mode": {kind: kString, enum: []string{"replace", "append"}}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},

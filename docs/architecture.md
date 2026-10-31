@@ -6,27 +6,27 @@ The words used here are defined in [glossary.md](glossary.md).
 
 ## Packages
 
-| Package                | Role                                                                                                                                                                  |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cmd/akmctl`           | The binary; calls `internal/cli`.                                                                                                                                     |
-| `internal/frontmatter` | The YAML-lite parser and the byte-splice editor. Fixtures: `testdata/yaml-lite.json`.                                                                                 |
-| `internal/record`      | The loader: records, roadmap, manifest, sections, etags, wikilink-to-id resolution.                                                                                   |
-| `internal/api`         | Every operation (`version ls search show board find when check index new set close claim release migrate init config`), request validation and the response envelope. |
-| `internal/check`       | The rules WK, I, A, RM, G, L, S, CL, SF.                                                                                                                              |
-| `internal/index`       | The ADR index generator, stable under Prettier.                                                                                                                       |
-| `internal/width`       | Prettier's string-width rule; tables generated from Unicode 17.0.0 (`data/`, `gen/main.go`).                                                                          |
-| `internal/initrepo`    | `init`: the files for the options (docs dir, wikilinks, git), the embedded templates and skills, the no-overwrite writer.                                             |
-| `internal/migrate`     | Declarative layout migration steps (including `mint_ids`), safe application, handoff. No migrations are embedded yet.                                                 |
-| `internal/fsx`         | The advisory lock (`.akm.lock` in the manifest folder) and atomic writes.                                                                                             |
-| `internal/server`      | The HTTP binding and the workbench page (`web/`).                                                                                                                     |
-| `internal/cli`         | Flags to request parameters; `--format json\|table\|ids`; the `ui` command.                                                                                           |
+| Package                | Role                                                                                                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/akmctl`           | The binary; calls `internal/cli`.                                                                                                                                             |
+| `internal/frontmatter` | The YAML-lite parser and the byte-splice editor. Fixtures: `testdata/yaml-lite.json`.                                                                                         |
+| `internal/record`      | The loader: records, roadmap, manifest, sections, etags, wikilink-to-id resolution.                                                                                           |
+| `internal/api`         | Every operation (`version ls search show board find when check commits index new set close claim release migrate init config`), request validation and the response envelope. |
+| `internal/check`       | The rules WK, I, A, RM, G, L, S, CL, SF.                                                                                                                                      |
+| `internal/index`       | The ADR index generator, stable under Prettier.                                                                                                                               |
+| `internal/width`       | Prettier's string-width rule; tables generated from Unicode 17.0.0 (`data/`, `gen/main.go`).                                                                                  |
+| `internal/initrepo`    | `init`: the files for the options (docs dir, wikilinks, git), the embedded templates and skills, the no-overwrite writer.                                                     |
+| `internal/migrate`     | Declarative layout migration steps (including `mint_ids`), safe application, handoff. No migrations are embedded yet.                                                         |
+| `internal/fsx`         | The advisory lock (`.akm.lock` in the manifest folder) and atomic writes.                                                                                                     |
+| `internal/server`      | The HTTP binding and the workbench page (`web/`).                                                                                                                             |
+| `internal/cli`         | Flags to request parameters; `--format json\|table\|ids`; the `ui` command.                                                                                                   |
 
 ## Invariants
 
 - Standard library only in the tool; `go.yaml.in/yaml/v3` is a test oracle and never linked into the binary.
 - `init` never overwrites a file; versions in what it writes come from the tool's constants (`check.LayoutVersion`), not from templates. `internal/initrepo/templates/skills` is a copy of `.agents/skills`, kept equal by a test.
 - The manifest, `.akm-deny`, `.akm.lock` and `.migrate-log` share one folder (`docs/` by default), found by `record.Locate`: `docs/.layout`, else exactly one `<name>/.layout` among the root's immediate non-hidden subdirectories; two is an error. No code hard-codes `docs/` for them.
-- The tool never stages, commits or pushes. `close` renames; `new adr` does not regenerate the index (`index` does).
+- The tool never stages, commits or pushes; it describes a step's commit (`commit` member) and `commits` reads git history, read-only. `close` renames; `new adr` does not regenerate the index (`index` does).
 - A write is a compare-and-swap on an etag under the repository lock, written by temp file and rename.
 - Unknown frontmatter keys, comments, quoting and line endings survive every edit byte for byte.
 - Records the tool writes use bare ids unless the manifest sets `reference_style: wikilink`.

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/commits.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "range": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_./~^@{}-]+(\\.\\.\\.?[A-Za-z0-9_./~^@{}-]+)?$"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "commits"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "checked": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "skipped": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "clean": {
+              "type": "boolean"
+            },
+            "commits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "sha": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40,64}$"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "step": {
+                    "type": "string"
+                  },
+                  "item": {
+                    "type": "string"
+                  },
+                  "ok": {
+                    "type": "boolean"
+                  },
+                  "problems": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "rule": {
+                          "enum": ["CM1", "CM2", "CM3"]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["rule", "message"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "sha",
+                  "subject",
+                  "step",
+                  "item",
+                  "ok",
+                  "problems"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "checked",
+            "skipped",
+            "clean",
+            "commits"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

@@ -443,6 +443,27 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if h, ok := resp.Get("handoff"); ok {
 			fmt.Fprintf(w, "\n%v", h)
 		}
+	case "commits":
+		cs, _ := resp.Get("commits")
+		for _, c := range cs.([]api.Obj) {
+			sha, _ := c.Get("sha")
+			sub, _ := c.Get("subject")
+			ok, _ := c.Get("ok")
+			mark := "ok"
+			if ok == false {
+				mark = "FAIL"
+			}
+			fmt.Fprintf(w, "%.8v\t%s\t%v\n", sha, mark, sub)
+			ps, _ := c.Get("problems")
+			for _, p := range ps.([]api.Obj) {
+				rule, _ := p.Get("rule")
+				msg, _ := p.Get("message")
+				fmt.Fprintf(w, "\t[%v] %v\n", rule, msg)
+			}
+		}
+		ck, _ := resp.Get("checked")
+		sk, _ := resp.Get("skipped")
+		fmt.Fprintf(w, "%v AKM step commits checked, %v other commits skipped\n", ck, sk)
 	case "check":
 		fs, _ := resp.Get("findings")
 		for _, f := range fs.([]api.Obj) {
