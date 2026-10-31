@@ -1,7 +1,7 @@
 ---
 id: "261030-8d8t"
 title: skills install and update command
-status: active
+status: ready
 created: 2026-10-30
 updated: 2026-10-30
 kind: feature
