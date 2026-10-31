@@ -1,13 +1,15 @@
 ---
 id: "261030-8d8t"
 title: skills install and update command
-status: ready
+status: active
 created: 2026-10-30
 updated: 2026-10-30
 kind: feature
 priority: 3
 decisions: [261030-h6t7]
 summary: A command installs, checks and updates the akm skills packaged in the binary, in a repository that was not made by init.
+claimed_by: claude
+claimed_at: 2026-10-31T05:14
 ---
 
 # skills install and update command
@@ -42,3 +44,4 @@ ADR 261030-h6t7 is accepted. Build after 261030-p7r1 (skill names), so the insta
 - 2026-10-30: ADR 261030-h6t7 drafted (`proposed`) after the maintainer chose `skills install|status|update`, a marker file per skill folder and one code path with `init`.
 - 2026-10-30: released (claude).
 - 2026-10-30: ADR 261030-h6t7 accepted by the maintainer. Sequenced after 261030-p7r1 (the rename of akm-work-items and the naming grammar).
+- 2026-10-30: claimed (claude).
