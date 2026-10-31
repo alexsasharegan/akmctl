@@ -63,6 +63,7 @@ Workbench and polish:
 
 Hardening and small rules:
 
+- [261030-456q] Test strategy and coverage audit
 - [261029-q8z3] TestCompareAndSwapRace is flaky on Windows CI
 - [261028-jzsx] Cover the Windows path beyond CI
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
