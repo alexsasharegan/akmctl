@@ -1,12 +1,14 @@
 ---
 id: "261030-q03z"
 title: commit message format and stamp
-status: ready
+status: active
 created: 2026-10-30
 updated: 2026-10-30
 kind: feature
 priority: 2
 summary: A standard commit subject and AKM-* trailers for status steps, returned by the tool as a commit object and checked against the diff.
+claimed_by: claude
+claimed_at: 2026-10-31T04:08
 ---
 
 # commit message format and stamp
@@ -39,3 +41,4 @@ Nothing started. Take it after 261030-dw71 (it shares the API schema and fixture
 
 - 2026-10-30: filed.
 - 2026-10-30: refined from a design discussion with the maintainer; format, trailers, structured commit object and no tool commits approved.
+- 2026-10-30: claimed (claude).
