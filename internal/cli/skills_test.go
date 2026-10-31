@@ -18,10 +18,10 @@ func TestSkillsCommand(t *testing.T) {
 	if has(root, ".agents/skills/akm/SKILL.md") {
 		t.Fatal("refused write wrote")
 	}
-	if code, _, _ := cfg(root, "skills", "install", "--dry-run"); code != 0 || has(root, ".agents/skills/akm/SKILL.md") {
-		t.Fatal("dry run wrote")
+	if code, out, _ := cfg(root, "skills", "install", "--dry-run"); code != 0 || has(root, ".agents/skills/akm/SKILL.md") || !strings.Contains(out, "nothing written") {
+		t.Fatal("dry run wrote, or did not say it was a plan")
 	}
-	if code, _, errb := cfg(root, "skills", "install", "--yes"); code != 0 || !has(root, ".agents/skills/akm/.akm-skill.json") {
+	if code, out, errb := cfg(root, "skills", "install", "--yes"); code != 0 || !strings.HasSuffix(strings.TrimSpace(out), "applied") || !has(root, ".agents/skills/akm/.akm-skill.json") {
 		t.Fatalf("install: %d %s", code, errb)
 	}
 	if code, out, _ := cfg(root, "skills", "update", "--yes"); code != 0 || strings.Contains(out, "replace") {

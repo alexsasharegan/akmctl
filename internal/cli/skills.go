@@ -113,4 +113,10 @@ func skillsText(w io.Writer, resp api.Obj) {
 			fmt.Fprintf(w, "  skipped  %v (%v)\n", n, r)
 		}
 	}
+	switch ap, _ := resp.Get("applied"); {
+	case ap == true:
+		fmt.Fprintln(w, "applied")
+	case len(plan.([]api.Obj)) > 0:
+		fmt.Fprintln(w, "nothing written (a plan only)")
+	}
 }
