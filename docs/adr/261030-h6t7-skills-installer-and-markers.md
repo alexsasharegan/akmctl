@@ -2,7 +2,7 @@
 id: "261030-h6t7"
 title: A skills command installs, checks and updates the akm skills, and each skill folder carries a marker file
 summary: akmctl skills install|status|update writes the embedded akm skills with a marker per skill folder, telling outdated copies from hand-edited ones.
-status: proposed
+status: accepted
 date: 2026-10-30
 ---
 
@@ -62,7 +62,7 @@ A test fails if `init` writes a managed skill without a marker, if `update` repl
 
 ## Review
 
-Proposed 2026-10-30 after the maintainer chose the command shape, the marker file and the shared code path.
+Proposed 2026-10-30 after the maintainer chose the command shape, the marker file and the shared code path. Accepted by the maintainer on 2026-10-30. Review notes the same day: the marker's `.akm-` name fits a wider rule about system files (to be recorded in its own ADR), and a rename of `akm-work-items` is under consideration; both are handled in their own records, and the installer's removal rule for a renamed skill is decided there.
 
 ## Revert
 
