@@ -229,6 +229,10 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if err != nil {
 		return nil, unreadable(err)
 	}
+	var similar []Obj
+	if kind == record.Work {
+		similar = similarItems(repo, slug, title)
+	}
 	rel := repo.WorkDir() + "/" + id + "-" + slug + ".md"
 	if kind == record.ADR {
 		rel = repo.ADRDir() + "/" + id + "-" + slug + ".md"
@@ -244,7 +248,11 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if aerr != nil {
 		return nil, aerr
 	}
-	return O("record", recordObj(repo, rec, nil, true), "path", rec.Path), nil
+	out := O("record", recordObj(repo, rec, nil, true), "path", rec.Path)
+	if len(similar) > 0 {
+		out = append(out, KV{"similar", similar})
+	}
+	return out, nil
 }
 
 func mintID(repo *record.Repo, now time.Time) (string, error) {

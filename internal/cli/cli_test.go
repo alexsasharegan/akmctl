@@ -210,3 +210,18 @@ func TestMigrationFileFlag(t *testing.T) {
 		t.Fatalf("bad migration: code %d out %s", code, out.String())
 	}
 }
+
+func TestNewPrintsSimilarItems(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	var out, errb bytes.Buffer
+	code := Run([]string{"new", "work", "json-output-for-board", "--repo", root, "--format", "table"}, &out, &errb, ".")
+	if code != 0 || !strings.Contains(out.String(), "similar open items") || !strings.Contains(out.String(), "Add JSON output to ls") {
+		t.Fatalf("%d %s %s", code, out.String(), errb.String())
+	}
+	out.Reset()
+	code = Run([]string{"new", "work", "rotate-the-signing-keys", "--repo", root, "--format", "table"}, &out, &errb, ".")
+	if code != 0 || strings.Contains(out.String(), "similar") {
+		t.Fatalf("no match printed similar: %d %s", code, out.String())
+	}
+}

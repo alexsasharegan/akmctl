@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `new work` returns `similar`: up to five open work items (`raw`, `ready`, `active`, `blocked`) that share at least two words with the slug and title, most shared first. It never refuses, and a response with no match is unchanged. The CLI prints them under the new path. The API spec (section 4.10) states the matching rule, `new.json` has the member, and the `akm-work-items` and `akm` skills tell the agent to add to a match instead of filing a duplicate.
+
 ## 0.3.2 - 2026-10-30
 
 - `section`: appending to `## Log` adds a `- ` bullet to a first line that has no list marker, so a bare line no longer joins the previous bullet. The API spec and the skill reference say so.

@@ -16,7 +16,7 @@ The repository's `AGENTS.md` wins over this skill where they disagree. Fields, s
 
 ## No item fits
 
-`akmctl new work <slug>` creates a `raw` item. Ask the maintainer which item to work. Do not type an id by hand; without the tool use the recipe in `AGENTS.md`.
+Before filing, read what `ls --status raw,ready,active,blocked` shows. `akmctl new work <slug>` creates a `raw` item and lists `similar` open items under the new path (up to five that share words with the slug and title). It never refuses. If one of them covers the work, add to that item (its `## Goal`, `## Next` or `## Log`) and, if you already created the new one, drop it with a reason in its Outcome. Otherwise keep the new item. Ask the maintainer which item to work. Do not type an id by hand; without the tool use the recipe in `AGENTS.md`.
 
 ## While working
 

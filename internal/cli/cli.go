@@ -503,6 +503,15 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if p, ok := resp.Get("path"); ok {
 			fmt.Fprintln(w, p)
 		}
+		if sv, ok := resp.Get("similar"); ok {
+			fmt.Fprintln(w, "similar open items (add to one instead of filing, if it fits):")
+			for _, o := range sv.([]api.Obj) {
+				id, _ := o.Get("id")
+				st, _ := o.Get("status")
+				ti, _ := o.Get("title")
+				fmt.Fprintf(w, "  %v\t%v\t%v\n", id, st, ti)
+			}
+		}
 		if p, ok := resp.Get("moved_to"); ok {
 			fmt.Fprintln(w, "moved to", p)
 		}

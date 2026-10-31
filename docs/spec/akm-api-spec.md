@@ -188,7 +188,11 @@ Response: `id`, `date`, `weekday` (English name), `age_days` (integer, negative 
 | `fields`  | object          | Initial values: for `work`, `summary`, `kind`, `parent`, `priority`, `blocked_by`, `decisions`; for `adr`, `summary`, `scope`. Others are `invalid_request`. |
 | `as_of`   | timestamp       | The clock for the id's date. Tests set it.                                                                                                                   |
 
-Response: `record` and `path`. The new file comes from the template, with a fresh id, `created` and `updated` (or `date`) set to today, status `raw` (work) or `proposed` (ADR). A `parent` that does not resolve is `not_found`. The id is chosen so that no existing file in the three directories has it. Side effect: writes one file.
+Response: `record` and `path`. The new file comes from the template, with a fresh id, `created` and `updated` (or `date`) set to today, status `raw` (work) or `proposed` (ADR). A `parent` that does not resolve is `not_found`. The id is chosen so that no existing file in the three directories has it. For `kind: work`, the response also has `similar` when open items resemble the new one, and omits it otherwise (a response with no match is as it was before `similar`). `new` never refuses because of a match.
+
+The matching rule: a _word_ is a maximal run of letters and digits (Unicode), lower-cased; the stop words `a an and are as at be by for from in is it of on or the to with` are dropped, and a word counts once. The new item's words are those of the slug (hyphens as spaces) and of the title. A candidate is a work item whose `status` is `raw`, `ready`, `active` or `blocked` (a `done` or `dropped` item never matches), and its words are those of its `title` and `summary`. The candidate matches when it shares at least two words with the new item, or every word when the new item has fewer than two. No stemming. The matches are ordered by the number of shared words, most first, then by id, and the first five are returned. Each is `{id, status, title, path, words}`, `words` being the shared words in the order of the new item. The new item itself is never a match. `new adr` returns no `similar`.
+
+Side effect: writes one file.
 
 ### 4.11 `set`
 
