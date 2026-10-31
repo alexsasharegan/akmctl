@@ -319,6 +319,10 @@ def write_cases(cases, basic):
     text = basic[M1N2].replace("status: raw\n", "status: ready\n").replace("updated: 2026-10-26\n", "updated: 2026-10-28\n")
     files = dict(basic); files[M1N2] = text
     case("set", 8, "a status change returns the commit object", "basic", req, ok("set", req, record=pub(after_rec(files, M1N2)), changed=["status"], commit=commit("ready", "261026-m1n2", "ready", M1N2)), after={M1N2: text})
+    req = dict(id="261015-c4d5", changes=dict(parent="261022-e5f6"))
+    case("set", 9, "a parent edge that closes a loop is refused", "basic", req, err("set", req, "refused", "parent 261022-e5f6 would make a loop: 261015-c4d5 -> 261022-e5f6 -> 261015-c4d5", reason="rule", rule="WK4"))
+    req = dict(id="261022-e5f6", changes=dict(parent="261010-j9k0"))
+    case("set", 10, "an open item cannot take a closed parent", "basic", req, err("set", req, "refused", "261010-j9k0 is done, so 261022-e5f6 cannot be its child while open", reason="rule", rule="WK8"))
     # claim, release (repo with the claims extension)
     req = dict(id="261022-e5f6", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     text = clm[E5F6].replace("status: ready\n", "status: active\n").replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n")

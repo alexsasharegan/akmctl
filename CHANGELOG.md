@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `set` and `new` refuse a `parent` that would close a loop at any depth (WK4, with the chain in the message) or that would put an open item under a `done` or `dropped` parent (WK8). Before, both were accepted and left the repository failing `check`. A violation that is already present does not block an unrelated change. Two fixture cases (`set-9`, `set-10`) in both copies (work item 261031-wy32).
+
 - Specification only: `closable`, `complete`, `settled`, derived `blocked` and the dependency graph (the `blocked_by` entries plus parent-to-child links) are defined, WK8 is restated recursively, and rule WK18 (the dependency graph has no cycle) is added, with the requirement that `set` and `new` refuse a `parent` or `blocked_by` change that adds a WK4, WK8 or WK18 violation. The tool enforces them in work items 261031-wy32 and 261031-z50q; its `check` does not report WK18 until then (work item 261031-xprq).
 
 - `--repo <dir>` naming a folder that has no manifest while a folder above it does is now an error that names the ancestor, for every command but `migrate` and `version`. Before, the tool read that folder as an empty repository with default folders and gave wrong answers without a warning (`commits` reported a false CM3 on correct commits). `--repo` still never climbs: it is the root as given. The same check applies to `akmctl ui --repo` (work item 261030-8aph).

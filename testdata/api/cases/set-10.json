@@ -1,0 +1,29 @@
+{
+  "name": "an open item cannot take a closed parent",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "parent": "261010-j9k0"
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261022-e5f6",
+      "changes": {
+        "parent": "261010-j9k0"
+      }
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261010-j9k0 is done, so 261022-e5f6 cannot be its child while open",
+      "details": {
+        "reason": "rule",
+        "rule": "WK8"
+      }
+    }
+  }
+}

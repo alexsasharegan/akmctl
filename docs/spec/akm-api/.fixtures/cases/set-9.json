@@ -1,0 +1,29 @@
+{
+  "name": "a parent edge that closes a loop is refused",
+  "repo": "basic",
+  "request": {
+    "id": "261015-c4d5",
+    "changes": {
+      "parent": "261022-e5f6"
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261015-c4d5",
+      "changes": {
+        "parent": "261022-e5f6"
+      }
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "parent 261022-e5f6 would make a loop: 261015-c4d5 -> 261022-e5f6 -> 261015-c4d5",
+      "details": {
+        "reason": "rule",
+        "rule": "WK4"
+      }
+    }
+  }
+}

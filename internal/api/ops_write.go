@@ -325,6 +325,11 @@ func newRecordText(repo *record.Repo, kind, title string, f map[string]any, now 
 			if err != nil {
 				return "", "", err
 			}
+			if k == "parent" && fv.Kind == frontmatter.String {
+				if rerr := parentEdgeRule(repo, "", "raw", record.RefID(fv.Str)); rerr != nil {
+					return "", "", rerr
+				}
+			}
 			if err := set(k, fv); err != nil {
 				return "", "", err
 			}
@@ -443,6 +448,39 @@ func fieldValue(repo *record.Repo, typ, key string, v any) (frontmatter.Value, *
 	return bad("is not a field that can be set")
 }
 
+// parentEdgeRule refuses a new parent edge from the item id (status st; id is
+// empty for an item being filed) to parentID when the edge would close a loop
+// (WK4) or put an open item under a closed parent (WK8). The parent chain is
+// walked upwards: with a single parent per item, the edge closes a loop exactly
+// when the item is on the new parent's chain. A loop already in the chain that
+// does not pass through the item is not this edge's doing and ends the walk.
+func parentEdgeRule(repo *record.Repo, id, st, parentID string) *Error {
+	if id != "" {
+		chain := []string{id}
+		seen := map[string]bool{}
+		for cur := parentID; cur != "" && !seen[cur]; {
+			seen[cur] = true
+			chain = append(chain, cur)
+			if cur == id {
+				return refusedRule("WK4", "parent %s would make a loop: %s", parentID, strings.Join(chain, " -> "))
+			}
+			t := repo.ByID(cur)
+			if len(t) == 0 || t[0].Type != record.Work {
+				break
+			}
+			cur = record.RefID(t[0].Str("parent"))
+		}
+	}
+	if t := repo.ByID(parentID); len(t) > 0 && (t[0].Status() == "done" || t[0].Status() == "dropped") && st != "done" && st != "dropped" {
+		who := "a new item"
+		if id != "" {
+			who = id
+		}
+		return refusedRule("WK8", "%s is %s, so %s cannot be its child while open", parentID, t[0].Status(), who)
+	}
+	return nil
+}
+
 // ---- set ----
 
 var setFields = map[string][]string{
@@ -489,6 +527,11 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 			return nil, refusedRule("WK4", "an item cannot be its own parent")
 		}
 		cur, has := e.rec.Fields[k]
+		if k == "parent" && fv.Kind == frontmatter.String && !(has && sameValue(k, cur, fv)) {
+			if rerr := parentEdgeRule(repo, e.rec.ID, e.rec.Status(), record.RefID(fv.Str)); rerr != nil {
+				return nil, rerr
+			}
+		}
 		if fv.Kind == frontmatter.Null {
 			if has {
 				if _, derr := e.doc.Delete(k); derr != nil {
