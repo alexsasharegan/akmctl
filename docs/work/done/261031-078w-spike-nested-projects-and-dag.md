@@ -1,13 +1,12 @@
 ---
 id: "261031-078w"
 title: spike nested projects and dag
-status: active
+status: done
 created: 2026-10-31
 updated: 2026-10-31
+closed: 2026-10-31
 kind: spike
 summary: What AKM supports for nested projects and DAG-shaped work, and which features to add
-claimed_by: claude
-claimed_at: 2026-10-31T18:12
 ---
 
 # spike nested projects and dag
@@ -68,3 +67,4 @@ File follow-up items for the recommended features (cycle refusal and checks firs
 - 2026-10-31: filed.
 - 2026-10-31: claimed (claude).
 - 2026-10-31: probed nesting, cycles and blocked_by in a scratch repository; findings in Outcome.
+- 2026-10-31: maintainer direction: closable and blocked are recursive predicates (a parent asks its children); cycle refusal at any depth is a must, as is the blocked_by cycle check; tree view in the UI is backlog. Filed follow-ups: 261031-xprq (spec), 261031-wy32, 261031-z50q, 261031-qwhn, 261031-ph53, 261031-72bd, 261031-zz3y (workbench tree, backlog).
