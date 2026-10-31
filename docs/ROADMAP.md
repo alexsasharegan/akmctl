@@ -2,8 +2,6 @@
 
 ## Now
 
-- [261029-pzb1] Write the glossary and require every new feature to register its terms
-
 ## Next
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
