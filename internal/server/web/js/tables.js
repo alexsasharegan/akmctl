@@ -92,7 +92,7 @@ function buildTable(slug, rows, today) {
   return el("div", { class: "table-wrap" }, el("table", { class: "grid" }, el("thead", {}, el("tr", {}, cols.map((c) => el("th", { class: c.cls || "", scope: "col", text: c.head })))), body));
 }
 
-/** ctx: records(), today(), loadClosed(), setPage(p), open(id), go(slug). Returns { keys, focus, destroy }. */
+/** ctx: records(), today(), loadClosed(), closedNow(), setPage(p), open(id), go(slug). Returns { keys, focus, destroy }. */
 export function mountTables(host, ctx, slug) {
   const today = ctx.today();
   const records = ctx.records();
@@ -122,12 +122,18 @@ export function mountTables(host, ctx, slug) {
   }
 
   if (slug === "closed") {
-    content.replaceChildren(el("p", { class: "empty-col", text: "Loading closed work…" }));
+    // a table shown before is drawn again at once and redrawn only if the list changed
+    const had = ctx.closedNow();
+    const sig = (list) => JSON.stringify((list || []).map((r) => [r.id, field(r, "status"), field(r, "updated"), field(r, "title")]));
+    if (had) show(had);
+    else content.replaceChildren(el("p", { class: "empty-col", text: "Loading closed work…" }));
     ctx
       .loadClosed()
-      .then((list) => alive && show(list))
+      .then((list) => {
+        if (alive && (!had || sig(list) !== sig(had))) show(list);
+      })
       .catch((e) => {
-        if (alive) content.replaceChildren(el("div", { class: "err", role: "alert", text: describeError(e) }));
+        if (alive && !had) content.replaceChildren(el("div", { class: "err", role: "alert", text: describeError(e) }));
       });
   } else show();
   ctx.setPage(describe());

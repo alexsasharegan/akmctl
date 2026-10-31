@@ -127,7 +127,7 @@ export const state = {
   loadedAt: null,
   config: { root: "", identity: "" },
   folders: { ...DEFAULT_FOLDERS }, // work_dir and adr_dir of the repository (from `version`)
-  closed: null, // recently closed work, loaded when the table is first shown
+  closed: null, // recently closed work, loaded when the table is first shown; kept across reloads so the table can show it while it refreshes
 };
 
 /** Load every record's header once. Work comes in the order the board shows (roadmap, priority, id). */
@@ -135,7 +135,6 @@ export async function loadSnapshot() {
   const data = await api("GET", "records", { query: { fields: SNAPSHOT_FIELDS, sort: ["roadmap", "-priority", "id"] } });
   state.records = data.records;
   state.loadedAt = new Date();
-  state.closed = null;
   return state.records;
 }
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ui`: the "Recently closed" table no longer flashes when the records reload (`r`). The list is kept across reloads, drawn again at once, and redrawn only if it changed (work item 261029-57jq).
+
 - `ui`: a card shows who holds a claim and for how long (`held by claude, 2 days`). The snapshot now reads `claimed_by` and `claimed_at`; a record with no claim shows nothing (work item 261029-8948).
 
 - `akmctl skills [status|install|update]` is new (ADR 261030-h6t7, accepted): it reports, installs and updates the skills the tool manages, in a repository `init` did not make. Each managed skill folder carries a marker `.akm-skill.json` (tool version and file hashes), so `update` can tell an older shipped copy from an edit; an edited skill is left unless `confirm_edited`, and the retired `akm-work-items` folder is removed by `update` (an unmarked one needs `confirm_edited`). `init` and `config git-commits` write the same markers through the same code. The API spec (section 4.20), the schema `skills.json`, `GET`/`POST /skills`, the `init` and `config` fixtures, the `akm` skill reference `skills.md` and the glossary are updated. Not committed by the tool.

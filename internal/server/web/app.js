@@ -43,6 +43,7 @@ const viewCtx = {
   open: (id) => go({ name: "record", id }),
   go: (slug) => go({ name: "tables", table: slug }),
   loadClosed: () => loadClosed(),
+  closedNow: () => state.closed,
   check,
 };
 
