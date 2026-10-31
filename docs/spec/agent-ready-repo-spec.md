@@ -314,8 +314,21 @@ For `dropped`: the reason.
 ### Parent and child
 
 - A child names its parent with `parent`. Children are found by search, not listed in the parent's frontmatter (one source of truth).
-- A parent MUST NOT be `done` while any child is not `done` or `dropped`. A parent MAY be `dropped` only if every open child is dropped or re-parented first.
+- A parent MUST NOT be `done` while it is not closable (below): every child is `done` or `dropped`, and so on down the tree. A parent MAY be `dropped` only if every open child is dropped or re-parented first.
 - Depth is unlimited by the schema; the skill recommends two levels.
+
+### Closable, blocked and the dependency graph
+
+Parent and child links nest to any depth, so each of these is a question a record answers by asking its children, and a child that is itself a parent asks its own. Definitions (a reference is resolved by id; an entry of `blocked_by` that is free text is ignored):
+
+- **Settled:** `status` is `done` or `dropped`. An item that is not settled is **open**.
+- **Complete:** the item is settled and every child is complete. A leaf is complete when it is settled.
+- **Closable:** every child is complete. A leaf is always closable. An open item can be closed `done` only when it is closable.
+- **Blocked:** an entry of its `blocked_by` resolves to an open item, or any open child is blocked. Its `status` field is what the item declares; blocked is what the graph shows. An open item can have `status: ready` and still be blocked.
+- **Dependency graph:** one directed graph whose nodes are all work items. An item has an edge to each resolved `blocked_by` entry (it waits for that item) and to each of its children (a parent waits for its children). Both kinds of edge are in one graph, so one rule covers a mutual block, a longer loop, a parent blocked by a descendant and a child blocked by an ancestor.
+- The dependency graph MUST NOT contain a cycle (WK18). An item that is in a cycle can never be closable, so the cycle is a state the tool refuses to write and `check` reports.
+
+An operation that sets `parent` or `blocked_by` MUST refuse a change that would add a WK4, WK8 or WK18 violation, naming the rule and the edge that closes the loop; it need not refuse when the violation is already present. A tool MAY find a parent loop by walking up the new parent's chain (the item is on that chain exactly when the edge closes a loop) and a dependency cycle with a depth-first search; the choice is the tool's. A tool reports each cycle once, as the ordered list of its items, not once per member.
 
 ### Claiming (extension `claims`, optional)
 
@@ -434,7 +447,7 @@ Severity: **E** error (exit 1), **W** warning (printed, exit 0). Rule ids: `WK` 
 | WK5  | E   | `status: blocked` has a non-empty `blocked_by`; every `blocked_by` entry that matches the id pattern resolves to an item; other entries are free text and are not checked.                                                                                                                                                       |
 | WK6  | E   | `status: active` or `blocked` has a non-empty `## Next`.                                                                                                                                                                                                                                                                         |
 | WK7  | E   | `ready`, `active`, `blocked` or `done` has a `## Goal`; `done` or `dropped` has a non-empty `## Outcome`.                                                                                                                                                                                                                        |
-| WK8  | E   | A parent with `status: done` has no child that is not `done` or `dropped`.                                                                                                                                                                                                                                                       |
+| WK8  | E   | An item with `status: done` is closable: every child is complete (settled, with every child complete in turn).                                                                                                                                                                                                                   |
 | WK9  | E   | An item in `docs/work/done/` has status `done` or `dropped`; a `done` or `dropped` item is in `done/`.                                                                                                                                                                                                                           |
 | WK10 | W   | `active` item with `updated` older than 30 days (configurable).                                                                                                                                                                                                                                                                  |
 | WK11 | E   | Field types: `kind` is in its enum, `priority` is an integer, `blocked_by` and `decisions` are lists, every `decisions` entry resolves to an ADR, `summary` is at most 160 characters.                                                                                                                                           |
@@ -444,6 +457,7 @@ Severity: **E** error (exit 1), **W** warning (printed, exit 0). Rule ids: `WK` 
 | WK15 | E   | `closed` is a valid date (`YYYY-MM-DD`) and is not earlier than `created`.                                                                                                                                                                                                                                                       |
 | WK16 | E   | `cycle` matches `[A-Za-z0-9][A-Za-z0-9._-]{0,63}`.                                                                                                                                                                                                                                                                               |
 | WK17 | E   | `keep` is `true` or `false`.                                                                                                                                                                                                                                                                                                     |
+| WK18 | E   | The dependency graph (`blocked_by` entries and parent-to-child edges) has no cycle. Reported once per cycle, with its items in order.                                                                                                                                                                                            |
 | A1   | E   | ADR files parse; frontmatter within the simple subset (H5); `id` equals the filename's id part and matches the id pattern; `title`, `summary`, `status`, `date` present; `summary` is at most 160 characters.                                                                                                                    |
 | A2   | E   | ADR `status` is in the enum; `date` valid.                                                                                                                                                                                                                                                                                       |
 | A3   | E   | `superseded` has `superseded_by`; the target exists, is an ADR, and is not itself; if the target has `supersedes`, it points back. `supersedes` and `superseded_by` resolve to ADRs.                                                                                                                                             |

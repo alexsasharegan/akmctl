@@ -119,7 +119,7 @@ Write the encoder behind the existing `list` command, then add the schema test.
 | `done`    | Finished; `## Outcome` gives evidence for each "done when" line                                    |
 | `dropped` | Decided against; `## Outcome` gives the reason                                                     |
 
-`priority` is an optional integer (higher is sooner, default 0) that only sorts the listing; the roadmap wins. A parent can close only when all its children are done or dropped.
+`priority` is an optional integer (higher is sooner, default 0) that only sorts the listing; the roadmap wins. A parent can close only when it is closable: every child is done or dropped, and so on down the tree.
 
 Three more optional fields:
 
@@ -129,7 +129,7 @@ Three more optional fields:
 | `cycle`  | a label of letters, digits, `.`, `_` and `-`, at most 64 characters | The sprint, program increment or quarter the item is planned into, for example `2026-PI3-S4`. The tool treats it as an opaque label.                 |
 | `keep`   | `true` or `false`                                                   | `true` marks an item that a later compaction must never fold or archive. `false` and absence mean the same.                                          |
 
-The check rules are WK13 (a warning: an item in `done/` has no `closed`), WK14 (an open item has `closed`), WK15 (`closed` is not a date, or is earlier than `created`), WK16 (`cycle` is not a valid label) and WK17 (`keep` is not a boolean).
+The check rules are WK13 (a warning: an item in `done/` has no `closed`), WK14 (an open item has `closed`), WK15 (`closed` is not a date, or is earlier than `created`), WK16 (`cycle` is not a valid label), WK17 (`keep` is not a boolean) and WK18 (the dependency graph, `blocked_by` plus parent-to-child links, has a cycle).
 
 ### Decision records (ADRs)
 
@@ -177,7 +177,7 @@ A choice that is hard to reverse, or that rejects a real alternative, gets an AD
 
 ### Close an item
 
-For each "done when" line, name the test, command or file that proves it, in `## Outcome`. Set `done`, move the file to `docs/work/done/`, and update the roadmap. A parent closes after its children. `akmctl close` also writes `closed`; by hand, set it to today's date.
+For each "done when" line, name the test, command or file that proves it, in `## Outcome`. Set `done`, move the file to `docs/work/done/`, and update the roadmap. A parent closes after its children, at every level. `akmctl close` also writes `closed`; by hand, set it to today's date.
 
 ### Stop or hand off
 

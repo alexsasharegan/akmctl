@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Specification only: `closable`, `complete`, `settled`, derived `blocked` and the dependency graph (the `blocked_by` entries plus parent-to-child links) are defined, WK8 is restated recursively, and rule WK18 (the dependency graph has no cycle) is added, with the requirement that `set` and `new` refuse a `parent` or `blocked_by` change that adds a WK4, WK8 or WK18 violation. The tool enforces them in work items 261031-wy32 and 261031-z50q; its `check` does not report WK18 until then (work item 261031-xprq).
+
 - `--repo <dir>` naming a folder that has no manifest while a folder above it does is now an error that names the ancestor, for every command but `migrate` and `version`. Before, the tool read that folder as an empty repository with default folders and gave wrong answers without a warning (`commits` reported a false CM3 on correct commits). `--repo` still never climbs: it is the root as given. The same check applies to `akmctl ui --repo` (work item 261030-8aph).
 
 - `find` takes `name` as well as `id`: the target of a wikilink (`Vault Views`, or `Projects/Vault Views`) resolves to the one Markdown file with that name under the repository root, ignoring case and hidden folders, with `not_found` and `ambiguous` as for an id. `akmctl find --name <note>`, `GET /find?name=`; `find.json`, the API spec (4.8), three fixture cases and the `akm` reference are updated. `ui`: wikilinks in the drawer's fields, alone or in a list, are links. They open the note in Obsidian, show the alias, offer a "here" link when the note is a record, and read as unresolved (not clickable) when no note has the name (work item 261029-ctzc).
