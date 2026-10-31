@@ -8,8 +8,6 @@ kind: feature
 priority: 3
 decisions: [261030-h6t7]
 summary: A command installs, checks and updates the akm skills packaged in the binary, in a repository that was not made by init.
-claimed_by: claude
-claimed_at: 2026-10-31T04:43
 ---
 
 # skills install and update command
@@ -42,3 +40,4 @@ The maintainer reviews ADR 261030-h6t7 and accepts it. Then build `internal/skil
 - 2026-10-30: filed from the vault migration review; the vault has the records but not the skills.
 - 2026-10-30: claimed (claude).
 - 2026-10-30: ADR 261030-h6t7 drafted (`proposed`) after the maintainer chose `skills install|status|update`, a marker file per skill folder and one code path with `init`.
+- 2026-10-30: released (claude).
