@@ -32,7 +32,7 @@ Done when:
 
 ## Next
 
-The maintainer reviews ADR 261030-h6t7 and accepts it. Then build `internal/skills` (status, plan, install, update, markers), route `init` and `config git-commits` through it, add the `skills` operation (params, schema, fixtures), the CLI command and `GET /skills`, then the spec, guide, glossary and changelog.
+ADR 261030-h6t7 is accepted. Build after 261030-p7r1 (skill names), so the installer ships with the final names. Then build `internal/skills` (status, plan, install, update, markers), route `init` and `config git-commits` through it, add the `skills` operation (params, schema, fixtures), the CLI command and `GET /skills`, then the spec, guide, glossary and changelog.
 
 ## Log
 
@@ -41,3 +41,4 @@ The maintainer reviews ADR 261030-h6t7 and accepts it. Then build `internal/skil
 - 2026-10-30: claimed (claude).
 - 2026-10-30: ADR 261030-h6t7 drafted (`proposed`) after the maintainer chose `skills install|status|update`, a marker file per skill folder and one code path with `init`.
 - 2026-10-30: released (claude).
+- 2026-10-30: ADR 261030-h6t7 accepted by the maintainer. Sequenced after 261030-p7r1 (the rename of akm-work-items and the naming grammar).

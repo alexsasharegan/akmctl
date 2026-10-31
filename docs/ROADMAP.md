@@ -6,6 +6,11 @@
 
 ## Next
 
+Naming, before the skills installer is built:
+
+- [261030-p7r1] Skill names and file-name grammar
+- [261030-8d8t] skills install and update command
+
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
 
 - [261029-kb33] Workbench form controls: a custom select and a summary text area with a counter
@@ -29,7 +34,6 @@ Exit criteria (draft, for Alexander to edit). The layout, the API and the spec a
 Items:
 
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest
-- [261030-8d8t] skills install and update command
 - [261029-47m0] migrate plan: simulate move_file steps
 - [261029-m0vm] move_file: report the inbound links it leaves broken
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback
