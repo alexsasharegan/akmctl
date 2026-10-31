@@ -2,7 +2,10 @@
 
 ## Now
 
-The fixes that stop nested records reaching an invalid state are merged (WK4 loops, WK8, WK18); the patch release that carries them is the maintainer's to tag.
+The fixes that stop nested records reaching an invalid state are merged (WK4 loops, WK8, WK18); the patch release that carries them is the maintainer's to tag. Also in the release:
+
+- [261031-pbws] check warns when an item lists its own descendant in blocked_by
+- [261031-99b6] Say how a hand-edited cycle is stopped before it lands
 
 ## Next
 
