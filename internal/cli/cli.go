@@ -515,6 +515,17 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if p, ok := resp.Get("moved_to"); ok {
 			fmt.Fprintln(w, "moved to", p)
 		}
+		if cm, ok := resp.Get("commit"); ok {
+			msg, _ := cm.(api.Obj).Get("message")
+			ps, _ := cm.(api.Obj).Get("paths")
+			fmt.Fprintln(w, "commit message (use as given; stage these paths and the code):")
+			for _, l := range strings.Split(msg.(string), "\n") {
+				fmt.Fprintln(w, "  "+l)
+			}
+			for _, p := range ps.([]any) {
+				fmt.Fprintln(w, "  stage:", p)
+			}
+		}
 		if dv, ok := resp.Get("dependents"); ok {
 			fmt.Fprintln(w, "open items that were waiting on this one (unblock or re-point each):")
 			for _, o := range dv.([]api.Obj) {

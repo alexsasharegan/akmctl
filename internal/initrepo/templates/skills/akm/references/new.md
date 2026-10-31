@@ -22,6 +22,8 @@ Read the list: if an item covers the work, add to it. `new` never refuses becaus
 
 A work item starts `raw`, an ADR `proposed`. The slug is lowercase kebab-case, at most 60 characters; `--title` overrides the title. Fill the file with `set` and `section`.
 
+Returns a `commit` (message and paths to stage) for the commit; the optional `akm-commit` skill says how to use it.
+
 Files changed: one new file in the work or ADR folder.
 
 Errors: `invalid_request` for a bad slug, kind or initial field; `not_found` when a `parent` does not resolve.

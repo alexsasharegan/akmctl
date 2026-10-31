@@ -182,6 +182,11 @@ def sort_recs(recs, keys, rank):
         recs = present + absent
     return recs
 
+def commit(step, item, detail, *paths):
+    """The commit object of ADR 261030-tbkh."""
+    return dict(step=step, item=item, detail=detail, paths=list(paths),
+                message="%s(%s): %s\n\nAKM-Step: %s\nAKM-Item: %s" % (item, step, detail, step, item))
+
 def ok(op, req, **kw): return dict(api_version="1.0", operation=op, request=req, ok=True, **kw)
 def err(op, req, code, msg, **d):
     e = dict(code=code, message=msg)
@@ -292,12 +297,12 @@ def write_cases(cases, basic):
     text = clo[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 2, "close moves the file to done/", "closable", req,
-         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS), after={A2B3_DONE: text}, removed=[A2B3])
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("close", "261020-a2b3", "done", A2B3, A2B3_DONE)), after={A2B3_DONE: text}, removed=[A2B3])
     req = dict(id="261020-a2b3", status="dropped", as_of="2026-10-28")
     text = clo[A2B3].replace("status: active\n", "status: dropped\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 6, "dropping an item also writes closed", "closable", req,
-         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS), after={A2B3_DONE: text}, removed=[A2B3])
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("drop", "261020-a2b3", "dropped", A2B3, A2B3_DONE)), after={A2B3_DONE: text}, removed=[A2B3])
     # cycle, keep and the managed closed field
     req = dict(id="261022-e5f6", changes=dict(cycle="2026-PI3-S4"), as_of="2026-10-28")
     text = basic[E5F6].replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\ncycle: 2026-PI3-S4\n---\n")
@@ -309,19 +314,24 @@ def write_cases(cases, basic):
     case("set", 6, "pin an item with keep", "basic", req, ok("set", req, record=pub(after_rec(files, A2B3)), changed=["keep"]), after={A2B3: text})
     req = dict(id="261022-e5f6", changes=dict(closed="2026-10-28"))
     case("set", 7, "closed is set only by close", "basic", req, err("set", req, "invalid_request", 'changes: "closed" cannot be set on a work (id, created, updated, closed, date and claim fields are managed by the tool)', parameter="changes"))
+    req = dict(id="261026-m1n2", changes=dict(status="ready"), as_of="2026-10-28")
+    M1N2 = "docs/work/261026-m1n2-explore-a-plugin-system.md"
+    text = basic[M1N2].replace("status: raw\n", "status: ready\n").replace("updated: 2026-10-26\n", "updated: 2026-10-28\n")
+    files = dict(basic); files[M1N2] = text
+    case("set", 8, "a status change returns the commit object", "basic", req, ok("set", req, record=pub(after_rec(files, M1N2)), changed=["status"], commit=commit("ready", "261026-m1n2", "ready", M1N2)), after={M1N2: text})
     # claim, release (repo with the claims extension)
     req = dict(id="261022-e5f6", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     text = clm[E5F6].replace("status: ready\n", "status: active\n").replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n")
     text = text.rstrip("\n") + "\n\n## Log\n- 2026-10-28: claimed (agent-1).\n"
     files = dict(clm); files[E5F6] = text
-    case("claim", 1, "claim a ready item", "claims", req, ok("claim", req, record=pub(after_rec(files, E5F6)), previous_holder=None), after={E5F6: text})
+    case("claim", 1, "claim a ready item", "claims", req, ok("claim", req, record=pub(after_rec(files, E5F6)), previous_holder=None, commit=commit("claim", "261022-e5f6", "claimed by agent-1", E5F6)), after={E5F6: text})
     req = dict(id="261020-a2b3", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     case("claim", 2, "another holder's fresh claim refuses", "claims", req, err("claim", req, "refused", "261020-a2b3 is claimed by agent-9", reason="claimed"))
     req = dict(id="261020-a2b3", as_of="2026-10-28")
     text = clm[A2B3].replace("claimed_by: agent-9\nclaimed_at: 2026-10-28T08:00\n", "").replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
     text = text.rstrip("\n") + "\n- 2026-10-28: released (agent-9).\n"
     files = dict(clm); files[A2B3] = text
-    case("release", 1, "release a claim", "claims", req, ok("release", req, record=pub(after_rec(files, A2B3))), after={A2B3: text})
+    case("release", 1, "release a claim", "claims", req, ok("release", req, record=pub(after_rec(files, A2B3)), commit=commit("release", "261020-a2b3", "released", A2B3)), after={A2B3: text})
 
     # dry_run: the would-be record carries the current etag, nothing is written
     req = dict(id="261022-e5f6", changes=dict(priority=4, summary="Document them."), dry_run=True, as_of="2026-10-28")
@@ -335,12 +345,12 @@ def write_cases(cases, basic):
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = after_rec(files, A2B3_DONE); rec["etag"] = next(r for r in load(basic) if r["path"] == A2B3)["etag"]
     case("close", 4, "dry run of a close with an outcome: the diff names the new path", "basic", req,
-         ok("close", req, record=pub(rec), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, diff=mkdiff(A2B3, A2B3_DONE, basic[A2B3], text)), would_be={A2B3_DONE: text})
+         ok("close", req, record=pub(rec), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("close", "261020-a2b3", "done", A2B3, A2B3_DONE), diff=mkdiff(A2B3, A2B3_DONE, basic[A2B3], text)), would_be={A2B3_DONE: text})
     # close with outcome
     req = dict(id="261020-a2b3", status="done", outcome="Shipped in 0.2.", as_of="2026-10-28")
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 3, "close writes the outcome in the same write", "basic", req,
-         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS), after={A2B3_DONE: text}, removed=[A2B3])
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("close", "261020-a2b3", "done", A2B3, A2B3_DONE)), after={A2B3_DONE: text}, removed=[A2B3])
     vault_write_cases(case, basic)
     # section
     def sec(n, name, repo, req, newtext, path, secname, sectext, changed=True, dryrun=False):
@@ -409,7 +419,7 @@ def vault_write_cases(case, basic):
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = dict(next(r for r in load(files) if r["path"] == A2B3_DONE), path=relocate(A2B3_DONE))
     case("close", 5, "close moves the file to done/ under the configured work folder", "vault", req,
-         ok("close", req, record=pub(rec), moved_from=relocate(A2B3), moved_to=relocate(A2B3_DONE), dependents=[dict(d, path=relocate(d["path"])) for d in A2B3_DEPENDENTS]), after={relocate(A2B3_DONE): text}, removed=[relocate(A2B3)])
+         ok("close", req, record=pub(rec), moved_from=relocate(A2B3), moved_to=relocate(A2B3_DONE), dependents=[dict(d, path=relocate(d["path"])) for d in A2B3_DEPENDENTS], commit=commit("close", "261020-a2b3", "done", relocate(A2B3), relocate(A2B3_DONE))), after={relocate(A2B3_DONE): text}, removed=[relocate(A2B3)])
 
 ALPHABET = "0123456789abcdefghjkmnpqrstvwxyz"
 

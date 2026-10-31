@@ -252,6 +252,7 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if len(similar) > 0 {
 		out = append(out, KV{"similar", similar})
 	}
+	out = append(out, KV{"commit", commitObj("file", id, title, rec.Path)})
 	return out, nil
 }
 
@@ -541,7 +542,25 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return e.finish(O("record", recordObj(repo, rec, nil, true), "changed", changed)), nil
+	out := O("record", recordObj(repo, rec, nil, true), "changed", changed)
+	if typ == record.Work {
+		if step := statusStep(oldStatus, newStatus); step != "" {
+			detail := map[string]string{"ready": "ready", "start": "started", "unblock": "unblocked"}[step]
+			if step == "block" {
+				detail = "blocked on " + firstBlocker(e.doc)
+			}
+			out = append(out, KV{"commit", commitObj(step, rec.ID, detail, rec.Path)})
+		}
+	}
+	return e.finish(out), nil
+}
+
+// firstBlocker is the first blocked_by entry of the document, as written.
+func firstBlocker(doc *frontmatter.Doc) string {
+	if v, ok := doc.Get("blocked_by"); ok && len(v.Items) > 0 {
+		return record.RefID(v.Items[0].Str)
+	}
+	return "its blocker"
 }
 
 // sameValue compares a stored value with a new one, reading references as ids.
@@ -608,6 +627,11 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	if len(deps) > 0 {
 		out = append(out, KV{"dependents", deps})
 	}
+	step, detail := "close", "done"
+	if status == "dropped" {
+		step, detail = "drop", "dropped"
+	}
+	out = append(out, KV{"commit", commitObj(step, rec.ID, detail, from, rec.Path)})
 	return e.finish(out), nil
 }
 
@@ -717,7 +741,7 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return e.finish(O("record", recordObj(repo, rec, nil, true), "previous_holder", previous)), nil
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "previous_holder", previous, "commit", commitObj("claim", rec.ID, "claimed by "+who, rec.Path))), nil
 }
 
 func opRelease(repo *record.Repo, q Request) (Obj, *Error) {
@@ -747,7 +771,7 @@ func opRelease(repo *record.Repo, q Request) (Obj, *Error) {
 	if cerr != nil {
 		return nil, cerr
 	}
-	return e.finish(O("record", recordObj(repo, rec, nil, true))), nil
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "commit", commitObj("release", rec.ID, "released", rec.Path))), nil
 }
 
 // ---- section ----

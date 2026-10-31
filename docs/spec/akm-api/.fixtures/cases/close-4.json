@@ -53,6 +53,16 @@
         "path": "docs/work/261024-g7h8-publish-the-first-release.md"
       }
     ],
+    "commit": {
+      "step": "close",
+      "item": "261020-a2b3",
+      "detail": "done",
+      "paths": [
+        "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "docs/work/done/261020-a2b3-add-json-output-to-ls.md"
+      ],
+      "message": "261020-a2b3(close): done\n\nAKM-Step: close\nAKM-Item: 261020-a2b3"
+    },
     "diff": {
       "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
       "new_path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",

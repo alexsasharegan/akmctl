@@ -26,7 +26,7 @@ One commit per logical step:
 1. Run `akmctl check`; fix errors first.
 2. Stage ONLY by path: the work item, the roadmap, the ADR index and the code files this step changed. Never `git add -A` or `git add .`.
 3. Leave unrelated dirty files alone: do not stage, stash, revert or commit them.
-4. Message: `<id>: <what happened>`, for example `261029-chq2: claim`, `261029-chq2: block on ADR review`, `261029-chq2: close`.
+4. Message: for a status change, use the `commit.message` the command returned, as given: `<id>(<step>): <detail>`, a blank line, then the trailers `AKM-Step` and `AKM-Item`. Stage `commit.paths` and the code the step changed. You may put a body between the subject and the trailers and add other trailers (attribution) after them; do not change the subject or the two `AKM-` trailers. `new`, `claim`, `release`, `close` and a `set` that changes `status` return one (`--format json`, or the block the command prints). For a `## Next` checkpoint, which returns none, write `<id>: <what happened>`.
 5. Follow the repository's `AGENTS.md` on attribution lines.
 
 ## Never

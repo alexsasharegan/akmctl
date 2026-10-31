@@ -41,7 +41,16 @@
         "claimed_at": "2026-10-28T09:30"
       }
     },
-    "previous_holder": null
+    "previous_holder": null,
+    "commit": {
+      "step": "claim",
+      "item": "261022-e5f6",
+      "detail": "claimed by agent-1",
+      "paths": [
+        "docs/work/261022-e5f6-document-the-exit-codes.md"
+      ],
+      "message": "261022-e5f6(claim): claimed by agent-1\n\nAKM-Step: claim\nAKM-Item: 261022-e5f6"
+    }
   },
   "after": {
     "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: active\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Log\n- 2026-10-28: claimed (agent-1).\n"

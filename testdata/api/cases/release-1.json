@@ -38,6 +38,15 @@
         "claimed_by": null,
         "claimed_at": null
       }
+    },
+    "commit": {
+      "step": "release",
+      "item": "261020-a2b3",
+      "detail": "released",
+      "paths": [
+        "docs/work/261020-a2b3-add-json-output-to-ls.md"
+      ],
+      "message": "261020-a2b3(release): released\n\nAKM-Step: release\nAKM-Item: 261020-a2b3"
     }
   },
   "after": {

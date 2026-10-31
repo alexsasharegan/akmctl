@@ -78,6 +78,9 @@
                 "required": ["id", "status", "title", "path"],
                 "additionalProperties": false
               }
+            },
+            "commit": {
+              "$ref": "common.json#/$defs/commit"
             }
           },
           "required": [

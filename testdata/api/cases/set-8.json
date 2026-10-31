@@ -1,0 +1,62 @@
+{
+  "name": "a status change returns the commit object",
+  "repo": "basic",
+  "request": {
+    "id": "261026-m1n2",
+    "changes": {
+      "status": "ready"
+    },
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261026-m1n2",
+      "changes": {
+        "status": "ready"
+      },
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261026-m1n2",
+      "type": "work",
+      "path": "docs/work/261026-m1n2-explore-a-plugin-system.md",
+      "id_date": "2026-10-26",
+      "etag": "b317dfc2c0734783",
+      "fields": {
+        "id": "261026-m1n2",
+        "title": "Explore a plugin system",
+        "summary": null,
+        "status": "ready",
+        "kind": null,
+        "parent": null,
+        "blocked_by": null,
+        "priority": null,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-26",
+        "updated": "2026-10-28",
+        "closed": null,
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "changed": [
+      "status"
+    ],
+    "commit": {
+      "step": "ready",
+      "item": "261026-m1n2",
+      "detail": "ready",
+      "paths": [
+        "docs/work/261026-m1n2-explore-a-plugin-system.md"
+      ],
+      "message": "261026-m1n2(ready): ready\n\nAKM-Step: ready\nAKM-Item: 261026-m1n2"
+    }
+  },
+  "after": {
+    "docs/work/261026-m1n2-explore-a-plugin-system.md": "---\nid: 261026-m1n2\ntitle: Explore a plugin system\nstatus: ready\ncreated: 2026-10-26\nupdated: 2026-10-28\n---\n\n# Explore a plugin system\n\n## Notes\nMaybe later.\n"
+  }
+}

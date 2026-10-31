@@ -21,6 +21,8 @@ open items that were waiting on this one (unblock or re-point each):
 
 `close` never edits them: unblock or re-point each with `set`, in the same commit.
 
+Returns a `commit` (message and paths to stage) for the commit; the optional `akm-commit` skill says how to use it.
+
 Files changed: the record, renamed into `done/`; `updated` and `closed` are set to today.
 
 Errors: `refused` with `reason: "empty_outcome"` or `"open_children"` (a parent closes after its children); `not_found`; `stale`.

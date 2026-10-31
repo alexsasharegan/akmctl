@@ -31,6 +31,7 @@
 
 ## Proposed
 
-| id                                                        | title                                                        | date       | scope | summary                                                      | supersedes / superseded_by |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ | -------------------------- |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0) |                            |
+| id                                                            | title                                                                                  | date       | scope | summary                                                                                                                                | supersedes / superseded_by |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md)     | Work items gain closed, cycle and keep fields (layout 0.3.0)                           | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0)                                                                           |                            |
+| [261030-tbkh](261030-tbkh-commit-message-format-and-stamp.md) | AKM step commits use one subject and trailers, returned by the tool as a commit object | 2026-10-30 |       | AKM step commits use one subject and AKM-Step and AKM-Item trailers; the tool returns them as a commit object and still never commits. |                            |

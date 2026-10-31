@@ -75,6 +75,9 @@
             },
             "diff": {
               "$ref": "common.json#/$defs/diff"
+            },
+            "commit": {
+              "$ref": "common.json#/$defs/commit"
             }
           },
           "required": [
