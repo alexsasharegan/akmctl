@@ -4,7 +4,6 @@
 
 Close the gaps that let nested records reach an invalid state in the current release, then cut a patch release (the maintainer tags):
 
-- [261031-xprq] Define closable and blocked as recursive predicates over parent and blocked_by
 - [261031-wy32] Refuse parent edges that make a loop or put an open item under a closed parent
 - [261031-z50q] Check blocked_by cycles and parent-child deadlocks
 
