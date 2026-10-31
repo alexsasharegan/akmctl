@@ -2,10 +2,6 @@
 
 ## Now
 
-Cut v0.3.3, which carries the nested-record fixes (WK4 loops, WK8, WK18, WK19, the "Gate hand edits" guide section):
-
-- [261031-nep4] release v0 3 3
-
 ## Next
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):

@@ -1,14 +1,13 @@
 ---
 id: "261031-nep4"
 title: release v0 3 3
-status: active
+status: done
 created: 2026-10-31
 updated: 2026-10-31
+closed: 2026-10-31
 kind: chore
 priority: 10
 summary: Cut v0.3.3
-claimed_by: claude
-claimed_at: 2026-10-31T19:21
 ---
 
 # release v0 3 3
@@ -26,9 +25,19 @@ Done when:
 
 ## Next
 
-Prepare the changelog and run the full check, then push main, tag and verify.
+Close this item.
+
+## Outcome
+
+- Changelog: `## 0.3.3 - 2026-10-31` heading in `CHANGELOG.md`.
+- Tag `v0.3.3` (annotated) pushed; the `release` workflow run 41233978127 passed. CI on the prepared commit passed on Linux and macOS (the non-blocking Windows job failed, as before).
+- `gh release view v0.3.3` lists the five archives (darwin amd64 and arm64, linux amd64 and arm64, windows amd64) and `SHA256SUMS`.
+- `go install github.com/alexsasharegan/akmctl/cmd/akmctl@v0.3.3` then `akmctl version` prints `akmctl 0.3.3 (API 1.0)`.
+
+Decision: none.
 
 ## Log
 
 - 2026-10-31: filed.
 - 2026-10-31: claimed (claude).
+- 2026-10-31: tagged and released; verified.
