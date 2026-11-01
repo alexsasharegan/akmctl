@@ -39,6 +39,7 @@
 
 ## Proposed
 
-| id                                                        | title                                                        | date       | scope | summary                                                      | supersedes / superseded_by |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ | -------------------------- |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0) |                            |
+| id                                                           | title                                                        | date       | scope                       | summary                                                                                                                                        | supersedes / superseded_by |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ---------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md)    | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |                             | Work items gain closed, cycle and keep fields (layout 0.3.0)                                                                                   |                            |
+| [261101-gw7b](261101-gw7b-log-entries-carry-a-local-time.md) | Log entries carry a local time with its offset               | 2026-11-01 | internal/api, internal/body | A Log line carries the writer's local time and its offset; claim, release and log write it, and an optional at records when the thing happened |                            |
