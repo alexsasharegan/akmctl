@@ -2,11 +2,13 @@
 id: "261031-6bzq"
 title: spike body writer api
 summary: "Spike: a Markdown writer and body write operations so no agent or UI hand-writes Markdown"
-status: raw
+status: active
 kind: spike
 parent: "261031-gtw6"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
+claimed_by: claude
+claimed_at: 2026-11-01T07:05
 ---
 
 # spike body writer api
@@ -30,3 +32,4 @@ Done when:
 ## Log
 
 - 2026-10-31: filed.
+- 2026-11-01: claimed (claude).
