@@ -1,12 +1,14 @@
 ---
 id: "261101-q72k"
 title: move section writes onto the section tree
-status: raw
+status: active
 created: 2026-11-01
 updated: 2026-11-01
 kind: feature
 parent: 261031-gtw6
 summary: AddSection on body.Tree; section and the API write path use the tree and refuse unsupported constructs; delete SetSection
+claimed_by: claude
+claimed_at: 2026-11-01T08:04
 ---
 
 # move section writes onto the section tree
@@ -30,3 +32,4 @@ Not started. Read the spike's Outcome and ADR 261101-tr8e; make ready once the A
 - 2026-11-01: filed by spike 261031-6bzq.
 - 2026-11-01: refusal rule narrowed in ADR 261101-tr8e; blocked_by 261101-4j86 (the classification).
 - 2026-11-01: 261101-4j86 closed; blocked_by removed.
+- 2026-11-01: claimed (claude).
