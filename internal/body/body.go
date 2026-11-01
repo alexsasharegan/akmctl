@@ -4,7 +4,8 @@
 // others. It reads a narrow subset of Markdown. A construct outside the subset is
 // an error that names it and the line (the tool fails closed); it is never
 // guessed at. A goldmark adapter in the tests is the oracle that the subset is
-// read the way CommonMark reads it.
+// read the way CommonMark reads it. On top of the blocks, tree.go splits a body into
+// sections and edits them by splice (ADR 261031-gam0).
 package body
 
 import (

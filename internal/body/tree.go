@@ -1,0 +1,377 @@
+package body
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
+	"fmt"
+	"regexp"
+	"strings"
+)
+
+// The section tree (ADR 261031-gam0). A body is a preamble, the text before the
+// first "## " heading, and an ordered list of sections. The tree is a view over
+// the bytes it was split from: Join returns them unchanged, and an edit builds
+// the new bytes by splicing only the span it means to change, so unknown
+// sections and hand formatting are never rewritten.
+
+// Errors the edits return.
+var (
+	ErrNoSection  = errors.New("no such section")
+	ErrNoItem     = errors.New("no such item")
+	ErrStale      = errors.New("the section changed since it was read")
+	ErrAppendOnly = errors.New("the Log section is append-only")
+)
+
+// Section is one "## " section: its heading line and the text under it, up to
+// the next "## " heading.
+type Section struct {
+	Name  string // the heading text, trimmed
+	Line  int    // 1-based line of the heading
+	Start int    // offset of the heading line
+	Body  int    // offset of the first byte after the heading line
+	End   int    // offset of the next section's heading, or the end of the body
+}
+
+// Key is the name compared case-insensitively, as sections are addressed.
+func (s Section) Key() string { return strings.ToLower(s.Name) }
+
+// Tree is a body split into a preamble and sections.
+type Tree struct {
+	src      []byte
+	sections []Section
+}
+
+// Split reads body (the text after the frontmatter) with Locate and splits it at
+// its "## " headings. It returns the error of Locate for a construct outside the
+// supported subset (ErrUnsupported, with the construct and the line), so a body
+// the scanner does not understand is never split by guesswork.
+func Split(body []byte) (*Tree, error) {
+	lay, err := Locate(body)
+	if err != nil {
+		return nil, err
+	}
+	return build(body, lay), nil
+}
+
+// build splits src at the level-2 headings of lay.
+func build(src []byte, lay Layout) *Tree {
+	t := &Tree{src: src}
+	for _, b := range lay.Blocks {
+		if b.Kind != Heading || b.Level != 2 {
+			continue
+		}
+		body := b.End
+		if body < len(src) && src[body] == '\r' {
+			body++
+		}
+		if body < len(src) && src[body] == '\n' {
+			body++
+		}
+		t.sections = append(t.sections, Section{Name: headingName(string(src[b.Start:b.End])), Line: b.Line, Start: b.Start, Body: body, End: len(src)})
+	}
+	for i := 0; i+1 < len(t.sections); i++ {
+		t.sections[i].End = t.sections[i+1].Start
+	}
+	return t
+}
+
+// headingName is the text of an ATX heading line: no marker, no closing hashes
+// (a run of hashes after a space), trimmed.
+func headingName(line string) string {
+	s := strings.TrimSpace(strings.TrimLeft(line, "#"))
+	if i := strings.LastIndexAny(s, " \t"); i >= 0 && strings.Trim(s[i+1:], "#") == "" {
+		s = strings.TrimSpace(s[:i])
+	} else if strings.Trim(s, "#") == "" {
+		s = ""
+	}
+	return s
+}
+
+// Join returns the bytes the tree was split from.
+func (t *Tree) Join() []byte { return append([]byte(nil), t.src...) }
+
+// Preamble is the text before the first section.
+func (t *Tree) Preamble() []byte {
+	end := len(t.src)
+	if len(t.sections) > 0 {
+		end = t.sections[0].Start
+	}
+	return t.src[:end]
+}
+
+// Sections lists the sections in order.
+func (t *Tree) Sections() []Section { return append([]Section(nil), t.sections...) }
+
+// Section finds the first section named name, without regard to case.
+func (t *Tree) Section(name string) (Section, bool) {
+	for _, s := range t.sections {
+		if strings.EqualFold(s.Name, strings.TrimSpace(name)) {
+			return s, true
+		}
+	}
+	return Section{}, false
+}
+
+// Text is the text under the heading of s, without the heading line.
+func (t *Tree) Text(s Section) []byte { return t.src[s.Body:s.End] }
+
+// Etag identifies the bytes of s, its heading line included. An edit that
+// carries an etag is refused with ErrStale when the section has changed.
+func (t *Tree) Etag(s Section) string {
+	h := sha256.Sum256(t.src[s.Start:s.End])
+	return hex.EncodeToString(h[:8])
+}
+
+// lineSpan is one line of the body: its bytes without the line ending, and the
+// ending ("\n", "\r\n" or "" at the end of a body with no final newline).
+type lineSpan struct {
+	start, end int // the text, without the ending
+	eol        string
+}
+
+func (t *Tree) lines(from, to int) []lineSpan {
+	var out []lineSpan
+	for off := from; off < to; {
+		nl := bytes.IndexByte(t.src[off:to], '\n')
+		if nl < 0 {
+			out = append(out, lineSpan{off, to, ""})
+			break
+		}
+		end := off + nl
+		eol := "\n"
+		if end > off && t.src[end-1] == '\r' {
+			end--
+			eol = "\r\n"
+		}
+		out = append(out, lineSpan{off, end, eol})
+		off += nl + 1
+	}
+	return out
+}
+
+// fileEOL is the line ending the body uses, from its first line break.
+func (t *Tree) fileEOL() string {
+	if i := bytes.IndexByte(t.src, '\n'); i > 0 && t.src[i-1] == '\r' {
+		return "\r\n"
+	}
+	return "\n"
+}
+
+// ---- Goal: the checklist ----
+
+// Item is one checklist item.
+type Item struct {
+	Pos   int  // 1-based position in the checklist
+	Done  bool // the box is ticked
+	Text  string
+	Line  int // 1-based line in the body
+	Start int // offset of the line
+	End   int // offset after the line's text, before its line ending
+	box   int // offset of the character between the brackets
+}
+
+// Checklist is the first contiguous run of task lines ("- [ ] text", "- [x] text",
+// one per line) in the section, or nil when it has none. A task line after a
+// blank line or other text is not part of the run; it stays in the prose.
+func (t *Tree) Checklist(name string) ([]Item, error) {
+	s, ok := t.Section(name)
+	if !ok {
+		return nil, ErrNoSection
+	}
+	lay, err := Locate(t.src[s.Body:s.End])
+	if err != nil {
+		return nil, err
+	}
+	var out []Item
+	prevLine := 0
+	for _, b := range lay.Blocks {
+		if b.Kind != Task {
+			if len(out) > 0 {
+				break // another block ends the run
+			}
+			continue
+		}
+		if len(out) > 0 && b.Line != prevLine+1 {
+			break
+		}
+		start, end := s.Body+b.Start, s.Body+b.End
+		line := string(t.src[start:end])
+		open := strings.IndexByte(line, '[')
+		out = append(out, Item{
+			Pos: len(out) + 1, Done: b.Done, Text: strings.TrimSpace(line[open+3:]),
+			Line: s.Line + b.Line, Start: start, End: end, box: start + open + 1,
+		})
+		prevLine = b.Line
+	}
+	return out, nil
+}
+
+// SetChecked ticks or unticks item pos (1-based) of the checklist in section
+// name and returns the new body: only the character between the brackets
+// changes. etag, when not empty, must be the Etag of the section as it was read.
+func (t *Tree) SetChecked(name string, pos int, done bool, etag string) ([]byte, error) {
+	s, ok := t.Section(name)
+	if !ok {
+		return nil, ErrNoSection
+	}
+	if etag != "" && etag != t.Etag(s) {
+		return nil, ErrStale
+	}
+	items, err := t.Checklist(name)
+	if err != nil {
+		return nil, err
+	}
+	if pos < 1 || pos > len(items) {
+		return nil, fmt.Errorf("%w: item %d of %d", ErrNoItem, pos, len(items))
+	}
+	it := items[pos-1]
+	if it.Done == done {
+		return t.Join(), nil
+	}
+	c := byte(' ')
+	if done {
+		c = 'x'
+	}
+	out := t.Join()
+	out[it.box] = c
+	return out, nil
+}
+
+// ---- Log: dated entries ----
+
+// Entry is one Log entry, "- YYYY-MM-DD: text".
+type Entry struct {
+	Date  string
+	Text  string
+	Line  int // 1-based line in the body
+	Start int
+	End   int
+}
+
+var logLine = regexp.MustCompile(`^- (\d{4}-\d{2}-\d{2}): ?(.*)$`)
+
+// LogEntries lists the lines of the Log section that have the entry form, in
+// order. Any other line (a continuation, a note) is opaque text and is not
+// listed.
+func (t *Tree) LogEntries() ([]Entry, error) {
+	s, ok := t.Section("log")
+	if !ok {
+		return nil, ErrNoSection
+	}
+	var out []Entry
+	for i, l := range t.lines(s.Body, s.End) {
+		if m := logLine.FindStringSubmatch(string(t.src[l.start:l.end])); m != nil {
+			out = append(out, Entry{Date: m[1], Text: m[2], Line: s.Line + 1 + i, Start: l.start, End: l.end})
+		}
+	}
+	return out, nil
+}
+
+// AppendLog adds "- date: text" after the last non-blank line of the Log section
+// and returns the new body. The line ends as the line before it does.
+func (t *Tree) AppendLog(date, text string) ([]byte, error) {
+	s, ok := t.Section("log")
+	if !ok {
+		return nil, ErrNoSection
+	}
+	text = strings.Join(strings.Fields(text), " ")
+	entry := "- " + date + ": " + text
+	return t.appendLine(s, entry), nil
+}
+
+// appendLine inserts a line after the last non-blank line of s (after its
+// heading when it has none).
+func (t *Tree) appendLine(s Section, line string) []byte {
+	eol := t.fileEOL()
+	at := s.Body
+	var last lineSpan
+	found := false
+	for _, l := range t.lines(s.Body, s.End) {
+		if strings.TrimSpace(string(t.src[l.start:l.end])) != "" {
+			last, found = l, true
+		}
+	}
+	var ins string
+	if found {
+		if last.eol != "" {
+			eol = last.eol
+		}
+		at = last.end + len(last.eol)
+		if last.eol == "" { // no final newline: break the line first, and add none after
+			ins = eol + line
+		} else {
+			ins = line + eol
+		}
+	} else {
+		// an empty section: a blank line after the heading, then the line
+		if s.Body > s.Start && t.src[s.Body-1] == '\n' {
+			ins = eol + line + eol
+		} else { // the heading is the last line and has no ending
+			ins = eol + eol + line
+		}
+	}
+	out := make([]byte, 0, len(t.src)+len(ins))
+	out = append(out, t.src[:at]...)
+	out = append(out, ins...)
+	out = append(out, t.src[at:]...)
+	return out
+}
+
+// ---- Replacing a section ----
+
+// ReplaceSection replaces the text of section name and returns the new body. The
+// blank lines before and after the old text stay; the new text is written with
+// the body's line endings. A section with no text gets a blank line after its
+// heading. The Log section cannot be replaced (ErrAppendOnly). etag, when not
+// empty, must be the Etag of the section as it was read.
+func (t *Tree) ReplaceSection(name, text, etag string) ([]byte, error) {
+	s, ok := t.Section(name)
+	if !ok {
+		return nil, ErrNoSection
+	}
+	if strings.EqualFold(s.Name, "log") {
+		return nil, ErrAppendOnly
+	}
+	if etag != "" && etag != t.Etag(s) {
+		return nil, ErrStale
+	}
+	eol := t.fileEOL()
+	text = strings.Trim(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	var repl string
+	if text != "" {
+		repl = strings.ReplaceAll(text, "\n", eol)
+	}
+	ls := t.lines(s.Body, s.End)
+	first, last := -1, -1
+	for i, l := range ls {
+		if strings.TrimSpace(string(t.src[l.start:l.end])) != "" {
+			if first < 0 {
+				first = i
+			}
+			last = i
+		}
+	}
+	var out []byte
+	switch {
+	case first < 0: // no text yet
+		out = append(out, t.src[:s.Body]...)
+		if !bytes.HasSuffix(t.src[:s.Body], []byte("\n")) {
+			out = append(out, eol...)
+		}
+		if repl != "" {
+			out = append(out, eol...)
+			out = append(out, repl...)
+			out = append(out, eol...)
+		}
+		out = append(out, t.src[s.Body:]...)
+	default:
+		a := ls[first].start
+		b := ls[last].end
+		out = append(out, t.src[:a]...)
+		out = append(out, repl...)
+		out = append(out, t.src[b:]...)
+	}
+	return out, nil
+}
