@@ -2,10 +2,9 @@
 id: "261101-tr8e"
 title: Body writes go through the section tree, with tick and log operations
 summary: Body writes are splices by the section tree; add tick and log operations, address items by section and position, refuse only unreadable constructs that matter
-status: proposed
+status: accepted
 date: 2026-11-01
 scope: [internal/api, internal/body, internal/record, internal/server]
-authored_by: agent
 ---
 
 # Body writes go through the section tree, with tick and log operations
@@ -45,9 +44,13 @@ What the questions around this decision settled; they bind the code that impleme
 1. **The document is the source of truth and the tool is a guest.** The tool never requires a file to conform to it, never changes the format to suit its parser (no ids or markers in the Markdown), and never writes a byte it was not asked to change.
 2. **Understand as little Markdown as possible.** The tree reads headings, fences, task lines and list lines; everything else is opaque bytes carried through unchanged. A construct is claimed only when an edit needs it, and then only with the oracle's agreement.
 3. **A refusal is cautious, narrow and named.** When the tool cannot be sure, it declines rather than guesses. It declines only where the doubt can affect the edit (a structural construct anywhere, a local one in the edited section), says which construct and line, and loses nothing.
-4. **A refusal is a defect to burn down, and it is measured.** The refusal rate on real notes is a tracked number, not an assumption. When it passes a threshold the maintainer sets, the answer is to claim more constructs or to promote goldmark, not to tell people to change their notes. Proposed threshold: more than 5% of the work items in a real repository have a refusal in a section an operation edits (today, in the vault: 3% of sections, 13% of files whole).
+4. **A refusal is a defect to burn down, and it is measured.** The refusal rate on real notes is a tracked number, not an assumption. Every kind of refusal met on real work items or ADRs gets its own backlog item, however rare: one exception is still a note the tool cannot edit. Separately, when the rate passes a threshold the maintainer sets, the answer is to claim more constructs or to promote goldmark, not to tell people to change their notes. The threshold, set by the maintainer on 2026-11-01: more than 5% of the work items in a real repository have a refusal in a section an operation edits (today, in the vault: 3% of sections, 13% of files whole).
 5. **The parser is swappable, so the choice is cheap to reverse.** Nothing written into a file depends on how it was read. The `Locator` interface returns blocks with byte offsets; our scanner, a larger scanner or goldmark (ADR 261031-cpbg keeps that option, which needs an ADR for the dependency) can sit behind it without a file migration.
 6. **Reach for another encoding only when the humans stop reading the files.** A structured encoding would make writing trivial and give up the reason for Markdown here: records that a person and an agent both read and edit in an editor and in git.
+
+## Confirmation
+
+`TestTreeMatchesSetSection` (`internal/record/section_test.go`) holds the section tree and `SetSection` to one behaviour on every work item until `section` moves onto the tree; `TestSplitJoinRecords`, `TestTreeAgainstOracle` and `FuzzTree` (`internal/body`) hold the tree to lossless edits. The operations add their own tests (work items 261101-ga4s and 261101-q72k).
 
 ## Consequences
 
