@@ -23,12 +23,12 @@ Related, already filed: 261031-ph53 (`new --parent --kind` and `split`), 261031-
 - [x] The Log lists where the nudge can live (a new skill, a section of `akm-track-work`, a hint from `new` or `check` on an oversized item, the guide) with the cost and reach of each, and names one or a mix.
 - [x] The procedure for splitting an existing item is written down and walked through once on a real item: what stays in the parent's Goal, what moves to children, how the parent's history and links are kept, and when a spike's parent closes.
 - [x] A prototype of the chosen surface exists (a draft skill or hint) and was tried by a cold agent on an oversized item; the Log records what it got wrong.
-- [ ] The Log says how 261031-ph53 and 261031-qwhn change, if at all, and any term the work adds is registered in `docs/glossary.md`.
+- [x] The Log says how 261031-ph53 and 261031-qwhn change, if at all, and any term the work adds is registered in `docs/glossary.md`.
 - [ ] An implementation work item is filed (`akmctl new work`) whose Goal carries the acceptance criteria, adjusted for what the prototype showed.
 
 ## Next
 
-Box 4: decide how 261031-ph53 (split) and 261031-qwhn (tree view) change: add to ph53 the per-child steps the trial found costly, register any new term in docs/glossary.md. Then box 5: file the implementation item.
+Box 5: file the implementation item (akmctl new work) whose Goal carries the acceptance criteria: ship the Item too big section (already in the tree), then ph53, 72bd and 3erc as its children or siblings. Then close the spike.
 
 ## Log
 
@@ -42,3 +42,6 @@ Box 4: decide how 261031-ph53 (split) and 261031-qwhn (tree view) change: add to
 - 2026-11-01 10:14-07:00: Maintainer asked whether close should report open tasks under the parent. Yes: close prints dependents but nothing about the parent (references/close.md). Added as a box on 261031-72bd (rollup counts) rather than a new item.
 - 2026-11-01 10:17-07:00: Cold-agent trial (a sonnet subagent, scratch copy of the repo, only the draft section and AGENTS.md as guidance) split 261030-456q into a parent and four children; check passed. What it got wrong or had to guess: (1) 'one commit for the children' conflicts with one file commit per child; (2) commit order unstated, children go first; (3) no step to claim the parent first, and an active parent needs a Next (WK6); (4) release leaves the parent active, so say to set it ready; (5) moving boxes has no command and remove needs --confirm, so section plus one Log line; (6) an ordered list of children trips B1; (7) link style unstated, items use relative Markdown links; (8) a blocked child needs a Next before set status=blocked, and the block commit message names only the first blocker (tool quirk, not filed); (9) siblings sharing one report file need a named owner; (10) similar lists the parent and siblings. Section rewritten to fix 1-4 and 6-10 (5 by rule); the revised text was not tried again.
 - 2026-11-01 10:17-07:00: ticked "A prototype of the chosen surface exists (a draft skill or hint) and was tried by a cold agent on an oversized item; the Log records what it got wrong.": .agents/skills/akm-track-work/SKILL.md section 'Item too big'; trial in scratch repo, Log entry
+- 2026-11-01 10:22-07:00: Filed 261101-3erc: the block commit message names only the first blocker.
+- 2026-11-01 10:22-07:00: Box 4: 261031-ph53 amended (priority inheritance, per-child commit messages, a reminder of what is left on the parent, skill shortened to use split, 'split' to be registered when built); 261031-qwhn unchanged. 'Umbrella' registered under Parent in the glossary now, since the skill and gtw6 already use it. The revised section was not re-tried; the changes are wording fixes for what the trial hit.
+- 2026-11-01 10:22-07:00: ticked "The Log says how 261031-ph53 and 261031-qwhn change, if at all, and any term the work adds is registered in `docs/glossary.md`.": Log; 261031-ph53 Goal; docs/glossary.md Parent row
