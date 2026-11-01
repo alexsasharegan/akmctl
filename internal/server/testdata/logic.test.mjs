@@ -389,12 +389,12 @@ assert.equal(L.pageTitle({ view: "ADRs" }), "ADRs - akmctl");
 {
   const T = await import("./toasts.js");
   const sp = (o) => T.toastSpec("m", o);
-  assert.deepEqual(sp(), { msg: "m", level: "info", persistent: false, ms: 8000 });
+  assert.deepEqual(sp(), { msg: "m", level: "info", persistent: false, ms: 15000 });
   assert.equal(sp({ level: "error" }).persistent, true);
   assert.equal(sp({ level: "error", persistent: false }).persistent, false);
   assert.equal(sp({ level: "success", persistent: true }).persistent, true);
   assert.equal(sp({ ms: 12000 }).ms, 12000);
-  assert.equal(sp({ ms: -1 }).ms, 8000);
+  assert.equal(sp({ ms: -1 }).ms, 15000);
   assert.throws(() => T.toastSpec("m", "bad"), TypeError);
   assert.throws(() => T.toastSpec("m", { level: "bad" }), RangeError);
   assert.equal(T.roleFor("error"), "alert");

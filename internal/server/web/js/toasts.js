@@ -4,7 +4,7 @@
 // hover or keyboard focus (a "hold") pauses.
 
 export const LEVELS = ["success", "info", "warning", "error"];
-export const EPHEMERAL_MS = 8000;
+export const EPHEMERAL_MS = 15000;
 export const LIMIT = 3;
 
 /**

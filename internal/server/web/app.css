@@ -255,7 +255,7 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .toast-close:hover{background:color-mix(in srgb,var(--toast-fg) 18%,transparent)}
 .toast .toast-close:focus-visible,.toast .toast-btn:focus-visible{outline:var(--focus-w) solid var(--toast-fg);outline-offset:1px}
 @media (prefers-reduced-motion:no-preference){
-  .toast:not(.persistent)::before{animation:toast-count var(--toast-ms,8s) linear forwards}
+  .toast:not(.persistent)::before{animation:toast-count var(--toast-ms,15s) linear forwards}
   .toast:not(.persistent):hover::before,.toast:not(.persistent):focus-within::before{animation-play-state:paused}
   @keyframes toast-count{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 }
