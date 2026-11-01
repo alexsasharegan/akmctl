@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexsasharegan/akmctl/internal/body"
 	"github.com/alexsasharegan/akmctl/internal/depgraph"
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/index"
@@ -563,12 +564,9 @@ func (c *checker) agents() {
 	}
 	lines := strings.Split(strings.TrimRight(string(b), "\n"), "\n")
 	have := map[string]bool{}
-	fence := false
+	var fence body.FenceTracker
 	for _, l := range lines {
-		if strings.HasPrefix(l, "```") {
-			fence = !fence
-		}
-		if !fence && strings.HasPrefix(l, "## ") {
+		if !fence.In(strings.TrimRight(l, "\r")) && strings.HasPrefix(l, "## ") {
 			have[strings.TrimSpace(l[3:])] = true
 		}
 	}

@@ -78,8 +78,7 @@ func (Scanner) Locate(body []byte) (Layout, error) {
 		}
 
 		if fch != 0 {
-			c := strings.TrimLeft(t, " ")
-			if n := runLen(c, fch); len(t)-len(c) <= 3 && n >= flen && strings.TrimSpace(c[n:]) == "" {
+			if fenceClose(t, fch, flen) {
 				fStart.End, fStart.EndLine = lineEnd, lineNo
 				lay.Blocks = append(lay.Blocks, fStart)
 				fch, flen = 0, 0
@@ -102,15 +101,8 @@ func (Scanner) Locate(body []byte) (Layout, error) {
 		}
 
 		// a fence opens at column 0
-		if n := runLen(t, '`'); n >= 3 && !strings.Contains(t[n:], "`") {
-			fch, flen = '`', n
-			fStart = Block{Kind: Fence, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo}
-			prevBlank = false
-			off = next
-			continue
-		}
-		if n := runLen(t, '~'); n >= 3 {
-			fch, flen = '~', n
+		if ch, n, ok := fenceOpen(t); ok {
+			fch, flen = ch, n
 			fStart = Block{Kind: Fence, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo}
 			prevBlank = false
 			off = next

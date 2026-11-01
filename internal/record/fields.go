@@ -3,6 +3,7 @@ package record
 import (
 	"strings"
 
+	mdbody "github.com/alexsasharegan/akmctl/internal/body"
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 )
 
@@ -64,7 +65,7 @@ func Sections(body string) (names []string, text map[string]string) {
 	text = map[string]string{}
 	var cur string
 	var buf []string
-	fence := false
+	var fence mdbody.FenceTracker
 	flush := func() {
 		if cur != "" {
 			text[cur] = strings.Trim(strings.Join(buf, "\n"), "\n")
@@ -73,10 +74,7 @@ func Sections(body string) (names []string, text map[string]string) {
 	}
 	for _, l := range strings.Split(body, "\n") {
 		l = strings.TrimRight(l, "\r")
-		if strings.HasPrefix(l, "```") || strings.HasPrefix(l, "~~~") {
-			fence = !fence
-		}
-		if !fence && strings.HasPrefix(l, "## ") {
+		if !fence.In(l) && strings.HasPrefix(l, "## ") {
 			flush()
 			cur = strings.ToLower(strings.TrimSpace(l[3:]))
 			names = append(names, cur)
@@ -91,13 +89,10 @@ func Sections(body string) (names []string, text map[string]string) {
 // FirstHeading is the text of the first "# " heading of a body outside fenced
 // code blocks, or "".
 func FirstHeading(body string) string {
-	fence := false
+	var fence mdbody.FenceTracker
 	for _, l := range strings.Split(body, "\n") {
 		l = strings.TrimRight(l, "\r")
-		if strings.HasPrefix(l, "```") || strings.HasPrefix(l, "~~~") {
-			fence = !fence
-		}
-		if !fence && strings.HasPrefix(l, "# ") {
+		if !fence.In(l) && strings.HasPrefix(l, "# ") {
 			return strings.TrimSpace(l[2:])
 		}
 	}
@@ -124,14 +119,11 @@ func (r *Record) NextLine() (string, bool) {
 // eol is the line ending to use.
 func AppendToSection(body, name, line, eol string) string {
 	lines := strings.Split(body, "\n")
-	fence := false
+	var fence mdbody.FenceTracker
 	start, end := -1, len(lines)
 	for i, l := range lines {
 		t := strings.TrimRight(l, "\r")
-		if strings.HasPrefix(t, "```") || strings.HasPrefix(t, "~~~") {
-			fence = !fence
-		}
-		if fence || !strings.HasPrefix(t, "## ") {
+		if fence.In(t) || !strings.HasPrefix(t, "## ") {
 			continue
 		}
 		if start >= 0 {
@@ -213,13 +205,10 @@ func SetSection(body, name, text string, appendMode bool, eol string) string {
 	}
 	blank := func(l string) bool { return strings.TrimSpace(l) == "" }
 	start, end, logAt := -1, len(lines), -1
-	fence := false
+	var fence mdbody.FenceTracker
 	for i, l := range lines {
 		t := strings.TrimRight(l, "\r")
-		if strings.HasPrefix(t, "```") || strings.HasPrefix(t, "~~~") {
-			fence = !fence
-		}
-		if fence || !strings.HasPrefix(t, "## ") {
+		if fence.In(t) || !strings.HasPrefix(t, "## ") {
 			continue
 		}
 		h := strings.TrimSpace(t[3:])

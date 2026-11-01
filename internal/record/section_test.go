@@ -1,6 +1,9 @@
 package record
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestSetSection(t *testing.T) {
 	body := "\n# T\n\n## Goal\nOld goal.\n\n## Log\n- one\n"
@@ -47,5 +50,29 @@ func TestSetSection(t *testing.T) {
 	// sibling sections are untouched
 	if got := SetSection("## A\na\n\n## B\nb\n\n## C\nc\n", "b", "B2", false, "\n"); got != "## A\na\n\n## B\nB2\n\n## C\nc\n" {
 		t.Errorf("sibling: %q", got)
+	}
+}
+
+// TestFenceRule: every function that looks for a heading follows the same fence
+// rule: a fence closes only on the same character and at least as many of it
+// (work item 261031-2j14).
+func TestFenceRule(t *testing.T) {
+	mixed := "## A\n```\n~~~\n## Notes\n```\n## B\nb\n"  // ~~~ inside backticks does not close it
+	long := "## A\n````\n```\n## Notes\n````\n## B\nb\n" // ``` inside ```` does not close it
+	tilde := "## A\n~~~\n```\n## Notes\n~~~\n## B\nb\n"  // ``` inside ~~~ does not close it
+	for name, body := range map[string]string{"mixed": mixed, "long": long, "tilde": tilde} {
+		names, _ := Sections(body)
+		if len(names) != 2 || names[0] != "a" || names[1] != "b" {
+			t.Errorf("%s: Sections names = %v, want [a b]", name, names)
+		}
+		if got := SetSection(body, "Notes", "n", false, "\n"); got != body+"\n## Notes\n\nn\n" {
+			t.Errorf("%s: SetSection saw a heading inside the fence:\n%s", name, got)
+		}
+		if got := AppendToSection(body, "Notes", "n", "\n"); got != strings.TrimRight(body, "\n")+"\n\n## Notes\nn\n" {
+			t.Errorf("%s: AppendToSection saw a heading inside the fence:\n%s", name, got)
+		}
+		if got := FirstHeading("```\n~~~\n# in\n```\n# out\n"); got != "out" {
+			t.Errorf("FirstHeading = %q, want out", got)
+		}
 	}
 }

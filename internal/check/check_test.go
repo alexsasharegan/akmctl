@@ -137,6 +137,7 @@ func TestRules(t *testing.T) {
 		{"RM3 done on the roadmap", "RM3", "E", map[string]func(string) string{rm: sub("## Later\n", "## Later\n- [261010-j9k0] Licence\n")}},
 		{"RM4 top-level not on roadmap", "RM4", "W", map[string]func(string) string{rm: sub("- [261015-c4d5] Machine-readable listings\n", "")}},
 		{"G1 missing heading", "G1", "E", map[string]func(string) string{"AGENTS.md": sub("## Rules", "## Conduct")}},
+		{"G1 heading hidden in a longer fence", "G1", "E", map[string]func(string) string{"AGENTS.md": sub("## Rules", "````\n```\n## Rules\n````")}},
 		{"G1 missing file", "G1", "E", map[string]func(string) string{"AGENTS.md": nil}},
 		{"G2 long", "G2", "W", map[string]func(string) string{"AGENTS.md": func(s string) string { return s + strings.Repeat("- x\n", 80) }}},
 		{"G3 missing script", "G3", "W", map[string]func(string) string{"AGENTS.md": sub("`akmctl check`", "`scripts/check.sh`")}},
