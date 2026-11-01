@@ -14,7 +14,7 @@ summary: Two workbench tabs on different repositories look the same in the brows
 
 ## Goal
 
-Alexander runs one akmctl ui per repository (for example the vault and the akmctl repo) and cannot tell the tabs apart: the document title is the same in each. Put the repository name in the title (the same name the header shows, from version.repository.name or GET /ui/config root), and the view in it, for example 'Board - obsidian.vaults - akmctl'. Keep it current on every route change and on a record open. If two repositories have the same folder name, add the parent folder (decide the rule and write it down).
+Alexander runs one akmctl ui per repository (for example the vault and the akmctl repo) and cannot tell the tabs apart: the document title is the same in each. Put the repository name in the title (the same name the header shows, from version.repository.name or GET /ui/config root), and the view in it, for example 'Board - notes.vaults - akmctl'. Keep it current on every route change and on a record open. If two repositories have the same folder name, add the parent folder (decide the rule and write it down).
 
 Done when:
 

@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	tasks = "Vault Notes/9 pkm/tasks"
-	adrs  = "Vault Notes/9 pkm/adr"
+	tasks = "Vault Notes/Notes/tasks"
+	adrs  = "Vault Notes/Notes/adr"
 )
 
 // filesRepo writes files (path to text) under a temp dir and loads it.

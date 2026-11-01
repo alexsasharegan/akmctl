@@ -171,7 +171,7 @@ Response: `path`, `changed` (the generated text differs from the file), `written
 Gives the path of a record by `id`, or of a note by `name`. Exactly one of the two is needed.
 
 - `id` returns `{id, type, path}`. `not_found` if no file has it; `ambiguous` if several do.
-- `name` is the target of a wikilink: a file name without `.md`, optionally with the folders it sits in (`Projects/Vault Views`). The tool looks at every Markdown file under the repository root, skipping hidden folders (`.git`, `.obsidian`, `.trash`, `.agents`) and `node_modules`, and never follows a link. The match ignores case and takes a trailing run of folders. It returns `{name, path}`, and `id` and `type` as well when the file is a record. `not_found` if no note has the name; `ambiguous` (`details.paths`) if several do. A name that is empty or holds `..` or a backslash is `invalid_request`.
+- `name` is the target of a wikilink: a file name without `.md`, optionally with the folders it sits in (`Projects/Project Notes`). The tool looks at every Markdown file under the repository root, skipping hidden folders (`.git`, `.obsidian`, `.trash`, `.agents`) and `node_modules`, and never follows a link. The match ignores case and takes a trailing run of folders. It returns `{name, path}`, and `id` and `type` as well when the file is a record. `not_found` if no note has the name; `ambiguous` (`details.paths`) if several do. A name that is empty or holds `..` or a backslash is `invalid_request`.
 
 `id` and `name` together are `invalid_request`. CLI: `akmctl find <id>` and `akmctl find --name <note>`. HTTP: `GET /find/{id}` and `GET /find?name=<note>`.
 

@@ -1,6 +1,6 @@
 # find
 
-Use it to turn an id into a file path, so you can open it or stage it by path. Read-only. `--name` does the same for a note name, the target of a wikilink such as `[[Vault Views]]`.
+Use it to turn an id into a file path, so you can open it or stage it by path. Read-only. `--name` does the same for a note name, the target of a wikilink such as `[[Project Notes]]`.
 
 ```
 $ akmctl find 261029-atxk
@@ -8,8 +8,8 @@ docs/work/261029-atxk-add-json-output.md
 ```
 
 ```
-$ akmctl find --name "Vault Views"
-Projects/Vault Views.md
+$ akmctl find --name "Project Notes"
+Projects/Project Notes.md
 ```
 
 Files changed: none.

@@ -44,7 +44,7 @@ func vaultCopy(t *testing.T, closed map[string]string) *record.Repo {
 }
 
 func TestMoveClosedOnTheVaultFixture(t *testing.T) {
-	const dir = "Deep Thought/9 pkm/tasks"
+	const dir = "Notes/tasks"
 	repo := vaultCopy(t, map[string]string{
 		"261022-e5f6-document-the-exit-codes.md": "done",
 		"261026-m1n2-explore-a-plugin-system.md": "dropped",

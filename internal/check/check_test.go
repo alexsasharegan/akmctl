@@ -247,7 +247,7 @@ func vaultRepo(t *testing.T, edits map[string]func(string) string) *record.Repo 
 }
 
 func TestCustomFolders(t *testing.T) {
-	const w = "Deep Thought/9 pkm/tasks/"
+	const w = "Notes/tasks/"
 	if res := Run(vaultRepo(t, nil), Options{AsOf: asOf}); len(res.Findings) != 0 || res.State != "current" {
 		t.Fatalf("%+v", res)
 	}
@@ -256,13 +256,13 @@ func TestCustomFolders(t *testing.T) {
 		edits      map[string]func(string) string
 		msg        string
 	}{
-		{"WK9 names the done folder", "WK9", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": sub("status: ready", "status: dropped")}, "belongs in Deep Thought/9 pkm/tasks/done/"},
+		{"WK9 names the done folder", "WK9", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": sub("status: ready", "status: dropped")}, "belongs in Notes/tasks/done/"},
 		{"WK1 for an unreadable task", "WK1", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": sub("status: ready", "status: ready\nstatus: raw")}, ""},
-		{"A1 for an unreadable ADR", "A1", map[string]func(string) string{"Deep Thought/9 pkm/adr/261012-p3q4-store-records-as-markdown-files.md": sub("status: accepted", "status: accepted\nstatus: proposed")}, ""},
-		{"A4 index in the ADR folder", "A4", map[string]func(string) string{"Deep Thought/9 pkm/adr/README.md": func(s string) string { return s + "x\n" }}, ""},
-		{"RM1 in the roadmap file", "RM1", map[string]func(string) string{"Deep Thought/9 pkm/ROADMAP.md": sub("## Later\n", "## Later\n- [261099-bbbb] Ghost\n")}, ""},
+		{"A1 for an unreadable ADR", "A1", map[string]func(string) string{"Notes/adr/261012-p3q4-store-records-as-markdown-files.md": sub("status: accepted", "status: accepted\nstatus: proposed")}, ""},
+		{"A4 index in the ADR folder", "A4", map[string]func(string) string{"Notes/adr/README.md": func(s string) string { return s + "x\n" }}, ""},
+		{"RM1 in the roadmap file", "RM1", map[string]func(string) string{"Notes/ROADMAP.md": sub("## Later\n", "## Later\n- [261099-bbbb] Ghost\n")}, ""},
 		{"L1 reaches the work folder", "L1", map[string]func(string) string{w + "261022-e5f6-document-the-exit-codes.md": func(s string) string { return s + "\n[gone](missing.md)\n" }}, ""},
-		{"S3 for a bad folder", "S3", map[string]func(string) string{"docs/.layout": sub("work_dir: Deep Thought/9 pkm/tasks", "work_dir: ../tasks")}, `".."`},
+		{"S3 for a bad folder", "S3", map[string]func(string) string{"docs/.layout": sub("work_dir: Notes/tasks", "work_dir: ../tasks")}, `".."`},
 	}
 	for _, c := range cases {
 		res := Run(vaultRepo(t, c.edits), Options{AsOf: asOf})

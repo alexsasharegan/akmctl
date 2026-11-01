@@ -14,7 +14,7 @@ summary: In the header, the WORKBENCH label and the repository name sit lower th
 
 ## Goal
 
-Reported by Alexander with two screenshots (dark theme, the akmctl repo and the obsidian.vaults repo): the small WORKBENCH label and the repository name are not vertically centered against the akmctl title and the tab row; the baselines differ. Reproduce at a few widths, find the cause (probably align-items or mixed baselines between the logo font and the label font) and fix it.
+Reported by Alexander with two screenshots (dark theme, the akmctl repo and the notes.vaults repo): the small WORKBENCH label and the repository name are not vertically centered against the akmctl title and the tab row; the baselines differ. Reproduce at a few widths, find the cause (probably align-items or mixed baselines between the logo font and the label font) and fix it.
 
 Done when:
 

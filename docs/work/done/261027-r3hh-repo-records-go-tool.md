@@ -31,7 +31,7 @@ Done when: a first release builds on the maintainer's platforms, passes the API 
 
 ## What `pkm-workbench` has today (subagent summary, 2026-10-27; read-only, code not run)
 
-A Go stdlib-only server, `pkm-wb`. It already has the same six statuses in one table, a Kanban for the first four, atomic conflict-checked writes, watch mode and a move wizard. It loads only `9 pkm/tasks/` with `type: task`; its frontmatter parser is hand-rolled, flat and string-only, so it cannot read lists (`blocked_by`, `decisions`, `scope`) or integers (`priority`). It has no `id`, `title`, `summary`, `parent`, `blocked_by`, `kind` or `priority`; it uses `created_at`, `updated_at`, `project`, `origin`, `adr`. It has no JSON listing. Views are Go code in `internal/tasks/views.go`.
+A Go stdlib-only server, `pkm-wb`. It already has the same six statuses in one table, a Kanban for the first four, atomic conflict-checked writes, watch mode and a move wizard. It loads only `Notes/tasks/` with `type: task`; its frontmatter parser is hand-rolled, flat and string-only, so it cannot read lists (`blocked_by`, `decisions`, `scope`) or integers (`priority`). It has no `id`, `title`, `summary`, `parent`, `blocked_by`, `kind` or `priority`; it uses `created_at`, `updated_at`, `project`, `origin`, `adr`. It has no JSON listing. Views are Go code in `internal/tasks/views.go`.
 
 ## Owned here (Y24, Y28, Y30)
 

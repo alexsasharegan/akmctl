@@ -513,7 +513,7 @@ def write_cases(cases, basic):
     req = dict(id="261010-j9k0", text="Late note.")
     case("log", 2, "a closed record is refused", "basic", req, err("log", req, "refused", "261010-j9k0 is closed; its sections are not edited", reason="closed"))
 
-VW, VA, VR = "Deep Thought/9 pkm/tasks", "Deep Thought/9 pkm/adr", "Deep Thought/9 pkm/ROADMAP.md"
+VW, VA, VR = "Notes/tasks", "Notes/adr", "Notes/ROADMAP.md"
 
 def relocate(p):
     for a, b in (("docs/work/", VW + "/"), ("docs/adr/", VA + "/")):
@@ -562,8 +562,8 @@ def seeded_id(date, seed, name):
     h = hashlib.sha256((seed + "\0" + name + "\0" + "0").encode()).digest()
     return date + "-" + "".join(ALPHABET[b & 31] for b in h[:4])
 
-LEGACY_TASK = "Deep Thought/9 pkm/tasks/2026-10-20 Write the docs.md"
-LEGACY_ADR = "Deep Thought/9 pkm/adr/ADR-001 Use SQLite.md"
+LEGACY_TASK = "Notes/tasks/2026-10-20 Write the docs.md"
+LEGACY_ADR = "Notes/adr/ADR-001 Use SQLite.md"
 
 def build_legacy(name):
     """A notes repository with no layout history: a manifest that names the folders, notes without ids."""
@@ -571,7 +571,7 @@ def build_legacy(name):
     shutil.rmtree(root, ignore_errors=True)
     files = {
         "AGENTS.md": AGENTS,
-        "docs/.layout": "work_dir: Deep Thought/9 pkm/tasks\nadr_dir: Deep Thought/9 pkm/adr\nroadmap: Deep Thought/9 pkm/ROADMAP.md\n",
+        "docs/.layout": "work_dir: Notes/tasks\nadr_dir: Notes/adr\nroadmap: Notes/ROADMAP.md\n",
         LEGACY_TASK: "---\ntype: task\nstatus: ready\ncreated_at: 2026-10-20\nupdated_at: 2026-10-21\n---\n# Write the docs\n\nWhy it matters.\n\n## Done when\n\n- [ ] It is written.\n",
         LEGACY_ADR: "---\nid: 1\ntype: adr\nstatus: accepted\ndate: 2026-10-01\n---\n# Use SQLite\n",
     }
@@ -581,7 +581,7 @@ def build_legacy(name):
     return files
 
 def legacy_migration():
-    T, A = "Deep Thought/9 pkm/tasks", "Deep Thought/9 pkm/adr"
+    T, A = "Notes/tasks", "Notes/adr"
     return {"from": "0.0.0", "to": "0.3.0", "steps": [
         {"id": "created", "kind": "rename_field", "class": "auto", "description": "created_at becomes created", "dir": T, "from": "created_at", "to": "created"},
         {"id": "updated", "kind": "rename_field", "class": "auto", "description": "updated_at becomes updated", "dir": T, "from": "updated_at", "to": "updated"},
@@ -598,8 +598,8 @@ def legacy_cases(case):
     req = dict(mode="plan", migrations=[mig])
     t_id = seeded_id("261020", "vault-tasks", LEGACY_TASK)
     a_id = seeded_id("261001", "vault-adrs", LEGACY_ADR)
-    t_to = "Deep Thought/9 pkm/tasks/%s-write-the-docs.md" % t_id
-    a_to = "Deep Thought/9 pkm/adr/%s-adr-001-use-sqlite.md" % a_id
+    t_to = "Notes/tasks/%s-write-the-docs.md" % t_id
+    a_to = "Notes/adr/%s-adr-001-use-sqlite.md" % a_id
     def st(id_, kind, files, **kw): return dict(id=id_, kind=kind, **{"class": "auto"}, files=files, status="pending", **kw)
     steps = [
         st("created", "rename_field", [LEGACY_TASK]), st("updated", "rename_field", [LEGACY_TASK]), st("title", "title_from_h1", [LEGACY_TASK]),

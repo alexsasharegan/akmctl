@@ -29,8 +29,8 @@
       ],
       "reference_style": "id",
       "claim_stale_hours": 24,
-      "work_dir": "Deep Thought/9 pkm/tasks",
-      "adr_dir": "Deep Thought/9 pkm/adr",
+      "work_dir": "Notes/tasks",
+      "adr_dir": "Notes/adr",
       "git_commits": false
     }
   }

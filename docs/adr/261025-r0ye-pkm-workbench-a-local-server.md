@@ -21,14 +21,14 @@ The task views in Tasks (`Tasks.base`) render only inside Obsidian, and Bases ha
 
 Build `pkm-workbench` (short names `pkm-wb`, `pkmwb`): a local server, in its own repo, that serves task views from the vault's files and writes changes back to the YAML frontmatter. The files stay the source of truth.
 
-- **Repo and stack.** `~/github.com/alexsasharegan/pkm-workbench`, outside the vault. Go, standard library only (a dependency comes in only when it earns its place, with the reason logged). Templates, CSS and JS are embedded in one binary. The UI is designed from scratch and shares no code with Vault Views.
-- **Scope.** Version 1 serves notes with `type: task` in `9 pkm/tasks/`, read per request, no file watcher.
+- **Repo and stack.** `~/github.com/alexsasharegan/pkm-workbench`, outside the vault. Go, standard library only (a dependency comes in only when it earns its place, with the reason logged). Templates, CSS and JS are embedded in one binary. The UI is designed from scratch and shares no code with Project Notes.
+- **Scope.** Version 1 serves notes with `type: task` in `Notes/tasks/`, read per request, no file watcher.
 - **Views.** The server defines its own views. `Tasks.base` stays for Obsidian. Both implement one authoritative view spec, which moves into the Tasks hub, and a check compares their lists on the same files.
 - **Writes.** Direct file writes (not the `obsidian` CLI, which needs Obsidian running). One frontmatter line is edited in place, with no YAML re-serialising. A hash of the file, taken when the page was rendered, is checked before the write, which is refused on a mismatch. The write goes through a temp file and a rename. Closing a task is the one structured edit: it requires an outcome, puts `## Outcome` above `## Log`, deletes `## Next`, and sets `status` and `updated_at`.
 - **Security.** Bind `127.0.0.1` only. A per-run token and `Origin` and `Host` checks on reads and writes. No phone access in version 1.
 - **Inbox lane.** A new task status `raw` for unrefined captures, shown as its own lane. `inbox` keeps its meaning: filed, not claimed.
 
-Rejected: parsing `.base` files and Bases formulas; the `obsidian` CLI as the write path; reusing the Vault Views kit and renderer (static pages, and Alexander dislikes its look); Node, Python or Rust; a repo shared with the Vault Views fork; a file watcher in version 1.
+Rejected: parsing `.base` files and Bases formulas; the `obsidian` CLI as the write path; reusing the Project Notes kit and renderer (static pages, and Alexander dislikes its look); Node, Python or Rust; a repo shared with the Project Notes fork; a file watcher in version 1.
 
 ## Consequences
 

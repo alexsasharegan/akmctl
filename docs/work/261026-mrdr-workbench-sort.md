@@ -2,7 +2,7 @@
 id: 261026-mrdr
 type: task
 status: ready
-project: Vault Views
+project: Project Notes
 origin: 261025-g68j
 created: 2026-10-26
 updated: 2026-10-26

@@ -13,14 +13,14 @@ func TestFindByNote(t *testing.T) {
 		os.MkdirAll(filepath.Dir(full), 0o755)
 		os.WriteFile(full, []byte(text), 0o644)
 	}
-	write("Projects/Vault Views.md", "# Vault Views\n")
+	write("Projects/Project Notes.md", "# Project Notes\n")
 	write("Projects/Other/Plan.md", "# Plan\n")
 	write("Archive/Plan.md", "# Plan\n")
 	write(".obsidian/Hidden.md", "x")
 	write("node_modules/pkg/Dep.md", "x")
 
-	resp := mustOK(t, root, "find", Request{"name": "vault views"})
-	if p, _ := resp.Get("path"); p != "Projects/Vault Views.md" {
+	resp := mustOK(t, root, "find", Request{"name": "project notes"})
+	if p, _ := resp.Get("path"); p != "Projects/Project Notes.md" {
 		t.Fatalf("path %v", p)
 	}
 	if _, has := resp.Get("id"); has {

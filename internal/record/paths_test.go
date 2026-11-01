@@ -8,7 +8,7 @@ import (
 )
 
 func TestCheckRelPath(t *testing.T) {
-	for _, ok := range []string{"docs/work", "Deep Thought/9 pkm/tasks", "tasks", "a/b/c.md", "é ü/x"} {
+	for _, ok := range []string{"docs/work", "Notes/tasks", "tasks", "a/b/c.md", "é ü/x"} {
 		if err := CheckRelPath(ok); err != nil {
 			t.Errorf("%q: %v", ok, err)
 		}
@@ -42,14 +42,14 @@ func TestLoadCustomFolders(t *testing.T) {
 	if len(r.Problems) != 0 {
 		t.Fatalf("problems %v", r.Problems)
 	}
-	if r.WorkDir() != "Deep Thought/9 pkm/tasks" || r.ADRDir() != "Deep Thought/9 pkm/adr" || r.RoadmapPath() != "Deep Thought/9 pkm/ROADMAP.md" {
+	if r.WorkDir() != "Notes/tasks" || r.ADRDir() != "Notes/adr" || r.RoadmapPath() != "Notes/ROADMAP.md" {
 		t.Fatalf("%s %s %s", r.WorkDir(), r.ADRDir(), r.RoadmapPath())
 	}
 	if len(r.Records) != 8 {
 		t.Fatalf("%d records", len(r.Records))
 	}
 	rec := r.ByID("261010-j9k0")[0]
-	if rec.Path != "Deep Thought/9 pkm/tasks/done/261010-j9k0-choose-a-licence.md" || !r.IsDone(rec.Path) {
+	if rec.Path != "Notes/tasks/done/261010-j9k0-choose-a-licence.md" || !r.IsDone(rec.Path) {
 		t.Fatalf("done item at %s", rec.Path)
 	}
 	if len(r.Roadmap) != 2 || r.Roadmap[0] != "261015-c4d5" {

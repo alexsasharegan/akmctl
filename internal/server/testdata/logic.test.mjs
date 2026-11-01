@@ -363,18 +363,18 @@ assert.equal(L.obsidianUrl({ root: "" }, "a.md"), "");
 console.log("ok");
 
 // the repository's folders come from version.repository, with the defaults when it names none
-assert.deepEqual(L.foldersFrom({ repository: { work_dir: "Deep Thought/9 pkm/tasks", adr_dir: "Deep Thought/9 pkm/adr" } }), { work_dir: "Deep Thought/9 pkm/tasks", adr_dir: "Deep Thought/9 pkm/adr" });
+assert.deepEqual(L.foldersFrom({ repository: { work_dir: "Notes/tasks", adr_dir: "Notes/adr" } }), { work_dir: "Notes/tasks", adr_dir: "Notes/adr" });
 assert.deepEqual(L.foldersFrom({ repository: null }), L.DEFAULT_FOLDERS);
 assert.deepEqual(L.foldersFrom(undefined), { work_dir: "docs/work", adr_dir: "docs/adr" });
 assert.deepEqual(L.foldersFrom({ repository: { work_dir: "", adr_dir: 5 } }), L.DEFAULT_FOLDERS);
-assert.equal(C.fileNote("Deep Thought/9 pkm/tasks", "call-plumber"), "File: Deep Thought/9 pkm/tasks/<id>-call-plumber.md");
+assert.equal(C.fileNote("Notes/tasks", "call-plumber"), "File: Notes/tasks/<id>-call-plumber.md");
 assert.equal(C.fileNote("docs/work", ""), "");
-assert.match(M.opLabel({ kind: "close", status: "done", outcome: "x" }, "i", { work_dir: "Deep Thought/9 pkm/tasks" }), /move the file to Deep Thought\/9 pkm\/tasks\/done\/$/);
+assert.match(M.opLabel({ kind: "close", status: "done", outcome: "x" }, "i", { work_dir: "Notes/tasks" }), /move the file to Notes\/tasks\/done\/$/);
 assert.match(M.opLabel({ kind: "close", status: "dropped" }, "i"), /move the file to docs\/work\/done\/$/);
 
 // page title: the repository's folder name, with the parent folder when another root shares it
 assert.equal(L.repoLabel("/Users/me/github.com/alexsasharegan/akmctl"), "akmctl");
-assert.equal(L.repoLabel("C:\\Users\\me\\obsidian.vaults\\"), "obsidian.vaults");
+assert.equal(L.repoLabel("C:\\Users\\me\\notes.vaults\\"), "notes.vaults");
 assert.equal(L.repoLabel("/home/me/work/docs", ["/home/me/play/docs"]), "work/docs");
 assert.equal(L.repoLabel("/home/me/work/docs", ["/home/me/work/docs"]), "docs");
 assert.equal(L.repoLabel("/home/me/work/docs", ["/home/me/play/akmctl"]), "docs");
@@ -459,36 +459,36 @@ assert.equal(L.pageTitle({ view: "ADRs" }), "ADRs - akmctl");
 }
 
 // project filter
-assert.equal(L.projectTarget('[[Vault Views]]'), "Vault Views");
-assert.equal(L.projectTarget("[[AEI Fabrication|AEI]]"), "AEI Fabrication");
+assert.equal(L.projectTarget('[[Project Notes]]'), "Project Notes");
+assert.equal(L.projectTarget("[[Acme Fabrication|Acme]]"), "Acme Fabrication");
 assert.equal(L.projectTarget("[[Notes#Plan]]"), "Notes");
 assert.equal(L.projectTarget("  plain  "), "plain");
 assert.equal(L.projectTarget(null), "");
 assert.equal(L.projectTarget("[[]]"), "");
 {
-  const rs = [work("a", { project: "[[AEI Fabrication]]" }), work("b", { project: "[[AEI Fabrication|AEI]]" }), work("c", { project: "[[Vault Views]]" }), work("d", {}), adr("z", {})];
+  const rs = [work("a", { project: "[[Acme Fabrication]]" }), work("b", { project: "[[Acme Fabrication|Acme]]" }), work("c", { project: "[[Project Notes]]" }), work("d", {}), adr("z", {})];
   const c = L.projectCounts(rs);
-  assert.deepEqual(c.list, [{ target: "AEI Fabrication", count: 2 }, { target: "Vault Views", count: 1 }]);
+  assert.deepEqual(c.list, [{ target: "Acme Fabrication", count: 2 }, { target: "Project Notes", count: 1 }]);
   assert.equal(c.none, 1);
   assert.equal(L.hasProjects(rs), true);
   assert.equal(L.hasProjects([work("d", {}), adr("z", {})]), false);
   assert.deepEqual(L.filterByProject(rs, null), rs);
-  assert.deepEqual(L.filterByProject(rs, "AEI Fabrication").map((r) => r.id), ["a", "b", "z"]);
+  assert.deepEqual(L.filterByProject(rs, "Acme Fabrication").map((r) => r.id), ["a", "b", "z"]);
   assert.deepEqual(L.filterByProject(rs, L.NO_PROJECT).map((r) => r.id), ["d", "z"]);
   assert.deepEqual(L.filterByProject(rs, "Nope").map((r) => r.id), ["z"]);
 }
-assert.equal(L.projectFromHash("#/board?project=Vault%20Views"), "Vault Views");
+assert.equal(L.projectFromHash("#/board?project=Project%20Notes"), "Project Notes");
 assert.equal(L.projectFromHash("#/board"), null);
 assert.equal(L.projectFromHash("#/board?project="), null);
 assert.equal(L.projectFromHash("#/tables/blocked?project=~"), "~");
-assert.equal(L.withProject("#/board", "Vault Views"), "#/board?project=Vault%20Views");
+assert.equal(L.withProject("#/board", "Project Notes"), "#/board?project=Project%20Notes");
 assert.equal(L.withProject("#/board?project=x", null), "#/board");
 assert.deepEqual(L.parseRoute("#/tables/blocked?project=x"), { name: "tables", table: "blocked" });
 assert.deepEqual(L.parseRoute("#/record/261020-a2b3?project=x"), { name: "record", id: "261020-a2b3" });
 
 // wikilinks in field values
-assert.deepEqual(L.wikilinkParts("[[Vault Views]]"), { target: "Vault Views", alias: "", heading: "" });
-assert.deepEqual(L.wikilinkParts("[[AEI Fabrication|AEI]]"), { target: "AEI Fabrication", alias: "AEI", heading: "" });
+assert.deepEqual(L.wikilinkParts("[[Project Notes]]"), { target: "Project Notes", alias: "", heading: "" });
+assert.deepEqual(L.wikilinkParts("[[Acme Fabrication|Acme]]"), { target: "Acme Fabrication", alias: "Acme", heading: "" });
 assert.deepEqual(L.wikilinkParts("[[Notes#Plan|the plan]]"), { target: "Notes", alias: "the plan", heading: "Plan" });
 assert.deepEqual(L.wikilinkParts(" [[261025-g68j-build-pkm-workbench]] "), { target: "261025-g68j-build-pkm-workbench", alias: "", heading: "" });
 assert.equal(L.wikilinkParts("see [[A]]"), null);

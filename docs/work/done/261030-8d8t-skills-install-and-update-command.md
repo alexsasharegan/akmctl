@@ -37,7 +37,7 @@ Only the last check remains: run `akmctl skills install` in the maintainer's vau
 
 ## Outcome
 
-akmctl skills status|install|update ships (ADR 261030-h6t7), with a marker per skill folder and one code path shared with init and config git-commits. Verified in the maintainer's Obsidian vault: install wrote 28 files, status was clean, and akmctl check was unchanged (0 errors, 128 warnings). That vault's task 261030-wf9z (outside this repository, in the vault under 9 pkm/tasks/done/) then retired its task-lifecycle skill for akm-track-work. Not exercised on a real folder: the akm-work-items rename (the vault never had it), covered by API tests. One follow-up fix came from the vault run: the text output now says whether a plan was applied.
+akmctl skills status|install|update ships (ADR 261030-h6t7), with a marker per skill folder and one code path shared with init and config git-commits. Verified in the maintainer's Obsidian vault: install wrote 28 files, status was clean, and akmctl check was unchanged (0 errors, 128 warnings). That vault's task 261030-wf9z (outside this repository, in the vault under Notes/tasks/done/) then retired its task-lifecycle skill for akm-track-work. Not exercised on a real folder: the akm-work-items rename (the vault never had it), covered by API tests. One follow-up fix came from the vault run: the text output now says whether a plan was applied.
 
 ## Log
 

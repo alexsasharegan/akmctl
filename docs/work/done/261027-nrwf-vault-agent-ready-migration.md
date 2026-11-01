@@ -19,8 +19,8 @@ Alexander expects to dogfood the agent-ready layout in the vault, which needs a 
 Known differences, from [agent-ready-repo-spec](../../spec/agent-ready-repo-spec.md):
 
 - The vault's task notes use `created_at`, `updated_at`, `project`, `origin` and `adr`, are named `YYYY-MM-DD slug`, and carry no `id`. The layout uses `created`, `updated`, `parent`, `decisions`, `YYMMDD-xxxx` ids and `blocked_by`.
-- The vault is a notes repository, not a code repository, so `docs/work/` and `docs/adr/` would map to `Deep Thought/9 pkm/tasks/` and `adr/`.
-- The workbench loads only `9 pkm/tasks/` with `type: task` and cannot read lists or integers today.
+- The vault is a notes repository, not a code repository, so `docs/work/` and `docs/adr/` would map to `Notes/tasks/` and `adr/`.
+- The workbench loads only `Notes/tasks/` with `type: task` and cannot read lists or integers today.
 
 Done when: a mapping from the vault's fields and folders to the layout is written, a migration plan is agreed with Alexander, and the workbench changes it needs are listed.
 

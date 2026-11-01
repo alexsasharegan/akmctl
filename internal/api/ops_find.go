@@ -45,7 +45,7 @@ func skipDir(name string) bool { return strings.HasPrefix(name, ".") || name == 
 
 // findNote finds the Markdown file for a note name the way a wikilink names
 // it: the file name without .md, in any folder, with the folders it gives as a
-// trailing path ("Projects/Vault Views"). The match ignores case. Links are not
+// trailing path ("Projects/Project Notes"). The match ignores case. Links are not
 // followed. No match is not_found; several are ambiguous.
 func findNote(repo *record.Repo, name string) (string, *Error) {
 	want := strings.ToLower(strings.TrimSuffix(strings.Trim(strings.TrimSpace(name), "/"), ".md"))

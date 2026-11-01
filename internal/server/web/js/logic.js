@@ -335,7 +335,7 @@ export function filterByProject(records, sel) {
   });
 }
 
-/** The project in a hash such as "#/board?project=Vault%20Views", or null. */
+/** The project in a hash such as "#/board?project=Project%20Notes", or null. */
 export function projectFromHash(hash) {
   const q = String(hash || "").split("?")[1];
   if (q === undefined) return null;

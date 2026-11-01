@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	vWork = "Deep Thought/9 pkm/tasks"
-	vADR  = "Deep Thought/9 pkm/adr"
+	vWork = "Notes/tasks"
+	vADR  = "Notes/adr"
 )
 
 func TestVersionReportsFolders(t *testing.T) {
@@ -35,7 +35,7 @@ func TestWritesFollowTheManifestFolders(t *testing.T) {
 	// new work and new adr land in their folders
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "add-a-thing", "as_of": "2026-10-28"})
 	p, _ := resp.Get("path")
-	if !regexp.MustCompile(`^Deep Thought/9 pkm/tasks/261028-[0-9a-hjkmnp-tv-z]{4}-add-a-thing\.md$`).MatchString(p.(string)) {
+	if !regexp.MustCompile(`^Notes/tasks/261028-[0-9a-hjkmnp-tv-z]{4}-add-a-thing\.md$`).MatchString(p.(string)) {
 		t.Fatalf("work path %v", p)
 	}
 	resp = mustOK(t, root, "new", Request{"kind": "adr", "slug": "use-sqlite", "as_of": "2026-10-28"})

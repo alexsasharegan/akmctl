@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	oTasks = "Notes Vault/9 pkm/tasks"
-	oADR   = "Notes Vault/9 pkm/adr"
+	oTasks = "Notes Vault/Notes/tasks"
+	oADR   = "Notes Vault/Notes/adr"
 )
 
 // legacyRepo is a notes repository with no layout history: a manifest that

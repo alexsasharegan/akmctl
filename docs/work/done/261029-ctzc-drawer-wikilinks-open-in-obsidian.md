@@ -7,14 +7,14 @@ updated: 2026-10-31
 closed: 2026-10-31
 kind: feature
 priority: 2
-summary: project and origin hold wikilinks such as Vault Views; show them as links that open the target in Obsidian.
+summary: project and origin hold wikilinks such as Project Notes; show them as links that open the target in Obsidian.
 ---
 
 # Make wikilinks in drawer fields clickable and open them in Obsidian
 
 ## Goal
 
-In the drawer, project: `[[Vault Views]]` and origin: `[[261025-g68j-build-pkm-workbench]]` are plain text. Parse a quoted wikilink (with or without an alias, in a field or inside a list) and render it as a link. Clicking opens the target note in Obsidian, the same action as Open in Obsidian. If the target is an AKM record, offer to open it in the workbench drawer instead (open question: which is the default; Alexander asked for the Obsidian open first).
+In the drawer, project: `[[Project Notes]]` and origin: `[[261025-g68j-build-pkm-workbench]]` are plain text. Parse a quoted wikilink (with or without an alias, in a field or inside a list) and render it as a link. Clicking opens the target note in Obsidian, the same action as Open in Obsidian. If the target is an AKM record, offer to open it in the workbench drawer instead (open question: which is the default; Alexander asked for the Obsidian open first).
 
 Done when:
 
