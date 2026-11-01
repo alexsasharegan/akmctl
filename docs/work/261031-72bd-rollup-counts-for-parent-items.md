@@ -1,7 +1,7 @@
 ---
 id: "261031-72bd"
 title: rollup counts for parent items
-status: raw
+status: ready
 created: 2026-10-31
 updated: 2026-11-01
 summary: Children done / total, direct and transitive, in show, ls --tree and the API
