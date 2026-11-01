@@ -268,3 +268,25 @@ func TestRepoInsideARepositoryIsRefused(t *testing.T) {
 		t.Fatalf("no ancestor: %s", out.String())
 	}
 }
+
+func TestEveryCommandHasHelp(t *testing.T) {
+	for _, op := range commandNames() {
+		for _, args := range [][]string{{op, "--help"}, {"help", op}} {
+			var out, errb bytes.Buffer
+			if code := Run(args, &out, &errb, "."); code != 0 {
+				t.Errorf("%v: exit %d, stderr %q", args, code, errb.String())
+			}
+			ex := examples[op]
+			if !strings.HasPrefix(ex, "akmctl "+op) || !strings.Contains(out.String(), ex) || !strings.Contains(out.String(), "usage: akmctl "+op) {
+				t.Errorf("%v: missing usage or example %q in %q", args, ex, out.String())
+			}
+		}
+	}
+}
+
+func TestHelpForAnUnknownCommandFails(t *testing.T) {
+	var out, errb bytes.Buffer
+	if code := Run([]string{"help", "nope"}, &out, &errb, "."); code != 2 || !strings.Contains(errb.String(), "unknown command") {
+		t.Fatalf("code %d, stderr %q", code, errb.String())
+	}
+}

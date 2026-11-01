@@ -16,15 +16,18 @@ claimed_at: 2026-11-01T21:41
 
 Hit twice in the session of spike 261101-baze (`akmctl new work x --help`, `akmctl set --help`): `akmctl: invalid_request: unknown parameter "help"`. An agent or newcomer reaches for `--help` first. Done when:
 
-- [ ] `<command> --help` and `akmctl help <command>` print that command's flags and one example, and exit 0.
-- [ ] A test covers every command, so a new command without usage text fails it.
+- [x] `<command> --help` and `akmctl help <command>` print that command's flags and one example, and exit 0.
+- [x] A test covers every command, so a new command without usage text fails it.
 
 ## Next
 
-Find where commands parse flags in `cmd/akmctl`, add a per-command usage table and the `--help` / `help <command>` path, then the every-command test.
+Done; close after Alexander's review.
 
 ## Log
 
 - 2026-11-01: filed.
 - 2026-11-01 10:31-07:00: Filed from spike 261101-baze (found by the maintainer's new rule: every akmctl failure is filed).
 - 2026-11-01 14:41-07:00: claimed (claude).
+- 2026-11-01 15:09-07:00: ticked "`<command> --help` and `akmctl help <command>` print that command's flags and one example, and exit 0.": akmctl close --help, set -h, ui --help and help <command> print flags and an example, exit 0 (TestEveryCommandHasHelp)
+- 2026-11-01 15:09-07:00: ticked "A test covers every command, so a new command without usage text fails it.": TestEveryCommandHasHelp fails for a command with no example
+- 2026-11-01 15:09-07:00: Added internal/cli/help.go: --help, -h and help <command> print flags (from the API parameter table) and an example; TestEveryCommandHasHelp covers every command.
