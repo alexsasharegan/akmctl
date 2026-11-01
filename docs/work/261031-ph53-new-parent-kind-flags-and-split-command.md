@@ -5,6 +5,7 @@ status: raw
 created: 2026-10-31
 updated: 2026-11-01
 summary: CLI new takes --parent and --kind; split creates several children of an item
+parent: 261101-t8h8
 ---
 
 # new parent kind flags and split command

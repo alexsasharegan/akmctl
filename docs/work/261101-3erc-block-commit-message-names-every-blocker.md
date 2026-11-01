@@ -6,6 +6,7 @@ created: 2026-11-01
 updated: 2026-11-01
 kind: bug
 summary: The block step's commit message names only the first blocked_by entry, so a three-blocker item reads as blocked on one
+parent: 261101-t8h8
 ---
 
 # block commit message names every blocker
