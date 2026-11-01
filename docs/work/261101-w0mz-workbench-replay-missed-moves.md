@@ -7,8 +7,6 @@ created: 2026-11-01
 updated: 2026-11-01
 kind: feature
 priority: 1
-claimed_by: codex
-claimed_at: 2026-11-01T23:35
 ---
 
 # workbench replay missed moves
@@ -34,9 +32,12 @@ Done when:
 
 ## Next
 
-Drive the board in the browser with moves made from the shell while the tab is hidden, and write the gap list.
+The current `pollWork` listing exposes only each work item’s latest status, path and etag, so it cannot reconstruct several moves while the tab is hidden. Decide whether the API needs to expose move history; read `internal/server/web/js/live.js`, `internal/server/web/js/anim.js` and `internal/server/web/js/store.js`, then drive the board in a browser to document current behavior.
 
 ## Log
 
 - 2026-11-01: filed from Alexander's note: the away-and-agent moves matter more than the wish-list polish.
 - 2026-11-01 16:35-07:00: claimed (codex).
+- 2026-11-01 16:36-07:00: released (codex).
+- 2026-11-01 16:36-07:00: confirmed pollWork carries only the latest status, path and etag
+- 2026-11-01 16:36-07:00: confirmed pollWork carries only the latest status, path and etag; the API has no replay history
