@@ -28,7 +28,7 @@ Not in this item: typed Goal, Next and Log parsing and splice edits (261031-j4bc
 
 ## Next
 
-Checkpoint, not finished. Built and passing: `internal/body` (body.go, scanner.go; tests body_test.go, oracle_test.go, battery_test.go), goldmark v1.8.7 in `go.mod` (tests only; `go list -deps ./cmd/akmctl` has no goldmark), the docs/architecture.md row and three glossary rows. All 125+ records are located and none refused; the seeded generator (30,000 documents) has 0 confident errors.
+Checkpoint. The 300-second fuzz run after the last fix was clean (PASS, no new findings), so step (1) below is done; steps (2) and (3) remain. Built and passing: `internal/body` (body.go, scanner.go; tests body_test.go, oracle_test.go, battery_test.go), goldmark v1.8.7 in `go.mod` (tests only; `go list -deps ./cmd/akmctl` has no goldmark), the docs/architecture.md row and three glossary rows. All 125+ records are located and none refused; the seeded generator (30,000 documents) has 0 confident errors.
 
 Left: (1) a clean fuzz run: `go test ./internal/body -run '^$' -fuzz=FuzzAgainstOracle -fuzztime=300s`. Each failure it finds is saved under `internal/body/testdata/fuzz/` (keep them; they run as ordinary tests); fix it by adding a refusal to scanner.go plus a row in `TestRefusals`, never by loosening the comparison. The last finds were goldmark task-box quirks in ordered and nested lists and table delimiter lookalikes. (2) Then `go vet ./... && go test ./...`, `/tmp/akmctl check`, `npm run format:check`, tick the Done-when boxes, and `close` with an Outcome (include the fuzz finding rate). (3) Then 261031-2j14 (move `SetSection` onto `body`) and 261031-j4bc (typed layer, splice edits).
 
@@ -38,3 +38,4 @@ Left: (1) a clean fuzz run: `go test ./internal/body -run '^$' -fuzz=FuzzAgainst
 - 2026-10-31: claimed (claude).
 - 2026-10-31: made ready and claimed to build it.
 - 2026-10-31: built `internal/body` (Locate, scanner, UnsupportedError), goldmark v1.8.7 as a test-only dependency, the oracle adapter, the battery over the records and hostile cases, a seeded generator and `FuzzAgainstOracle`; each fuzz finding became a refusal and a unit test.
+- 2026-10-31: a 300-second `FuzzAgainstOracle` run passed with no new findings after the table-delimiter refusal.
