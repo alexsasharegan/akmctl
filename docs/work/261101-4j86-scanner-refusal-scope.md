@@ -1,12 +1,14 @@
 ---
 id: "261101-4j86"
 title: "scanner refusals: structural or local, and fewer of them"
-status: raw
+status: active
 created: 2026-11-01
 updated: 2026-11-01
 kind: feature
 parent: 261031-gtw6
 summary: Locate reports each refusal as structural or local, and claims blockquote and indented code as opaque blocks, so writes refuse less; per ADR 261101-tr8e
+claimed_by: claude
+claimed_at: 2026-11-01T07:41
 ---
 
 # scanner refusals: structural or local, and fewer of them
@@ -29,3 +31,4 @@ Not started. Read ADR 261101-tr8e (Decision, 'Fail closed, narrowly'), internal/
 - 2026-11-01: filed.
 - 2026-11-01: filed after Alexander asked why a blockquote anywhere should block a tick.
 - 2026-11-01: census on the maintainer's vault added to the Goal; ADR 261101-tr8e gained its principles and the 5% threshold (to be set by Alexander).
+- 2026-11-01: claimed (claude).
