@@ -172,6 +172,7 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 			// with Obsidian, and claiming it as a task means numbering ordered boxes in
 			// the checklist, a model change for two vault items in sections no write
 			// touches. A local refusal only stops writes to a section that holds one.
+			// The maintainer wants ordered task lists: work item 261101-wder claims them.
 			if refuse("ordered-list task") {
 				return Layout{}, refusal
 			}
