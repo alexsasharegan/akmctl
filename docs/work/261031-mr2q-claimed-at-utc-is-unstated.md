@@ -3,9 +3,10 @@ id: "261031-mr2q"
 title: claimed_at is UTC but nothing an agent reads says so
 status: raw
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 kind: chore
 summary: claimed_at is UTC, stated in the spec but not in the guide or skills agents read; fix by documenting it, with a Z suffix recorded as the alternative
+decisions: [261029-5pe1, 261101-gw7b]
 ---
 
 # claimed_at is UTC but nothing an agent reads says so
@@ -13,6 +14,7 @@ summary: claimed_at is UTC, stated in the spec but not in the guide or skills ag
 ## Goal
 
 `claimed_at` is a UTC timestamp (`YYYY-MM-DDTHH:MM`, no `Z` or offset), while `created`, `updated` and Log dates are the writer's local calendar day. The UTC rule is stated in the spec (`agent-ready-repo-spec.md`, `akm-api-spec.md`), the glossary, the CHANGELOG and a comment in `internal/api/ops_write.go`, but not in `docs/spec/akm-guide.md`, `.agents/skills/akm/references/claim.md`, the `akm` or `akm-track-work` skills, or ADR 261028-mnc0. An agent that reads only the skills sees a bare time beside local dates; on 2026-10-31 one took `claimed_at: 2026-11-01T05:02` (22:02 local, MST) for a clock error. The tool itself is consistent: it writes and compares in UTC, so the 24-hour staleness rule is unaffected. The risk is to readers.
+Read first: ADR 261029-5pe1 (the date and time conventions this documents) and the proposed ADR 261101-gw7b, which adds a third convention (Log lines carry local time with an offset). The wording written here should fit the table in that ADR; the `claimed_at` rule itself does not change.
 
 ## Options
 
