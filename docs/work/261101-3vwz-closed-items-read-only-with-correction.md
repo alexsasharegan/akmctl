@@ -2,7 +2,7 @@
 id: "261101-3vwz"
 title: closed items read only with correction
 summary: "set and section refuse a closed work item unless the call carries a correction reason, which is written to the Log in the same write (ADR 261101-dxcn)"
-status: raw
+status: ready
 kind: feature
 parent: "261031-gtw6"
 created: 2026-11-01

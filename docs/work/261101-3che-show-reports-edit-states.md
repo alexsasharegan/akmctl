@@ -2,7 +2,7 @@
 id: "261101-3che"
 title: show reports edit states
 summary: "A record read carries an edit state (yes, warn, no, with a reason) for each field and section, so the drawer draws controls from the tool's rules"
-status: raw
+status: ready
 kind: feature
 parent: "261031-gtw6"
 blocked_by: ["261101-3vwz"]

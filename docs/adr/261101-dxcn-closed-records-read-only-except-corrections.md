@@ -2,7 +2,7 @@
 id: "261101-dxcn"
 title: Closed work items are read-only except through a logged correction
 summary: "set and section refuse a closed work item unless the call carries a correction reason, written to the Log in the same write; keep is always editable"
-status: proposed
+status: accepted
 date: 2026-11-01
 scope: [internal/api]
 ---
