@@ -24,7 +24,7 @@
       "type": "work",
       "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
       "id_date": "2026-10-20",
-      "etag": "b31236f6ee03e09b",
+      "etag": "16e7c0aededa652c",
       "fields": {
         "id": "261020-a2b3",
         "title": "Add JSON output to ls",
@@ -110,7 +110,7 @@
           "lines": [
             {
               "op": "ctx",
-              "text": "- [ ] It is done.",
+              "text": "- [x] It is done.",
               "old": 17,
               "new": 17
             },
@@ -174,6 +174,6 @@
     }
   },
   "would_be": {
-    "docs/work/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: active\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the decoder test.\n\n## Log\n- 2026-10-20: started.\n"
+    "docs/work/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: active\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [x] It is done.\n\n## Next\nWrite the decoder test.\n\n## Log\n- 2026-10-20: started.\n"
   }
 }

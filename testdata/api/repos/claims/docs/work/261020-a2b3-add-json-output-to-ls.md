@@ -16,7 +16,7 @@ claimed_at: 2026-10-28T08:00
 ## Goal
 Do the thing.
 
-- [ ] It is done.
+- [x] It is done.
 
 ## Next
 Write the encoder test.

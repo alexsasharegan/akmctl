@@ -15,7 +15,7 @@ updated: 2026-10-27
 ## Goal
 Do the thing.
 
-- [ ] It is done.
+- [x] It is done.
 
 ## Next
 Write the encoder test.

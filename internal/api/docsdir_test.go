@@ -74,7 +74,7 @@ func TestCustomDocsDirEndToEnd(t *testing.T) {
 	if p, _ := rec.(Obj).Get("path"); !strings.HasPrefix(p.(string), "knowledge/work/") {
 		t.Errorf("path %v", p)
 	}
-	callOK(t, base, "section", Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [ ] it works"})
+	callOK(t, base, "section", Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [x] it works"})
 	callOK(t, base, "set", Request{"id": id, "changes": map[string]any{"status": "ready"}})
 	callOK(t, base, "claim", Request{"id": id, "as": "agent"})
 	if !exists(base, "knowledge/.akm.lock") {

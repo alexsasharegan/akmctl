@@ -33,10 +33,11 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 
 ## Close
 
-1. Write `## Outcome`: for each "done when" line, the test, command or file that proves it (for `dropped`, the reason).
-2. Ask whether the work made a choice that is hard to reverse or that rejected a real alternative. If yes, draft an ADR with `akm-record-decision` (or find the one that already records it) and list its id in the item's `decisions` field. If no, end the Outcome with `Decision: none`. The tool does not check this; the answer is yours to give.
-3. `akmctl close <id> done` (or `dropped`). It sets the status and `closed` (today), moves the file to `docs/work/done/` and refuses an empty Outcome.
-4. Read the list of open items it prints (`dependents`): they named this item in `blocked_by`. For each, unblock it (`set status=ready`, and remove the entry from `blocked_by`) or re-point `blocked_by` at what it still waits on. The tool lists them and edits none.
-5. `close` also rewrote the Markdown links the move breaks, and listed those files; do not fix links by hand unless it reports `link_errors`. Run `akmctl check`. Commit with the message `close` printed, staging its `paths`, the work and any roadmap change with it.
+1. Tick each "done when" box as its proof lands: `akmctl tick <id> <n> --evidence "<test or file>"`. `close done` refuses an empty box; if a box no longer applies, rewrite the Goal with `section` and say why in the Outcome.
+2. Write `## Outcome`: for each "done when" line, the test, command or file that proves it (for `dropped`, the reason).
+3. Ask whether the work made a choice that is hard to reverse or that rejected a real alternative. If yes, draft an ADR with `akm-record-decision` (or find the one that already records it) and list its id in the item's `decisions` field. If no, end the Outcome with `Decision: none`. The tool does not check this; the answer is yours to give.
+4. `akmctl close <id> done` (or `dropped`). It sets the status and `closed` (today), moves the file to `docs/work/done/` and refuses an empty Outcome.
+5. Read the list of open items it prints (`dependents`): they named this item in `blocked_by`. For each, unblock it (`set status=ready`, and remove the entry from `blocked_by`) or re-point `blocked_by` at what it still waits on. The tool lists them and edits none.
+6. `close` also rewrote the Markdown links the move breaks, and listed those files; do not fix links by hand unless it reports `link_errors`. Run `akmctl check`. Commit with the message `close` printed, staging its `paths`, the work and any roadmap change with it.
 
 The template for a new item is `assets/work-item.md` (for use without the tool).

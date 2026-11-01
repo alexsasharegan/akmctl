@@ -793,6 +793,11 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 			}
 		}
 	}
+	if status == "done" {
+		if rerr := uncheckedGoal(e); rerr != nil {
+			return nil, rerr
+		}
+	}
 	if serr := e.doc.Set("status", frontmatter.NewString(status)); serr != nil {
 		return nil, unreadable(serr)
 	}
@@ -1062,6 +1067,31 @@ func staleSection(tr *mdbody.Tree, sec mdbody.Section) *Error {
 	return &Error{"stale", "the " + strings.ToLower(sec.Name) + " section changed since it was read", O("section_etag", tr.Etag(sec))}
 }
 
+// uncheckedGoal refuses `close done` while the Goal holds an empty box: the
+// criteria are not met, or the box is stale and the Goal should say so. A body
+// the tree cannot read is not checked (the check needs the Goal's lines).
+func uncheckedGoal(e *edit) *Error {
+	tr, err := mdbody.Split([]byte(e.text))
+	if err != nil {
+		return nil
+	}
+	items, err := tr.Unchecked("goal")
+	if err != nil || len(items) == 0 {
+		return nil
+	}
+	var rows []any
+	var msg []string
+	for _, it := range items {
+		row := O("line", it.Line, "text", it.Text)
+		if it.Pos > 0 {
+			row = append(row, KV{"position", it.Pos})
+		}
+		rows = append(rows, row)
+		msg = append(msg, fmt.Sprintf("line %d %q", it.Line, it.Text))
+	}
+	return &Error{"refused", fmt.Sprintf("%s has unchecked boxes in its Goal: %s; tick each with evidence (tick --evidence), change the Goal with section, or close it dropped", e.rec.ID, strings.Join(msg, ", ")), O("reason", "unchecked_goal", "items", rows)}
+}
+
 func opTick(repo *record.Repo, q Request) (Obj, *Error) {
 	name := strings.TrimSpace(q.str("section"))
 	if name == "" {
@@ -1097,6 +1127,35 @@ func opTick(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, &Error{Code: "not_found", Message: fmt.Sprintf("%s has no item %d in its %s checklist", e.rec.ID, pos, strings.ToLower(name))}
 	case terr != nil:
 		return nil, unsupportedBody(e, terr)
+	}
+	if ev := strings.Join(strings.Fields(q.str("evidence")), " "); q.str("evidence") != "" {
+		if ev == "" || strings.ContainsAny(q.str("evidence"), "\r\n") {
+			return nil, invalid("evidence", "evidence must be one non-empty line")
+		}
+		items, _ := tr.Checklist(name)
+		verb := "ticked"
+		if !done {
+			verb = "unticked"
+		}
+		now := clock(q)
+		line := fmt.Sprintf("%s \"%s\": %s", verb, items[pos-1].Text, ev)
+		var aerr error
+		if otr, serr := mdbody.Split(out); serr != nil {
+			aerr = serr
+		} else if _, has := otr.Section("log"); has {
+			var b []byte
+			if b, aerr = otr.WithEOL(e.eol).AppendLog(logStamp(q, now), line); aerr == nil {
+				out = b
+			}
+		} else {
+			var s string
+			if s, aerr = record.AppendToSection(string(out), "log", "- "+logStamp(q, now)+": "+line, e.eol); aerr == nil {
+				out = []byte(s)
+			}
+		}
+		if aerr != nil {
+			return nil, unsupportedBody(e, aerr)
+		}
 	}
 	return finishBodyEdit(repo, q, e, string(out), name, func(rec *record.Record) Obj {
 		items, _ := mustSplit(rec.Body).Checklist(name)

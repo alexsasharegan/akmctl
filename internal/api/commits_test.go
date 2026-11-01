@@ -69,6 +69,7 @@ func TestCommitsAcceptsTheToolsOwnMessages(t *testing.T) {
 	commitWith(t, root, mustOK(t, root, "release", Request{"id": "261022-e5f6", "as_of": "2026-10-28"}), nil)
 	commitWith(t, root, mustOK(t, root, "set", Request{"id": "261022-e5f6", "changes": map[string]any{"status": "ready"}, "as_of": "2026-10-28"}), nil)
 	commitWith(t, root, mustOK(t, root, "new", Request{"kind": "work", "slug": "frob", "as_of": "2026-10-28"}), nil)
+	mustOK(t, root, "tick", Request{"id": "261022-e5f6", "item": 1, "as_of": "2026-10-28"})
 	commitWith(t, root, mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "done", "outcome": "Done.", "as_of": "2026-10-28"}), nil)
 	clean, problems, checked, skipped := commitsReport(t, root)
 	if !clean || len(problems) != 0 || checked != 5 || skipped != 1 {
@@ -99,6 +100,7 @@ func TestCommitsFlagsWhatDoesNotAgree(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			root := commitsRepo(t, "closable")
+			mustOK(t, root, "tick", Request{"id": "261022-e5f6", "item": 1, "as_of": "2026-10-28"})
 			commitWith(t, root, mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "done", "outcome": "Done.", "as_of": "2026-10-28"}), c.edit)
 			clean, problems, _, _ := commitsReport(t, root)
 			if clean || !has(problems, c.want) {

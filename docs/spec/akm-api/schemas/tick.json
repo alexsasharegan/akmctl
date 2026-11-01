@@ -12,6 +12,10 @@
           "type": "integer",
           "minimum": 1
         },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
         "section": {
           "type": "string",
           "minLength": 1

@@ -58,6 +58,7 @@ def render(rec):
     return path, "---\n" + "".join("%s: %s\n" % (k, fmt(v)) for k, v in fm) + "---\n" + body
 
 GOAL = ("Goal", "Do the thing.\n\n- [ ] It is done.")
+GOAL_MET = ("Goal", "Do the thing.\n\n- [x] It is done.")  # an item that can close
 RECS = [
     work("261010-j9k0", "choose-a-licence", "Choose a licence", "done", "2026-10-10", "2026-10-12", done=True, closed="2026-10-12",
          sections=[GOAL, ("Outcome", "MIT, in `LICENSE`.")]),
@@ -66,7 +67,7 @@ RECS = [
          sections=[GOAL, ("Next", "Finish the children."), ("Log", "- 2026-10-15: opened.")]),
     work("261020-a2b3", "add-json-output-to-ls", "Add JSON output to ls", "active", "2026-10-20", "2026-10-27",
          extra=[("parent", "261015-c4d5"), ("priority", 2)], summary="Print ls results as JSON.",
-         sections=[GOAL, ("Next", "Write the encoder test.\n\nSaved: 2026-10-27 18:00"), ("Log", "- 2026-10-20: started.")]),
+         sections=[GOAL_MET, ("Next", "Write the encoder test.\n\nSaved: 2026-10-27 18:00"), ("Log", "- 2026-10-20: started.")]),
     work("261022-e5f6", "document-the-exit-codes", "Document the exit codes", "ready", "2026-10-22", "2026-10-22",
          extra=[("parent", "261015-c4d5")], sections=[GOAL]),
     work("261024-g7h8", "publish-the-first-release", "Publish the first release", "blocked", "2026-10-24", "2026-10-25",
@@ -358,6 +359,8 @@ def write_cases(cases, basic):
     case("set", 10, "an open item cannot take a closed parent", "basic", req, err("set", req, "refused", "261010-j9k0 is done, so 261022-e5f6 cannot be its child while open", reason="rule", rule="WK8"))
     req = dict(id="261020-a2b3", changes=dict(blocked_by=["261024-g7h8"]))
     case("set", 11, "a blocked_by entry that closes a cycle is refused", "basic", req, err("set", req, "refused", "blocked_by 261024-g7h8 would make a dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3", reason="rule", rule="WK18"))
+    req = dict(id="261022-e5f6", status="done", outcome="Shipped.")
+    case("close", 9, "done is refused while the Goal has an empty box", "basic", req, err("close", req, "refused", '261022-e5f6 has unchecked boxes in its Goal: line 7 "It is done."; tick each with evidence (tick --evidence), change the Goal with section, or close it dropped', reason="unchecked_goal", items=[dict(line=7, text="It is done.", position=1)]))
     req = dict(id="261015-c4d5", status="dropped", outcome="Not needed.")
     case("close", 7, "dropping a parent with an open child is refused", "basic", req, err("close", req, "refused", "child 261020-a2b3 is not done or dropped", reason="open_children", rule="WK8"))
     req = dict(kind="work", slug="late-child", fields=dict(parent="261015-c4d5", blocked_by=["261015-c4d5"]))
@@ -462,6 +465,12 @@ def write_cases(cases, basic):
          ok("tick", req, record=pub(after_rec(files, E5F6)), section=sec_out(tk, "goal", "Do the thing.\n\n- [ ] It is done.\n1. [ ] Ordered step.\n2. [x] Another."), item=dict(position=3, done=True, text="Another."), changed=True), after={E5F6: tk})
     req = dict(id="261020-a2b3", item=1, section_etag="0000000000000000")
     case("tick", 3, "a stale section_etag answers with the current one", "basic", req, err("tick", req, "stale", "the goal section changed since it was read", section_etag=section_etag(basic[A2B3], "goal")))
+    req = dict(id="261022-e5f6", item=1, evidence="TestExit passes", as_of="2026-10-28")
+    tk = basic[E5F6].replace("updated: 2026-10-22\n", "updated: 2026-10-28\n").replace("- [ ] It is done.", "- [x] It is done.")
+    tk = tk.rstrip("\n") + "\n\n## Log\n- 2026-10-28: ticked \"It is done.\": TestExit passes\n"
+    files = dict(basic); files[E5F6] = tk
+    case("tick", 6, "evidence writes a Log line in the same write", "basic", req,
+         ok("tick", req, record=pub(after_rec(files, E5F6)), section=sec_out(tk, "goal", "Do the thing.\n\n- [x] It is done."), item=dict(position=1, done=True, text="It is done."), changed=True), after={E5F6: tk})
     req = dict(id="261022-e5f6", item=5)
     case("tick", 4, "an item that does not exist", "basic", req, err("tick", req, "not_found", "261022-e5f6 has no item 5 in its goal checklist"))
     req = dict(id="261020-a2b3", text="tests written.", as_of="2026-10-28")

@@ -1,0 +1,33 @@
+{
+  "name": "done is refused while the Goal has an empty box",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "status": "done",
+    "outcome": "Shipped."
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "close",
+    "request": {
+      "id": "261022-e5f6",
+      "status": "done",
+      "outcome": "Shipped."
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261022-e5f6 has unchecked boxes in its Goal: line 7 \"It is done.\"; tick each with evidence (tick --evidence), change the Goal with section, or close it dropped",
+      "details": {
+        "reason": "unchecked_goal",
+        "items": [
+          {
+            "line": 7,
+            "text": "It is done.",
+            "position": 1
+          }
+        ]
+      }
+    }
+  }
+}

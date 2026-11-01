@@ -59,7 +59,7 @@ sequenceDiagram
 
 ## What it would still need
 
-- `close` that reads the Goal checkboxes ([261031-zek2](../work/261031-zek2-close-checks-goal-checkboxes.md)).
+- `close` that reads the Goal checkboxes ([261031-zek2](../work/done/261031-zek2-close-checks-goal-checkboxes.md)).
 - A way to see an item that keeps flapping ([261031-st7s](../work/261031-st7s-claim-churn-loop-detection.md)).
 - A way to keep an agent inside its task ([261031-xmn6](../work/261031-xmn6-work-item-scope-field.md)).
 - Leaf-only routing, so no turn is handed a project too big for one context ([261031-w3ms](../work/261031-w3ms-spike-ready-leaf-routing-in-nested-projects.md)).

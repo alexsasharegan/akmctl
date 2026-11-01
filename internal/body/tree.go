@@ -239,6 +239,40 @@ func (t *Tree) Checklist(name string) ([]Item, error) {
 	return out, nil
 }
 
+// Unchecked lists every task of section name whose box is empty, in order, not
+// only the first run that Checklist reads. Pos is the item's position in the
+// checklist (the number tick takes), or 0 for a task outside that run, which tick
+// cannot address.
+func (t *Tree) Unchecked(name string) ([]Item, error) {
+	s, ok := t.Section(name)
+	if !ok {
+		return nil, ErrNoSection
+	}
+	run, err := t.Checklist(name)
+	if err != nil {
+		return nil, err
+	}
+	pos := map[int]int{}
+	for _, it := range run {
+		pos[it.Start] = it.Pos
+	}
+	lay, err := LocateTolerant(t.src[s.Body:s.End])
+	if err != nil {
+		return nil, err
+	}
+	var out []Item
+	for _, b := range lay.Blocks {
+		if b.Kind != Task || b.Done {
+			continue
+		}
+		start, end := s.Body+b.Start, s.Body+b.End
+		line := string(t.src[start:end])
+		open := strings.IndexByte(line, '[')
+		out = append(out, Item{Pos: pos[start], Text: strings.TrimSpace(line[open+3:]), Line: s.Line + b.Line, Start: start, End: end})
+	}
+	return out, nil
+}
+
 // SetChecked ticks or unticks item pos (1-based) of the checklist in section
 // name and returns the new body: only the character between the brackets
 // changes. etag, when not empty, must be the Etag of the section as it was read.

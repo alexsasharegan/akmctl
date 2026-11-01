@@ -21,7 +21,7 @@ Work item bodies already follow a convention: `## Goal` (prose plus a "Done when
 - The node types inside a section: prose, checklist item (with a done state and an optional commit), dated log entry, link list, table. Whether each is a typed node or opaque text.
 - Open versus closed: the options to compare are (a) a fixed set of sections plus a free-form `notes` area, (b) fixed core sections plus extension sections declared by name, kind and node type, (c) any `##` heading allowed with only the core ones typed. Include what an Obsidian user typing by hand can still do, and what survives a round trip unchanged.
 - The model in the data: a body as an ordered list of typed sections (the in-memory form the writer and the drawer both use), with a stable id per section and per checklist item so edits address them without matching text.
-- How it relates to frontmatter: which facts belong in a field (priority, project) and which in the body (goal text); whether a "done when" item is data other rules read (see [261031-zek2](../261031-zek2-close-checks-goal-checkboxes.md)).
+- How it relates to frontmatter: which facts belong in a field (priority, project) and which in the body (goal text); whether a "done when" item is data other rules read (see [261031-zek2](261031-zek2-close-checks-goal-checkboxes.md)).
 
 Done when:
 
@@ -41,7 +41,7 @@ Recommendation: build option (c), an open body with a typed core, and write the 
 - **Options on the real items.** (a) closed core: 11 items fail. (b) declared extensions: same 11 are errors until declared, and it needs a declaration mechanism first. (c) open with a typed core: 123 of 123 valid, and the lossless split and join reproduces every file byte for byte.
 - **Round trip rule.** Unknown content is never rewritten; a typed edit splices only the touched lines (ticking changes `[ ]` to `[x]` in place); nothing else is normalized.
 - **Addressing.** Section name plus 1-based position, guarded by a section etag. No ids in the file: none exist today and they would add noise to hand edits.
-- **A finding outside the model.** 24 of 70 closed items still have unticked "done when" boxes, so `close` does not tick them; this is [261031-zek2](../261031-zek2-close-checks-goal-checkboxes.md).
+- **A finding outside the model.** 24 of 70 closed items still have unticked "done when" boxes, so `close` does not tick them; this is [261031-zek2](261031-zek2-close-checks-goal-checkboxes.md).
 - **Not covered:** the spec's rules for `Next` (`Saved:` line), the ADR body, and a prototype writer in Go. The survey ran in Python over the files; the Go split is the follow-up.
 - Follow-ups: [261031-j4bc](261031-j4bc-body-section-tree-package.md) (the section tree package), and the open spikes 261031-6bzq (operations) and 261031-x50y (declaration and `check`), which build on this model.
 

@@ -19,7 +19,7 @@
       "code": "stale",
       "message": "the goal section changed since it was read",
       "details": {
-        "section_etag": "206a2052f432c2a2"
+        "section_etag": "2e83d8e0ee254f8b"
       }
     }
   }

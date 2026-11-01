@@ -314,7 +314,7 @@ func TestWorkLifecycle(t *testing.T) {
 			resp := run(t, dir, "new", api.Request{"kind": "work", "slug": "first-task", "title": "First task"})
 			rec, _ := resp.Get("record")
 			id, _ := rec.(api.Obj).Get("id")
-			run(t, dir, "section", api.Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [ ] it works"})
+			run(t, dir, "section", api.Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [x] it works"})
 			run(t, dir, "set", api.Request{"id": id, "changes": map[string]any{"status": "ready"}})
 			run(t, dir, "claim", api.Request{"id": id, "as": "agent"})
 			run(t, dir, "section", api.Request{"id": id, "name": "Next", "text": "Close it."})
