@@ -18,6 +18,16 @@ The repository's `AGENTS.md` wins over this skill where they disagree. Fields, s
 
 Before filing, read what `ls --status raw,ready,active,blocked` shows. `akmctl new work <slug>` creates a `raw` item and lists `similar` open items under the new path (up to five that share words with the slug and title). It never refuses. If one of them covers the work, add to that item (its `## Goal`, `## Next` or `## Log`) and, if you already created the new one, drop it with a reason in its Outcome. Otherwise keep the new item. Ask the maintainer which item to work. Do not type an id by hand; without the tool use the recipe in `AGENTS.md`.
 
+## Item too big
+
+An item is too big when its "done when" boxes are independent deliverables, when a spike asks more than one question, or when parts could go to different people or agents. Boxes that are steps of one change are not: keep one item. Split it into a parent and children; the repository's tree is `parent` links (`akmctl ls --parent <id>` shows the children).
+
+1. Claim the item first if you do not hold it. It becomes the parent: the umbrella with the why, the children, and a "done when" of its own (every child `done` or `dropped`, plus what only the whole can show). Work the children, not the parent.
+2. File each child: `akmctl new work <slug>`, then `akmctl set <child> kind=<kind> parent=<parent> summary="..."` and `akmctl section <child> Goal`. Give each one question or deliverable with its own "done when"; a spike's last box files the build item. Read the `similar` list `new` prints, and ignore the parent and the siblings in it. A child that waits for siblings needs a `## Next` before `set status=blocked blocked_by=<ids>`, and never `blocked_by` a descendant (WK19). If siblings write one shared file, name it in the parent's Goal and say that each child creates it if missing.
+3. Rewrite the parent's `## Goal` with `akmctl section`: keep the why, list the children in dependency order as plain bullets with relative Markdown links (`- [Title](<id>-<slug>.md): what it does`), not an ordered list (check rule B1 warns on one) and not wikilinks unless the repository uses them. Move each old box to the child that owns it, or keep it on the parent, and record where each went in one Log line (`akmctl log`). `akmctl remove` is for a requirement that is gone, and an agent asks the user before passing `--confirm`. Keep the old `## Log`.
+4. Write the parent a `## Next` that points at the first child, `akmctl release` it, and set it to `ready`: `release` leaves it `active`, and an unclaimed `active` item makes the next agent ask. Only the parent goes on the roadmap. A parent closes after its children.
+5. `akmctl check`. Commit the children first, one `file` commit per child as the tool prints it (fold the `ready` and `block` steps into the neighbouring commit if you must), then the parent's rewrite and release.
+
 ## While working
 
 - Keep `## Next` as the single next concrete step. Overwrite it at each checkpoint.
