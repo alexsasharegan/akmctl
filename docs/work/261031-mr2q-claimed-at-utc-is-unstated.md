@@ -1,12 +1,14 @@
 ---
 id: "261031-mr2q"
 title: claimed_at is UTC but nothing an agent reads says so
-status: raw
+status: active
 created: 2026-10-31
 updated: 2026-11-01
 kind: chore
 summary: claimed_at is UTC, stated in the spec but not in the guide or skills agents read; fix by documenting it, with a Z suffix recorded as the alternative
 decisions: [261029-5pe1, 261101-gw7b]
+claimed_by: claude
+claimed_at: 2026-11-01T08:37
 ---
 
 # claimed_at is UTC but nothing an agent reads says so
@@ -39,3 +41,4 @@ Not started. Edit the three files named in Goal (option 1), mirror the skill cha
 
 - 2026-10-31: filed.
 - 2026-10-31: filed after an agent mistook a UTC claimed_at for a clock error (found while resuming 261031-yw5v).
+- 2026-11-01: claimed (claude).
