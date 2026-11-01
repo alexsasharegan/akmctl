@@ -7,6 +7,7 @@ updated: 2026-10-31
 kind: feature
 parent: 261031-gtw6
 summary: A package that splits a body into sections, parses the typed core sections and splices edits, per ADR 261031-gam0
+blocked_by: [261031-g9zk]
 ---
 
 # body section tree package
@@ -23,3 +24,4 @@ From spike 261031-qbat and ADR [261031-gam0](../adr/261031-gam0-work-item-body-m
 ## Log
 
 - 2026-10-31: filed.
+- 2026-10-31: blocked_by 261031-g9zk: the parser choice (dependency or our scanner) sets how this is built.

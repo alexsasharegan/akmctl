@@ -40,3 +40,4 @@ Typed nodes are addressed by section name and 1-based position, guarded by a sec
 - Typed extension sections remain possible later (261031-x50y) and need no file change.
 - Closing does not tick the "done when" boxes (24 closed items are unticked); this model makes `close` ticking them possible (261031-zek2).
 - A hand edit that breaks a typed shape degrades to opaque text rather than failing; `check` rules for it are for 261031-x50y.
+- Whether the section tree is built on a parser dependency or our own scanner is open (spike 261031-g9zk); this decision holds either way, since it is about the model and the edit rule, not the parser.
