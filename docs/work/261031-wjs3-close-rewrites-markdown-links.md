@@ -1,11 +1,13 @@
 ---
 id: "261031-wjs3"
 title: close rewrites the Markdown links its move breaks
-status: raw
+status: active
 created: 2026-10-31
 updated: 2026-10-31
 kind: bug
 summary: close moves an item into done/ and breaks relative Markdown links in and to it; it should rewrite them in the same write set
+claimed_by: claude
+claimed_at: 2026-11-01T06:13
 ---
 
 # close rewrites the Markdown links its move breaks
@@ -33,3 +35,4 @@ Not started. Read internal/api close (ops_write.go), 261029-xtqj and 261029-m0vm
 
 - 2026-10-31: filed.
 - 2026-10-31: filed from the closing of 261031-yw5v, which broke three links.
+- 2026-10-31: claimed (claude).
