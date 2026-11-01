@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	mdbody "github.com/alexsasharegan/akmctl/internal/body"
 	"github.com/alexsasharegan/akmctl/internal/depgraph"
@@ -765,7 +766,7 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 		if step := statusStep(oldStatus, newStatus); step != "" {
 			detail := map[string]string{"ready": "ready", "start": "started", "unblock": "unblocked"}[step]
 			if step == "block" {
-				detail = "blocked on " + firstBlocker(e.doc)
+				detail = blockedByDetail(e.doc)
 			}
 			out = append(out, KV{"commit", commitObj(step, rec.ID, detail, rec.Path)})
 		}
@@ -773,12 +774,63 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	return e.finish(out), nil
 }
 
-// firstBlocker is the first blocked_by entry of the document, as written.
-func firstBlocker(doc *frontmatter.Doc) string {
-	if v, ok := doc.Get("blocked_by"); ok && len(v.Items) > 0 {
-		return record.RefID(v.Items[0].Str)
+const maxBlockedDetail = 120
+
+// blockedByDetail names the blockers in their stored order. Long lists are
+// capped so the generated commit subject stays usable, with the omitted count
+// made explicit.
+func blockedByDetail(doc *frontmatter.Doc) string {
+	v, ok := doc.Get("blocked_by")
+	if !ok || len(v.Items) == 0 {
+		return "blocked on its blocker"
 	}
-	return "its blocker"
+	names := make([]string, 0, len(v.Items))
+	for _, item := range v.Items {
+		names = append(names, record.RefID(item.Str))
+	}
+	const prefix = "blocked on "
+	shown := ""
+	included := 0
+	for i, name := range names {
+		sep := ""
+		if shown != "" {
+			sep = ", "
+		}
+		candidate := prefix + shown + sep + name
+		if i < len(names)-1 {
+			candidate += fmt.Sprintf(" … (+%d more)", len(names)-i-1)
+		}
+		if utf8.RuneCountInString(candidate) <= maxBlockedDetail {
+			shown += sep + name
+			included++
+			continue
+		}
+		if shown == "" {
+			// A single unusually long free-text blocker still gets a bounded subject.
+			suffix := ""
+			if i < len(names)-1 {
+				suffix = fmt.Sprintf(" … (+%d more)", len(names)-i-1)
+			}
+			budget := maxBlockedDetail - utf8.RuneCountInString(prefix) - 1 - utf8.RuneCountInString(suffix)
+			if budget > 0 {
+				runes := []rune(name)
+				if len(runes) > budget {
+					runes = runes[:budget]
+				}
+				shown = string(runes) + "…"
+				included = 1
+			}
+		}
+		break
+	}
+	if shown == "" {
+		return prefix + "…"
+	}
+	detail := prefix + shown
+	if included < len(names) {
+		detail += fmt.Sprintf(" … (+%d more)", len(names)-included)
+	}
+	return detail
 }
 
 // sameValue compares a stored value with a new one, reading references as ids.

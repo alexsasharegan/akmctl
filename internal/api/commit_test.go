@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 )
 
 var reCommitMessage = regexp.MustCompile(`^(\d{6}-[0-9a-hjkmnp-tv-z]{4})\(([a-z]+)\): (.+)\n\nAKM-Step: ([a-z]+)\nAKM-Item: (\d{6}-[0-9a-hjkmnp-tv-z]{4})$`)
@@ -56,6 +58,44 @@ func TestSetStatusChangeReturnsCommit(t *testing.T) {
 		t.Errorf("detail = %v", d)
 	}
 	checkCommit(t, mustOK(t, root, "set", Request{"id": "261026-m1n2", "changes": map[string]any{"status": "ready"}}), "unblock")
+	r = mustOK(t, root, "set", Request{"id": "261026-m1n2", "changes": map[string]any{"status": "blocked", "blocked_by": []any{"legal review", "security review", "release owner"}}})
+	if d, _ := checkCommit(t, r, "block").Get("detail"); d != "blocked on legal review, security review, release owner" {
+		t.Errorf("detail = %v", d)
+	}
+}
+
+func TestBlockedByDetailBoundsLongListsAndHandlesNoBlockers(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		body string
+		want string
+	}{
+		{name: "none", want: "blocked on its blocker"},
+		{name: "one", body: "blocked_by: [legal review]", want: "blocked on legal review"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			doc, err := frontmatter.Parse([]byte("---\n" + tc.body + "\n---\n"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got := blockedByDetail(doc); got != tc.want {
+				t.Fatalf("blockedByDetail() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+
+	items := make([]string, 20)
+	for i := range items {
+		items[i] = "blocker-" + strings.Repeat("x", 8)
+	}
+	doc, err := frontmatter.Parse([]byte("---\nblocked_by: [" + strings.Join(items, ", ") + "]\n---\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := blockedByDetail(doc)
+	if len([]rune(got)) > maxBlockedDetail || !strings.Contains(got, "more)") {
+		t.Fatalf("long blocker detail is not bounded with an omitted count: %q", got)
+	}
 }
 
 func TestSetWithoutStatusChangeReturnsNoCommit(t *testing.T) {

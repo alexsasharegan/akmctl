@@ -16,7 +16,7 @@ Umbrella from spike 261101-baze (design: docs/design/decomposing-work.md). A mai
 
 - [261031-ph53](261031-ph53-new-parent-kind-flags-and-split-command.md): `new --parent --kind` and `split`, with priority inheritance, per-child commit messages and a parent reminder.
 - [261031-72bd](261031-72bd-rollup-counts-for-parent-items.md): rollup counts, and `close` of a child reporting the parent and its open siblings.
-- [261101-3erc](261101-3erc-block-commit-message-names-every-blocker.md): the block commit message names every blocker.
+- [261101-3erc](done/261101-3erc-block-commit-message-names-every-blocker.md): the block commit message names every blocker.
 
 Done when:
 
