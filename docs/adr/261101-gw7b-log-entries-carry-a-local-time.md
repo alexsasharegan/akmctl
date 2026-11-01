@@ -2,7 +2,7 @@
 id: "261101-gw7b"
 title: Log entries carry a local time with its offset
 summary: A Log line carries the writer's local time and its offset; claim, release and log write it, and an optional at records when the thing happened
-status: proposed
+status: accepted
 date: 2026-11-01
 scope: [internal/api, internal/body]
 ---
