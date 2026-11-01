@@ -2,7 +2,7 @@
 id: "261031-cpbg"
 title: Read work item bodies with our own scanner, checked against goldmark as a test oracle
 summary: A narrow Markdown scanner behind a Locate interface, fail closed outside its subset, with goldmark as a test-only oracle that can be promoted to production
-status: proposed
+status: accepted
 date: 2026-10-31
 ---
 
