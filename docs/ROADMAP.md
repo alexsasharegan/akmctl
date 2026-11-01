@@ -12,6 +12,10 @@ Workbench polish and the Obsidian Bases file, in order (the styling freeze is li
 - [261028-esyt] Show and edit a record's fields in the drawer
 - [261029-kb88] Generate an Obsidian Bases file that mirrors the workbench
 
+Then make work decomposition discoverable (the children in order: 3erc, ph53, 72bd):
+
+- [261101-t8h8] Make work decomposition discoverable
+
 ## Later
 
 ### 1.0.0

@@ -1,7 +1,7 @@
 ---
 id: "261101-t8h8"
 title: make work decomposition discoverable
-status: raw
+status: ready
 created: 2026-11-01
 updated: 2026-11-01
 kind: feature
@@ -26,7 +26,7 @@ Done when:
 
 ## Next
 
-Take 261031-ph53 first (split); the rest follow.
+Take 261101-3erc (small bug), then 261031-ph53 (split), then 261031-72bd; finish with the guide pointer and the cold-agent retest.
 
 ## Log
 
