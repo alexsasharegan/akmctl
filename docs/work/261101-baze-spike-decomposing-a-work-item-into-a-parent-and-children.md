@@ -20,7 +20,7 @@ Related, already filed: 261031-ph53 (`new --parent --kind` and `split`), 261031-
 
 ### Done when
 
-- [ ] The Log lists where the nudge can live (a new skill, a section of `akm-track-work`, a hint from `new` or `check` on an oversized item, the guide) with the cost and reach of each, and names one or a mix.
+- [x] The Log lists where the nudge can live (a new skill, a section of `akm-track-work`, a hint from `new` or `check` on an oversized item, the guide) with the cost and reach of each, and names one or a mix.
 - [ ] The procedure for splitting an existing item is written down and walked through once on a real item: what stays in the parent's Goal, what moves to children, how the parent's history and links are kept, and when a spike's parent closes.
 - [ ] A prototype of the chosen surface exists (a draft skill or hint) and was tried by a cold agent on an oversized item; the Log records what it got wrong.
 - [ ] The Log says how 261031-ph53 and 261031-qwhn change, if at all, and any term the work adds is registered in `docs/glossary.md`.
@@ -28,10 +28,12 @@ Related, already filed: 261031-ph53 (`new --parent --kind` and `split`), 261031-
 
 ## Next
 
-Read how akm-track-work, new, split (ph53) and the guide surface parent/child today, then list the candidate surfaces in the Log.
+Write the split procedure and walk it through on a real item (box 2): draft .agents/skills/akm-decompose-work/SKILL.md, then try it on 261031-gtw6 (body schema and drawer redesign), which looks multi-part.
 
 ## Log
 
 - 2026-11-01: filed.
 - 2026-11-01 09:43-07:00: claimed (claude).
 - 2026-11-01 09:43-07:00: Survey: the guide (docs/spec/akm-guide.md:82,122,182) mentions parents only as a field and a closing rule; no skill, command output or check rule says 'split an oversized item'. akm-track-work has 'No item fits' (file a raw item) but no 'item is too big' branch. Candidate surfaces to weigh: (a) new skill akm-decompose-work, (b) a section in akm-track-work, (c) a guide chapter, (d) a hint from new/check/ls, (e) split command (261031-ph53). Not yet weighed.
+- 2026-11-01 09:46-07:00: ticked "The Log lists where the nudge can live (a new skill, a section of `akm-track-work`, a hint from `new` or `check` on an oversized item, the guide) with the cost and reach of each, and names one or a mix.": Log entry weighing surfaces a to e
+- 2026-11-01 09:46-07:00: Weighed the surfaces. (a) New skill akm-decompose-work: found by description when an agent says 'too big'; a user who never loads skills never sees it. (b) Section in akm-track-work: cheapest and rides the skill every agent loads, but buries a procedure in a lifecycle skill. (c) Guide chapter: reaches humans, not agents at the moment of need. (d) Hint from new/check/ls: reaches everyone at the moment of need, but 'oversized' is a judgment the tool cannot make; the only safe trigger is kind: spike, and a nag on every spike is noise. (e) split (ph53): the mechanism the others point at, not a surface. Pick: (a) a small skill for the procedure, with a one-line pointer in akm-track-work 'No item fits' and in the guide, and (e) as the tool it calls. Skip (d) unless the cold-agent trial shows the pointers are missed.
