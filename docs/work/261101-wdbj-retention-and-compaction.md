@@ -19,7 +19,7 @@ Design source: [retention-and-compaction](../design/retention-and-compaction.md)
 Children (none is built until its spike has an outcome):
 
 - [261101-dkv2](261101-dkv2-spike-retention-and-compaction.md): the discovery spike, workstreams A to G. Refinement may split it into one spike per workstream, as children of this item.
-- A proof of concept that a parent survives compaction, in a throwaway repository (to file once the spike fixes the index shape). It tests whether the parent's index plus a Git recovery commit can restore a child.
+- [261101-hefr](261101-hefr-poc-parent-survives-compaction.md): a hand-built proof of concept in a scratch repository that a compacted parent can still find and restore its children. It runs ahead of the spike, to feed it.
 
 What already exists and bears on it:
 
