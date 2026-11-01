@@ -8,7 +8,7 @@ kind: bug
 summary: log --at 09:46 fails with 'has the wrong form' and never says what form is valid; the same message serves every pattern parameter
 ---
 
-# log --at error does not say the expected form
+# A pattern-checked parameter's error does not say the expected form
 
 ## Goal
 
