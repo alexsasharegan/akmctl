@@ -1,7 +1,7 @@
 ---
 id: "261101-tr8e"
 title: Body writes go through the section tree, with tick and log operations
-summary: Body writes are splices by the section tree; add tick and log operations, address items by section and position, and refuse what the scanner cannot read
+summary: Body writes are splices by the section tree; add tick and log operations, address items by section and position, refuse only unreadable constructs that matter
 status: proposed
 date: 2026-11-01
 scope: [internal/api, internal/body, internal/record, internal/server]
@@ -31,7 +31,8 @@ Option (b).
 - **One write.** Each operation reads the file under the repository lock, splits the body, splices, sets `updated` and writes the file once by the existing compare-and-swap, so a body edit and `updated` are atomic. `dry_run` and its `diff` come with it.
 - **Addressing and conflicts.** Items are addressed by section name and position, as in ADR 261031-gam0. `if_match` is the whole-file etag as for `set`. `section_etag` is optional: a client that holds one section for a long time (the drawer) sends the etag it read, and the operation applies if that section is unchanged even when other parts of the file moved on; otherwise it answers `stale` and returns the current section etag. Responses carry the section and its etag.
 - **Round-trip rule.** Bytes outside the edited span are never changed. Inside it: a tick changes one byte; a log entry is one line `- YYYY-MM-DD: text` added after the last non-blank line of `## Log`, with the line ending of the line before it; a replace keeps the blank lines before and after the old text and writes the new text with the file's line ending, trimmed of leading and trailing blank lines.
-- **Fail closed.** The write operations use `Split`. A body with a construct the scanner refuses (`ErrUnsupported`) is `refused`, with the construct and line in `details`, and nothing is written; the maintainer edits that file by hand. All 160 records pass today.
+- **Fail closed, narrowly.** The scanner's refusals (`ErrUnsupported`) come in two kinds, and `Locate` reports which. A _structural_ refusal is a construct that could change where a heading, fence or checklist is: an HTML line, an indented fence, heading or code line, a tab-indented line, a setext underline or thematic break after text, a block inside a list item, a control character or a bare carriage return. A _local_ refusal is confined to its own lines: a blockquote, a table-delimiter lookalike, an ordered-list task, a task box with unusual contents, an empty list item. A write is `refused`, with the construct and line in `details`, and nothing is written, when the body has a structural refusal anywhere, or a local one inside the section being edited. A local construct in another section is not a reason to refuse: a Goal box ticks in a file whose Notes section has a callout. All 160 records pass today.
+- **Fewer refusals over time.** Local constructs the scanner can skip as opaque blocks (a blockquote region, an indented code block) stop being refusals one at a time, each checked against the goldmark oracle (work item 261101-4j86). Refusing is the default; claiming a construct needs the battery to agree.
 - **Missing sections.** Creating a missing section (before `## Log`, as `SetSection` does) becomes a tree operation (`AddSection`) before `section` moves onto the tree.
 - **`section` moves onto the tree**, and `SetSection` is deleted, once `AddSection` exists and the equivalence test passes for the new behaviour.
 
@@ -40,6 +41,6 @@ Option (b).
 - An agent ticks a box with about 35 bytes of request after reading the Goal, instead of resending it or re-reading the file; a stale or wrong address is an error and not a silent edit.
 - The drawer can tick, append and replace with section-level conflict handling and no Markdown of its own.
 - The API grows by two operations and one optional parameter, additive for clients that ignore them (API 1.x). Two fixtures per operation in both copies, the spec, the skills and the HTTP table change.
-- `section` becomes stricter: a body with an unsupported construct can no longer be written by the tool. This is the price of one scanner and one fence rule; the line scan stops being a second opinion on where sections are.
+- `section` becomes stricter only where it must: a body with a structural construct, or a local one in the edited section, can no longer be written by the tool. This is the price of one scanner and one fence rule; the line scan stops being a second opinion on where sections are. `check` should report such a body before an agent meets it (a rule for 261031-x50y).
 - Position addressing can pick the wrong item if the Goal changed between a read and a write. `section_etag` and `if_match` exist for that; an agent that writes without either gets last-writer-wins on positions, as it does for text today.
 - Duplicate section names are addressed by the first. `Next`'s optional `Saved:` line is part of the section text and is replaced with it.
