@@ -1,16 +1,13 @@
 package record
 
 import (
-	"os"
-	"path/filepath"
+	"errors"
+	mdbody "github.com/alexsasharegan/akmctl/internal/body"
 	"strings"
 	"testing"
-
-	mdbody "github.com/alexsasharegan/akmctl/internal/body"
-	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 )
 
-func TestSetSection(t *testing.T) {
+func TestEditSection(t *testing.T) {
 	body := "\n# T\n\n## Goal\nOld goal.\n\n## Log\n- one\n"
 	cases := []struct {
 		name, section, text string
@@ -35,25 +32,25 @@ func TestSetSection(t *testing.T) {
 		if c.eol == "\r\n" {
 			in = "\r\n# T\r\n\r\n## Goal\r\nOld goal.\r\n\r\n## Log\r\n- one\r\n"
 		}
-		if got := SetSection(in, c.section, c.text, c.app, c.eol); got != c.want {
+		if got := set(t, in, c.section, c.text, c.app, c.eol); got != c.want {
 			t.Errorf("%s:\ngot  %q\nwant %q", c.name, got, c.want)
 		}
 	}
 	// no Log: the section goes to the end; the last section can be replaced and
 	// a missing final newline is added
-	if got := SetSection("# T\n\n## Goal\nx", "Notes", "n", false, "\n"); got != "# T\n\n## Goal\nx\n\n## Notes\n\nn\n" {
+	if got := set(t, "# T\n\n## Goal\nx", "Notes", "n", false, "\n"); got != "# T\n\n## Goal\nx\n\n## Notes\n\nn\n" {
 		t.Errorf("end: %q", got)
 	}
-	if got := SetSection("# T\n\n## Goal\nx", "goal", "y", false, "\n"); got != "# T\n\n## Goal\ny\n" {
+	if got := set(t, "# T\n\n## Goal\nx", "goal", "y", false, "\n"); got != "# T\n\n## Goal\ny\n" {
 		t.Errorf("last: %q", got)
 	}
 	// a heading inside a code fence is not a heading
 	fenced := "## A\n```\n## Notes\n```\n"
-	if got := SetSection(fenced, "Notes", "n", false, "\n"); got != fenced+"\n## Notes\n\nn\n" {
+	if got := set(t, fenced, "Notes", "n", false, "\n"); got != fenced+"\n## Notes\n\nn\n" {
 		t.Errorf("fence: %q", got)
 	}
 	// sibling sections are untouched
-	if got := SetSection("## A\na\n\n## B\nb\n\n## C\nc\n", "b", "B2", false, "\n"); got != "## A\na\n\n## B\nB2\n\n## C\nc\n" {
+	if got := set(t, "## A\na\n\n## B\nb\n\n## C\nc\n", "b", "B2", false, "\n"); got != "## A\na\n\n## B\nB2\n\n## C\nc\n" {
 		t.Errorf("sibling: %q", got)
 	}
 }
@@ -70,10 +67,10 @@ func TestFenceRule(t *testing.T) {
 		if len(names) != 2 || names[0] != "a" || names[1] != "b" {
 			t.Errorf("%s: Sections names = %v, want [a b]", name, names)
 		}
-		if got := SetSection(body, "Notes", "n", false, "\n"); got != body+"\n## Notes\n\nn\n" {
+		if got := set(t, body, "Notes", "n", false, "\n"); got != body+"\n## Notes\n\nn\n" {
 			t.Errorf("%s: SetSection saw a heading inside the fence:\n%s", name, got)
 		}
-		if got := AppendToSection(body, "Notes", "n", "\n"); got != strings.TrimRight(body, "\n")+"\n\n## Notes\nn\n" {
+		if got := mustAppend(t, body, "Notes", "n"); got != strings.TrimRight(body, "\n")+"\n\n## Notes\nn\n" {
 			t.Errorf("%s: AppendToSection saw a heading inside the fence:\n%s", name, got)
 		}
 		if got := FirstHeading("```\n~~~\n# in\n```\n# out\n"); got != "out" {
@@ -82,52 +79,62 @@ func TestFenceRule(t *testing.T) {
 	}
 }
 
-// TestTreeMatchesSetSection: on every work item of this repository, replacing a
-// section and appending a Log line with the section tree gives the bytes that
-// SetSection gives. It holds the line scan and the tree to one behaviour until
-// section writes move onto the tree (spike 261031-6bzq).
-func TestTreeMatchesSetSection(t *testing.T) {
-	files, _ := filepath.Glob("../../docs/work/*.md")
-	done, _ := filepath.Glob("../../docs/work/done/*.md")
-	files = append(files, done...)
-	if len(files) < 100 {
-		t.Fatalf("only %d work items found; is the working directory wrong?", len(files))
+// set is EditSection for tests that expect no refusal.
+func set(t *testing.T, body, name, text string, appendMode bool, eol string) string {
+	t.Helper()
+	got, err := EditSection(body, name, text, appendMode, eol)
+	if err != nil {
+		t.Fatalf("EditSection(%q, %q): %v", body, name, err)
 	}
-	edits := 0
-	for _, f := range files {
-		src, err := os.ReadFile(f)
-		if err != nil {
-			t.Fatal(err)
-		}
-		d, err := frontmatter.Parse(src)
-		if err != nil {
-			t.Fatal(err)
-		}
-		b := d.Body()
-		tr, err := mdbody.Split(b)
-		if err != nil {
-			t.Errorf("%s: %v", f, err)
-			continue
-		}
-		for _, s := range tr.Sections() {
-			if s.Key() == "log" {
-				continue
-			}
-			want := SetSection(string(b), s.Name, "Replacement.\nSecond line.", false, "\n")
-			got, err := tr.ReplaceSection(s.Name, "Replacement.\nSecond line.", "")
-			if err != nil || string(got) != want {
-				t.Errorf("%s ## %s: tree and SetSection differ (%v)", f, s.Name, err)
-			}
-			edits++
-		}
-		if _, ok := tr.Section("log"); ok {
-			want := SetSection(string(b), "log", "2026-11-01: x", true, "\n")
-			got, err := tr.AppendLog("2026-11-01", "x")
-			if err != nil || string(got) != want {
-				t.Errorf("%s: tree and SetSection differ on a Log append (%v)", f, err)
-			}
-			edits++
+	return got
+}
+
+// TestEditSectionEdges: creation in an empty body, in CRLF, with no Log, and the
+// refusal rule (ADR 261101-tr8e).
+func TestEditSectionEdges(t *testing.T) {
+	eq := func(name, got, want string) {
+		t.Helper()
+		if got != want {
+			t.Errorf("%s:\ngot  %q\nwant %q", name, got, want)
 		}
 	}
-	t.Logf("%d items, %d edits identical", len(files), edits)
+	eq("empty body", set(t, "", "goal", "g", false, "\n"), "## Goal\n\ng\n")
+	eq("empty body, CRLF", set(t, "", "goal", "g", false, "\r\n"), "## Goal\r\n\r\ng\r\n")
+	eq("create before Log, CRLF", set(t, "## Goal\r\nx\r\n\r\n## Log\r\n- a\r\n", "Notes", "n\nm", false, "\r\n"), "## Goal\r\nx\r\n\r\n## Notes\r\n\r\nn\r\nm\r\n\r\n## Log\r\n- a\r\n")
+	eq("create with no Log", set(t, "# T\n\ntext", "Notes", "n", false, "\n"), "# T\n\ntext\n\n## Notes\n\nn\n")
+	eq("create, no text", set(t, "# T\n", "Notes", "", false, "\n"), "# T\n\n## Notes\n")
+	eq("append creates", set(t, "## Goal\nx\n", "log", "- a", true, "\n"), "## Goal\nx\n\n## Log\n\n- a\n")
+	// a heading is capitalised only when the name is all lowercase
+	eq("mixed case kept", set(t, "## A\n", "ToDo", "t", false, "\n"), "## A\n\n## ToDo\n\nt\n")
+
+	// refusals: structural anywhere, local only in the edited section
+	structural := "## Goal\nx\n\n<div>\n\n## Notes\nn\n"
+	for _, name := range []string{"goal", "notes", "other"} {
+		_, err := EditSection(structural, name, "y", false, "\n")
+		var u *mdbody.UnsupportedError
+		if !errors.As(err, &u) || !u.Structural || u.Line != 4 {
+			t.Errorf("structural, %s: err = %v", name, err)
+		}
+	}
+	local := "## Goal\n- [ ] a\n\n## Notes\n1. [ ] b\n"
+	if _, err := EditSection(local, "goal", "y", false, "\n"); err != nil {
+		t.Errorf("a local construct in another section refused the write: %v", err)
+	}
+	_, err := EditSection(local, "notes", "y", false, "\n")
+	var u *mdbody.UnsupportedError
+	if !errors.As(err, &u) || u.Structural || u.Line != 5 {
+		t.Errorf("local construct in the edited section: err = %v", err)
+	}
+	if _, err := EditSection(local, "notes", "y", true, "\n"); err == nil {
+		t.Errorf("append to a section with a local construct was not refused")
+	}
+}
+
+func mustAppend(t *testing.T, body, name, line string) string {
+	t.Helper()
+	got, err := AppendToSection(body, name, line, "\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return got
 }

@@ -392,3 +392,28 @@ func TestLocalConstructScope(t *testing.T) {
 		t.Errorf("tick in a Goal with a blockquote: %v", err)
 	}
 }
+
+func TestAddSection(t *testing.T) {
+	cases := []struct{ name, in, sec, text, want string }{
+		{"before Log", "## Goal\ng\n\n## Log\n- a\n", "Notes", "n", "## Goal\ng\n\n## Notes\n\nn\n\n## Log\n- a\n"},
+		{"before Log, no blank line above", "## Goal\ng\n## Log\n- a\n", "Notes", "n", "## Goal\ng\n\n## Notes\n\nn\n\n## Log\n- a\n"},
+		{"no Log", "# T\n\n## Goal\ng\n", "outcome", "done", "# T\n\n## Goal\ng\n\n## Outcome\n\ndone\n"},
+		{"no Log, no final newline", "## Goal\ng", "Notes", "n", "## Goal\ng\n\n## Notes\n\nn\n"},
+		{"empty body", "", "goal", "g", "## Goal\n\ng\n"},
+		{"CRLF", "## Goal\r\ng\r\n\r\n## Log\r\n- a\r\n", "Notes", "a\nb", "## Goal\r\ng\r\n\r\n## Notes\r\n\r\na\r\nb\r\n\r\n## Log\r\n- a\r\n"},
+		{"no text", "## Goal\ng\n", "Notes", "", "## Goal\ng\n\n## Notes\n"},
+	}
+	for _, c := range cases {
+		tr, err := Split([]byte(c.in))
+		if err != nil {
+			t.Fatalf("%s: %v", c.name, err)
+		}
+		got, err := tr.AddSection(c.sec, c.text)
+		if err != nil || string(got) != c.want {
+			t.Errorf("%s:\ngot  %q (%v)\nwant %q", c.name, got, err, c.want)
+		}
+		if _, err := Split(got); err != nil {
+			t.Errorf("%s: the result does not split: %v", c.name, err)
+		}
+	}
+}

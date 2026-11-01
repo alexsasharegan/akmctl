@@ -115,44 +115,21 @@ func (r *Record) NextLine() (string, bool) {
 }
 
 // AppendToSection adds a line at the end of the "## name" section of a body and
-// returns the new body; the section is created at the end when it is missing.
-// eol is the line ending to use.
-func AppendToSection(body, name, line, eol string) string {
-	lines := strings.Split(body, "\n")
-	var fence mdbody.FenceTracker
-	start, end := -1, len(lines)
-	for i, l := range lines {
-		t := strings.TrimRight(l, "\r")
-		if fence.In(t) || !strings.HasPrefix(t, "## ") {
-			continue
-		}
-		if start >= 0 {
-			end = i
-			break
-		}
-		if strings.EqualFold(strings.TrimSpace(t[3:]), name) {
-			start = i
-		}
+// returns the new body; the section is created when it is missing. eol is the
+// line ending for a body that has none of its own. The error is an
+// *mdbody.UnsupportedError when the body has a construct the tool cannot edit
+// around (ADR 261101-tr8e).
+func AppendToSection(body, name, line, eol string) (string, error) {
+	tr, err := mdbody.Split([]byte(body))
+	if err != nil {
+		return "", err
 	}
-	if start < 0 {
+	if _, ok := tr.Section(name); !ok {
+		// the section goes at the end, its first line straight under the heading
 		b := strings.TrimRight(body, "\r\n")
-		heading := strings.ToUpper(name[:1]) + name[1:]
-		return b + eol + eol + "## " + heading + eol + line + eol
+		return b + eol + eol + "## " + strings.ToUpper(name[:1]) + name[1:] + eol + line + eol, nil
 	}
-	last := start
-	for i := start + 1; i < end; i++ {
-		if strings.TrimSpace(lines[i]) != "" {
-			last = i
-		}
-	}
-	out := append([]string(nil), lines[:last+1]...)
-	cr := ""
-	if eol == "\r\n" {
-		cr = "\r"
-	}
-	out = append(out, line+cr)
-	out = append(out, lines[last+1:]...)
-	return strings.Join(out, "\n")
+	return EditSection(body, name, line, true, eol)
 }
 
 // listItem reports whether text starts with a Markdown list marker: "- ", "* ",
@@ -168,16 +145,19 @@ func listItem(text string) bool {
 	return i > 0 && i+1 < len(text) && (text[i] == '.' || text[i] == ')') && text[i+1] == ' '
 }
 
-// SetSection replaces the text of the "## name" section of a body, or appends
-// lines to it, and returns the new body. The heading is matched without regard
-// to case, outside code fences. A missing section is created: before the "## Log"
-// section when there is one, otherwise at the end. Blank lines around the
-// section text are kept, and eol is the line ending to write.
-func SetSection(body, name, text string, appendMode bool, eol string) string {
-	cr := ""
-	if eol == "\r\n" {
-		cr = "\r"
+// EditSection replaces the text of the "## name" section of a body, or appends
+// lines to it, through the section tree, and returns the new body. The heading is
+// matched without regard to case, outside code fences. A missing section is
+// created: before the "## Log" section when there is one, otherwise at the end.
+// Bytes outside the section are never changed. A body with a structural
+// construct, or a local one in the section, is refused with an
+// *mdbody.UnsupportedError and nothing is written.
+func EditSection(body, name, text string, appendMode bool, eol string) (string, error) {
+	tr, err := mdbody.Split([]byte(body))
+	if err != nil {
+		return "", err
 	}
+	tr.WithEOL(eol)
 	name = strings.TrimSpace(name)
 	text = strings.ReplaceAll(text, "\r\n", "\n")
 	if appendMode {
@@ -186,110 +166,18 @@ func SetSection(body, name, text string, appendMode bool, eol string) string {
 			// a bare line would join the previous bullet
 			text = "- " + text
 		}
-	} else {
-		text = strings.Trim(text, "\n")
+		out, err := tr.AppendText(name, text)
+		return string(out), err
 	}
-	var tl []string
-	if text != "" {
-		for _, l := range strings.Split(text, "\n") {
-			tl = append(tl, l+cr)
-		}
+	if _, ok := tr.Section(name); !ok {
+		out, err := tr.AddSection(name, text)
+		return string(out), err
 	}
-	if appendMode && tl == nil {
-		return body
+	sec, _ := tr.Section(name)
+	out, err := tr.ReplaceSection(name, text, "")
+	if err == nil && sec.End == len(body) && len(out) > 0 && out[len(out)-1] != '\n' {
+		// the last section ends the file with a line ending
+		out = append(out, tr.WithEOL(eol).LineEnding()...)
 	}
-	var lines []string
-	endsNL := strings.HasSuffix(body, "\n")
-	if body != "" {
-		lines = strings.Split(strings.TrimSuffix(body, "\n"), "\n")
-	}
-	blank := func(l string) bool { return strings.TrimSpace(l) == "" }
-	start, end, logAt := -1, len(lines), -1
-	var fence mdbody.FenceTracker
-	for i, l := range lines {
-		t := strings.TrimRight(l, "\r")
-		if fence.In(t) || !strings.HasPrefix(t, "## ") {
-			continue
-		}
-		h := strings.TrimSpace(t[3:])
-		if start >= 0 {
-			end = i
-			break
-		}
-		if strings.EqualFold(h, name) {
-			start = i
-		} else if strings.EqualFold(h, "log") && logAt < 0 {
-			logAt = i
-		}
-	}
-	var out []string
-	if start < 0 {
-		heading := name
-		if heading == strings.ToLower(heading) {
-			r := []rune(heading)
-			heading = strings.ToUpper(string(r[0])) + string(r[1:])
-		}
-		block := []string{"## " + heading + cr}
-		if tl != nil {
-			block = append(block, cr) // a blank line after the heading, as Prettier writes it
-		}
-		block = append(block, tl...)
-		if logAt >= 0 {
-			out = append(out, lines[:logAt]...)
-			if logAt > 0 && !blank(lines[logAt-1]) {
-				out = append(out, cr)
-			}
-			out = append(out, block...)
-			out = append(out, cr)
-			out = append(out, lines[logAt:]...)
-		} else {
-			out = append(out, lines...)
-			if len(lines) > 0 && !blank(lines[len(lines)-1]) {
-				out = append(out, cr)
-			}
-			out = append(out, block...)
-			endsNL = true
-		}
-		return strings.Join(out, "\n") + nl(endsNL)
-	}
-	content := lines[start+1 : end]
-	first, last := -1, -1
-	for i, l := range content {
-		if !blank(l) {
-			if first < 0 {
-				first = i
-			}
-			last = i
-		}
-	}
-	var lead, core, trail []string
-	if first < 0 {
-		lead = content
-	} else {
-		lead, core, trail = content[:first], content[first:last+1], content[last+1:]
-	}
-	if appendMode {
-		core = append(append([]string(nil), core...), tl...)
-	} else {
-		core = tl
-	}
-	if len(trail) == 0 && end < len(lines) {
-		trail = []string{cr}
-	}
-	out = append(out, lines[:start+1]...)
-	out = append(out, lead...)
-	out = append(out, core...)
-	out = append(out, trail...)
-	out = append(out, lines[end:]...)
-	if end == len(lines) {
-		endsNL = true
-	}
-	return strings.Join(out, "\n") + nl(endsNL)
-}
-
-func nl(b bool) string {
-	if b {
-		return "\n"
-	}
-	return ""
+	return string(out), err
 }

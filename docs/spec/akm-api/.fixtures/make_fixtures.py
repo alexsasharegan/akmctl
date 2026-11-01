@@ -417,6 +417,11 @@ def write_cases(cases, basic):
     case("section", 5, "the Log section cannot be replaced", "basic", req, err("section", req, "invalid_request", "the Log section is append-only: use mode append", parameter="mode"))
     req = dict(id="261010-j9k0", name="Notes", text="Late note.")
     case("section", 6, "a closed record is refused", "basic", req, err("section", req, "refused", "261010-j9k0 is closed; its sections are not edited", reason="closed"))
+    brf = build("bodyrefusal", bodyrefusal)
+    req = dict(id="261022-e5f6", name="Goal", text="New goal.", as_of="2026-10-28")
+    ln = next(i for i, l in enumerate(brf[E5F6].split("\n"), 1) if l.startswith("1. [ ] ordered step"))
+    case("section", 7, "a construct akmctl cannot edit in the section is refused", "bodyrefusal", req,
+         err("section", req, "refused", "261022-e5f6 has ordered-list task at line %d, which akmctl cannot edit around; edit the file by hand" % ln, reason="unsupported_markdown", construct="ordered-list task", line=ln, structural=False))
 
 VW, VA, VR = "Deep Thought/9 pkm/tasks", "Deep Thought/9 pkm/adr", "Deep Thought/9 pkm/ROADMAP.md"
 

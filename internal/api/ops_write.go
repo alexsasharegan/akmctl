@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/rand"
+	"errors"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	mdbody "github.com/alexsasharegan/akmctl/internal/body"
 	"github.com/alexsasharegan/akmctl/internal/depgraph"
 	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 	"github.com/alexsasharegan/akmctl/internal/fsx"
@@ -52,6 +54,20 @@ func refusedRule(rule, format string, a ...any) *Error {
 	e := refused("rule", format, a...)
 	e.Details = O("reason", "rule", "rule", rule)
 	return e
+}
+
+// unsupportedBody is the refusal for a body write the section tree will not make:
+// the body holds a construct akmctl cannot edit around, and nothing is written.
+func unsupportedBody(e *edit, err error) *Error {
+	var u *mdbody.UnsupportedError
+	if !errors.As(err, &u) {
+		return unreadable(err)
+	}
+	// the line is the file's, as rule B1 reports it
+	line := u.Line + strings.Count(string(e.rec.Text[:len(e.rec.Text)-len(e.rec.Body)]), "\n")
+	re := refused("unsupported_markdown", "%s has %s at line %d, which akmctl cannot edit around; edit the file by hand", e.rec.ID, u.Construct, line)
+	re.Details = O("reason", "unsupported_markdown", "construct", u.Construct, "line", line, "structural", u.Structural)
+	return re
 }
 
 func unreadable(err error) *Error { return &Error{Code: "unreadable", Message: err.Error()} }
@@ -717,7 +733,10 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	}
 	status := q.str("status")
 	if o := q.str("outcome"); strings.TrimSpace(o) != "" {
-		e.text = record.SetSection(e.text, "Outcome", o, false, e.eol)
+		var terr error
+		if e.text, terr = record.EditSection(e.text, "Outcome", o, false, e.eol); terr != nil {
+			return nil, unsupportedBody(e, terr)
+		}
 	}
 	_, text := record.Sections(e.text)
 	if strings.TrimSpace(text["outcome"]) == "" {
@@ -888,7 +907,10 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 	}
 	if logLine != "" {
-		e.text = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol)
+		var terr error
+		if e.text, terr = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol); terr != nil {
+			return nil, unsupportedBody(e, terr)
+		}
 	}
 	rec, cerr := e.commit("")
 	if cerr != nil {
@@ -919,7 +941,10 @@ func opRelease(repo *record.Repo, q Request) (Obj, *Error) {
 	if serr := e.doc.Set("updated", frontmatter.NewString(today(now))); serr != nil {
 		return nil, unreadable(serr)
 	}
-	e.text = record.AppendToSection(e.text, "log", "- "+today(now)+": released ("+prev+").", e.eol)
+	var terr error
+	if e.text, terr = record.AppendToSection(e.text, "log", "- "+today(now)+": released ("+prev+").", e.eol); terr != nil {
+		return nil, unsupportedBody(e, terr)
+	}
 	rec, cerr := e.commit("")
 	if cerr != nil {
 		return nil, cerr
@@ -949,7 +974,10 @@ func opSection(repo *record.Repo, q Request) (Obj, *Error) {
 	if repo.IsDone(e.rec.Path) {
 		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
 	}
-	text := record.SetSection(e.text, name, q.str("text"), mode == "append", e.eol)
+	text, terr := record.EditSection(e.text, name, q.str("text"), mode == "append", e.eol)
+	if terr != nil {
+		return nil, unsupportedBody(e, terr)
+	}
 	changed := text != e.text
 	rec := e.rec
 	if changed {

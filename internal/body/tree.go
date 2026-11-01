@@ -42,6 +42,14 @@ type Tree struct {
 	src      []byte
 	sections []Section
 	refusals []Refusal // local constructs the scan stepped over
+	eol      string    // the line ending for a body with no line break (default "\n")
+}
+
+// WithEOL sets the line ending the tree writes when the body has no line break
+// of its own (an empty body, or one line); a body that has one keeps it.
+func (t *Tree) WithEOL(eol string) *Tree {
+	t.eol = eol
+	return t
 }
 
 // Split reads body (the text after the frontmatter) with a tolerant Locate and
@@ -172,9 +180,15 @@ func (t *Tree) lines(from, to int) []lineSpan {
 func (t *Tree) fileEOL() string {
 	if i := bytes.IndexByte(t.src, '\n'); i > 0 && t.src[i-1] == '\r' {
 		return "\r\n"
+	} else if i < 0 && t.eol != "" {
+		return t.eol
 	}
 	return "\n"
 }
+
+// LineEnding is the line ending the tree writes: the body's own, or the one set
+// by WithEOL when the body has no line break.
+func (t *Tree) LineEnding() string { return t.fileEOL() }
 
 // ---- Goal: the checklist ----
 
@@ -395,9 +409,72 @@ func (t *Tree) ReplaceSection(name, text, etag string) ([]byte, error) {
 	default:
 		a := ls[first].start
 		b := ls[last].end
+		if repl == "" { // clearing removes the lines whole, so no empty line is left behind
+			b += len(ls[last].eol)
+		}
 		out = append(out, t.src[:a]...)
 		out = append(out, repl...)
 		out = append(out, t.src[b:]...)
 	}
 	return out, nil
+}
+
+// ---- Adding a section and appending text ----
+
+// AddSection creates the section name with text and returns the new body. It goes
+// before the first "## Log" section, otherwise at the end. The heading is written
+// as given, or capitalised when the name is all lowercase; a section with text has
+// a blank line after its heading, as Prettier writes it, and one blank line
+// separates it from its neighbours. It does not check that the name is free:
+// callers look first.
+func (t *Tree) AddSection(name, text string) ([]byte, error) {
+	eol := t.fileEOL()
+	name = strings.TrimSpace(name)
+	if name == strings.ToLower(name) {
+		r := []rune(name)
+		name = strings.ToUpper(string(r[:1])) + string(r[1:])
+	}
+	block := "## " + name + eol
+	if text = strings.Trim(strings.ReplaceAll(text, "\r\n", "\n"), "\n"); text != "" {
+		block += eol + strings.ReplaceAll(text, "\n", eol) + eol
+	}
+	if lg, ok := t.Section("log"); ok {
+		pre := t.src[:lg.Start]
+		out := append([]byte(nil), pre...)
+		if ls := t.lines(0, lg.Start); len(ls) > 0 && strings.TrimSpace(string(t.src[ls[len(ls)-1].start:ls[len(ls)-1].end])) != "" {
+			out = append(out, eol...)
+		}
+		out = append(out, block...)
+		out = append(out, eol...)
+		return append(out, t.src[lg.Start:]...), nil
+	}
+	out := append([]byte(nil), t.src...)
+	if len(out) > 0 {
+		if !bytes.HasSuffix(out, []byte("\n")) {
+			out = append(out, eol...)
+		}
+		ls := t.lines(0, len(t.src))
+		if last := ls[len(ls)-1]; strings.TrimSpace(string(t.src[last.start:last.end])) != "" {
+			out = append(out, eol...)
+		}
+	}
+	return append(out, block...), nil
+}
+
+// AppendText adds text after the last non-blank line of section name and returns
+// the new body; a missing section is created with it (AddSection). The text is
+// written as given, one line ending per line. Nothing is written for empty text.
+func (t *Tree) AppendText(name, text string) ([]byte, error) {
+	text = strings.TrimRight(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	if text == "" {
+		return t.Join(), nil
+	}
+	s, ok := t.Section(name)
+	if !ok {
+		return t.AddSection(name, text)
+	}
+	if err := t.refusedIn(s); err != nil {
+		return nil, err
+	}
+	return t.appendLine(s, strings.ReplaceAll(text, "\n", t.fileEOL())), nil
 }

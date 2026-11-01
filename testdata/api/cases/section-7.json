@@ -1,0 +1,31 @@
+{
+  "name": "a construct akmctl cannot edit in the section is refused",
+  "repo": "bodyrefusal",
+  "request": {
+    "id": "261022-e5f6",
+    "name": "Goal",
+    "text": "New goal.",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "section",
+    "request": {
+      "id": "261022-e5f6",
+      "name": "Goal",
+      "text": "New goal.",
+      "as_of": "2026-10-28"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261022-e5f6 has ordered-list task at line 17, which akmctl cannot edit around; edit the file by hand",
+      "details": {
+        "reason": "unsupported_markdown",
+        "construct": "ordered-list task",
+        "line": 17,
+        "structural": false
+      }
+    }
+  }
+}

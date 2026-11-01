@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `section`, `close --outcome` and the Log line of `claim` and `release` write through the section tree. The line scan `SetSection` is gone. Bytes outside the edited section are never changed. A body with a structural construct, or a local one in the section being written, is `refused` with `details.reason: "unsupported_markdown"`, the construct and the file's line, and nothing is written. Clearing a section that is already empty no longer adds a blank line. Fixture `section-7` in both copies (work item 261101-q72k, ADR 261101-tr8e).
+
 - `check` warns (rule B1) about a record body that `akmctl` does not read: it names the construct and line, and says whether no write is safe (structural) or only writes to that section are refused (local). Blockquotes are read as opaque text and are not reported. In the maintainer's vault, 2 of 435 work-item sections hold a local construct, where 18 of 138 files used to be refused whole (work item 261101-4j86, ADR 261101-tr8e). Fixture `check-8` in both copies.
 
 - `close` repairs the relative Markdown links its move into `done/` breaks: the item's own links are re-based and the inline links to it in other records, the roadmap, AGENTS.md and the docs are rewritten. The response has `links_rewritten` and, for a file it could not write, `link_errors`; `commit.paths` lists every file written. Fixture `close-8` in both copies; new package `internal/mdlinks`, which `check` rule L1 now uses too (work item 261031-wjs3).
