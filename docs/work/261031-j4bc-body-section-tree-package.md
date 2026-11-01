@@ -1,12 +1,14 @@
 ---
 id: "261031-j4bc"
 title: body section tree package
-status: ready
+status: active
 created: 2026-10-31
 updated: 2026-10-31
 kind: feature
 parent: 261031-gtw6
 summary: internal/body gains a lossless section tree, typed Goal/Next/Log/Outcome and splice edits, on top of Locate, per ADR 261031-gam0
+claimed_by: claude
+claimed_at: 2026-11-01T06:59
 ---
 
 # body section tree package
@@ -46,3 +48,4 @@ Not started. Read ADR 261031-gam0, internal/body (scanner.go, fence.go) and inte
 - 2026-10-31: Goal rewritten after 261031-yw5v, 261031-2j14 and 261031-wjs3 closed: ADRs accepted, Locate and FenceTracker exist, no wait on 261031-6bzq for the primitives; blocked_by removed.
 - 2026-10-31: Alexander confirmed Split fails closed when Locate refuses; made ready.
 - 2026-10-31: Alexander confirmed Split fails closed when Locate refuses; made ready.
+- 2026-10-31: claimed (claude).
