@@ -1,0 +1,57 @@
+{
+  "name": "ordered boxes count with the bullet boxes: item 3 is the second ordered one",
+  "repo": "orderedgoal",
+  "request": {
+    "id": "261022-e5f6",
+    "item": 3,
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "tick",
+    "request": {
+      "id": "261022-e5f6",
+      "item": 3,
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "bb760f430418ec46",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": null,
+        "status": "ready",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": null,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "closed": null,
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "section": {
+      "name": "goal",
+      "text": "Do the thing.\n\n- [ ] It is done.\n1. [ ] Ordered step.\n2. [x] Another.",
+      "etag": "7b3b416cae2aadda"
+    },
+    "item": {
+      "position": 3,
+      "done": true,
+      "text": "Another."
+    },
+    "changed": true
+  },
+  "after": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n1. [ ] Ordered step.\n2. [x] Another.\n"
+  }
+}

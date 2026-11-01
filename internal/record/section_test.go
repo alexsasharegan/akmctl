@@ -116,7 +116,7 @@ func TestEditSectionEdges(t *testing.T) {
 			t.Errorf("structural, %s: err = %v", name, err)
 		}
 	}
-	local := "## Goal\n- [ ] a\n\n## Notes\n1. [ ] b\n"
+	local := "## Goal\n- [ ] a\n\n## Notes\n*\tb\n"
 	if _, err := EditSection(local, "goal", "y", false, "\n"); err != nil {
 		t.Errorf("a local construct in another section refused the write: %v", err)
 	}

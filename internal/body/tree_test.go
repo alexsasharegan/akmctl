@@ -370,9 +370,9 @@ func FuzzTree(f *testing.F) {
 // TestLocalConstructScope: a local construct blocks only the edits of its own
 // section. A blockquote is not a refusal at all.
 func TestLocalConstructScope(t *testing.T) {
-	src := "## Goal\n\n- [ ] one\n\n## Notes\n\n> a callout\n\n1. [ ] ordered\n\n## Log\n\n- 2026-10-01: a\n"
+	src := "## Goal\n\n- [ ] one\n\n## Notes\n\n> a callout\n\n- [ ]\n\n## Log\n\n- 2026-10-01: a\n"
 	tr := mustSplit(t, src)
-	if r := tr.Refusals(); len(r) != 1 || r[0].Construct != "ordered-list task" || r[0].Line != 9 {
+	if r := tr.Refusals(); len(r) != 1 || r[0].Construct != "task item without text" || r[0].Line != 9 {
 		t.Fatalf("refusals = %+v", r)
 	}
 	if out, err := tr.SetChecked("goal", 1, true, ""); err != nil || !strings.Contains(string(out), "- [x] one") {
@@ -438,5 +438,27 @@ func TestLogEntriesBothForms(t *testing.T) {
 	out, _ := mustSplit(t, "## Log\n- 2026-10-01: a\n").AppendLog("2026-11-01 14:30-07:00", "b")
 	if string(out) != "## Log\n- 2026-10-01: a\n- 2026-11-01 14:30-07:00: b\n" {
 		t.Errorf("append: %q", out)
+	}
+}
+
+// Ordered and bullet tasks share one count: position n stays a stable index
+// (work item 261101-wder).
+func TestOrderedChecklist(t *testing.T) {
+	for _, eol := range []string{"\n", "\r\n"} {
+		src := strings.ReplaceAll("## Goal\n\n- [ ] a\n1. [ ] b\n2. [x] c\n- [ ] d\n\n## Log\n", "\n", eol)
+		tr := mustSplit(t, src)
+		items, err := tr.Checklist("goal")
+		if err != nil || len(items) != 4 || items[1].Text != "b" || items[2].Pos != 3 || !items[2].Done {
+			t.Fatalf("%q: items %+v %v", eol, items, err)
+		}
+		out, err := tr.SetChecked("goal", 2, true, "")
+		want := strings.Replace(src, "1. [ ] b", "1. [x] b", 1)
+		if err != nil || string(out) != want {
+			t.Errorf("%q: tick 2 = %q %v", eol, out, err)
+		}
+		out, err = tr.SetChecked("goal", 3, false, "")
+		if want = strings.Replace(src, "2. [x] c", "2. [ ] c", 1); err != nil || string(out) != want {
+			t.Errorf("%q: untick 3 = %q %v", eol, out, err)
+		}
 	}
 }

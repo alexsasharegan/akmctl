@@ -216,7 +216,11 @@ def closable(files):
 
 def bodyrefusal(files):
     """basic, plus a list line akmctl does not read in the last section of one item."""
-    files[E5F6] += "\n1. [ ] ordered step\n"
+    files[E5F6] += "\n*\ttab step\n"
+
+def orderedgoal(files):
+    """basic, plus ordered boxes after the bullet box in one item's Goal."""
+    files[E5F6] = files[E5F6].replace("- [ ] It is done.", "- [ ] It is done.\n1. [ ] Ordered step.\n2. [ ] Another.", 1)
 
 def closelinks(files):
     """closable, plus links out of the item and a note with a link to it."""
@@ -419,9 +423,9 @@ def write_cases(cases, basic):
     case("section", 6, "a closed record is refused", "basic", req, err("section", req, "refused", "261010-j9k0 is closed; its sections are not edited", reason="closed"))
     brf = build("bodyrefusal", bodyrefusal)
     req = dict(id="261022-e5f6", name="Goal", text="New goal.", as_of="2026-10-28")
-    ln = next(i for i, l in enumerate(brf[E5F6].split("\n"), 1) if l.startswith("1. [ ] ordered step"))
+    ln = next(i for i, l in enumerate(brf[E5F6].split("\n"), 1) if l.startswith("*\ttab step"))
     case("section", 7, "a construct akmctl cannot edit in the section is refused", "bodyrefusal", req,
-         err("section", req, "refused", "261022-e5f6 has ordered-list task at line %d, which akmctl cannot edit around; edit the file by hand" % ln, reason="unsupported_markdown", construct="ordered-list task", line=ln, structural=False))
+         err("section", req, "refused", "261022-e5f6 has tab after a list marker at line %d, which akmctl cannot edit around; edit the file by hand" % ln, reason="unsupported_markdown", construct="tab after a list marker", line=ln, structural=False))
 
     # tick and log
     def section_etag(text, name):
@@ -450,6 +454,12 @@ def write_cases(cases, basic):
     wcase("tick", 1, "tick the first box of the Goal", req, tk, E5F6, "goal", "Do the thing.\n\n- [x] It is done.", ("item", dict(position=1, done=True, text="It is done.")))
     req = dict(id="261022-e5f6", item=1, dry_run=True, as_of="2026-10-28")
     wcase("tick", 2, "dry run: the tick as a diff, nothing written", req, tk, E5F6, "goal", "Do the thing.\n\n- [x] It is done.", ("item", dict(position=1, done=True, text="It is done.")), dryrun=True)
+    og = build("orderedgoal", orderedgoal)
+    req = dict(id="261022-e5f6", item=3, as_of="2026-10-28")
+    tk = og[E5F6].replace("updated: 2026-10-22\n", "updated: 2026-10-28\n").replace("2. [ ] Another.", "2. [x] Another.")
+    files = dict(og); files[E5F6] = tk
+    case("tick", 5, "ordered boxes count with the bullet boxes: item 3 is the second ordered one", "orderedgoal", req,
+         ok("tick", req, record=pub(after_rec(files, E5F6)), section=sec_out(tk, "goal", "Do the thing.\n\n- [ ] It is done.\n1. [ ] Ordered step.\n2. [x] Another."), item=dict(position=3, done=True, text="Another."), changed=True), after={E5F6: tk})
     req = dict(id="261020-a2b3", item=1, section_etag="0000000000000000")
     case("tick", 3, "a stale section_etag answers with the current one", "basic", req, err("tick", req, "stale", "the goal section changed since it was read", section_etag=section_etag(basic[A2B3], "goal")))
     req = dict(id="261022-e5f6", item=5)
@@ -747,7 +757,7 @@ def main():
     case("check", 7, "a warning does not make the repository unclean", "redundant", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=1, count=1, findings=f7, reconcile=dict(state="current")))
     brf = build("bodyrefusal", bodyrefusal)
     last_h = [l for l in brf[E5F6].split("\n") if l.startswith("## ")][-1][3:]
-    f8 = [dict(rule="B1", severity="W", file=E5F6, line=line_of(brf, E5F6, "1. [ ] ordered step"), id="261022-e5f6", message="line %d: ordered-list task; akmctl cannot edit the \"%s\" section" % (line_of(brf, E5F6, "1. [ ] ordered step"), last_h), **{"class": None})]
+    f8 = [dict(rule="B1", severity="W", file=E5F6, line=line_of(brf, E5F6, "*\ttab step"), id="261022-e5f6", message="line %d: tab after a list marker; akmctl cannot edit the \"%s\" section" % (line_of(brf, E5F6, "*\ttab step"), last_h), **{"class": None})]
     case("check", 8, "a construct akmctl cannot edit is a warning", "bodyrefusal", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=1, count=1, findings=f8, reconcile=dict(state="current")))
     req = {}
     case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.3.0"}, to="0.3.0", state="current", steps=[], findings=[], clean=True))

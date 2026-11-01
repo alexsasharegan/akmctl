@@ -22,7 +22,7 @@
         "file": "docs/work/261022-e5f6-document-the-exit-codes.md",
         "line": 17,
         "id": "261022-e5f6",
-        "message": "line 17: ordered-list task; akmctl cannot edit the \"Goal\" section",
+        "message": "line 17: tab after a list marker; akmctl cannot edit the \"Goal\" section",
         "class": null
       }
     ],

@@ -27,6 +27,8 @@ var (
 	tabMarkerRe   = regexp.MustCompile(`^ {0,3}[-*+] *\t`)
 	emptyTaskRe   = regexp.MustCompile(`^ {0,3}[-*+] {1,4}\[[ xX]\]\s*$`)
 	orderedTask   = regexp.MustCompile(`^\s*\d+[.)]([ \t]+(\d+[.)]|[-*+]|#{1,6}|>))*[ \t]+\[`)
+	ordTaskRe     = regexp.MustCompile(`^( {0,3})(\d{1,9})([.)]) {1,4}\[([ xX])\] +[ \t]*\S`)
+	ordItemRe     = regexp.MustCompile(`^( {0,3})(\d{1,9})([.)]) +\S`)
 	deepTaskRe    = regexp.MustCompile(`^ {4,}[-*+] \[[ xX]\]`)
 	bulletRe      = regexp.MustCompile(`^[-*+] +\S`)
 	htmlRe        = regexp.MustCompile(`^ {0,3}<[a-zA-Z/!?]`)
@@ -63,6 +65,7 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		fStart    Block
 		prevBlank = true
 		prev      string // the previous line, "" after a blank one
+		ord       ordState
 		lineNo    int
 	)
 	off := 0
@@ -106,7 +109,7 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 			} else {
 				fStart.End, fStart.EndLine = lineEnd, lineNo
 			}
-			prevBlank = false
+			prevBlank, ord = false, ordState{}
 			off = next
 			continue
 		}
@@ -114,7 +117,7 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		blank := strings.TrimSpace(t) == ""
 		switch {
 		case blank:
-			prevBlank, prev = true, ""
+			prevBlank, prev, ord = true, "", ordState{}
 			off = next
 			continue
 		case leadTabRe.MatchString(t):
@@ -128,11 +131,12 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		if ch, n, ok := fenceOpen(t); ok {
 			fch, flen = ch, n
 			fStart = Block{Kind: Fence, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo}
-			prevBlank = false
+			prevBlank, ord = false, ordState{}
 			off = next
 			continue
 		}
 
+		var ordTask []string
 		skip := false // a local construct was stepped over: the line is plain text
 		switch {
 		case indFenceRe.MatchString(t):
@@ -167,16 +171,16 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		case indHeadingRe.MatchString(t):
 			return fail("indented heading")
 		case orderedTask.MatchString(t):
-			// Kept as a local refusal (work item 261101-xher). The oracle reads "1. [ ]"
-			// as a task, so reading it as a plain list item would disagree with GFM and
-			// with Obsidian, and claiming it as a task means numbering ordered boxes in
-			// the checklist, a model change for two vault items in sections no write
-			// touches. A local refusal only stops writes to a section that holds one.
-			// The maintainer wants ordered task lists: work item 261101-wder claims them.
-			if refuse("ordered-list task") {
+			// "1. [ ] x" is a task like "- [ ] x" (work item 261101-wder). It is claimed
+			// when it is a list item by CommonMark's rules (see ordState.listItem); any
+			// other shape, such as nested markers or a box without text, stays a local
+			// refusal.
+			if m := ordTaskRe.FindStringSubmatch(t); m != nil && ord.listItem(m[1], m[2], m[3], prevBlank) {
+				ordTask = m
+			} else if refuse("ordered-list task") {
 				return Layout{}, refusal
 			}
-			skip = true
+			skip = ordTask == nil
 		case deepTaskRe.MatchString(t):
 			if refuse("task item indented four or more spaces") {
 				return Layout{}, refusal
@@ -216,6 +220,8 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 					return fail("empty heading")
 				}
 				lay.Blocks = append(lay.Blocks, Block{Kind: Heading, Level: len(m[1]), Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
+			case ordTask != nil:
+				lay.Blocks = append(lay.Blocks, Block{Kind: Task, Done: ordTask[4] != " ", Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
 			case taskRe.MatchString(t):
 				m := taskRe.FindStringSubmatch(t)
 				lay.Blocks = append(lay.Blocks, Block{Kind: Task, Done: m[2] != " ", Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
@@ -223,6 +229,7 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 				lay.Blocks = append(lay.Blocks, Block{Kind: ListItem, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
 			}
 		}
+		ord = ord.next(t, prevBlank)
 		prevBlank, prev = false, t
 		off = next
 	}
@@ -243,6 +250,31 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 // The oracle battery checks both against goldmark.
 func plainHTML(t string) bool {
 	return htmlCommentRe.MatchString(t) || htmlInlineRe.MatchString(t)
+}
+
+// ordState remembers whether the line before was an ordered list item, so that the
+// next one can be its sibling.
+type ordState struct {
+	ok     bool
+	indent int
+	delim  string
+}
+
+// listItem reports whether an ordered line is a list item and not text of the
+// paragraph before it. An ordered item may interrupt a paragraph only when it
+// starts at 1; otherwise it must follow a blank line, or be the next item of the
+// list the line before began (same delimiter and indent).
+func (o ordState) listItem(indent, num, delim string, prevBlank bool) bool {
+	return prevBlank || num == "1" || (o.ok && o.delim == delim && o.indent == len(indent))
+}
+
+// next is the state after line t, which was read with prevBlank before it.
+func (o ordState) next(t string, prevBlank bool) ordState {
+	m := ordItemRe.FindStringSubmatch(t)
+	if m == nil || !o.listItem(m[1], m[2], m[3], prevBlank) {
+		return ordState{}
+	}
+	return ordState{ok: true, indent: len(m[1]), delim: m[3]}
 }
 
 func runLen(t string, c byte) int {

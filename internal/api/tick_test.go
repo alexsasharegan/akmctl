@@ -163,7 +163,7 @@ func TestTickRefusesUnreadableBody(t *testing.T) {
 	p := filepath.Join(root, e5f6Path)
 	b, _ := os.ReadFile(p)
 	// a local construct in Notes does not stop a tick in Goal; in Goal it does
-	os.WriteFile(p, append(b, []byte("\n## Notes\n\n1. [ ] ordered\n")...), 0o644)
+	os.WriteFile(p, append(b, []byte("\n## Notes\n\n*\tordered\n")...), 0o644)
 	mustOK(t, root, "tick", Request{"id": e5f6ID, "item": 1})
 	_, err := call(t, root, "tick", Request{"id": e5f6ID, "item": 1, "section": "notes"})
 	if err == nil || err.Code != "refused" {

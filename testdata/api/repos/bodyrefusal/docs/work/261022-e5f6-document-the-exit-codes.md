@@ -14,4 +14,4 @@ Do the thing.
 
 - [ ] It is done.
 
-1. [ ] ordered step
+*	tab step

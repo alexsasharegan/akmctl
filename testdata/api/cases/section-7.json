@@ -19,10 +19,10 @@
     "ok": false,
     "error": {
       "code": "refused",
-      "message": "261022-e5f6 has ordered-list task at line 17, which akmctl cannot edit around; edit the file by hand",
+      "message": "261022-e5f6 has tab after a list marker at line 17, which akmctl cannot edit around; edit the file by hand",
       "details": {
         "reason": "unsupported_markdown",
-        "construct": "ordered-list task",
+        "construct": "tab after a list marker",
         "line": 17,
         "structural": false
       }

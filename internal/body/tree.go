@@ -203,8 +203,8 @@ type Item struct {
 	box   int // offset of the character between the brackets
 }
 
-// Checklist is the first contiguous run of task lines ("- [ ] text", "- [x] text",
-// one per line) in the section, or nil when it has none. A task line after a
+// Checklist is the first contiguous run of task lines ("- [ ] text", "1. [x] text",
+// bullet and ordered alike, one per line) in the section, or nil when it has none. A task line after a
 // blank line or other text is not part of the run; it stays in the prose.
 func (t *Tree) Checklist(name string) ([]Item, error) {
 	s, ok := t.Section(name)

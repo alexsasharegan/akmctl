@@ -106,8 +106,8 @@ func TestRecords(t *testing.T) {
 // ordinary record text; the second is hostile.
 var (
 	ordinary = []string{"## Goal", "## Log", "## Next", "text", "more text", "", "", "- [ ] item", "- [x] done",
-		"- plain", "- 2026-10-31: log", "```", "~~~", "# Title", "### Sub", "* [ ] star"}
-	nasty = []string{"##x", "## A ##", "  ## indented", "    ## code", "- [ ] item", "1. [ ] ordered", "  - [ ] nested",
+		"- plain", "1. [ ] o", "2. [x] p", "- 2026-10-31: log", "```", "~~~", "# Title", "### Sub", "* [ ] star"}
+	nasty = []string{"##x", "## A ##", "  ## indented", "    ## code", "- [ ] item", "1. [ ] ordered", "2. [x] two", "3) [ ] x", "1) [X] y", "  1. [ ] ind", "10. [ ] ten", "1. plain", "2. plain", "007. [ ] z", "1.\t[ ] tab", "0) 0) [X]", "  - [ ] nested",
 		"```go", "  ```", "````", "`````", "~~~~", "<div>", "</div>", "<!-- c -->", "<br>", "<b>bold</b> text", "</b> tail", "<a href=\"x\">", "<!-- open", "-->", "<!-- c --> after", "> quote", "> ## in quote",
 		"> - [ ] q", "| a | b |", "|---|---|", "---", "===", "Setext", "\ttab", "[ref]: http://x", "* * *", "-", "##", "- [ ]"}
 )

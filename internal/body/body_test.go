@@ -116,7 +116,9 @@ func TestRefusals(t *testing.T) {
 		{"block inside a list item", "text\n  * # [X]\n", 2},
 		{"setext heading underline or thematic break after text", "Title\n-\n", 2},
 		{"setext heading underline or thematic break after text", "- [X] 0\n-:\n", 2},
-		{"ordered-list task", "1. [ ] one\n", 1},
+		{"ordered-list task", "text\n2. [ ] one\n", 2},
+		{"ordered-list task", "1. [ ]\n", 1},
+		{"ordered-list task", "1.     [ ] one\n", 1},
 		{"ordered-list task", "0) 0) [X]\n", 1},
 		{"task item indented four or more spaces", "- a\n    - [ ] deep\n", 2},
 		{"indented code in a list item", "-      x\n", 1},
@@ -221,7 +223,7 @@ func TestEveryRefusalIsClassified(t *testing.T) {
 // TestTolerant: a tolerant scan steps over local constructs, records them with
 // their line, and still stops at a structural one.
 func TestTolerant(t *testing.T) {
-	src := "## A\n\n1. [ ] ordered\n- [ ] real\n\n## B\n\n-\n"
+	src := "## A\n\n- [ ]\n- [ ] real\n\n## B\n\n-\n"
 	if _, err := Locate([]byte(src)); !errors.Is(err, ErrUnsupported) {
 		t.Fatalf("strict Locate = %v", err)
 	}
@@ -229,7 +231,7 @@ func TestTolerant(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(lay.Refusals) != 2 || lay.Refusals[0].Construct != "ordered-list task" || lay.Refusals[0].Line != 3 || lay.Refusals[1].Line != 8 {
+	if len(lay.Refusals) != 2 || lay.Refusals[0].Construct != "task item without text" || lay.Refusals[0].Line != 3 || lay.Refusals[1].Line != 8 {
 		t.Errorf("refusals = %+v", lay.Refusals)
 	}
 	var tasks int
@@ -269,5 +271,40 @@ func TestPlainHTML(t *testing.T) {
 		if n := 0; len(lay.Blocks) == n {
 			t.Errorf("%q: no blocks", src)
 		}
+	}
+}
+
+// An ordered task is a task like a bullet one (work item 261101-wder), when it is
+// a list item by CommonMark's rules; the oracle decides which shapes qualify.
+func TestOrderedTasks(t *testing.T) {
+	for _, src := range []string{
+		"## A\n\n1. [ ] one\n2. [x] two\n1) [ ] three\n",
+		"## A\n\n- [ ] bullet\n1. [ ] ordered\n- [x] bullet\n",
+		"## A\n\n5. [ ] starts at five\n6. [X] six\n",
+		"## A\ntext\n1. [ ] interrupts a paragraph\n",
+		"## A\n\n  1. [ ] indented two\n  2. [ ] two\n",
+	} {
+		lay, err := Locate([]byte(src))
+		if err != nil {
+			t.Errorf("%q: %v", src, err)
+			continue
+		}
+		if _, diff := compare([]byte(src)); diff != "" {
+			t.Errorf("%q:\n%s", src, diff)
+		}
+		var n int
+		for _, b := range lay.Blocks {
+			if b.Kind == Task {
+				n++
+			}
+		}
+		if n < 2 && !strings.Contains(src, "interrupts") {
+			t.Errorf("%q: %d tasks", src, n)
+		}
+	}
+	// text before a non-1 number: the line is paragraph text, so it is refused (locally)
+	// and not claimed
+	if _, err := Locate([]byte("## A\ntext\n2. [ ] x\n")); !errors.Is(err, ErrUnsupported) {
+		t.Errorf("non-1 number after text: %v", err)
 	}
 }

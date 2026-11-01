@@ -22,8 +22,8 @@ const (
 	// Fence is a fenced code block, from its opening line to its closing line, or
 	// to the last line when it is not closed.
 	Fence
-	// Task is a task list item, "- [ ] text" or "- [x] text", with at most three
-	// leading spaces. It spans its first line.
+	// Task is a task list item, "- [ ] text" or "- [x] text", or an ordered one
+	// ("1. [ ] text", "2) [x] text"), with at most three leading spaces. It spans its first line.
 	Task
 	// ListItem is a bullet item at column 0 that is not a task. It spans its first
 	// line.

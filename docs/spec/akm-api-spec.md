@@ -362,7 +362,7 @@ Side effect: writes files in a write mode with `confirm` and without `dry_run`. 
 
 ### 4.21 `tick`
 
-Set or clear one checkbox of a checklist in a record's body, without sending the section again (ADR 261101-tr8e). The checklist is the first run of task lines (`- [ ] text`, `- [x] text`, one per line, no blank line between) in the section.
+Set or clear one checkbox of a checklist in a record's body, without sending the section again (ADR 261101-tr8e). The checklist is the first run of task lines (`- [ ] text`, `- [x] text`, or an ordered `1. [ ] text`, `2) [x] text`; one per line, no blank line between) in the section. Bullet and ordered boxes share one count, so a position is a stable index: `- [ ] a`, `1. [ ] b`, `2. [ ] c` are items 1, 2 and 3. An ordered line is a box only when CommonMark reads it as a list item: after a blank line, starting at `1`, or as the next item of the ordered list on the line before; any other ordered line is `unsupported_markdown`, local. Nested markers (`1. 1. [ ] x`) and a marker followed by more than four spaces are refused.
 
 | Parameter                      | Type    | Default      | Meaning                                                                                                                           |
 | ------------------------------ | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------- |

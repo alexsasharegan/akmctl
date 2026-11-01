@@ -9,7 +9,7 @@ changed: true
 $ akmctl tick 261029-atxk 2 --undo
 ```
 
-`<n>` is the 1-based position of the box in the checklist: the first run of `- [ ]` lines with no blank line between. `--section <name>` picks another section (default `goal`). A box already in the asked state is `changed: false` and writes nothing. To guard against a changed list, pass the `section_etag` from an earlier response (`--section-etag`): a mismatch is `stale`.
+`<n>` is the 1-based position of the box in the checklist: the first run of `- [ ]` or `1. [ ]` lines with no blank line between; bullet and ordered boxes share one count (`- [ ] a`, `1. [ ] b` are items 1 and 2). `--section <name>` picks another section (default `goal`). A box already in the asked state is `changed: false` and writes nothing. To guard against a changed list, pass the `section_etag` from an earlier response (`--section-etag`): a mismatch is `stale`.
 
 Files changed: the one record; one byte of it, and `updated` is set to today.
 
