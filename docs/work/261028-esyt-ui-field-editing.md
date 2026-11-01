@@ -2,11 +2,12 @@
 id: "261028-esyt"
 title: Show and edit a record's fields in the drawer
 summary: The drawer shows frontmatter as a typed table and edits each editable field in place through set, with etag conflict handling; merges the typed-table item
-status: ready
+status: blocked
 kind: feature
 priority: 1
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-31
+blocked_by: [261031-z0n8]
 ---
 
 # Show and edit a record's fields in the drawer
@@ -30,10 +31,11 @@ Done when:
 
 ## Next
 
-Ready. Needs the controls in 261029-kb33 and 261029-bdt9 for summary, kind, parent and blocked_by; the table and the simple fields can start first.
+Blocked on spike 261031-z0n8 (which fields are editable in which status; closed items). Unblock when its outcome is in, then update this item to match. Needs the controls in 261029-kb33 and 261029-bdt9 for summary, kind, parent and blocked_by; the table and the simple fields can start first.
 
 ## Log
 
 - 2026-10-28: filed.
 - 2026-10-29: refined with Alexander; merged 261029-paw7 into this item.
 - 2026-10-31: the edit rules (which fields when, closed items) are decided by spike 261031-z0n8 under 261031-gtw6; the table and simple fields can start first.
+- 2026-10-31: blocked on 261031-z0n8; the edit rules and the drawer redesign (261031-gtw6) may change this item's scope.
