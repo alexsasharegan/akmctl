@@ -2,8 +2,6 @@
 
 ## Now
 
-- [261101-m3pv] Subcommands reject --help instead of printing usage
-
 ## Next
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):

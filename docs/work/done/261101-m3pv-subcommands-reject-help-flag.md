@@ -1,13 +1,12 @@
 ---
 id: "261101-m3pv"
 title: Subcommands reject --help instead of printing usage
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-01
+closed: 2026-11-01
 kind: bug
 summary: akmctl <command> --help fails with unknown parameter "help"; only `akmctl help` lists commands, and it has no per-command page
-claimed_by: claude
-claimed_at: 2026-11-01T21:41
 ---
 
 # Subcommands reject --help instead of printing usage
@@ -22,6 +21,10 @@ Hit twice in the session of spike 261101-baze (`akmctl new work x --help`, `akmc
 ## Next
 
 Done; close after Alexander's review.
+
+## Outcome
+
+akmctl <command> --help, -h and akmctl help <command> print the command's flags (from the API parameter table) and one example, exit 0. TestEveryCommandHasHelp fails for any command without an example. ADR check: none.
 
 ## Log
 
