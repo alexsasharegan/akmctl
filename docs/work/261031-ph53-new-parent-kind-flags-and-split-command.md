@@ -1,7 +1,7 @@
 ---
 id: "261031-ph53"
 title: new parent kind flags and split command
-status: raw
+status: ready
 created: 2026-10-31
 updated: 2026-11-01
 summary: CLI new takes --parent and --kind; split creates several children of an item
