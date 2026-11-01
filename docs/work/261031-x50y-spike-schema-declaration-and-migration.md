@@ -13,7 +13,7 @@ updated: 2026-10-31
 
 ## Goal
 
-Once the body has a model ([261031-qbat](261031-qbat-spike-work-item-body-model.md)), someone has to declare it, check it and carry old records to it. Find out:
+Once the body has a model ([261031-qbat](done/261031-qbat-spike-work-item-body-model.md)), someone has to declare it, check it and carry old records to it. Find out:
 
 - Where it lives: in the spec and the tool only, in `docs/.layout`, or in an extension a repository can add to (custom sections and fields for its own workflow). Whether a repository may add sections and fields, and how that is validated.
 - Enforcement: new `check` rules (a rule per violation class, with a rule id), their severity, and whether the rules apply to closed items. How a hand-edited file that breaks the schema is reported and repaired.

@@ -13,7 +13,7 @@ updated: 2026-10-31
 
 ## Goal
 
-A strong priority: every write to a record body goes through the tool. An agent or the workbench says "tick this item", "append this log line", "replace the goal text", and the tool produces correct Markdown, so no one spends tokens on formatting. Depends on the model in [261031-qbat](261031-qbat-spike-work-item-body-model.md). Find out:
+A strong priority: every write to a record body goes through the tool. An agent or the workbench says "tick this item", "append this log line", "replace the goal text", and the tool produces correct Markdown, so no one spends tokens on formatting. Depends on the model in [261031-qbat](done/261031-qbat-spike-work-item-body-model.md). Find out:
 
 - The writer: a parse to the section tree and a render back, standard library only (no new dependency without an ADR). What it must preserve byte for byte (unknown sections, hand formatting, wikilinks, tables) and what it may normalize. Compare a full re-render with targeted splices of the changed span; the diff a maintainer sees in git is the test.
 - The operations: `section` already exists, so start from what it does and where it falls short. Candidates: set or append text in a section, add, tick or untick a checklist item, append a dated log entry, add or remove an extension section, move a section. Addressing by section and item id rather than by text.

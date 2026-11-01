@@ -35,6 +35,7 @@
 
 ## Proposed
 
-| id                                                        | title                                                        | date       | scope | summary                                                      | supersedes / superseded_by |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ | -------------------------- |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0) |                            |
+| id                                                        | title                                                                               | date       | scope | summary                                                                                                 | supersedes / superseded_by |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0)                        | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0)                                            |                            |
+| [261031-gam0](261031-gam0-work-item-body-model.md)        | A work item body is a list of sections, with typed core sections and open extension | 2026-10-31 |       | A work item body is an ordered list of named sections; Goal, Next, Log and Outcome are typed, any other |                            |
