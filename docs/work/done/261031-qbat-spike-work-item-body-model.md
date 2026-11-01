@@ -43,7 +43,7 @@ Recommendation: build option (c), an open body with a typed core, and write the 
 - **Addressing.** Section name plus 1-based position, guarded by a section etag. No ids in the file: none exist today and they would add noise to hand edits.
 - **A finding outside the model.** 24 of 70 closed items still have unticked "done when" boxes, so `close` does not tick them; this is [261031-zek2](../261031-zek2-close-checks-goal-checkboxes.md).
 - **Not covered:** the spec's rules for `Next` (`Saved:` line), the ADR body, and a prototype writer in Go. The survey ran in Python over the files; the Go split is the follow-up.
-- Follow-ups: [261031-j4bc](../261031-j4bc-body-section-tree-package.md) (the section tree package), and the open spikes 261031-6bzq (operations) and 261031-x50y (declaration and `check`), which build on this model.
+- Follow-ups: [261031-j4bc](261031-j4bc-body-section-tree-package.md) (the section tree package), and the open spikes 261031-6bzq (operations) and 261031-x50y (declaration and `check`), which build on this model.
 
 ## Log
 

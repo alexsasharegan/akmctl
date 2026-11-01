@@ -17,7 +17,7 @@ Found by the fuzz prototype in spike [261031-g9zk](261031-g9zk-spike-markdown-pa
 
 - [x] A test with a mixed fence (backticks closed by `~~~`) and a four-backtick fence holding three fails today and passes after the fix.
 - [x] `section` and anything else that finds headings use the same fence rule.
-- [x] The fix is made in or ahead of the body package from [261031-j4bc](../261031-j4bc-body-section-tree-package.md), so the rule lives in one place.
+- [x] The fix is made in or ahead of the body package from [261031-j4bc](261031-j4bc-body-section-tree-package.md), so the rule lives in one place.
 
 ## Next
 

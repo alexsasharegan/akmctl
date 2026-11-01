@@ -46,7 +46,7 @@ Recommendation: adopt goldmark (with GFM) as a reader behind an internal body pa
 - **Cost.** No dependencies of its own, MIT, about 13,700 non-test lines (akmctl has about 11,200), +1.36 MB on a 10.1 MB binary, 100+ releases. A parser's spec moves slowly, so upgrades are mostly about edge cases, not new syntax.
 - **Prettier.** goldmark's core has no Markdown printer. A parser plus our own printer could replace Prettier for records, but matching its output is a long tail of its own; kept as a finding, not a decision.
 - **Not done.** I did not test goldmark's nested-heading offsets for setext headings, tables or HTML blocks beyond the cases above; I did not check CommonMark or GFM spec versions (from memory: CommonMark 0.31.2, GFM 0.29); I did not build the Go package.
-- Follow-ups: [261031-j4bc](../261031-j4bc-body-section-tree-package.md) now builds on this once the ADR is accepted; the open spikes 261031-6bzq (operations) and 261031-x50y (schema) can start from the section model.
+- Follow-ups: [261031-j4bc](261031-j4bc-body-section-tree-package.md) now builds on this once the ADR is accepted; the open spikes 261031-6bzq (operations) and 261031-x50y (schema) can start from the section model.
 
 ## Log
 
