@@ -1,11 +1,13 @@
 ---
 id: "261031-2j14"
 title: section fence tracking
-status: raw
+status: active
 created: 2026-10-31
 updated: 2026-10-31
 kind: bug
 summary: SetSection ends a code fence on any backtick or tilde fence line, so a mixed or longer fence can hide or invent a section heading
+claimed_by: claude
+claimed_at: 2026-11-01T06:08
 ---
 
 # section fence tracking
@@ -21,3 +23,4 @@ Found by the fuzz prototype in spike [261031-g9zk](done/261031-g9zk-spike-markdo
 ## Log
 
 - 2026-10-31: filed.
+- 2026-10-31: claimed (claude).
