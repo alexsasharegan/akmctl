@@ -2,6 +2,14 @@
 
 How a version of `akmctl` is cut. The maintainer tags and pushes (AGENTS.md); an agent prepares everything up to the tag.
 
+## When to release
+
+Before 1.0.0 there are no hard rules; these are hints, and the maintainer decides.
+
+- **Version.** A change that breaks callers (a new refusal on an existing operation, a changed output, a layout change) is a minor bump (`0.x.0`). A patch (`0.x.y`) carries fixes and docs. A new operation or parameter that breaks nothing is the maintainer's call.
+- **1.0.0** means the API is frozen. It is not what a breaking release becomes; breaking changes are expected until then.
+- **A good moment.** A logical chunk is finished: the code, fixtures, spec and docs agree and `check` is clean (the body-schema work was one). Many unreleased changelog entries, or a fix someone is waiting on, are also reasons.
+
 ## Prepare
 
 1. File a `chore` work item for the release (`akmctl new work release-v0-3-2`), claim it, and put it under Now in `docs/ROADMAP.md`. Its done-when: the changelog heading, the tag pushed by the maintainer, the archives attached and `go install` reporting the version. Leave `## Next` as the tag step.
