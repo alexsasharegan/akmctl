@@ -36,3 +36,4 @@ Ready. Needs the controls in 261029-kb33 and 261029-bdt9 for summary, kind, pare
 
 - 2026-10-28: filed.
 - 2026-10-29: refined with Alexander; merged 261029-paw7 into this item.
+- 2026-10-31: the edit rules (which fields when, closed items) are decided by spike 261031-z0n8 under 261031-gtw6; the table and simple fields can start first.
