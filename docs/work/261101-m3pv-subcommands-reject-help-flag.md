@@ -19,6 +19,10 @@ Hit twice in the session of spike 261101-baze (`akmctl new work x --help`, `akmc
 - [ ] `<command> --help` and `akmctl help <command>` print that command's flags and one example, and exit 0.
 - [ ] A test covers every command, so a new command without usage text fails it.
 
+## Next
+
+Find where commands parse flags in `cmd/akmctl`, add a per-command usage table and the `--help` / `help <command>` path, then the every-command test.
+
 ## Log
 
 - 2026-11-01: filed.
