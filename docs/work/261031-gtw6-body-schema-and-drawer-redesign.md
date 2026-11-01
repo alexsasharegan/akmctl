@@ -20,7 +20,7 @@ The umbrella for one redesign with two halves, from Alexander's notes of 2026-10
 Children (spikes, in dependency order; none is built until its spike has an outcome):
 
 - [261031-qbat](done/261031-qbat-spike-work-item-body-model.md): what a work item body contains, and the open-versus-closed question.
-- [261031-6bzq](261031-6bzq-spike-body-writer-api.md): the Markdown writer and the body write API (needs the model).
+- [261031-6bzq](done/261031-6bzq-spike-body-writer-api.md): the Markdown writer and the body write API (needs the model).
 - [261031-x50y](261031-x50y-spike-schema-declaration-and-migration.md): where the schema is declared, how `check` enforces it, how existing items migrate (needs the model).
 - [261031-g9zk](done/261031-g9zk-spike-markdown-parser-dependency.md): which Markdown parser, if any, gives exact block spans for splice edits (needs the model; blocks the section tree package 261031-j4bc).
 - [261031-18t8](261031-18t8-spike-drawer-layout.md): the drawer's width, layout and navigation (independent).

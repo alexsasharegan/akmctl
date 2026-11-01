@@ -1,8 +1,13 @@
 package record
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	mdbody "github.com/alexsasharegan/akmctl/internal/body"
+	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 )
 
 func TestSetSection(t *testing.T) {
@@ -75,4 +80,54 @@ func TestFenceRule(t *testing.T) {
 			t.Errorf("FirstHeading = %q, want out", got)
 		}
 	}
+}
+
+// TestTreeMatchesSetSection: on every work item of this repository, replacing a
+// section and appending a Log line with the section tree gives the bytes that
+// SetSection gives. It holds the line scan and the tree to one behaviour until
+// section writes move onto the tree (spike 261031-6bzq).
+func TestTreeMatchesSetSection(t *testing.T) {
+	files, _ := filepath.Glob("../../docs/work/*.md")
+	done, _ := filepath.Glob("../../docs/work/done/*.md")
+	files = append(files, done...)
+	if len(files) < 100 {
+		t.Fatalf("only %d work items found; is the working directory wrong?", len(files))
+	}
+	edits := 0
+	for _, f := range files {
+		src, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		d, err := frontmatter.Parse(src)
+		if err != nil {
+			t.Fatal(err)
+		}
+		b := d.Body()
+		tr, err := mdbody.Split(b)
+		if err != nil {
+			t.Errorf("%s: %v", f, err)
+			continue
+		}
+		for _, s := range tr.Sections() {
+			if s.Key() == "log" {
+				continue
+			}
+			want := SetSection(string(b), s.Name, "Replacement.\nSecond line.", false, "\n")
+			got, err := tr.ReplaceSection(s.Name, "Replacement.\nSecond line.", "")
+			if err != nil || string(got) != want {
+				t.Errorf("%s ## %s: tree and SetSection differ (%v)", f, s.Name, err)
+			}
+			edits++
+		}
+		if _, ok := tr.Section("log"); ok {
+			want := SetSection(string(b), "log", "2026-11-01: x", true, "\n")
+			got, err := tr.AppendLog("2026-11-01", "x")
+			if err != nil || string(got) != want {
+				t.Errorf("%s: tree and SetSection differ on a Log append (%v)", f, err)
+			}
+			edits++
+		}
+	}
+	t.Logf("%d items, %d edits identical", len(files), edits)
 }

@@ -14,7 +14,7 @@ summary: internal/body gains a lossless section tree, typed Goal/Next/Log/Outcom
 
 ## Goal
 
-Build the in-memory body model that the body writer (spike [261031-6bzq](../261031-6bzq-spike-body-writer-api.md)) and the drawer will share, in `internal/body`, on top of `Locate` ([261031-yw5v](261031-yw5v-locate-scanner-and-goldmark-oracle.md), done) and the shared `FenceTracker` ([261031-2j14](261031-2j14-section-fence-tracking.md), done). The model and edit rule are decided: ADR [261031-gam0](../../adr/261031-gam0-work-item-body-model.md) (open body, typed core) and ADR [261031-cpbg](../../adr/261031-cpbg-goldmark-markdown-parser.md) (own scanner, goldmark as a test-only oracle); both are accepted, so nothing here waits on a decision.
+Build the in-memory body model that the body writer (spike [261031-6bzq](261031-6bzq-spike-body-writer-api.md)) and the drawer will share, in `internal/body`, on top of `Locate` ([261031-yw5v](261031-yw5v-locate-scanner-and-goldmark-oracle.md), done) and the shared `FenceTracker` ([261031-2j14](261031-2j14-section-fence-tracking.md), done). The model and edit rule are decided: ADR [261031-gam0](../../adr/261031-gam0-work-item-body-model.md) (open body, typed core) and ADR [261031-cpbg](../../adr/261031-cpbg-goldmark-markdown-parser.md) (own scanner, goldmark as a test-only oracle); both are accepted, so nothing here waits on a decision.
 
 This item is the package, not the CLI or API surface; the operations, addressing syntax and error shapes are 261031-6bzq's. It provides the primitives those will call:
 
