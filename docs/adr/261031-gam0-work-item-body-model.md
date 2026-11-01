@@ -2,7 +2,7 @@
 id: "261031-gam0"
 title: A work item body is a list of sections, with typed core sections and open extension
 summary: A work item body is an ordered list of named sections; Goal, Next, Log and Outcome are typed, any other ## section is kept as opaque Markdown
-status: proposed
+status: accepted
 date: 2026-10-31
 ---
 
