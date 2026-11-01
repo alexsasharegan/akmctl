@@ -236,13 +236,14 @@ func (s *Server) run(w http.ResponseWriter, op string, req api.Request) {
 
 // writeOps need an If-Match when they change an existing record.
 // A dry run is exempt: it writes nothing.
-var needsIfMatch = map[string]bool{"set": true, "section": true, "close": true, "claim": true, "release": true}
+var needsIfMatch = map[string]bool{"set": true, "section": true, "tick": true, "log": true, "close": true, "claim": true, "release": true}
 
 // route maps a method and path to an operation and its request.
 func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool, *api.Error) {
 	m := r.Method
 	var op string
-	var id, name string
+	var id, name, section string
+	var item int
 	switch {
 	case len(seg) == 1 && seg[0] == "version" && m == "GET":
 		op = "version"
@@ -280,6 +281,14 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op, id = "when", seg[1]
 	case len(seg) == 4 && seg[0] == "records" && seg[2] == "sections" && m == "PUT":
 		op, id, name = "section", seg[1], seg[3]
+	case len(seg) == 6 && seg[0] == "records" && seg[2] == "sections" && seg[4] == "items" && m == "PUT":
+		n, err := strconv.Atoi(seg[5])
+		if err != nil {
+			return "", nil, false, &api.Error{Code: "invalid_request", Message: "the item in the path must be a number", Details: api.O("parameter", "item")}
+		}
+		op, id, section, item = "tick", seg[1], seg[3], n
+	case len(seg) == 3 && seg[0] == "records" && seg[2] == "log" && m == "POST":
+		op, id = "log", seg[1]
 	case len(seg) == 3 && seg[0] == "records" && seg[2] == "close" && m == "POST":
 		op, id = "close", seg[1]
 	case len(seg) == 3 && seg[0] == "records" && seg[2] == "claim" && m == "POST":
@@ -325,8 +334,19 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		}
 		req["name"] = name
 	}
+	if section != "" {
+		if got, ok := req["section"]; ok && got != section {
+			return "", nil, false, &api.Error{Code: "invalid_request", Message: "section in the body differs from the section in the path", Details: api.O("parameter", "section")}
+		}
+		req["section"] = section
+		if got, ok := req["item"]; ok && got != float64(item) {
+			return "", nil, false, &api.Error{Code: "invalid_request", Message: "item in the body differs from the item in the path", Details: api.O("parameter", "item")}
+		}
+		req["item"] = item
+	}
 	if needsIfMatch[op] {
-		if _, ok := req["if_match"]; !ok {
+		_, hasSecEtag := req["section_etag"]
+		if _, ok := req["if_match"]; !ok && !hasSecEtag {
 			h := strings.Trim(strings.TrimSpace(r.Header.Get("If-Match")), `"`)
 			if h == "" && req["dry_run"] != true {
 				return "", nil, false, &api.Error{Code: "refused", Message: "a write needs If-Match with the record's etag (read the record first)", Details: api.O("reason", "if_match_required")}

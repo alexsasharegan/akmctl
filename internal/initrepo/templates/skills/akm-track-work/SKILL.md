@@ -21,7 +21,7 @@ Before filing, read what `ls --status raw,ready,active,blocked` shows. `akmctl n
 ## While working
 
 - Keep `## Next` as the single next concrete step. Overwrite it at each checkpoint.
-- Append dated lines to `## Log`; never rewrite old lines.
+- Append dated lines to `## Log` with `akmctl log <id> <text>`; never rewrite old lines. Tick a Goal box with `akmctl tick <id> <n>`.
 - Update both in the same commit as the code.
 - Commit one step at a time (file, ready, start, claim, release, close, ...). Each command that changes an item prints a commit message: use it as given, never your own subject. If the `akm-commit` skill is installed (`.agents/skills/akm-commit`), it has the rest.
 - Command details are in the `akm` skill (`.agents/skills/akm/references/`).

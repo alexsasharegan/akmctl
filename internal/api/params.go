@@ -94,6 +94,8 @@ var specs = map[string]map[string]param{
 	"new":     {"kind": {kind: kString, enum: []string{"work", "adr"}, required: true}, "slug": s(req), "title": s(), "fields": {kind: kObject}, "as_of": s(pat(reDateTS))},
 	"set":     {"id": s(req, pat(reID)), "changes": {kind: kObject, required: true}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"section": {"id": s(req, pat(reID)), "name": s(req), "text": s(req, empty), "mode": {kind: kString, enum: []string{"replace", "append"}}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
+	"tick":    {"id": s(req, pat(reID)), "item": {kind: kInt, min: 1, required: true}, "section": s(), "done": {kind: kBool}, "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
+	"log":     {"id": s(req, pat(reID)), "text": s(req), "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"close":   {"id": s(req, pat(reID)), "status": {kind: kString, enum: []string{"done", "dropped"}, required: true}, "outcome": s(), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"claim":   {"id": s(req, pat(reID)), "as": s(req), "if_match": s(pat(reEtag)), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"release": {"id": s(req, pat(reID)), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},

@@ -621,6 +621,27 @@
         "message"
       ],
       "additionalProperties": false
+    },
+    "section_etag_text": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "etag": {
+          "$ref": "#/$defs/etag"
+        }
+      },
+      "required": [
+        "name",
+        "text",
+        "etag"
+      ],
+      "additionalProperties": false
     }
   }
 }

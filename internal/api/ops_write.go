@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -994,4 +995,135 @@ func opSection(repo *record.Repo, q Request) (Obj, *Error) {
 	}
 	_, secs := record.Sections(rec.Body)
 	return e.finish(O("record", recordObj(repo, rec, nil, true), "section", O("name", strings.ToLower(name), "text", secs[strings.ToLower(name)]), "changed", changed)), nil
+}
+
+// ---- tick and log ----
+
+// sectionOut is the section as the write operations return it: name in lower
+// case, the text as `show` returns it, and the etag a client sends back as
+// section_etag.
+func sectionOut(body, name string) Obj {
+	_, text := record.Sections(body)
+	key := strings.ToLower(name)
+	etag := ""
+	if tr, err := mdbody.Split([]byte(body)); err == nil {
+		if sec, ok := tr.Section(name); ok {
+			etag = tr.Etag(sec)
+		}
+	}
+	return O("name", key, "text", text[key], "etag", etag)
+}
+
+// staleSection is the answer to a section_etag that no longer matches.
+func staleSection(tr *mdbody.Tree, sec mdbody.Section) *Error {
+	return &Error{"stale", "the " + strings.ToLower(sec.Name) + " section changed since it was read", O("section_etag", tr.Etag(sec))}
+}
+
+func opTick(repo *record.Repo, q Request) (Obj, *Error) {
+	name := strings.TrimSpace(q.str("section"))
+	if name == "" {
+		name = "goal"
+	}
+	done := true
+	if v, ok := q["done"].(bool); ok {
+		done = v
+	}
+	pos, _ := asInt(q["item"])
+	e, unlock, err := openEdit(repo, q)
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+	if repo.IsDone(e.rec.Path) {
+		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
+	}
+	tr, terr := mdbody.Split([]byte(e.text))
+	if terr != nil {
+		return nil, unsupportedBody(e, terr)
+	}
+	sec, ok := tr.Section(name)
+	if !ok {
+		return nil, &Error{Code: "not_found", Message: "no section " + strings.ToLower(name) + " in " + e.rec.ID}
+	}
+	if want := q.str("section_etag"); want != "" && want != tr.Etag(sec) {
+		return nil, staleSection(tr, sec)
+	}
+	out, terr := tr.SetChecked(name, pos, done, "")
+	switch {
+	case errors.Is(terr, mdbody.ErrNoItem):
+		return nil, &Error{Code: "not_found", Message: fmt.Sprintf("%s has no item %d in its %s checklist", e.rec.ID, pos, strings.ToLower(name))}
+	case terr != nil:
+		return nil, unsupportedBody(e, terr)
+	}
+	return finishBodyEdit(repo, q, e, string(out), name, func(rec *record.Record) Obj {
+		items, _ := mustSplit(rec.Body).Checklist(name)
+		it := items[pos-1]
+		return O("position", pos, "done", it.Done, "text", it.Text)
+	}, "item")
+}
+
+func opLog(repo *record.Repo, q Request) (Obj, *Error) {
+	text := strings.Join(strings.Fields(q.str("text")), " ")
+	if text == "" || strings.ContainsAny(q.str("text"), "\r\n") {
+		return nil, invalid("text", "text must be one non-empty line")
+	}
+	e, unlock, err := openEdit(repo, q)
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+	if repo.IsDone(e.rec.Path) {
+		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
+	}
+	tr, terr := mdbody.Split([]byte(e.text))
+	if terr != nil {
+		return nil, unsupportedBody(e, terr)
+	}
+	entry := "- " + today(clock(q)) + ": " + text
+	var out string
+	if sec, ok := tr.Section("log"); ok {
+		if want := q.str("section_etag"); want != "" && want != tr.Etag(sec) {
+			return nil, staleSection(tr, sec)
+		}
+		b, aerr := tr.WithEOL(e.eol).AppendLog(today(clock(q)), text)
+		if aerr != nil {
+			return nil, unsupportedBody(e, aerr)
+		}
+		out = string(b)
+	} else {
+		if q.str("section_etag") != "" {
+			return nil, &Error{Code: "not_found", Message: "no section log in " + e.rec.ID}
+		}
+		var aerr error
+		if out, aerr = record.AppendToSection(e.text, "log", entry, e.eol); aerr != nil {
+			return nil, unsupportedBody(e, aerr)
+		}
+	}
+	return finishBodyEdit(repo, q, e, out, "log", func(*record.Record) Obj { return O("text", entry) }, "entry")
+}
+
+func mustSplit(body string) *mdbody.Tree {
+	tr, _ := mdbody.Split([]byte(body))
+	return tr
+}
+
+// finishBodyEdit writes a new body for tick and log: it sets updated when the
+// text changed, commits once and answers with the record, the section with its
+// etag, `changed` and the operation's own member.
+func finishBodyEdit(repo *record.Repo, q Request, e *edit, text, secName string, member func(*record.Record) Obj, memberName string) (Obj, *Error) {
+	changed := text != e.text
+	rec := e.rec
+	if changed {
+		e.text = text
+		if e.rec.Type == record.Work {
+			if serr := e.doc.Set("updated", frontmatter.NewString(today(clock(q)))); serr != nil {
+				return nil, unreadable(serr)
+			}
+		}
+		var cerr *Error
+		if rec, cerr = e.commit(""); cerr != nil {
+			return nil, cerr
+		}
+	}
+	return e.finish(O("record", recordObj(repo, rec, nil, true), "section", sectionOut(rec.Body, secName), memberName, member(rec), "changed", changed)), nil
 }

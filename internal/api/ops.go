@@ -68,6 +68,10 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opSet(repo, req)
 	case "section":
 		body, err = opSection(repo, req)
+	case "tick":
+		body, err = opTick(repo, req)
+	case "log":
+		body, err = opLog(repo, req)
 	case "close":
 		body, err = opClose(repo, req)
 	case "claim":
@@ -83,7 +87,7 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 }
 
 // writesRecords lists the operations that write under the manifest's folders.
-var writesRecords = map[string]bool{"new": true, "set": true, "section": true, "close": true, "claim": true, "release": true, "index": true}
+var writesRecords = map[string]bool{"new": true, "set": true, "section": true, "tick": true, "log": true, "close": true, "claim": true, "release": true, "index": true}
 
 // manifestPathError refuses a write while the manifest names a bad folder
 // (rule S3): the defaults would be used, and a write would land in the wrong place.

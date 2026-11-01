@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/tick.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "item": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "if_match": {
+          "$ref": "common.json#/$defs/etag"
+        },
+        "section_etag": {
+          "$ref": "common.json#/$defs/etag"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "item"
+      ],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "tick"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "record": {
+              "$ref": "common.json#/$defs/record"
+            },
+            "diff": {
+              "$ref": "common.json#/$defs/diff"
+            },
+            "section": {
+              "$ref": "common.json#/$defs/section_etag_text"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "item": {
+              "type": "object",
+              "properties": {
+                "position": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "done": {
+                  "type": "boolean"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "position",
+                "done",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "record",
+            "section",
+            "item",
+            "changed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

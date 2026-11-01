@@ -1,0 +1,26 @@
+{
+  "name": "a stale section_etag answers with the current one",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "item": 1,
+    "section_etag": "0000000000000000"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "tick",
+    "request": {
+      "id": "261020-a2b3",
+      "item": 1,
+      "section_etag": "0000000000000000"
+    },
+    "ok": false,
+    "error": {
+      "code": "stale",
+      "message": "the goal section changed since it was read",
+      "details": {
+        "section_etag": "206a2052f432c2a2"
+      }
+    }
+  }
+}

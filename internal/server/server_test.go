@@ -539,3 +539,49 @@ func TestUIConfig(t *testing.T) {
 		t.Fatalf("POST config: %d", r.status)
 	}
 }
+
+func TestTickAndLogRoutes(t *testing.T) {
+	ts, root := setup(t)
+	tick := "/api/v1/records/261022-e5f6/sections/Goal/items/1"
+	et := etagOf(t, ts, "261022-e5f6")
+	hdr := map[string]string{"If-Match": `"` + et + `"`}
+	if r := do(t, ts, "PUT", tick, `{}`, nil); r.status != 428 {
+		t.Fatalf("no If-Match: %d", r.status)
+	}
+	if r := do(t, ts, "PUT", "/api/v1/records/261022-e5f6/sections/Goal/items/x", `{}`, hdr); r.status != 400 {
+		t.Fatalf("item not a number: %d", r.status)
+	}
+	if r := do(t, ts, "PUT", tick, `{"item":2}`, hdr); r.status != 400 {
+		t.Fatalf("item mismatch: %d", r.status)
+	}
+	r := do(t, ts, "PUT", tick, `{"as_of":"2026-10-28"}`, hdr)
+	if r.status != 200 || r.body["changed"] != true {
+		t.Fatalf("tick: %d %v", r.status, r.body)
+	}
+	sec, _ := r.body["section"].(map[string]any)
+	if sec["etag"] == nil || !strings.Contains(sec["text"].(string), "[x] It is done.") {
+		t.Fatalf("section: %v", sec)
+	}
+	b, _ := os.ReadFile(filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md"))
+	if !strings.Contains(string(b), "- [x] It is done.") {
+		t.Fatal(string(b))
+	}
+	// the section etag stands in for If-Match
+	if r := do(t, ts, "PUT", tick, `{"done":false,"section_etag":"`+sec["etag"].(string)+`"}`, nil); r.status != 200 {
+		t.Fatalf("section_etag: %d %v", r.status, r.body)
+	}
+	if r := do(t, ts, "PUT", tick, `{"done":false,"section_etag":"0000000000000000"}`, nil); r.status != 412 {
+		t.Fatalf("stale section: %d", r.status)
+	}
+	l := do(t, ts, "POST", "/api/v1/records/261022-e5f6/log", `{"text":"hello","as_of":"2026-10-29"}`, map[string]string{"If-Match": `"` + etagOf(t, ts, "261022-e5f6") + `"`})
+	if l.status != 200 {
+		t.Fatalf("log: %d %v", l.status, l.body)
+	}
+	b, _ = os.ReadFile(filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md"))
+	if !strings.Contains(string(b), "- 2026-10-29: hello\n") {
+		t.Fatal(string(b))
+	}
+	if r := do(t, ts, "POST", "/api/v1/records/261022-e5f6/log", `{"text":"x"}`, nil); r.status != 428 {
+		t.Fatalf("log no If-Match: %d", r.status)
+	}
+}

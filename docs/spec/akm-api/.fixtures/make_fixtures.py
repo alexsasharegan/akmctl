@@ -423,6 +423,43 @@ def write_cases(cases, basic):
     case("section", 7, "a construct akmctl cannot edit in the section is refused", "bodyrefusal", req,
          err("section", req, "refused", "261022-e5f6 has ordered-list task at line %d, which akmctl cannot edit around; edit the file by hand" % ln, reason="unsupported_markdown", construct="ordered-list task", line=ln, structural=False))
 
+    # tick and log
+    def section_etag(text, name):
+        body = text.split("---\n", 2)[2]
+        lines = body.split("\n")
+        pos, start, end = 0, None, len(body)
+        for ln in lines:
+            if ln.startswith("## "):
+                if start is not None: end = pos; break
+                if ln[3:].strip().lower() == name: start = pos
+            pos += len(ln) + 1
+        return hashlib.sha256(body[start:end].encode()).hexdigest()[:16]
+    def sec_out(text, name, body_text):
+        return dict(name=name, text=body_text, etag=section_etag(text, name))
+    def wcase(op, n, name, req, newtext, path, secname, sectext, member, changed=True, dryrun=False):
+        files = dict(basic); files[path] = newtext
+        rec = after_rec(files, path)
+        if dryrun: rec["etag"] = next(r for r in load(basic) if r["path"] == path)["etag"]
+        extra = dict(diff=mkdiff(path, path, basic[path], newtext)) if dryrun else {}
+        mname, mval = member
+        case(op, n, name, "basic", req,
+             ok(op, req, record=pub(rec), section=sec_out(newtext, secname, sectext), **{mname: mval}, changed=changed, **extra),
+             after=None if dryrun else {path: newtext}, would_be={path: newtext} if dryrun else None)
+    req = dict(id="261022-e5f6", item=1, as_of="2026-10-28")
+    tk = basic[E5F6].replace("updated: 2026-10-22\n", "updated: 2026-10-28\n").replace("- [ ] It is done.", "- [x] It is done.")
+    wcase("tick", 1, "tick the first box of the Goal", req, tk, E5F6, "goal", "Do the thing.\n\n- [x] It is done.", ("item", dict(position=1, done=True, text="It is done.")))
+    req = dict(id="261022-e5f6", item=1, dry_run=True, as_of="2026-10-28")
+    wcase("tick", 2, "dry run: the tick as a diff, nothing written", req, tk, E5F6, "goal", "Do the thing.\n\n- [x] It is done.", ("item", dict(position=1, done=True, text="It is done.")), dryrun=True)
+    req = dict(id="261020-a2b3", item=1, section_etag="0000000000000000")
+    case("tick", 3, "a stale section_etag answers with the current one", "basic", req, err("tick", req, "stale", "the goal section changed since it was read", section_etag=section_etag(basic[A2B3], "goal")))
+    req = dict(id="261022-e5f6", item=5)
+    case("tick", 4, "an item that does not exist", "basic", req, err("tick", req, "not_found", "261022-e5f6 has no item 5 in its goal checklist"))
+    req = dict(id="261020-a2b3", text="tests written.", as_of="2026-10-28")
+    lg = set_section(basic[A2B3], "Log", "- 2026-10-28: tests written.", append=True).replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
+    wcase("log", 1, "append a dated Log entry", req, lg, A2B3, "log", "- 2026-10-20: started.\n- 2026-10-28: tests written.", ("entry", dict(text="- 2026-10-28: tests written.")))
+    req = dict(id="261010-j9k0", text="Late note.")
+    case("log", 2, "a closed record is refused", "basic", req, err("log", req, "refused", "261010-j9k0 is closed; its sections are not edited", reason="closed"))
+
 VW, VA, VR = "Deep Thought/9 pkm/tasks", "Deep Thought/9 pkm/adr", "Deep Thought/9 pkm/ROADMAP.md"
 
 def relocate(p):
@@ -533,7 +570,7 @@ def legacy_cases(case):
 # small files are compared exactly; the others (AGENTS.md, the skills, ...) are only
 # required to exist, so the wording of a template is not part of the contract.
 AKM_REFS = ["board", "check", "claim", "close", "commits", "config", "find", "index", "init", "ls", "migrate", "new",
-    "release", "search", "section", "set", "show", "skills", "version", "when"]
+    "release", "search", "section", "set", "show", "skills", "tick", "log", "version", "when"]
 INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/%s.md" % r for r in AKM_REFS] + [
     ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",
     ".agents/skills/akm-track-work/SKILL.md", ".agents/skills/akm-track-work/assets/work-item.md",
