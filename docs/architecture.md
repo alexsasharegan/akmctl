@@ -25,6 +25,7 @@ The words used here are defined in [glossary.md](glossary.md).
 ## Invariants
 
 - Standard library only in the tool; `go.yaml.in/yaml/v3` is a test oracle and never linked into the binary.
+- Large specifications (YAML, Markdown) are read by our own narrow implementation of the subset the records use, checked against an oracle library that is test-only, and the tool fails closed outside that subset: it refuses and names the construct, and writes nothing (ADR 261031-nvka).
 - `init` never overwrites a file; versions in what it writes come from the tool's constants (`check.LayoutVersion`), not from templates. `internal/initrepo/templates/skills` is a copy of `.agents/skills`, kept equal by a test.
 - The manifest, `.akm-deny`, `.akm.lock` and `.akm-migrate-log` share one folder (`docs/` by default), found by `record.Locate`: `docs/.layout`, else exactly one `<name>/.layout` among the root's immediate non-hidden subdirectories; two is an error. No code hard-codes `docs/` for them.
 - The tool never stages, commits or pushes; it describes a step's commit (`commit` member) and `commits` reads git history, read-only. `close` renames; `new adr` does not regenerate the index (`index` does).

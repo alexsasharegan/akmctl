@@ -94,6 +94,15 @@ Register every new view, control and message here when it is added. Names are as
 | **Unresolved link**     | avoid: broken link                                   | A wikilink in a drawer field whose note name `find --name` cannot match to one file. It is shown dotted and is not clickable. A name that matches several files is also unresolved.                                                                                                                                                       |
 | **Palette**             | search box                                           | The search box (`⌘K`).                                                                                                                                                                                                                                                                                                                    |
 
+## Libraries and oracles
+
+How the project reads large specifications (ADR 261031-nvka).
+
+| Term            | Aliases                   | Meaning                                                                                                                                                                                                          |
+| --------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Oracle**      | reference implementation  | An established library used only in tests (and never linked into the binary) as the reference that our own narrow implementation of a specification is checked against. `go.yaml.in/yaml/v3` is the YAML oracle. |
+| **Fail closed** | avoid: best effort, guess | Outside the subset of a format that the tool supports, it refuses, names the construct it does not understand and writes nothing, instead of guessing.                                                           |
+
 ## Skill and file vocabulary
 
 How the project names things (ADRs 261029-tb3d, 261030-1wj5 and 261030-wsqb).
