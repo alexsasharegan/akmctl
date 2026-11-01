@@ -3,7 +3,7 @@ id: "261029-m0vm"
 title: "move_file: report the inbound links it leaves broken"
 status: ready
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-31
 kind: feature
 priority: 3
 summary: move_file does not repair links; two sweep links broke in the vault run and were fixed by hand.
@@ -23,3 +23,4 @@ Done when:
 ## Log
 
 - 2026-10-29: filed.
+- 2026-10-31: 261031-wjs3 added internal/mdlinks (link scanner and rewrite) and the close-side repair; the migrate-side report can reuse it.
