@@ -108,7 +108,7 @@ var (
 	ordinary = []string{"## Goal", "## Log", "## Next", "text", "more text", "", "", "- [ ] item", "- [x] done",
 		"- plain", "- 2026-10-31: log", "```", "~~~", "# Title", "### Sub", "* [ ] star"}
 	nasty = []string{"##x", "## A ##", "  ## indented", "    ## code", "- [ ] item", "1. [ ] ordered", "  - [ ] nested",
-		"```go", "  ```", "````", "`````", "~~~~", "<div>", "</div>", "<!-- c -->", "<br>", "> quote", "> ## in quote",
+		"```go", "  ```", "````", "`````", "~~~~", "<div>", "</div>", "<!-- c -->", "<br>", "<b>bold</b> text", "</b> tail", "<a href=\"x\">", "<!-- open", "-->", "<!-- c --> after", "> quote", "> ## in quote",
 		"> - [ ] q", "| a | b |", "|---|---|", "---", "===", "Setext", "\ttab", "[ref]: http://x", "* * *", "-", "##", "- [ ]"}
 )
 

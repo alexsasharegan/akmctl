@@ -30,6 +30,8 @@ var (
 	deepTaskRe    = regexp.MustCompile(`^ {4,}[-*+] \[[ xX]\]`)
 	bulletRe      = regexp.MustCompile(`^[-*+] +\S`)
 	htmlRe        = regexp.MustCompile(`^ {0,3}<[a-zA-Z/!?]`)
+	htmlCommentRe = regexp.MustCompile(`^ {0,3}<!--.*-->`)
+	htmlInlineRe  = regexp.MustCompile(`^ {0,3}</?(?:a|b|i|u|em|strong|code|kbd|mark|span|sub|sup|small|del|ins)(?:[ \t][^<>]*)?>[ \t]*[^ \t<]`)
 	quoteRe       = regexp.MustCompile(`^ {0,3}>`)
 	tableRowRe    = regexp.MustCompile(`^[ 	|:-]*$`)
 	spacedThemRe  = regexp.MustCompile(`^ {0,3}(-([ \t]*-){2,}|\*([ \t]*\*){2,}|_([ \t]*_){2,})[ \t]*$`)
@@ -135,7 +137,7 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		switch {
 		case indFenceRe.MatchString(t):
 			return fail("indented fence")
-		case htmlRe.MatchString(t):
+		case htmlRe.MatchString(t) && !plainHTML(t):
 			return fail("HTML line")
 		case quoteRe.MatchString(t):
 			// a quote is opaque: its lines are not read, and a run of them is one block
@@ -165,6 +167,11 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		case indHeadingRe.MatchString(t):
 			return fail("indented heading")
 		case orderedTask.MatchString(t):
+			// Kept as a local refusal (work item 261101-xher). The oracle reads "1. [ ]"
+			// as a task, so reading it as a plain list item would disagree with GFM and
+			// with Obsidian, and claiming it as a task means numbering ordered boxes in
+			// the checklist, a model change for two vault items in sections no write
+			// touches. A local refusal only stops writes to a section that holds one.
 			if refuse("ordered-list task") {
 				return Layout{}, refusal
 			}
@@ -222,6 +229,19 @@ func (sc Scanner) Locate(body []byte) (Layout, error) {
 		lay.Blocks = append(lay.Blocks, fStart)
 	}
 	return lay, nil
+}
+
+// plainHTML reports an HTML line that cannot open an HTML block, so it cannot
+// swallow a heading and is read as a line of text (work item 261101-v65x):
+//   - a comment that ends on its own line (type 2 ends at the line holding "-->");
+//   - a line that starts with an inline-only tag (not one of the block names that
+//     open a type 6 block, nor script, style or pre) and has text after the tag.
+//     A tag alone on its line is a type 7 block, which runs to the next blank
+//     line, so it stays refused.
+//
+// The oracle battery checks both against goldmark.
+func plainHTML(t string) bool {
+	return htmlCommentRe.MatchString(t) || htmlInlineRe.MatchString(t)
 }
 
 func runLen(t string, c byte) int {

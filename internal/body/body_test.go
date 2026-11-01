@@ -99,6 +99,9 @@ func TestRefusals(t *testing.T) {
 	}{
 		{"indented fence", "## A\n\n  ```\n  x\n  ```\n", 3},
 		{"HTML line", "## A\n\n<div>\n## not\n</div>\n", 3},
+		{"HTML line", "## A\n\n<br>\n## not\n", 3},
+		{"HTML line", "## A\n\n<a href=\"x\">\n## not\n", 3},
+		{"HTML line", "## A\n\n<!-- open\n## not\n-->\n", 3},
 		{"tab-indented line", "text\n\tcode\n", 2},
 		{"tab-indented line", "text\n \t* [X]\n", 2},
 		{"table delimiter row", "a | b\n---|---\n", 2},
@@ -242,5 +245,29 @@ func TestTolerant(t *testing.T) {
 	var u *UnsupportedError
 	if !errors.As(err, &u) || !u.Structural || u.Construct != "HTML line" {
 		t.Errorf("tolerant scan of an HTML line = %v", err)
+	}
+}
+
+// A one-line comment and a line that starts with an inline tag and has text
+// after it cannot open an HTML block, so they are text (work item 261101-v65x).
+func TestPlainHTML(t *testing.T) {
+	for _, src := range []string{
+		"## A\n\n<!-- c -->\n## B\n",
+		"## A\n<!-- c --> after\n- [ ] x\n",
+		"## A\n\n<b>bold</b> text\n## B\n",
+		"## A\n\n</b> tail\n## B\n",
+		"## A\n\n<a href=\"x\">link</a>\n## B\n",
+	} {
+		lay, err := Locate([]byte(src))
+		if err != nil {
+			t.Errorf("%q: %v", src, err)
+			continue
+		}
+		if _, diff := compare([]byte(src)); diff != "" {
+			t.Errorf("%q:\n%s", src, diff)
+		}
+		if n := 0; len(lay.Blocks) == n {
+			t.Errorf("%q: no blocks", src)
+		}
 	}
 }
