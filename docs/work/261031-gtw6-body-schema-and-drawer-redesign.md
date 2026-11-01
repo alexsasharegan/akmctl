@@ -36,3 +36,4 @@ Children (spikes, in dependency order; none is built until its spike has an outc
 
 - 2026-10-31: filed with five spike children, from Alexander's notes on the drawer and a schematized body.
 - 2026-10-31: added spike 261031-g9zk (parser dependency) after the body-model spike; 261031-j4bc waits for it.
+- 2026-10-31: accepted ADR 261031-nvka (narrow implementations checked against oracles); parser ADR 261031-cpbg rewritten to that approach and still proposed; filed bug 261031-2j14 from the fuzz prototype.
