@@ -20,6 +20,7 @@ Children (none is built until its spike has an outcome):
 
 - [261101-dkv2](261101-dkv2-spike-retention-and-compaction.md): the discovery spike, workstreams A to G. Refinement may split it into one spike per workstream, as children of this item.
 - [261101-hefr](done/261101-hefr-poc-parent-survives-compaction.md): a hand-built proof of concept in a scratch repository that a compacted parent can still find and restore its children. It runs ahead of the spike, to feed it.
+- [261101-2479](done/261101-2479-poc-links-to-compacted-items.md): the same repository, trying four ways to keep links to a compacted item working; recommends the fragment rewrite.
 
 What already exists and bears on it:
 
