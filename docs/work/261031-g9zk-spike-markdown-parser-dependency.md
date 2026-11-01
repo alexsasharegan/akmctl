@@ -1,12 +1,14 @@
 ---
 id: "261031-g9zk"
 title: spike markdown parser dependency
-status: raw
+status: active
 created: 2026-10-31
 updated: 2026-10-31
 kind: spike
 parent: 261031-gtw6
 summary: "Spike: which Markdown parser, if any, gives exact block spans for splice edits, and whether a dependency is worth it"
+claimed_by: claude
+claimed_at: 2026-11-01T04:20
 ---
 
 # spike markdown parser dependency
@@ -28,6 +30,12 @@ Done when:
 - [ ] Whether a parser plus our own printer could replace Prettier for records is noted as a finding only; replacing Prettier is a separate decision.
 - [ ] A recommendation (adopt one, extend our scanner, or defer) is in `## Outcome`; the dependency or the decision not to take one has a `proposed` ADR (the dependency rule in AGENTS.md); `261031-gam0` and `261031-j4bc` are updated to match; follow-up items are filed.
 
+## Next
+
+Build a scratch Go module outside the repository (the scratchpad) with goldmark, gomarkdown/markdown and blackfriday; write a harness that prints each candidate's block spans, then run the corpus and the hostile cases.
+
 ## Log
 
 - 2026-10-31: filed from the body-model discussion; the section tree package 261031-j4bc waits for it.
+- 2026-10-31: claimed (claude).
+- 2026-10-31: made ready and claimed to start the spike.
