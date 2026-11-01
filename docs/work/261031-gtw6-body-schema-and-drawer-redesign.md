@@ -24,7 +24,7 @@ Children (spikes, in dependency order; none is built until its spike has an outc
 - [261031-x50y](261031-x50y-spike-schema-declaration-and-migration.md): where the schema is declared, how `check` enforces it, how existing items migrate (needs the model).
 - [261031-g9zk](done/261031-g9zk-spike-markdown-parser-dependency.md): which Markdown parser, if any, gives exact block spans for splice edits (needs the model; blocks the section tree package 261031-j4bc).
 - [261031-18t8](261031-18t8-spike-drawer-layout.md): the drawer's width, layout and navigation (independent).
-- [261031-z0n8](261031-z0n8-spike-field-edit-rules-by-status.md): which fields and body sections are editable in which status (needs the model; informs [261028-esyt](261028-esyt-ui-field-editing.md)).
+- [261031-z0n8](done/261031-z0n8-spike-field-edit-rules-by-status.md): which fields and body sections are editable in which status (needs the model; informs [261028-esyt](261028-esyt-ui-field-editing.md)).
 
 [261028-esyt](261028-esyt-ui-field-editing.md) (edit fields in the drawer) is ready and first on the roadmap. Its field table and simple controls can proceed, but its "which fields are editable when" and its closed-items rule are decided by the last spike above. Done when:
 
