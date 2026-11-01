@@ -6,6 +6,7 @@ created: 2026-11-01
 updated: 2026-11-01
 kind: spike
 summary: "Spike: a lifecycle for archiving and compacting completed work and keeping its knowledge, with a Git recovery path"
+parent: 261101-wdbj
 ---
 
 # spike retention and compaction
