@@ -16,6 +16,8 @@ Spike 261031-6bzq. The model is decided (ADR 261031-gam0: an open body with type
 
 Today one operation writes a body: `section`, which replaces a `## ` section or appends to it with the line scan `record.SetSection`. To tick a Goal box an agent must resend the whole Goal (median 837 bytes, up to 4.8 KB) or hand-edit the file after reading it (median file 1.9 KB, up to 20 KB), and either can get the Markdown wrong. A Log line needs the right date and bullet. The drawer will need to tick, append and replace without losing a concurrent edit. `SetSection` and the tree must not drift: on all 129 work items, replacing each section and appending a Log line with the tree gives byte-for-byte the same file as `SetSection` (401 of 401 edits, `TestTreeMatchesSetSection`).
 
+**A census of real notes** (2026-11-01, the maintainer's Obsidian vault; counts only, nothing from the notes is kept). Whole-file refusals under the scanner as it is: this repository's 160 records, 0 refused. The vault's work items (137 files, 568 `##` sections): 18 files refused, all local (16 blockquotes, 2 ordered-list tasks), which is 13% of files but 18 of 568 sections (3%). Its ADRs: 1 of 26 refused (an HTML line, structural). Every note in the vault (2,544 files, outside the assets folder): 31% refused, led by a thematic break or setext underline straight after text (272 files), blockquotes (227), tab-indented lines (132) and empty list items (46). The last group is not what the tool edits, but it shows how a stricter scanner would fare on prose notes.
+
 ## Considered Options
 
 - **(a) Keep `section` only.** No new surface. Ticking stays a full Goal rewrite, and nothing protects a section from a stale write except the whole-file etag.
@@ -35,6 +37,17 @@ Option (b).
 - **Fewer refusals over time.** Local constructs the scanner can skip as opaque blocks (a blockquote region, an indented code block) stop being refusals one at a time, each checked against the goldmark oracle (work item 261101-4j86). Refusing is the default; claiming a construct needs the battery to agree.
 - **Missing sections.** Creating a missing section (before `## Log`, as `SetSection` does) becomes a tree operation (`AddSection`) before `section` moves onto the tree.
 - **`section` moves onto the tree**, and `SetSection` is deleted, once `AddSection` exists and the equivalence test passes for the new behaviour.
+
+## Principles
+
+What the questions around this decision settled; they bind the code that implements it.
+
+1. **The document is the source of truth and the tool is a guest.** The tool never requires a file to conform to it, never changes the format to suit its parser (no ids or markers in the Markdown), and never writes a byte it was not asked to change.
+2. **Understand as little Markdown as possible.** The tree reads headings, fences, task lines and list lines; everything else is opaque bytes carried through unchanged. A construct is claimed only when an edit needs it, and then only with the oracle's agreement.
+3. **A refusal is cautious, narrow and named.** When the tool cannot be sure, it declines rather than guesses. It declines only where the doubt can affect the edit (a structural construct anywhere, a local one in the edited section), says which construct and line, and loses nothing.
+4. **A refusal is a defect to burn down, and it is measured.** The refusal rate on real notes is a tracked number, not an assumption. When it passes a threshold the maintainer sets, the answer is to claim more constructs or to promote goldmark, not to tell people to change their notes. Proposed threshold: more than 5% of the work items in a real repository have a refusal in a section an operation edits (today, in the vault: 3% of sections, 13% of files whole).
+5. **The parser is swappable, so the choice is cheap to reverse.** Nothing written into a file depends on how it was read. The `Locator` interface returns blocks with byte offsets; our scanner, a larger scanner or goldmark (ADR 261031-cpbg keeps that option, which needs an ADR for the dependency) can sit behind it without a file migration.
+6. **Reach for another encoding only when the humans stop reading the files.** A structured encoding would make writing trivial and give up the reason for Markdown here: records that a person and an agent both read and edit in an editor and in git.
 
 ## Consequences
 
