@@ -40,6 +40,7 @@
 
 ## Proposed
 
-| id                                                        | title                                                        | date       | scope | summary                                                      | supersedes / superseded_by |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ | -------------------------- |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0) |                            |
+| id                                                                        | title                                                              | date       | scope        | summary                                                                                                                                              | supersedes / superseded_by |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------ | ---------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md)                 | Work items gain closed, cycle and keep fields (layout 0.3.0)       | 2026-10-29 |              | Work items gain closed, cycle and keep fields (layout 0.3.0)                                                                                         |                            |
+| [261101-dxcn](261101-dxcn-closed-records-read-only-except-corrections.md) | Closed work items are read-only except through a logged correction | 2026-11-01 | internal/api | set and section refuse a closed work item unless the call carries a correction reason, written to the Log in the same write; keep is always editable |                            |
