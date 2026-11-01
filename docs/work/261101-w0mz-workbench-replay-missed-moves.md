@@ -2,11 +2,13 @@
 id: "261101-w0mz"
 title: workbench replay missed moves
 summary: When you return to the workbench, play the moves that happened while you were away (agents, the shell) as animations so none pass unseen
-status: ready
+status: active
 created: 2026-11-01
 updated: 2026-11-01
 kind: feature
 priority: 1
+claimed_by: codex
+claimed_at: 2026-11-01T23:35
 ---
 
 # workbench replay missed moves
@@ -37,3 +39,4 @@ Drive the board in the browser with moves made from the shell while the tab is h
 ## Log
 
 - 2026-11-01: filed from Alexander's note: the away-and-agent moves matter more than the wish-list polish.
+- 2026-11-01 16:35-07:00: claimed (codex).
