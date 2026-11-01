@@ -1,0 +1,33 @@
+{
+  "name": "a construct akmctl cannot edit is a warning",
+  "repo": "bodyrefusal",
+  "request": {
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "check",
+    "request": {
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "clean": true,
+    "errors": 0,
+    "warnings": 1,
+    "count": 1,
+    "findings": [
+      {
+        "rule": "B1",
+        "severity": "W",
+        "file": "docs/work/261022-e5f6-document-the-exit-codes.md",
+        "line": 17,
+        "id": "261022-e5f6",
+        "message": "line 17: ordered-list task; akmctl cannot edit the \"Goal\" section",
+        "class": null
+      }
+    ],
+    "reconcile": {
+      "state": "current"
+    }
+  }
+}

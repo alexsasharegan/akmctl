@@ -122,6 +122,8 @@ func TestRules(t *testing.T) {
 		}},
 		{"WK18 child blocked by its parent", "WK18", "E", map[string]func(string) string{e5f6: sub("parent: 261015-c4d5", "parent: 261015-c4d5\nblocked_by: [261015-c4d5]")}},
 		{"WK19 blocked_by a child", "WK19", "W", map[string]func(string) string{"docs/work/261015-c4d5-machine-readable-listings.md": sub("status: active", "status: active\nblocked_by: [261022-e5f6]")}},
+		{"B1 structural construct", "B1", "W", map[string]func(string) string{e5f6: func(t string) string { return t + "\n<div>\nhtml\n</div>\n" }}},
+		{"B1 local construct", "B1", "W", map[string]func(string) string{e5f6: func(t string) string { return t + "\n1. [ ] ordered\n" }}},
 		{"WK12 heading differs", "WK12", "W", map[string]func(string) string{e5f6: sub("# Document the exit codes", "# Something else")}},
 		{"I1 duplicate id", "I1", "E", map[string]func(string) string{"docs/work/261022-e5f6-copy.md": func(string) string {
 			return "---\nid: 261022-e5f6\ntitle: Copy\nstatus: raw\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n# Copy\n"
@@ -365,5 +367,27 @@ func TestRedundantBlockerRule(t *testing.T) {
 	}), Options{AsOf: asOf})
 	if got := count(res, "WK19"); len(got) != 1 {
 		t.Fatalf("%+v", res.Findings)
+	}
+}
+
+// TestB1Findings: a blockquote is read as opaque text and is not a finding; a
+// local construct is reported with its section and its file line, a structural
+// one once.
+func TestB1Findings(t *testing.T) {
+	add := func(text string) map[string]func(string) string {
+		return map[string]func(string) string{e5f6: func(t string) string { return t + text }}
+	}
+	res := Run(repoWith(t, add("\n> a callout\n")), Options{AsOf: asOf})
+	if got := count(res, "B1"); len(got) != 0 {
+		t.Errorf("blockquote reported: %+v", got)
+	}
+	res = Run(repoWith(t, add("\n1. [ ] ordered\n")), Options{AsOf: asOf})
+	got := count(res, "B1")
+	if len(got) != 1 || got[0].Severity != "W" || got[0].ID != "261022-e5f6" || !strings.Contains(got[0].Message, "ordered-list task") {
+		t.Fatalf("local: %+v", got)
+	}
+	res = Run(repoWith(t, add("\n<div>\n")), Options{AsOf: asOf})
+	if got := count(res, "B1"); len(got) != 1 || !strings.Contains(got[0].Message, "HTML line") || !strings.Contains(got[0].Message, "structural") {
+		t.Fatalf("structural: %+v", got)
 	}
 }

@@ -2,6 +2,8 @@ package body
 
 import (
 	"errors"
+	"os"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -97,7 +99,6 @@ func TestRefusals(t *testing.T) {
 	}{
 		{"indented fence", "## A\n\n  ```\n  x\n  ```\n", 3},
 		{"HTML line", "## A\n\n<div>\n## not\n</div>\n", 3},
-		{"blockquote", "> ## quoted\n", 1},
 		{"tab-indented line", "text\n\tcode\n", 2},
 		{"tab-indented line", "text\n \t* [X]\n", 2},
 		{"table delimiter row", "a | b\n---|---\n", 2},
@@ -163,5 +164,83 @@ func TestEmpty(t *testing.T) {
 		if err != nil || len(lay.Blocks) != 0 {
 			t.Errorf("%q: %+v, %v", s, lay.Blocks, err)
 		}
+	}
+}
+
+// TestQuoteIsOpaque: a run of blockquote lines is one Quote block, and nothing
+// inside it is a heading, a fence or a task.
+func TestQuoteIsOpaque(t *testing.T) {
+	src := "## A\n\n> ## not a heading\n> - [ ] not a task\n> ```\n\n- [ ] real\n"
+	lay, err := Locate([]byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var kinds []string
+	for _, b := range lay.Blocks {
+		kinds = append(kinds, b.Kind.String())
+	}
+	if got := strings.Join(kinds, ","); got != "heading,quote,task" {
+		t.Fatalf("blocks = %s", got)
+	}
+	if q := lay.Blocks[1]; q.Line != 3 || q.EndLine != 5 {
+		t.Errorf("quote lines %d-%d, want 3-5", q.Line, q.EndLine)
+	}
+}
+
+// TestEveryRefusalIsClassified: each construct the scanner can refuse is named in
+// exactly one of the two lists, so a new refusal cannot be added unclassified.
+func TestEveryRefusalIsClassified(t *testing.T) {
+	src, err := os.ReadFile("scanner.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	re := regexp.MustCompile(`(?:fail|refuse)\("([^"]+)"\)|Construct: "([^"]+)"`)
+	seen := map[string]bool{}
+	for _, m := range re.FindAllStringSubmatch(string(src), -1) {
+		c := m[1] + m[2]
+		seen[c] = true
+		if localConstructs[c] == structuralConstructs[c] {
+			t.Errorf("refusal %q must be in exactly one of localConstructs and structuralConstructs", c)
+		}
+	}
+	for c := range localConstructs {
+		if !seen[c] {
+			t.Errorf("localConstructs names %q, which the scanner never refuses", c)
+		}
+	}
+	for c := range structuralConstructs {
+		if !seen[c] {
+			t.Errorf("structuralConstructs names %q, which the scanner never refuses", c)
+		}
+	}
+}
+
+// TestTolerant: a tolerant scan steps over local constructs, records them with
+// their line, and still stops at a structural one.
+func TestTolerant(t *testing.T) {
+	src := "## A\n\n1. [ ] ordered\n- [ ] real\n\n## B\n\n-\n"
+	if _, err := Locate([]byte(src)); !errors.Is(err, ErrUnsupported) {
+		t.Fatalf("strict Locate = %v", err)
+	}
+	lay, err := LocateTolerant([]byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(lay.Refusals) != 2 || lay.Refusals[0].Construct != "ordered-list task" || lay.Refusals[0].Line != 3 || lay.Refusals[1].Line != 8 {
+		t.Errorf("refusals = %+v", lay.Refusals)
+	}
+	var tasks int
+	for _, b := range lay.Blocks {
+		if b.Kind == Task {
+			tasks++
+		}
+	}
+	if tasks != 1 {
+		t.Errorf("%d tasks, want 1 (the real one)", tasks)
+	}
+	_, err = LocateTolerant([]byte("## A\n\n<div>\n"))
+	var u *UnsupportedError
+	if !errors.As(err, &u) || !u.Structural || u.Construct != "HTML line" {
+		t.Errorf("tolerant scan of an HTML line = %v", err)
 	}
 }

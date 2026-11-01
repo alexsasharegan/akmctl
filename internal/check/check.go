@@ -2,6 +2,7 @@
 package check
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -82,6 +83,35 @@ func (c *checker) add(rule, sev, file string, line int, id, format string, a ...
 	c.out = append(c.out, Finding{rule, sev, file, line, id, fmt.Sprintf(format, a...)})
 }
 
+// bodies warns (B1) about a record whose body holds a construct the section tree
+// cannot read: akmctl cannot edit it (a structural construct) or cannot edit the
+// section it is in (a local one), and says which construct and line. Closed work
+// items are not edited, so they are not checked.
+func (c *checker) bodies() {
+	for _, r := range c.repo.Records {
+		if r.Type == record.Work && c.repo.IsDone(r.Path) {
+			continue
+		}
+		head := strings.Count(string(r.Text[:len(r.Text)-len(r.Body)]), "\n")
+		tr, err := body.Split([]byte(r.Body))
+		var u *body.UnsupportedError
+		if errors.As(err, &u) {
+			c.add("B1", "W", r.Path, head+u.Line, r.ID, "line %d: %s; akmctl cannot edit this body (%s)", head+u.Line, u.Construct, "structural")
+			continue
+		}
+		if err != nil {
+			continue
+		}
+		for _, s := range tr.Sections() {
+			for _, ref := range tr.Refusals() {
+				if ref.Start >= s.Start && ref.Start < s.End {
+					c.add("B1", "W", r.Path, head+ref.Line, r.ID, "line %d: %s; akmctl cannot edit the %q section", head+ref.Line, ref.Construct, s.Name)
+				}
+			}
+		}
+	}
+}
+
 // Run checks the repository.
 func Run(repo *record.Repo, opt Options) Result {
 	if opt.AsOf.IsZero() {
@@ -92,6 +122,7 @@ func Run(repo *record.Repo, opt Options) Result {
 	c.problems()
 	c.work()
 	c.adrs()
+	c.bodies()
 	c.ids()
 	c.roadmap()
 	c.agents()

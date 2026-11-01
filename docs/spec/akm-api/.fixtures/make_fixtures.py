@@ -214,6 +214,10 @@ def claims_layout(files):
 def closable(files):
     files[A2B3] += "\n## Outcome\nShipped.\n"
 
+def bodyrefusal(files):
+    """basic, plus a list line akmctl does not read in the last section of one item."""
+    files[E5F6] += "\n1. [ ] ordered step\n"
+
 def closelinks(files):
     """closable, plus links out of the item and a note with a link to it."""
     closable(files)
@@ -691,6 +695,10 @@ def main():
     p = "docs/work/261015-c4d5-machine-readable-listings.md"
     f7 = [dict(rule="WK19", severity="W", file=p, line=line_of(red, p, "blocked_by:"), id="261015-c4d5", message="blocked_by 261022-e5f6 is a descendant; a parent already waits for its children", **{"class": None})]
     case("check", 7, "a warning does not make the repository unclean", "redundant", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=1, count=1, findings=f7, reconcile=dict(state="current")))
+    brf = build("bodyrefusal", bodyrefusal)
+    last_h = [l for l in brf[E5F6].split("\n") if l.startswith("## ")][-1][3:]
+    f8 = [dict(rule="B1", severity="W", file=E5F6, line=line_of(brf, E5F6, "1. [ ] ordered step"), id="261022-e5f6", message="line %d: ordered-list task; akmctl cannot edit the \"%s\" section" % (line_of(brf, E5F6, "1. [ ] ordered step"), last_h), **{"class": None})]
+    case("check", 8, "a construct akmctl cannot edit is a warning", "bodyrefusal", dict(as_of=AS_OF), ok("check", dict(as_of=AS_OF), clean=True, errors=0, warnings=1, count=1, findings=f8, reconcile=dict(state="current")))
     req = {}
     case("migrate", 1, "a repository on the current layout has nothing to migrate", "basic", req, ok("migrate", req, mode="report", **{"from": "0.3.0"}, to="0.3.0", state="current", steps=[], findings=[], clean=True))
     # find, when

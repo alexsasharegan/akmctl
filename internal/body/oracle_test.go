@@ -66,6 +66,12 @@ func (goldmarkLocator) Locate(src []byte) (Layout, error) {
 				}
 			}
 		case *east.TaskCheckBox:
+			// the scanner treats a blockquote as opaque, so a box inside one is not a task it claims
+			for a := v.Parent(); a != nil; a = a.Parent() {
+				if _, quoted := a.(*ast.Blockquote); quoted {
+					return ast.WalkContinue, nil
+				}
+			}
 			if off, ok := firstLine(v.Parent()); ok {
 				ln, s, e := lineAt(off)
 				add(Block{Kind: Task, Done: v.IsChecked, Start: s, End: e, Line: ln, EndLine: ln})

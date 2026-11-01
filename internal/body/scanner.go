@@ -5,11 +5,18 @@ import (
 	"strings"
 )
 
-// Scanner is the Locator that reads the supported subset line by line.
-type Scanner struct{}
+// Scanner is the Locator that reads the supported subset line by line. By
+// default it returns an error at the first construct it does not read. With
+// Tolerant set it steps over a local construct (see localConstructs), treating
+// the line as plain text and recording it in Layout.Refusals, and still returns an
+// error for a structural one.
+type Scanner struct{ Tolerant bool }
 
-// Locate finds the blocks of body with the Scanner.
+// Locate finds the blocks of body with the strict Scanner.
 func Locate(body []byte) (Layout, error) { return Scanner{}.Locate(body) }
+
+// LocateTolerant finds the blocks of body, stepping over local constructs.
+func LocateTolerant(body []byte) (Layout, error) { return Scanner{Tolerant: true}.Locate(body) }
 
 var (
 	headingRe     = regexp.MustCompile(`^(#{1,6})([ \t]|$)`)
@@ -38,14 +45,14 @@ var (
 )
 
 // Locate implements Locator.
-func (Scanner) Locate(body []byte) (Layout, error) {
+func (sc Scanner) Locate(body []byte) (Layout, error) {
 	var lay Layout
 	for i, c := range body {
 		if (c < 0x20 && c != '\t' && c != '\n' && c != '\r') || c == 0x7f {
-			return Layout{}, &UnsupportedError{Construct: "control character", Line: 1 + strings.Count(string(body[:i]), "\n")}
+			return Layout{}, &UnsupportedError{Construct: "control character", Line: 1 + strings.Count(string(body[:i]), "\n"), Structural: true}
 		}
 		if c == '\r' && (i+1 == len(body) || body[i+1] != '\n') {
-			return Layout{}, &UnsupportedError{Construct: "bare carriage return line ending", Line: 1 + strings.Count(string(body[:i]), "\n")}
+			return Layout{}, &UnsupportedError{Construct: "bare carriage return line ending", Line: 1 + strings.Count(string(body[:i]), "\n"), Structural: true}
 		}
 	}
 	var (
@@ -74,7 +81,19 @@ func (Scanner) Locate(body []byte) (Layout, error) {
 		lineNo++
 
 		fail := func(c string) (Layout, error) {
-			return Layout{}, &UnsupportedError{Construct: c, Line: lineNo}
+			return Layout{}, &UnsupportedError{Construct: c, Line: lineNo, Structural: IsStructural(c)}
+		}
+		// refuse deals with a construct the scanner does not read: it stops with
+		// an error, or, in a tolerant scan of a local construct, records the line
+		// and goes on. It reports whether the scan must stop.
+		var refusal error
+		refuse := func(c string) bool {
+			if sc.Tolerant && !IsStructural(c) {
+				lay.Refusals = append(lay.Refusals, Refusal{Construct: c, Line: lineNo, Start: off})
+				return false
+			}
+			_, refusal = fail(c)
+			return true
 		}
 
 		if fch != 0 {
@@ -97,6 +116,9 @@ func (Scanner) Locate(body []byte) (Layout, error) {
 			off = next
 			continue
 		case leadTabRe.MatchString(t):
+			// Tried as plain text in work item 261101-4j86 and kept: the oracle reads a
+			// space-and-tab indent before a task marker ("* a\n \t* [X]") as a task of
+			// the list, which no line rule here matches (saved fuzz finding 672f74408e54df82).
 			return fail("tab-indented line")
 		}
 
@@ -109,13 +131,20 @@ func (Scanner) Locate(body []byte) (Layout, error) {
 			continue
 		}
 
+		skip := false // a local construct was stepped over: the line is plain text
 		switch {
 		case indFenceRe.MatchString(t):
 			return fail("indented fence")
 		case htmlRe.MatchString(t):
 			return fail("HTML line")
 		case quoteRe.MatchString(t):
-			return fail("blockquote")
+			// a quote is opaque: its lines are not read, and a run of them is one block
+			if n := len(lay.Blocks); n > 0 && lay.Blocks[n-1].Kind == Quote && lay.Blocks[n-1].EndLine == lineNo-1 {
+				lay.Blocks[n-1].End, lay.Blocks[n-1].EndLine = lineEnd, lineNo
+			} else {
+				lay.Blocks = append(lay.Blocks, Block{Kind: Quote, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
+			}
+			skip = true
 		case isDelimiterLike(t):
 			if !tableDelimiter(prev, t) {
 				return fail("table delimiter row")
@@ -127,41 +156,64 @@ func (Scanner) Locate(body []byte) (Layout, error) {
 		case indRuleRe.MatchString(t):
 			return fail("indented setext underline, thematic break or empty item")
 		case emptyItemRe.MatchString(t):
-			return fail("empty list item")
+			if refuse("empty list item") {
+				return Layout{}, refusal
+			}
+			skip = true
 		case setextEqRe.MatchString(t) && !prevBlank:
 			return fail("setext heading underline")
 		case indHeadingRe.MatchString(t):
 			return fail("indented heading")
 		case orderedTask.MatchString(t):
-			return fail("ordered-list task")
+			if refuse("ordered-list task") {
+				return Layout{}, refusal
+			}
+			skip = true
 		case deepTaskRe.MatchString(t):
-			return fail("task item indented four or more spaces")
+			if refuse("task item indented four or more spaces") {
+				return Layout{}, refusal
+			}
+			skip = true
 		case codeInItemRe.MatchString(t):
 			return fail("indented code in a list item")
 		case tabMarkerRe.MatchString(t):
-			return fail("tab after a list marker")
+			if refuse("tab after a list marker") {
+				return Layout{}, refusal
+			}
+			skip = true
 		case blockAfterMarker(t):
 			return fail("block inside a list item")
 		case unusualBox(t):
-			return fail("task box with unusual contents")
+			if refuse("task box with unusual contents") {
+				return Layout{}, refusal
+			}
+			skip = true
 		case glueTaskRe.MatchString(t):
-			return fail("task box not followed by a space")
+			if refuse("task box not followed by a space") {
+				return Layout{}, refusal
+			}
+			skip = true
 		case emptyTaskRe.MatchString(t):
-			return fail("task item without text")
+			if refuse("task item without text") {
+				return Layout{}, refusal
+			}
+			skip = true
 		}
 
-		switch {
-		case headingRe.MatchString(t):
-			m := headingRe.FindStringSubmatch(t)
-			if strings.Trim(strings.TrimSpace(t[len(m[1]):]), "#") == "" {
-				return fail("empty heading")
+		if !skip {
+			switch {
+			case headingRe.MatchString(t):
+				m := headingRe.FindStringSubmatch(t)
+				if strings.Trim(strings.TrimSpace(t[len(m[1]):]), "#") == "" {
+					return fail("empty heading")
+				}
+				lay.Blocks = append(lay.Blocks, Block{Kind: Heading, Level: len(m[1]), Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
+			case taskRe.MatchString(t):
+				m := taskRe.FindStringSubmatch(t)
+				lay.Blocks = append(lay.Blocks, Block{Kind: Task, Done: m[2] != " ", Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
+			case bulletRe.MatchString(t):
+				lay.Blocks = append(lay.Blocks, Block{Kind: ListItem, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
 			}
-			lay.Blocks = append(lay.Blocks, Block{Kind: Heading, Level: len(m[1]), Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
-		case taskRe.MatchString(t):
-			m := taskRe.FindStringSubmatch(t)
-			lay.Blocks = append(lay.Blocks, Block{Kind: Task, Done: m[2] != " ", Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
-		case bulletRe.MatchString(t):
-			lay.Blocks = append(lay.Blocks, Block{Kind: ListItem, Start: off, End: lineEnd, Line: lineNo, EndLine: lineNo})
 		}
 		prevBlank, prev = false, t
 		off = next

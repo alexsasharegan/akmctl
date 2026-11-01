@@ -41,14 +41,17 @@ func (s Section) Key() string { return strings.ToLower(s.Name) }
 type Tree struct {
 	src      []byte
 	sections []Section
+	refusals []Refusal // local constructs the scan stepped over
 }
 
-// Split reads body (the text after the frontmatter) with Locate and splits it at
-// its "## " headings. It returns the error of Locate for a construct outside the
-// supported subset (ErrUnsupported, with the construct and the line), so a body
-// the scanner does not understand is never split by guesswork.
+// Split reads body (the text after the frontmatter) with a tolerant Locate and
+// splits it at its "## " headings. A structural construct outside the supported
+// subset is an error (ErrUnsupported, with the construct and the line), so a body
+// whose sections the scanner cannot be sure of is never split by guesswork. A
+// local construct is stepped over: the tree splits, and an edit is refused only
+// when the local construct lies in the section it would change (ADR 261101-tr8e).
 func Split(body []byte) (*Tree, error) {
-	lay, err := Locate(body)
+	lay, err := LocateTolerant(body)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +60,7 @@ func Split(body []byte) (*Tree, error) {
 
 // build splits src at the level-2 headings of lay.
 func build(src []byte, lay Layout) *Tree {
-	t := &Tree{src: src}
+	t := &Tree{src: src, refusals: lay.Refusals}
 	for _, b := range lay.Blocks {
 		if b.Kind != Heading || b.Level != 2 {
 			continue
@@ -87,6 +90,20 @@ func headingName(line string) string {
 		s = ""
 	}
 	return s
+}
+
+// Refusals lists the local constructs the split stepped over, in order.
+func (t *Tree) Refusals() []Refusal { return append([]Refusal(nil), t.refusals...) }
+
+// refusedIn is the error for an edit of section s when a local construct lies
+// inside it, or nil.
+func (t *Tree) refusedIn(s Section) error {
+	for _, r := range t.refusals {
+		if r.Start >= s.Start && r.Start < s.End {
+			return &UnsupportedError{Construct: r.Construct, Line: r.Line}
+		}
+	}
+	return nil
 }
 
 // Join returns the bytes the tree was split from.
@@ -180,7 +197,7 @@ func (t *Tree) Checklist(name string) ([]Item, error) {
 	if !ok {
 		return nil, ErrNoSection
 	}
-	lay, err := Locate(t.src[s.Body:s.End])
+	lay, err := LocateTolerant(t.src[s.Body:s.End])
 	if err != nil {
 		return nil, err
 	}
@@ -215,6 +232,9 @@ func (t *Tree) SetChecked(name string, pos int, done bool, etag string) ([]byte,
 	s, ok := t.Section(name)
 	if !ok {
 		return nil, ErrNoSection
+	}
+	if err := t.refusedIn(s); err != nil {
+		return nil, err
 	}
 	if etag != "" && etag != t.Etag(s) {
 		return nil, ErrStale
@@ -276,6 +296,9 @@ func (t *Tree) AppendLog(date, text string) ([]byte, error) {
 	if !ok {
 		return nil, ErrNoSection
 	}
+	if err := t.refusedIn(s); err != nil {
+		return nil, err
+	}
 	text = strings.Join(strings.Fields(text), " ")
 	entry := "- " + date + ": " + text
 	return t.appendLine(s, entry), nil
@@ -333,6 +356,9 @@ func (t *Tree) ReplaceSection(name, text, etag string) ([]byte, error) {
 	}
 	if strings.EqualFold(s.Name, "log") {
 		return nil, ErrAppendOnly
+	}
+	if err := t.refusedIn(s); err != nil {
+		return nil, err
 	}
 	if etag != "" && etag != t.Etag(s) {
 		return nil, ErrStale

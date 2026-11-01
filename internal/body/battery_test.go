@@ -1,6 +1,7 @@
 package body
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -169,6 +170,87 @@ func FuzzAgainstOracle(f *testing.F) {
 	f.Fuzz(func(t *testing.T, s string) {
 		if refused, diff := compare([]byte(s)); !refused && diff != "" {
 			t.Fatalf("%q\n%s", s, diff)
+		}
+	})
+}
+
+// TestTolerantAgainstOracle: when a tolerant scan succeeds, the headings it finds
+// are the oracle's headings exactly, and every task and list item it claims is
+// one the oracle finds too. What it stepped over may differ; that is what makes
+// those lines refusals.
+func TestTolerantAgainstOracle(t *testing.T) {
+	r := rand.New(rand.NewSource(11))
+	const n = 30000
+	scanned, stepped, wrong := 0, 0, 0
+	for i := 0; i < n; i++ {
+		src := generate(r)
+		got, err := LocateTolerant(src)
+		if err != nil {
+			continue
+		}
+		scanned++
+		if len(got.Refusals) > 0 {
+			stepped++
+		}
+		if d := tolerantDiff(src, got); d != "" {
+			wrong++
+			if wrong <= 5 {
+				t.Errorf("%q\n%s", src, d)
+			}
+		}
+	}
+	t.Logf("tolerant scan: %d documents scanned, %d with a stepped-over construct, %d wrong", scanned, stepped, wrong)
+	if stepped < 500 {
+		t.Errorf("only %d documents had a local construct; the generator is too tame", stepped)
+	}
+}
+
+// tolerantDiff compares a tolerant layout with the oracle's: the headings must be
+// the same, and every task and list item the scanner claims must be the oracle's.
+func tolerantDiff(src []byte, got Layout) string {
+	want, _ := goldmarkLocator{}.Locate(src)
+	heads := func(l Layout) string {
+		var s []string
+		for _, p := range project(l) {
+			if strings.HasPrefix(p, "heading") {
+				s = append(s, p)
+			}
+		}
+		return strings.Join(s, " ")
+	}
+	oracle := map[string]bool{}
+	for _, p := range project(want) {
+		oracle[p] = true
+	}
+	bad := heads(got) != heads(want)
+	for _, p := range project(got) {
+		if !oracle[p] {
+			bad = true
+		}
+	}
+	if bad {
+		return fmt.Sprintf("scanner %v\noracle  %v", project(got), project(want))
+	}
+	return ""
+}
+
+// FuzzTolerantAgainstOracle: whatever a tolerant scan accepts, the oracle reads
+// the same headings, and agrees with every task and list item the scan claims.
+// Run with go test -fuzz=FuzzTolerantAgainstOracle -fuzztime=30s ./internal/body
+func FuzzTolerantAgainstOracle(f *testing.F) {
+	for _, s := range hostile {
+		f.Add(s)
+	}
+	for _, b := range repoBodies(f) {
+		f.Add(string(b))
+	}
+	f.Fuzz(func(t *testing.T, s string) {
+		got, err := LocateTolerant([]byte(s))
+		if err != nil {
+			return
+		}
+		if d := tolerantDiff([]byte(s), got); d != "" {
+			t.Fatalf("%q\n%s", s, d)
 		}
 	})
 }

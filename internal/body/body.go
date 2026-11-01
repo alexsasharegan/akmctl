@@ -28,6 +28,9 @@ const (
 	// ListItem is a bullet item at column 0 that is not a task. It spans its first
 	// line.
 	ListItem
+	// Quote is a run of consecutive blockquote lines ("> text", with at most three
+	// leading spaces). The scanner does not read inside it: it is opaque text.
+	Quote
 )
 
 func (k Kind) String() string {
@@ -40,6 +43,8 @@ func (k Kind) String() string {
 		return "task"
 	case ListItem:
 		return "list item"
+	case Quote:
+		return "quote"
 	}
 	return fmt.Sprintf("kind(%d)", int(k))
 }
@@ -59,9 +64,21 @@ type Block struct {
 }
 
 // Layout lists the blocks of a body in source order. A line that is inside a
-// fence belongs to the Fence block and to no other.
+// fence belongs to the Fence block and to no other. Refusals lists the local
+// constructs a tolerant scan stepped over (see LocateTolerant); a strict Locate
+// returns an error at the first one and leaves it empty.
 type Layout struct {
-	Blocks []Block
+	Blocks   []Block
+	Refusals []Refusal
+}
+
+// Refusal is a local construct the tolerant scan did not read: it is treated as
+// plain text and recorded, so an edit can tell whether it lies in the section it
+// means to change.
+type Refusal struct {
+	Construct string
+	Line      int // 1-based
+	Start     int // offset of the line
 }
 
 // Locator finds the blocks of a body. The scanner implements it; the tests also
@@ -75,10 +92,50 @@ type Locator interface {
 var ErrUnsupported = errors.New("unsupported Markdown construct")
 
 // UnsupportedError says which construct was met and on which line (1-based).
+// Structural is true when the construct could change where a heading, fence or
+// checklist is (ADR 261101-tr8e), so no edit of the body is safe; a local
+// construct only affects its own lines.
 type UnsupportedError struct {
-	Construct string
-	Line      int
+	Construct  string
+	Line       int
+	Structural bool
 }
+
+// localConstructs are the refusals confined to their own lines: they cannot hide
+// or invent a heading or a fence. Every other refusal is structural, so a
+// construct that is not listed here is treated as the more cautious kind.
+var localConstructs = map[string]bool{
+	"table delimiter row":                    true,
+	"empty list item":                        true,
+	"ordered-list task":                      true,
+	"task item indented four or more spaces": true,
+	"tab after a list marker":                true,
+	"task box with unusual contents":         true,
+	"task box not followed by a space":       true,
+	"task item without text":                 true,
+}
+
+// structuralConstructs are the refusals that could change where a heading, fence
+// or checklist is. TestEveryRefusalIsClassified checks that this and
+// localConstructs together name every construct the scanner refuses.
+var structuralConstructs = map[string]bool{
+	"control character":                true,
+	"bare carriage return line ending": true,
+	"tab-indented line":                true,
+	"indented fence":                   true,
+	"indented heading":                 true,
+	"HTML line":                        true,
+	"spaced thematic break":            true,
+	"setext heading underline or thematic break after text":   true,
+	"setext heading underline":                                true,
+	"indented setext underline, thematic break or empty item": true,
+	"indented code in a list item":                            true,
+	"block inside a list item":                                true,
+	"empty heading":                                           true,
+}
+
+// IsStructural reports whether refusing construct c is structural.
+func IsStructural(c string) bool { return !localConstructs[c] }
 
 func (e *UnsupportedError) Error() string {
 	return fmt.Sprintf("line %d: unsupported Markdown construct: %s", e.Line, e.Construct)

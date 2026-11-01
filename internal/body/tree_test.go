@@ -45,8 +45,8 @@ func TestSplitJoin(t *testing.T) {
 	if s := tr.Sections(); len(s) != 2 || s[0].Name != "A" || s[1].Name != "C#" {
 		t.Errorf("sections %+v", s)
 	}
-	if _, err := Split([]byte("## A\n\n> quoted\n")); !errors.Is(err, ErrUnsupported) {
-		t.Errorf("Split of a blockquote = %v, want ErrUnsupported", err)
+	if _, err := Split([]byte("## A\n\n<div>\n")); !errors.Is(err, ErrUnsupported) {
+		t.Errorf("Split of an HTML line = %v, want ErrUnsupported", err)
 	}
 }
 
@@ -230,7 +230,7 @@ func TestSplitJoinRecords(t *testing.T) {
 // changes nothing outside the span it means to change.
 func TestTreeAgainstOracle(t *testing.T) {
 	r := rand.New(rand.NewSource(7))
-	checked, edited := 0, 0
+	checked, edited, refused := 0, 0, 0
 	for i := 0; i < 20000; i++ {
 		src := generate(r)
 		tr, err := Split(src)
@@ -254,13 +254,20 @@ func TestTreeAgainstOracle(t *testing.T) {
 			if items, err := tr.Checklist(name); err == nil && len(items) > 0 {
 				k := r.Intn(len(items)) + 1
 				out, err := tr.SetChecked(name, k, !items[k-1].Done, "")
-				if err != nil {
+				switch {
+				case errors.Is(err, ErrUnsupported):
+					if tr.refusedIn(s) == nil {
+						t.Fatalf("%q: tick refused with no local construct in %s: %v", src, name, err)
+					}
+					refused++
+				case err != nil:
 					t.Fatalf("%q: %v", src, err)
+				default:
+					if d := diffCount(string(src), out); d != 1 {
+						t.Fatalf("%q: ticking changed %d bytes", src, d)
+					}
+					edited++
 				}
-				if d := diffCount(string(src), out); d != 1 {
-					t.Fatalf("%q: ticking changed %d bytes", src, d)
-				}
-				edited++
 			}
 			var out []byte
 			var err error
@@ -269,6 +276,13 @@ func TestTreeAgainstOracle(t *testing.T) {
 				out, err = tr.AppendLog("2026-11-01", "e")
 			default:
 				out, err = tr.ReplaceSection(name, "replaced", "")
+			}
+			if errors.Is(err, ErrUnsupported) {
+				if tr.refusedIn(s) == nil {
+					t.Fatalf("%q: %s edit refused with no local construct in it: %v", src, name, err)
+				}
+				refused++
+				continue
 			}
 			if err != nil {
 				t.Fatalf("%q: %s: %v", src, name, err)
@@ -282,7 +296,10 @@ func TestTreeAgainstOracle(t *testing.T) {
 			edited++
 		}
 	}
-	t.Logf("%d documents split, %d edits checked", checked, edited)
+	t.Logf("%d documents split, %d edits checked, %d refused for a local construct in their section", checked, edited, refused)
+	if refused < 100 {
+		t.Errorf("only %d edits were refused; the local-construct path is barely exercised", refused)
+	}
 	if checked < 2000 || edited < 2000 {
 		t.Errorf("too few documents or edits (%d, %d)", checked, edited)
 	}
@@ -334,6 +351,12 @@ func FuzzTree(f *testing.F) {
 			} else {
 				out, err = tr.ReplaceSection(sec.Name, "x", "")
 			}
+			if errors.Is(err, ErrUnsupported) {
+				if tr.refusedIn(sec) == nil {
+					t.Fatalf("%q: %s edit refused with no local construct in it: %v", s, sec.Name, err)
+				}
+				continue
+			}
 			if err != nil {
 				t.Fatalf("%q: %s: %v", s, sec.Name, err)
 			}
@@ -342,4 +365,30 @@ func FuzzTree(f *testing.F) {
 			}
 		}
 	})
+}
+
+// TestLocalConstructScope: a local construct blocks only the edits of its own
+// section. A blockquote is not a refusal at all.
+func TestLocalConstructScope(t *testing.T) {
+	src := "## Goal\n\n- [ ] one\n\n## Notes\n\n> a callout\n\n1. [ ] ordered\n\n## Log\n\n- 2026-10-01: a\n"
+	tr := mustSplit(t, src)
+	if r := tr.Refusals(); len(r) != 1 || r[0].Construct != "ordered-list task" || r[0].Line != 9 {
+		t.Fatalf("refusals = %+v", r)
+	}
+	if out, err := tr.SetChecked("goal", 1, true, ""); err != nil || !strings.Contains(string(out), "- [x] one") {
+		t.Errorf("tick beside a Notes section with a local construct: %v", err)
+	}
+	if _, err := tr.AppendLog("2026-10-02", "b"); err != nil {
+		t.Errorf("log append: %v", err)
+	}
+	_, err := tr.ReplaceSection("notes", "x", "")
+	var u *UnsupportedError
+	if !errors.As(err, &u) || u.Structural || u.Line != 9 || !errors.Is(err, ErrUnsupported) {
+		t.Errorf("replacing the Notes section = %v, want a local refusal on line 9", err)
+	}
+	// a blockquote inside the section being edited is fine
+	tr = mustSplit(t, "## Goal\n\n> note\n\n- [ ] one\n")
+	if out, err := tr.SetChecked("goal", 1, true, ""); err != nil || !strings.Contains(string(out), "- [x] one") {
+		t.Errorf("tick in a Goal with a blockquote: %v", err)
+	}
 }
