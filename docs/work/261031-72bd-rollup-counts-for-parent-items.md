@@ -23,3 +23,4 @@ From spike 261031-078w. A parent shows no progress. Add counts (`children_done`,
 - 2026-10-31: filed.
 - 2026-10-31: filed from spike 261031-078w.
 - 2026-11-01 10:14-07:00: Added a box for close reporting the parent and open siblings, from spike 261101-baze.
+- 2026-11-01: 261101-a86m (workbench close prompt) is blocked by this item's close reporting.
