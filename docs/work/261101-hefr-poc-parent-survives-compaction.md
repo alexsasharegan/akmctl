@@ -33,6 +33,10 @@ Done when:
 - [ ] Each question above is answered in `## Outcome` with the command output that shows it.
 - [ ] The tool defects found are filed as items; the findings feed 261101-dkv2 (they are not a design decision, so no ADR here).
 
+## Next
+
+Build the scratch repository in the session scratchpad: init, a parent with closed children, a nested parent, a link from retained work. Then compact by hand and run check, ls, show and a restore.
+
 ## Log
 
 - 2026-11-01: filed.
