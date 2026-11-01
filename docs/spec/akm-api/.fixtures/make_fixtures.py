@@ -360,7 +360,7 @@ def write_cases(cases, basic):
     req = dict(id="261020-a2b3", changes=dict(blocked_by=["261024-g7h8"]))
     case("set", 11, "a blocked_by entry that closes a cycle is refused", "basic", req, err("set", req, "refused", "blocked_by 261024-g7h8 would make a dependency cycle: 261020-a2b3 -> 261024-g7h8 -> 261020-a2b3", reason="rule", rule="WK18"))
     req = dict(id="261022-e5f6", status="done", outcome="Shipped.")
-    case("close", 9, "done is refused while the Goal has an empty box", "basic", req, err("close", req, "refused", '261022-e5f6 has unchecked boxes in its Goal: line 7 "It is done."; tick each with evidence (tick --evidence), change the Goal with section, or close it dropped', reason="unchecked_goal", items=[dict(line=7, text="It is done.", position=1)]))
+    case("close", 9, "done is refused while the Goal has an empty box", "basic", req, err("close", req, "refused", '261022-e5f6 has unchecked boxes in its Goal: line 7 "It is done."; tick each with evidence (tick --evidence), remove one whose requirement is gone (remove), change the Goal with section, or close it dropped', reason="unchecked_goal", items=[dict(line=7, text="It is done.", position=1)]))
     req = dict(id="261015-c4d5", status="dropped", outcome="Not needed.")
     case("close", 7, "dropping a parent with an open child is refused", "basic", req, err("close", req, "refused", "child 261020-a2b3 is not done or dropped", reason="open_children", rule="WK8"))
     req = dict(kind="work", slug="late-child", fields=dict(parent="261015-c4d5", blocked_by=["261015-c4d5"]))
@@ -473,6 +473,17 @@ def write_cases(cases, basic):
          ok("tick", req, record=pub(after_rec(files, E5F6)), section=sec_out(tk, "goal", "Do the thing.\n\n- [x] It is done."), item=dict(position=1, done=True, text="It is done."), changed=True), after={E5F6: tk})
     req = dict(id="261022-e5f6", item=5)
     case("tick", 4, "an item that does not exist", "basic", req, err("tick", req, "not_found", "261022-e5f6 has no item 5 in its goal checklist"))
+    # remove: delete an unchecked box and log it; lossy, so confirm is required
+    rm = basic[E5F6].replace("updated: 2026-10-22\n", "updated: 2026-10-28\n").replace("- [ ] It is done.\n", "")
+    rm = rm + "## Log\n- 2026-10-28: removed \"It is done.\": no longer needed\n"
+    req = dict(id="261022-e5f6", item=1, reason="no longer needed", confirm=True, as_of="2026-10-28")
+    wcase("remove", 1, "remove the only box of the Goal: the line goes and the Log says why", req, rm, E5F6, "goal", "Do the thing.", ("removed", dict(position=1, text="It is done.", items=[])))
+    req = dict(id="261022-e5f6", item=1, reason="no longer needed", dry_run=True, as_of="2026-10-28")
+    wcase("remove", 2, "dry run: no confirm needed, the removal as a diff, nothing written", req, rm, E5F6, "goal", "Do the thing.", ("removed", dict(position=1, text="It is done.", items=[])), dryrun=True)
+    req = dict(id="261022-e5f6", item=1, reason="no longer needed")
+    case("remove", 3, "without confirm the removal is refused: it loses history", "basic", req, err("remove", req, "refused", 'remove deletes item 1 ("It is done.") from 261022-e5f6 and logs it. This loses history: the tool does not track git, so the line is recoverable only from a commit. Commit first if you want it back, then pass confirm to accept the loss', reason="confirm_required", item=1, text="It is done."))
+    req = dict(id="261022-e5f6", item=5, reason="no longer needed", confirm=True)
+    case("remove", 4, "an item that does not exist", "basic", req, err("remove", req, "not_found", "261022-e5f6 has no item 5 in its goal checklist"))
     req = dict(id="261020-a2b3", text="tests written.", as_of="2026-10-28")
     lg = set_section(basic[A2B3], "Log", "- 2026-10-28: tests written.", append=True).replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
     wcase("log", 1, "append a dated Log entry", req, lg, A2B3, "log", "- 2026-10-20: started.\n- 2026-10-28: tests written.", ("entry", dict(text="- 2026-10-28: tests written.")))
@@ -597,7 +608,7 @@ def legacy_cases(case):
 # small files are compared exactly; the others (AGENTS.md, the skills, ...) are only
 # required to exist, so the wording of a template is not part of the contract.
 AKM_REFS = ["board", "check", "claim", "close", "commits", "config", "find", "index", "init", "ls", "migrate", "new",
-    "release", "search", "section", "set", "show", "skills", "tick", "log", "version", "when"]
+    "release", "remove", "search", "section", "set", "show", "skills", "tick", "log", "version", "when"]
 INIT_COMMON = [".agents/skills/akm/SKILL.md"] + [".agents/skills/akm/references/%s.md" % r for r in AKM_REFS] + [
     ".agents/skills/akm-record-decision/SKILL.md", ".agents/skills/akm-record-decision/assets/adr.md",
     ".agents/skills/akm-track-work/SKILL.md", ".agents/skills/akm-track-work/assets/work-item.md",

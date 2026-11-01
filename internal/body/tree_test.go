@@ -462,3 +462,30 @@ func TestOrderedChecklist(t *testing.T) {
 		}
 	}
 }
+
+func TestRemoveItem(t *testing.T) {
+	src := "# T\n\n## Goal\n\n- [ ] a\n1. [ ] b\n- [x] c\n\n## Log\n\n- 2026-11-01: x\n"
+	tr, err := Split([]byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, it, err := tr.RemoveItem("goal", 2, "")
+	if err != nil || it.Text != "b" {
+		t.Fatalf("%v %v", it, err)
+	}
+	if want := "# T\n\n## Goal\n\n- [ ] a\n- [x] c\n\n## Log\n\n- 2026-11-01: x\n"; string(out) != want {
+		t.Errorf("got %q", out)
+	}
+	if _, it, err := tr.RemoveItem("goal", 3, ""); !errors.Is(err, ErrChecked) || it.Text != "c" {
+		t.Errorf("ticked: %v %v", it, err)
+	}
+	if _, _, err := tr.RemoveItem("goal", 4, ""); !errors.Is(err, ErrNoItem) {
+		t.Errorf("missing: %v", err)
+	}
+	if _, _, err := tr.RemoveItem("goal", 1, "0000000000000000"); !errors.Is(err, ErrStale) {
+		t.Errorf("stale: %v", err)
+	}
+	if _, _, err := tr.RemoveItem("nonesuch", 1, ""); !errors.Is(err, ErrNoSection) {
+		t.Errorf("section: %v", err)
+	}
+}

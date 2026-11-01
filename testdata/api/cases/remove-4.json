@@ -1,0 +1,25 @@
+{
+  "name": "an item that does not exist",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "item": 5,
+    "reason": "no longer needed",
+    "confirm": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "remove",
+    "request": {
+      "id": "261022-e5f6",
+      "item": 5,
+      "reason": "no longer needed",
+      "confirm": true
+    },
+    "ok": false,
+    "error": {
+      "code": "not_found",
+      "message": "261022-e5f6 has no item 5 in its goal checklist"
+    }
+  }
+}

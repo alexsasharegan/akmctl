@@ -22,6 +22,7 @@ var (
 	ErrNoItem     = errors.New("no such item")
 	ErrStale      = errors.New("the section changed since it was read")
 	ErrAppendOnly = errors.New("the Log section is append-only")
+	ErrChecked    = errors.New("the item is ticked")
 )
 
 // Section is one "## " section: its heading line and the text under it, up to
@@ -305,6 +306,49 @@ func (t *Tree) SetChecked(name string, pos int, done bool, etag string) ([]byte,
 	out := t.Join()
 	out[it.box] = c
 	return out, nil
+}
+
+// RemoveItem deletes item pos (1-based) of the checklist in section name, line
+// ending included, and returns the new body with the removed item. Later items
+// move up by one. A ticked item is refused with ErrChecked: it is the record
+// that the work was done. etag, when not empty, must be the Etag of the section
+// as it was read.
+func (t *Tree) RemoveItem(name string, pos int, etag string) ([]byte, Item, error) {
+	s, ok := t.Section(name)
+	if !ok {
+		return nil, Item{}, ErrNoSection
+	}
+	if err := t.refusedIn(s); err != nil {
+		return nil, Item{}, err
+	}
+	if etag != "" && etag != t.Etag(s) {
+		return nil, Item{}, ErrStale
+	}
+	items, err := t.Checklist(name)
+	if err != nil {
+		return nil, Item{}, err
+	}
+	if pos < 1 || pos > len(items) {
+		return nil, Item{}, fmt.Errorf("%w: item %d of %d", ErrNoItem, pos, len(items))
+	}
+	it := items[pos-1]
+	if it.Done {
+		return nil, it, ErrChecked
+	}
+	from, to := it.Start, it.End
+	switch {
+	case to < len(t.src) && t.src[to] == '\r' && to+1 < len(t.src) && t.src[to+1] == '\n':
+		to += 2
+	case to < len(t.src) && t.src[to] == '\n':
+		to++
+	case from > 0 && t.src[from-1] == '\n': // the last line has no ending: take the one before it
+		from--
+		if from > 0 && t.src[from-1] == '\r' {
+			from--
+		}
+	}
+	src := t.Join()
+	return append(src[:from:from], src[to:]...), it, nil
 }
 
 // ---- Log: dated entries ----

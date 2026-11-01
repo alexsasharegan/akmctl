@@ -27,6 +27,6 @@ The move breaks relative Markdown links in and to the item, so `close` rewrites 
 
 Files changed: the record, renamed into `done/`, with `updated` and `closed` set to today; every file whose links to it were rewritten. `commit.paths` lists them all.
 
-`close done` is refused while the `## Goal` has an empty box (`reason: "unchecked_goal"`, each box named with its line and, when `tick` can address it, its number). Tick each one with its proof (`akmctl tick <id> <n> --evidence "..."`), change the Goal with `section` if the box no longer applies, or close the item `dropped`. There is no flag to close past it. `dropped` is not checked.
+`close done` is refused while the `## Goal` has an empty box (`reason: "unchecked_goal"`, each box named with its line and, when `tick` can address it, its number). Tick each one with its proof (`akmctl tick <id> <n> --evidence "..."`), `remove` it (`references/remove.md`) if the requirement is gone, change the Goal with `section`, or close the item `dropped`. There is no flag to close past it. `dropped` is not checked.
 
 Errors: `refused` with `reason: "empty_outcome"`, `"unchecked_goal"` or `"open_children"` (a parent closes after its children); `not_found`; `stale`.

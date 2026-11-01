@@ -1089,7 +1089,7 @@ func uncheckedGoal(e *edit) *Error {
 		rows = append(rows, row)
 		msg = append(msg, fmt.Sprintf("line %d %q", it.Line, it.Text))
 	}
-	return &Error{"refused", fmt.Sprintf("%s has unchecked boxes in its Goal: %s; tick each with evidence (tick --evidence), change the Goal with section, or close it dropped", e.rec.ID, strings.Join(msg, ", ")), O("reason", "unchecked_goal", "items", rows)}
+	return &Error{"refused", fmt.Sprintf("%s has unchecked boxes in its Goal: %s; tick each with evidence (tick --evidence), remove one whose requirement is gone (remove), change the Goal with section, or close it dropped", e.rec.ID, strings.Join(msg, ", ")), O("reason", "unchecked_goal", "items", rows)}
 }
 
 func opTick(repo *record.Repo, q Request) (Obj, *Error) {
@@ -1137,24 +1137,10 @@ func opTick(repo *record.Repo, q Request) (Obj, *Error) {
 		if !done {
 			verb = "unticked"
 		}
-		now := clock(q)
 		line := fmt.Sprintf("%s \"%s\": %s", verb, items[pos-1].Text, ev)
-		var aerr error
-		if otr, serr := mdbody.Split(out); serr != nil {
-			aerr = serr
-		} else if _, has := otr.Section("log"); has {
-			var b []byte
-			if b, aerr = otr.WithEOL(e.eol).AppendLog(logStamp(q, now), line); aerr == nil {
-				out = b
-			}
-		} else {
-			var s string
-			if s, aerr = record.AppendToSection(string(out), "log", "- "+logStamp(q, now)+": "+line, e.eol); aerr == nil {
-				out = []byte(s)
-			}
-		}
-		if aerr != nil {
-			return nil, unsupportedBody(e, aerr)
+		var lerr *Error
+		if out, lerr = logInto(e, q, out, line); lerr != nil {
+			return nil, lerr
 		}
 	}
 	return finishBodyEdit(repo, q, e, string(out), name, func(rec *record.Record) Obj {
@@ -1162,6 +1148,86 @@ func opTick(repo *record.Repo, q Request) (Obj, *Error) {
 		it := items[pos-1]
 		return O("position", pos, "done", it.Done, "text", it.Text)
 	}, "item")
+}
+
+// logInto appends line to the Log of body (creating the section when it has
+// none) with the stamp of this write.
+func logInto(e *edit, q Request, body []byte, line string) ([]byte, *Error) {
+	stamp := logStamp(q, clock(q))
+	otr, serr := mdbody.Split(body)
+	if serr != nil {
+		return nil, unsupportedBody(e, serr)
+	}
+	if _, has := otr.Section("log"); has {
+		b, aerr := otr.WithEOL(e.eol).AppendLog(stamp, line)
+		if aerr != nil {
+			return nil, unsupportedBody(e, aerr)
+		}
+		return b, nil
+	}
+	s, aerr := record.AppendToSection(string(body), "log", "- "+stamp+": "+line, e.eol)
+	if aerr != nil {
+		return nil, unsupportedBody(e, aerr)
+	}
+	return []byte(s), nil
+}
+
+// opRemove deletes one unchecked box of a checklist and logs it. The record
+// loses that line: the tool does not track git, so confirm says the caller
+// accepts that.
+func opRemove(repo *record.Repo, q Request) (Obj, *Error) {
+	name := strings.TrimSpace(q.str("section"))
+	if name == "" {
+		name = "goal"
+	}
+	reason := strings.Join(strings.Fields(q.str("reason")), " ")
+	if reason == "" || strings.ContainsAny(q.str("reason"), "\r\n") {
+		return nil, invalid("reason", "reason must be one non-empty line")
+	}
+	pos, _ := asInt(q["item"])
+	e, unlock, err := openEdit(repo, q)
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+	if repo.IsDone(e.rec.Path) {
+		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
+	}
+	tr, terr := mdbody.Split([]byte(e.text))
+	if terr != nil {
+		return nil, unsupportedBody(e, terr)
+	}
+	sec, ok := tr.Section(name)
+	if !ok {
+		return nil, &Error{Code: "not_found", Message: "no section " + strings.ToLower(name) + " in " + e.rec.ID}
+	}
+	if want := q.str("section_etag"); want != "" && want != tr.Etag(sec) {
+		return nil, staleSection(tr, sec)
+	}
+	out, it, terr := tr.RemoveItem(name, pos, "")
+	switch {
+	case errors.Is(terr, mdbody.ErrNoItem):
+		return nil, &Error{Code: "not_found", Message: fmt.Sprintf("%s has no item %d in its %s checklist", e.rec.ID, pos, strings.ToLower(name))}
+	case errors.Is(terr, mdbody.ErrChecked):
+		return nil, &Error{"refused", fmt.Sprintf("item %d (%q) is ticked, which records that the work was done; it is not removed. Say more with log, or change the Goal with section", pos, it.Text), O("reason", "ticked_box", "item", pos, "text", it.Text)}
+	case terr != nil:
+		return nil, unsupportedBody(e, terr)
+	}
+	if confirm, _ := q["confirm"].(bool); !confirm && !q.boolean("dry_run") {
+		return nil, &Error{"refused", fmt.Sprintf("remove deletes item %d (%q) from %s and logs it. This loses history: the tool does not track git, so the line is recoverable only from a commit. Commit first if you want it back, then pass confirm to accept the loss", pos, it.Text, e.rec.ID), O("reason", "confirm_required", "item", pos, "text", it.Text)}
+	}
+	var lerr *Error
+	if out, lerr = logInto(e, q, out, fmt.Sprintf("removed \"%s\": %s", it.Text, reason)); lerr != nil {
+		return nil, lerr
+	}
+	return finishBodyEdit(repo, q, e, string(out), name, func(rec *record.Record) Obj {
+		items, _ := mustSplit(rec.Body).Checklist(name)
+		rows := make([]Obj, 0, len(items))
+		for _, x := range items {
+			rows = append(rows, O("position", x.Pos, "done", x.Done, "text", x.Text))
+		}
+		return O("position", pos, "text", it.Text, "items", rows)
+	}, "removed")
 }
 
 func opLog(repo *record.Repo, q Request) (Obj, *Error) {

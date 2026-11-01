@@ -181,6 +181,8 @@ A choice that is hard to reverse, or that rejects a real alternative, gets an AD
 
 For each "done when" line, name the test, command or file that proves it, in `## Outcome`. Set `done`, move the file to `docs/work/done/`, and update the roadmap. A parent closes after its children, at every level. `akmctl close` also writes `closed`; by hand, set it to today's date.
 
+A "done when" box is a requirement, and `akmctl close <id> done` is refused while one is empty. Tick it with its proof (`akmctl tick <id> <n> --evidence "..."`), including when it was met a different way than written. If the requirement is gone, `akmctl remove <id> <n> --reason "..." --confirm` deletes the box and logs why. Removing loses history: the tool does not track git, so the line is recoverable only from a commit. Commit before you remove if you may want it back. A person decides that; an agent asks the user first. If the whole item is abandoned, close it `dropped`.
+
 ### Stop or hand off
 
 Rewrite `## Next` so a cold agent can resume: where the work stands, the single next step, what to read first. Commit it with the work.

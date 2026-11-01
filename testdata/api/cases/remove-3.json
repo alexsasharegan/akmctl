@@ -1,0 +1,28 @@
+{
+  "name": "without confirm the removal is refused: it loses history",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "item": 1,
+    "reason": "no longer needed"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "remove",
+    "request": {
+      "id": "261022-e5f6",
+      "item": 1,
+      "reason": "no longer needed"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "remove deletes item 1 (\"It is done.\") from 261022-e5f6 and logs it. This loses history: the tool does not track git, so the line is recoverable only from a commit. Commit first if you want it back, then pass confirm to accept the loss",
+      "details": {
+        "reason": "confirm_required",
+        "item": 1,
+        "text": "It is done."
+      }
+    }
+  }
+}

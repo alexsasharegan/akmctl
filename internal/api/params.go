@@ -96,6 +96,7 @@ var specs = map[string]map[string]param{
 	"set":     {"id": s(req, pat(reID)), "changes": {kind: kObject, required: true}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"section": {"id": s(req, pat(reID)), "name": s(req), "text": s(req, empty), "mode": {kind: kString, enum: []string{"replace", "append"}}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"tick":    {"id": s(req, pat(reID)), "evidence": s(), "item": {kind: kInt, min: 1, required: true}, "section": s(), "done": {kind: kBool}, "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
+	"remove":  {"id": s(req, pat(reID)), "item": {kind: kInt, min: 1, required: true}, "reason": s(req), "confirm": {kind: kBool}, "section": s(), "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"log":     {"id": s(req, pat(reID)), "text": s(req), "at": s(pat(reAt)), "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"close":   {"id": s(req, pat(reID)), "status": {kind: kString, enum: []string{"done", "dropped"}, required: true}, "outcome": s(), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
 	"claim":   {"id": s(req, pat(reID)), "as": s(req), "if_match": s(pat(reEtag)), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},

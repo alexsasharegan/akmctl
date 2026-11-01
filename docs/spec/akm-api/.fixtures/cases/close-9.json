@@ -17,7 +17,7 @@
     "ok": false,
     "error": {
       "code": "refused",
-      "message": "261022-e5f6 has unchecked boxes in its Goal: line 7 \"It is done.\"; tick each with evidence (tick --evidence), change the Goal with section, or close it dropped",
+      "message": "261022-e5f6 has unchecked boxes in its Goal: line 7 \"It is done.\"; tick each with evidence (tick --evidence), remove one whose requirement is gone (remove), change the Goal with section, or close it dropped",
       "details": {
         "reason": "unchecked_goal",
         "items": [

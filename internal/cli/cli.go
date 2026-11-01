@@ -20,7 +20,7 @@ import (
 var Version = "0.0.0-dev"
 
 // positional names the parameter that takes the positional arguments.
-var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "init": {"dir"}, "set": {"id"}, "section": {"id", "name"}, "tick": {"id", "item"}, "log": {"id", "text"}, "skills": {"mode"}}
+var positional = map[string][]string{"search": {"text"}, "show": {"id"}, "find": {"id"}, "when": {"id"}, "new": {"kind", "slug"}, "close": {"id", "status"}, "claim": {"id"}, "release": {"id"}, "init": {"dir"}, "set": {"id"}, "section": {"id", "name"}, "tick": {"id", "item"}, "remove": {"id", "item"}, "log": {"id", "text"}, "skills": {"mode"}}
 
 // Run executes one command line and returns the exit code.
 func Run(args []string, stdout, stderr io.Writer, cwd string) int {
@@ -213,9 +213,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		if len(pos) > 1 {
 			req["text"] = strings.Join(pos[1:], " ")
 		}
-	case op == "tick":
+	case op == "tick" || op == "remove":
 		if len(pos) > 2 {
-			fmt.Fprintf(stderr, "akmctl tick: unexpected argument %q\n", pos[2])
+			fmt.Fprintf(stderr, "akmctl %s: unexpected argument %q\n", op, pos[2])
 			return 2
 		}
 		for i, v := range pos {
@@ -549,7 +549,7 @@ func text(w io.Writer, op string, resp api.Obj) {
 		ch, _ := resp.Get("changed")
 		wr, _ := resp.Get("written")
 		fmt.Fprintf(w, "%v: changed=%v written=%v\n", p, ch, wr)
-	case "new", "set", "section", "tick", "log", "close", "claim", "release":
+	case "new", "set", "section", "tick", "remove", "log", "close", "claim", "release":
 		v, _ := resp.Get("record")
 		r := v.(api.Obj)
 		row(w, r)

@@ -1,0 +1,161 @@
+{
+  "name": "dry run: no confirm needed, the removal as a diff, nothing written",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "item": 1,
+    "reason": "no longer needed",
+    "dry_run": true,
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "remove",
+    "request": {
+      "id": "261022-e5f6",
+      "item": 1,
+      "reason": "no longer needed",
+      "dry_run": true,
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "1e3e49990ff5d8ed",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": null,
+        "status": "ready",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": null,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "closed": null,
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "section": {
+      "name": "goal",
+      "text": "Do the thing.",
+      "etag": "9779566ed2fab190"
+    },
+    "removed": {
+      "position": 1,
+      "text": "It is done.",
+      "items": []
+    },
+    "changed": true,
+    "diff": {
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "new_path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "hunks": [
+        {
+          "header": "@@ -4,7 +4,7 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "status: ready",
+              "old": 4,
+              "new": 4
+            },
+            {
+              "op": "ctx",
+              "text": "parent: 261015-c4d5",
+              "old": 5,
+              "new": 5
+            },
+            {
+              "op": "ctx",
+              "text": "created: 2026-10-22",
+              "old": 6,
+              "new": 6
+            },
+            {
+              "op": "rem",
+              "text": "updated: 2026-10-22",
+              "old": 7,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "updated: 2026-10-28",
+              "old": null,
+              "new": 7
+            },
+            {
+              "op": "ctx",
+              "text": "---",
+              "old": 8,
+              "new": 8
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 9,
+              "new": 9
+            },
+            {
+              "op": "ctx",
+              "text": "# Document the exit codes",
+              "old": 10,
+              "new": 10
+            }
+          ]
+        },
+        {
+          "header": "@@ -12,4 +12,5 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "## Goal",
+              "old": 12,
+              "new": 12
+            },
+            {
+              "op": "ctx",
+              "text": "Do the thing.",
+              "old": 13,
+              "new": 13
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 14,
+              "new": 14
+            },
+            {
+              "op": "rem",
+              "text": "- [ ] It is done.",
+              "old": 15,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "## Log",
+              "old": null,
+              "new": 15
+            },
+            {
+              "op": "add",
+              "text": "- 2026-10-28: removed \"It is done.\": no longer needed",
+              "old": null,
+              "new": 16
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "would_be": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n## Log\n- 2026-10-28: removed \"It is done.\": no longer needed\n"
+  }
+}
