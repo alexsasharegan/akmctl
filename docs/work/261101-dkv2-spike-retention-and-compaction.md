@@ -37,3 +37,4 @@ Done when:
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 16:15-07:00: POC 261101-hefr: a Compaction Index section on a closed parent restores a child from a Git recovery commit. Open for D, E, F: closed parents need a sanctioned write path (not --correction), L1 and show/ls must resolve through the index, and a recovery SHA must be checked and kept reachable (a squash plus gc loses it silently).
