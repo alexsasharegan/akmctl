@@ -1,7 +1,7 @@
 ---
 id: "261031-j4bc"
 title: body section tree package
-status: raw
+status: ready
 created: 2026-10-31
 updated: 2026-10-31
 kind: feature
@@ -23,7 +23,7 @@ This item is the package, not the CLI or API surface; the operations, addressing
 - A typed section that does not parse (a Goal with prose after the checklist, a Log line with a continuation) keeps the rest as opaque text, and the typed part still edits.
 - Line endings: a CRLF file stays CRLF, and an edit writes the line ending of the lines around it.
 
-Decided here, to be confirmed by Alexander before building: when `Locate` refuses a construct (`ErrUnsupported`), `Split` returns that error and nothing is written (fail closed, ADR 261031-nvka), instead of falling back to the line scan `SetSection` uses. Today `SetSection` and `section` keep their own line scan and are not moved onto this package by this item.
+Decided (Alexander, 2026-10-31): when `Locate` refuses a construct (`ErrUnsupported`), `Split` returns that error and nothing is written (fail closed, ADR 261031-nvka), instead of falling back to the line scan `SetSection` uses. Today `SetSection` and `section` keep their own line scan and are not moved onto this package by this item.
 
 Done when:
 
@@ -35,7 +35,7 @@ Done when:
 
 ## Next
 
-Not started. Read ADR 261031-gam0, internal/body (scanner.go, fence.go) and internal/record/fields.go (the line scan that stays for now). Get Alexander's answer on the fail-closed Split, then make the item ready and claim it.
+Not started. Read ADR 261031-gam0, internal/body (scanner.go, fence.go) and internal/record/fields.go (the line scan that stays for now). The fail-closed Split is confirmed. Claim the item and start with the lossless Split/Join over the real files.
 
 ## Log
 
@@ -44,3 +44,5 @@ Not started. Read ADR 261031-gam0, internal/body (scanner.go, fence.go) and inte
 - 2026-10-31: spike 261031-g9zk closed; unblocked, but wait for ADRs 261031-gam0 and 261031-cpbg to be accepted.
 - 2026-10-31: the `Locate` interface, scanner, oracle and fuzz moved to 261031-yw5v, built first; ADRs 261031-gam0 and 261031-cpbg are accepted.
 - 2026-10-31: Goal rewritten after 261031-yw5v, 261031-2j14 and 261031-wjs3 closed: ADRs accepted, Locate and FenceTracker exist, no wait on 261031-6bzq for the primitives; blocked_by removed.
+- 2026-10-31: Alexander confirmed Split fails closed when Locate refuses; made ready.
+- 2026-10-31: Alexander confirmed Split fails closed when Locate refuses; made ready.
