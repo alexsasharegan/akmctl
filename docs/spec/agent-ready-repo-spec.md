@@ -299,7 +299,7 @@ One paragraph, then a checklist of "done when" lines, each independently checkab
 The single next concrete step. Overwritten at checkpoints. Required when active or blocked.
 
 ## Log
-- YYYY-MM-DD: dated lines, appended, never rewritten.
+- YYYY-MM-DD HH:MM+HH:MM: dated lines, appended, never rewritten. The time and offset are optional: a line may be `- YYYY-MM-DD: text`.
 
 ## Outcome
 Filled at close. For `done`: for each "done when" line, the test, command or file that proves it.

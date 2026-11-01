@@ -277,14 +277,16 @@ func (t *Tree) SetChecked(name string, pos int, done bool, etag string) ([]byte,
 
 // Entry is one Log entry, "- YYYY-MM-DD: text".
 type Entry struct {
-	Date  string
-	Text  string
-	Line  int // 1-based line in the body
-	Start int
-	End   int
+	Date   string
+	Time   string // "HH:MM", empty for a date-only line
+	Offset string // "+HH:MM" or "-HH:MM", empty for a date-only line
+	Text   string
+	Line   int // 1-based line in the body
+	Start  int
+	End    int
 }
 
-var logLine = regexp.MustCompile(`^- (\d{4}-\d{2}-\d{2}): ?(.*)$`)
+var logLine = regexp.MustCompile(`^- (\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2})([+-]\d{2}:\d{2}))?: ?(.*)$`)
 
 // LogEntries lists the lines of the Log section that have the entry form, in
 // order. Any other line (a continuation, a note) is opaque text and is not
@@ -297,15 +299,16 @@ func (t *Tree) LogEntries() ([]Entry, error) {
 	var out []Entry
 	for i, l := range t.lines(s.Body, s.End) {
 		if m := logLine.FindStringSubmatch(string(t.src[l.start:l.end])); m != nil {
-			out = append(out, Entry{Date: m[1], Text: m[2], Line: s.Line + 1 + i, Start: l.start, End: l.end})
+			out = append(out, Entry{Date: m[1], Time: m[2], Offset: m[3], Text: m[4], Line: s.Line + 1 + i, Start: l.start, End: l.end})
 		}
 	}
 	return out, nil
 }
 
-// AppendLog adds "- date: text" after the last non-blank line of the Log section
+// AppendLog adds "- stamp: text" (the stamp is a date, or a date with a time and
+// offset, ADR 261101-gw7b) after the last non-blank line of the Log section
 // and returns the new body. The line ends as the line before it does.
-func (t *Tree) AppendLog(date, text string) ([]byte, error) {
+func (t *Tree) AppendLog(stamp, text string) ([]byte, error) {
 	s, ok := t.Section("log")
 	if !ok {
 		return nil, ErrNoSection
@@ -314,7 +317,7 @@ func (t *Tree) AppendLog(date, text string) ([]byte, error) {
 		return nil, err
 	}
 	text = strings.Join(strings.Fields(text), " ")
-	entry := "- " + date + ": " + text
+	entry := "- " + stamp + ": " + text
 	return t.appendLine(s, entry), nil
 }
 

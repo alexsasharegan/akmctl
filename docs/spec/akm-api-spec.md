@@ -225,11 +225,11 @@ Response: `record`, `moved_from`, `moved_to` (paths), and `diff` when `dry_run` 
 
 ### 4.13 `claim`
 
-Claims extension. `id` (**required**), `as` (**required**, a free string), `if_match`, `takeover` (boolean, default false), `dry_run`, `as_of` (timestamp; the clock). Sets `status: active` if the item is `ready`, sets `claimed_by` and `claimed_at`, appends a `claimed` line to `## Log`, and sets `updated`. `refused` with `details.reason: "claimed"` when another holder's claim is not stale (older than `claim_stale_hours`) unless `takeover` is true; a takeover adds a `took over from <name>` line. `refused` with `details.reason: "extension_off"` when the manifest does not enable `claims`. Response: `record`, `previous_holder` (string or `null`), and `diff` when `dry_run` is true.
+Claims extension. `id` (**required**), `as` (**required**, a free string), `if_match`, `takeover` (boolean, default false), `dry_run`, `as_of` (timestamp; the clock). Sets `status: active` if the item is `ready`, sets `claimed_by` and `claimed_at`, appends a `claimed` line to `## Log` (stamped as for `log`), and sets `updated`. `refused` with `details.reason: "claimed"` when another holder's claim is not stale (older than `claim_stale_hours`) unless `takeover` is true; a takeover adds a `took over from <name>` line. `refused` with `details.reason: "extension_off"` when the manifest does not enable `claims`. Response: `record`, `previous_holder` (string or `null`), and `diff` when `dry_run` is true.
 
 ### 4.14 `release`
 
-`id` (**required**), `if_match`, `dry_run`, `as_of`. Clears `claimed_by` and `claimed_at`, appends a `released` line to `## Log`, sets `updated`. The status is not changed. Response: `record`, and `diff` when `dry_run` is true.
+`id` (**required**), `if_match`, `dry_run`, `as_of`. Clears `claimed_by` and `claimed_at`, appends a `released` line to `## Log` (stamped as for `log`), sets `updated`. The status is not changed. Response: `record`, and `diff` when `dry_run` is true.
 
 ### 4.15 `migrate`
 
@@ -383,16 +383,17 @@ Response: `record` (after), `section` (`{name, text, etag}`: the section as `sho
 
 ### 4.22 `log`
 
-Add one dated entry to the `## Log` section of a record: `- YYYY-MM-DD: text`.
+Add one entry to the `## Log` section of a record: `- YYYY-MM-DD HH:MM+HH:MM: text`, stamped with the writer's local time and its UTC offset (ADR 261101-gw7b).
 
-| Parameter                      | Type   | Default      | Meaning                                                                                  |
-| ------------------------------ | ------ | ------------ | ---------------------------------------------------------------------------------------- |
-| `id`                           | id     | **required** | A work item or an ADR.                                                                   |
-| `text`                         | string | **required** | One line, not empty. Runs of white space become one space.                               |
-| `section_etag`                 | etag   | none         | The `etag` of the Log section as the client read it; as for `tick`. Needs a Log section. |
-| `if_match`, `dry_run`, `as_of` |        |              | As for `set`. The date is that of `as_of`, or today.                                     |
+| Parameter                      | Type   | Default      | Meaning                                                                                                                         |
+| ------------------------------ | ------ | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                           | id     | **required** | A work item or an ADR.                                                                                                          |
+| `text`                         | string | **required** | One line, not empty. Runs of white space become one space.                                                                      |
+| `at`                           | string | none         | When the thing happened: `YYYY-MM-DD HH:MM` or `YYYY-MM-DDTHH:MM`, with an optional offset (the zone of the write when absent). |
+| `section_etag`                 | etag   | none         | The `etag` of the Log section as the client read it; as for `tick`. Needs a Log section.                                        |
+| `if_match`, `dry_run`, `as_of` |        |              | As for `set`. The stamp is the time of `as_of`, or now.                                                                         |
 
-Response: `record` (after), `section` (`{name, text, etag}` of the Log), `entry` (`{text}`: the line as written), `changed` (always true) and `diff` when `dry_run` is true. The line goes after the last non-blank line of the Log with the line ending of the line before it; a record with no Log gets one at the end, as `claim` does. `updated` (work items) is set to today in the same write. Errors: `invalid_request` for empty or multi-line `text`; `stale`, `refused` with `details.reason` `closed` or `unsupported_markdown`, as for `tick`. Side effect: rewrites one file, unless `dry_run`. CLI: `akmctl log <id> <text>` (the words after the id are the text). HTTP: `POST /records/{id}/log`.
+Response: `record` (after), `section` (`{name, text, etag}` of the Log), `entry` (`{text}`: the line as written), `changed` (always true) and `diff` when `dry_run` is true. The line goes after the last non-blank line of the Log with the line ending of the line before it; a record with no Log gets one at the end, as `claim` does. `updated` (work items) is set to today in the same write. **Stamp.** The stamp is the local time to the minute and the machine's offset at that moment (`+00:00` for UTC): `- 2026-11-01 16:02-07:00: deployed`. A date-only `as_of` gives a date-only stamp (`- 2026-11-01: deployed`), since the tool does not invent a time of day; an `as_of` with a time is read as UTC and gives `+00:00`. `claim` and `release` stamp their Log lines the same way. Lines written before this form (`- YYYY-MM-DD: text`) stay valid and are never rewritten. The Log stays in write order and is not sorted by time. **`at`.** With `at`, the line keeps the write-time stamp and ends with ` (at <time>)`: the time and offset alone when `at` is on the stamp's day, with the date otherwise (`- 2026-11-01 16:02-07:00: deployed (at 11:05-07:00)`). An `at` after the time of the write is `invalid_request` (`details.parameter: "at"`), as is one that is not a valid time; with a date-only `as_of`, `at` is compared by day. Errors: `invalid_request` for empty or multi-line `text`; `stale`, `refused` with `details.reason` `closed` or `unsupported_markdown`, as for `tick`. Side effect: rewrites one file, unless `dry_run`. CLI: `akmctl log <id> <text>` (the words after the id are the text). HTTP: `POST /records/{id}/log`.
 
 ## 5. CLI binding
 

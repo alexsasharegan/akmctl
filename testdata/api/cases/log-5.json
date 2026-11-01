@@ -1,0 +1,28 @@
+{
+  "name": "an at after the write is refused",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "text": "deployed",
+    "as_of": "2026-10-28T16:02",
+    "at": "2026-10-28T16:03"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "log",
+    "request": {
+      "id": "261020-a2b3",
+      "text": "deployed",
+      "as_of": "2026-10-28T16:02",
+      "at": "2026-10-28T16:03"
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "at is after the time of the write",
+      "details": {
+        "parameter": "at"
+      }
+    }
+  }
+}

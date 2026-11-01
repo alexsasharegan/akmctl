@@ -44,6 +44,49 @@ func clock(q Request) time.Time {
 
 func today(t time.Time) string { return t.Format("2006-01-02") }
 
+// logStamp is the stamp of a Log line (ADR 261101-gw7b): the writer's local
+// time with its offset, "2006-01-02 15:04-07:00". A date-only as_of gives a
+// date-only stamp, because the tool does not invent a time of day; an as_of
+// with a time is read as UTC and so carries +00:00.
+func logStamp(q Request, t time.Time) string {
+	if len(q.str("as_of")) == 10 {
+		return today(t)
+	}
+	return t.Format("2006-01-02 15:04-07:00")
+}
+
+// logAt parses the `at` of a log call, in the zone of the write when it has no
+// offset, and renders the suffix " (at ...)": the time alone on the stamp's
+// day, with the date otherwise. It refuses a time after the write.
+func logAt(q Request, now time.Time) (string, *Error) {
+	s := q.str("at")
+	if s == "" {
+		return "", nil
+	}
+	layout := "2006-01-02 15:04"
+	if s[10] == 'T' {
+		layout = "2006-01-02T15:04"
+	}
+	var at time.Time
+	var err error
+	if len(s) > 16 {
+		at, err = time.Parse(layout+"-07:00", s)
+	} else {
+		at, err = time.ParseInLocation(layout, s, now.Location())
+	}
+	if err != nil {
+		return "", invalid("at", "at is not a valid time: %s", s)
+	}
+	dayOnly := len(q.str("as_of")) == 10 // the clock has no time of day to compare
+	if (!dayOnly && at.After(now)) || (dayOnly && today(at) > today(now)) {
+		return "", invalid("at", "at is after the time of the write")
+	}
+	if today(at) == today(now) {
+		return " (at " + at.Format("15:04-07:00") + ")", nil
+	}
+	return " (at " + at.Format("2006-01-02 15:04-07:00") + ")", nil
+}
+
 func refused(reason, format string, a ...any) *Error {
 	e := invalid("", format, a...)
 	e.Code = "refused"
@@ -909,7 +952,7 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 	}
 	if logLine != "" {
 		var terr error
-		if e.text, terr = record.AppendToSection(e.text, "log", "- "+today(now)+": "+logLine, e.eol); terr != nil {
+		if e.text, terr = record.AppendToSection(e.text, "log", "- "+logStamp(q, now)+": "+logLine, e.eol); terr != nil {
 			return nil, unsupportedBody(e, terr)
 		}
 	}
@@ -943,7 +986,7 @@ func opRelease(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, unreadable(serr)
 	}
 	var terr error
-	if e.text, terr = record.AppendToSection(e.text, "log", "- "+today(now)+": released ("+prev+").", e.eol); terr != nil {
+	if e.text, terr = record.AppendToSection(e.text, "log", "- "+logStamp(q, now)+": released ("+prev+").", e.eol); terr != nil {
 		return nil, unsupportedBody(e, terr)
 	}
 	rec, cerr := e.commit("")
@@ -1079,13 +1122,19 @@ func opLog(repo *record.Repo, q Request) (Obj, *Error) {
 	if terr != nil {
 		return nil, unsupportedBody(e, terr)
 	}
-	entry := "- " + today(clock(q)) + ": " + text
+	now := clock(q)
+	suffix, aerr0 := logAt(q, now)
+	if aerr0 != nil {
+		return nil, aerr0
+	}
+	text += suffix
+	entry := "- " + logStamp(q, now) + ": " + text
 	var out string
 	if sec, ok := tr.Section("log"); ok {
 		if want := q.str("section_etag"); want != "" && want != tr.Etag(sec) {
 			return nil, staleSection(tr, sec)
 		}
-		b, aerr := tr.WithEOL(e.eol).AppendLog(today(clock(q)), text)
+		b, aerr := tr.WithEOL(e.eol).AppendLog(logStamp(q, now), text)
 		if aerr != nil {
 			return nil, unsupportedBody(e, aerr)
 		}

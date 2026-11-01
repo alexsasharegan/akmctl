@@ -417,3 +417,26 @@ func TestAddSection(t *testing.T) {
 		}
 	}
 }
+
+func TestLogEntriesBothForms(t *testing.T) {
+	src := "## Log\n- 2026-10-01: old\n- 2026-11-01 14:30-07:00: new (at 11:05-07:00)\n- 2026-11-01 21:30+00:00: utc\n- 2026-11-01 14:30: no offset, opaque\n- 2026-11-01T14:30-07:00: T form, opaque\n"
+	es, err := mustSplit(t, src).LogEntries()
+	if err != nil || len(es) != 3 {
+		t.Fatalf("entries %+v %v", es, err)
+	}
+	want := []Entry{
+		{Date: "2026-10-01", Text: "old"},
+		{Date: "2026-11-01", Time: "14:30", Offset: "-07:00", Text: "new (at 11:05-07:00)"},
+		{Date: "2026-11-01", Time: "21:30", Offset: "+00:00", Text: "utc"},
+	}
+	for i, w := range want {
+		g := es[i]
+		if g.Date != w.Date || g.Time != w.Time || g.Offset != w.Offset || g.Text != w.Text {
+			t.Errorf("entry %d = %+v, want %+v", i, g, w)
+		}
+	}
+	out, _ := mustSplit(t, "## Log\n- 2026-10-01: a\n").AppendLog("2026-11-01 14:30-07:00", "b")
+	if string(out) != "## Log\n- 2026-10-01: a\n- 2026-11-01 14:30-07:00: b\n" {
+		t.Errorf("append: %q", out)
+	}
+}

@@ -271,7 +271,7 @@ func TestClaimAndRelease(t *testing.T) {
 		t.Fatalf("previous %v", pv)
 	}
 	text := read(t, root, "docs/work/261022-e5f6-document-the-exit-codes.md")
-	for _, want := range []string{"status: active\n", "claimed_by: agent-1\n", "claimed_at: 2026-10-28T09:30\n", "## Log\n- 2026-10-28: claimed (agent-1).\n"} {
+	for _, want := range []string{"status: active\n", "claimed_by: agent-1\n", "claimed_at: 2026-10-28T09:30\n", "## Log\n- 2026-10-28 09:30+00:00: claimed (agent-1).\n"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("missing %q in\n%s", want, text)
 		}

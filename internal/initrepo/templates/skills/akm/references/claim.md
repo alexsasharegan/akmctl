@@ -9,7 +9,7 @@ $ akmctl claim 261029-atxk --as other
 akmctl: refused: 261029-atxk is claimed by demo-agent
 ```
 
-`claimed_at` is UTC (`YYYY-MM-DDTHH:MM`, no `Z`). Dates beside it (`updated`, Log lines) are local days, so a `claimed_at` that looks hours ahead or behind is not a clock error. Do not edit it.
+`claimed_at` is UTC (`YYYY-MM-DDTHH:MM`, no `Z`). The dates beside it (`updated`) are local days and the Log line carries local time with its offset, so a `claimed_at` that looks hours ahead or behind is not a clock error. Do not edit it.
 
 If someone else holds a fresh claim, take another item. `--takeover` is for a stale claim, with the maintainer's say-so.
 

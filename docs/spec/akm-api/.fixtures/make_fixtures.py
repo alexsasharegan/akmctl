@@ -361,7 +361,7 @@ def write_cases(cases, basic):
     # claim, release (repo with the claims extension)
     req = dict(id="261022-e5f6", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     text = clm[E5F6].replace("status: ready\n", "status: active\n").replace("updated: 2026-10-22\n---\n", "updated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n")
-    text = text.rstrip("\n") + "\n\n## Log\n- 2026-10-28: claimed (agent-1).\n"
+    text = text.rstrip("\n") + "\n\n## Log\n- 2026-10-28 09:30+00:00: claimed (agent-1).\n"
     files = dict(clm); files[E5F6] = text
     case("claim", 1, "claim a ready item", "claims", req, ok("claim", req, record=pub(after_rec(files, E5F6)), previous_holder=None, commit=commit("claim", "261022-e5f6", "claimed by agent-1", E5F6)), after={E5F6: text})
     req = dict(id="261020-a2b3", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
@@ -457,6 +457,14 @@ def write_cases(cases, basic):
     req = dict(id="261020-a2b3", text="tests written.", as_of="2026-10-28")
     lg = set_section(basic[A2B3], "Log", "- 2026-10-28: tests written.", append=True).replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
     wcase("log", 1, "append a dated Log entry", req, lg, A2B3, "log", "- 2026-10-20: started.\n- 2026-10-28: tests written.", ("entry", dict(text="- 2026-10-28: tests written.")))
+    req = dict(id="261020-a2b3", text="deployed", as_of="2026-10-28T16:02")
+    lg = set_section(basic[A2B3], "Log", "- 2026-10-28 16:02+00:00: deployed", append=True).replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
+    wcase("log", 3, "an as_of with a time stamps the line with the time and +00:00", req, lg, A2B3, "log", "- 2026-10-20: started.\n- 2026-10-28 16:02+00:00: deployed", ("entry", dict(text="- 2026-10-28 16:02+00:00: deployed")))
+    req = dict(id="261020-a2b3", text="deployed", as_of="2026-10-28T16:02", at="2026-10-27T11:05-07:00")
+    lg = set_section(basic[A2B3], "Log", "- 2026-10-28 16:02+00:00: deployed (at 2026-10-27 11:05-07:00)", append=True).replace("updated: 2026-10-27\n", "updated: 2026-10-28\n")
+    wcase("log", 4, "at records when the thing happened, with its date when not the stamp's day", req, lg, A2B3, "log", "- 2026-10-20: started.\n- 2026-10-28 16:02+00:00: deployed (at 2026-10-27 11:05-07:00)", ("entry", dict(text="- 2026-10-28 16:02+00:00: deployed (at 2026-10-27 11:05-07:00)")))
+    req = dict(id="261020-a2b3", text="deployed", as_of="2026-10-28T16:02", at="2026-10-28T16:03")
+    case("log", 5, "an at after the write is refused", "basic", req, err("log", req, "invalid_request", "at is after the time of the write", parameter="at"))
     req = dict(id="261010-j9k0", text="Late note.")
     case("log", 2, "a closed record is refused", "basic", req, err("log", req, "refused", "261010-j9k0 is closed; its sections are not edited", reason="closed"))
 

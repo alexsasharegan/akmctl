@@ -11,7 +11,7 @@ The repository's `AGENTS.md` wins over this skill where they disagree. Fields, s
 
 1. `akmctl ls --status ready,active,blocked`. Without the tool: `grep -lE '^status: ?"?active"?$' docs/work/*.md`.
 2. Resume the `active` item you hold. If you hold none, take the top `ready` item (roadmap order, then `priority`). If several `active` items are unclaimed, ask.
-3. `akmctl claim <id> --as <name>` (claims extension). If someone else holds a fresh claim, do not work the item: tell the maintainer and take another. `claimed_at` is UTC, while `updated` and Log dates are local days; a difference of hours is not an error.
+3. `akmctl claim <id> --as <name>` (claims extension). If someone else holds a fresh claim, do not work the item: tell the maintainer and take another. `claimed_at` is UTC, while `updated` is a local day and Log lines carry local time with an offset; a difference of hours is not an error.
 4. Read `## Goal`, then `## Next`.
 
 ## No item fits
@@ -21,7 +21,7 @@ Before filing, read what `ls --status raw,ready,active,blocked` shows. `akmctl n
 ## While working
 
 - Keep `## Next` as the single next concrete step. Overwrite it at each checkpoint.
-- Append dated lines to `## Log` with `akmctl log <id> <text>`; never rewrite old lines. Tick a Goal box with `akmctl tick <id> <n>`.
+- Append lines to `## Log` with `akmctl log <id> <text>` (the tool stamps date, time and offset; add `--at` if the thing happened earlier); never rewrite old lines. Tick a Goal box with `akmctl tick <id> <n>`.
 - Update both in the same commit as the code.
 - Commit one step at a time (file, ready, start, claim, release, close, ...). Each command that changes an item prints a commit message: use it as given, never your own subject. If the `akm-commit` skill is installed (`.agents/skills/akm-commit`), it has the rest.
 - Command details are in the `akm` skill (`.agents/skills/akm/references/`).

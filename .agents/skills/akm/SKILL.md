@@ -31,7 +31,7 @@ Read the reference before the first use of a command.
 | Change status, priority or other fields | `akmctl set <id> k=v`      | `references/set.md`     |
 | Write Goal, Next or Outcome             | `akmctl section <id> <n>`  | `references/section.md` |
 | Tick a box of the Goal                  | `akmctl tick <id> <n>`     | `references/tick.md`    |
-| Add a dated Log line                    | `akmctl log <id> <text>`   | `references/log.md`     |
+| Add a stamped Log line                  | `akmctl log <id> <text>`   | `references/log.md`     |
 | Take an item before working it          | `akmctl claim <id> --as n` | `references/claim.md`   |
 | Give up an item                         | `akmctl release <id>`      | `references/release.md` |
 | Finish an item                          | `akmctl close <id> done`   | `references/close.md`   |
