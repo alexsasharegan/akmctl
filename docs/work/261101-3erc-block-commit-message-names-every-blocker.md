@@ -1,7 +1,7 @@
 ---
 id: "261101-3erc"
 title: block commit message names every blocker
-status: raw
+status: ready
 created: 2026-11-01
 updated: 2026-11-01
 kind: bug
