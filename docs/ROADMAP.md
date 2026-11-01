@@ -2,8 +2,6 @@
 
 ## Now
 
-- [261101-baze] Spike: decomposing a work item into a parent and children
-
 ## Next
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):

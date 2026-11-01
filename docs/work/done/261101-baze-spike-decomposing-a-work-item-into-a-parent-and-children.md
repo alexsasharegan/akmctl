@@ -1,13 +1,12 @@
 ---
 id: "261101-baze"
 title: spike decomposing a work item into a parent and children
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-01
+closed: 2026-11-01
 kind: spike
 summary: how a new user or agent finds out that an oversized item should become a parent with children, and the procedure for it
-claimed_by: claude
-claimed_at: 2026-11-01T16:43
 ---
 
 # spike decomposing a work item into a parent and children
@@ -24,11 +23,23 @@ Related, already filed: 261031-ph53 (`new --parent --kind` and `split`), 261031-
 - [x] The procedure for splitting an existing item is written down and walked through once on a real item: what stays in the parent's Goal, what moves to children, how the parent's history and links are kept, and when a spike's parent closes.
 - [x] A prototype of the chosen surface exists (a draft skill or hint) and was tried by a cold agent on an oversized item; the Log records what it got wrong.
 - [x] The Log says how 261031-ph53 and 261031-qwhn change, if at all, and any term the work adds is registered in `docs/glossary.md`.
-- [ ] An implementation work item is filed (`akmctl new work`) whose Goal carries the acceptance criteria, adjusted for what the prototype showed.
+- [x] An implementation work item is filed (`akmctl new work`) whose Goal carries the acceptance criteria, adjusted for what the prototype showed.
 
 ## Next
 
 Box 5: file the implementation item (akmctl new work) whose Goal carries the acceptance criteria: ship the Item too big section (already in the tree), then ph53, 72bd and 3erc as its children or siblings. Then close the spike.
+
+## Outcome
+
+Surfaces weighed: Log entry of 2026-11-01 (a to e). Pick: a section "Item too big" in `akm-track-work` and its template mirror, not a new skill (a new skill touches six `init` fixtures in two copies, `make_fixtures.py` and two Go tests).
+
+- Surfaces weighed and one picked: Log, and `.agents/skills/akm-track-work/SKILL.md`.
+- Procedure written and walked through on 261030-456q: `docs/design/decomposing-work.md`.
+- Prototype tried by a cold agent: the section, and the trial findings in the Log; the revised text was not re-tried.
+- ph53 and qwhn: ph53 amended, qwhn unchanged (Log); "umbrella" registered in `docs/glossary.md`; "split" is registered when ph53 ships.
+- Implementation item filed: 261101-t8h8, with ph53, 72bd (now also close reporting the parent) and 3erc (new bug from the trial) as children.
+
+Decision: none. Section versus skill is reversible; the skill can be split out later.
 
 ## Log
 
@@ -45,3 +56,4 @@ Box 5: file the implementation item (akmctl new work) whose Goal carries the acc
 - 2026-11-01 10:22-07:00: Filed 261101-3erc: the block commit message names only the first blocker.
 - 2026-11-01 10:22-07:00: Box 4: 261031-ph53 amended (priority inheritance, per-child commit messages, a reminder of what is left on the parent, skill shortened to use split, 'split' to be registered when built); 261031-qwhn unchanged. 'Umbrella' registered under Parent in the glossary now, since the skill and gtw6 already use it. The revised section was not re-tried; the changes are wording fixes for what the trial hit.
 - 2026-11-01 10:22-07:00: ticked "The Log says how 261031-ph53 and 261031-qwhn change, if at all, and any term the work adds is registered in `docs/glossary.md`.": Log; 261031-ph53 Goal; docs/glossary.md Parent row
+- 2026-11-01 10:25-07:00: ticked "An implementation work item is filed (`akmctl new work`) whose Goal carries the acceptance criteria, adjusted for what the prototype showed.": 261101-t8h8 filed with its Goal
