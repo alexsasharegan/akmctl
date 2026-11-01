@@ -13,7 +13,7 @@ updated: 2026-10-29
 
 ## Goal
 
-Decided 2026-10-29 ([261029-j0d0](../adr/261029-j0d0-one-tool-spec-and-fixtures-in-this-repository.md)): adopting AKM is the migration from layout 0.0.0, and `akmctl migrate` gets a discovery phase for a repository with no `docs/.layout`. Discovery reads what the repository has (task and ADR folders, id and status conventions, entry-point files, an `AGENTS.md`) and proposes a migration; the scripts in `scripts/vault-migration/` are the seed (they did this by hand for one vault). Dry run by default, no deletes, idempotent, as for every migration.
+Decided 2026-10-29 ([261029-j0d0](../adr/261029-j0d0-one-tool-spec-and-fixtures-in-this-repository.md)): adopting AKM is the migration from layout 0.0.0, and `akmctl migrate` gets a discovery phase for a repository with no `docs/.layout`. Discovery reads what the repository has (task and ADR folders, id and status conventions, entry-point files, an `AGENTS.md`) and proposes a migration. Dry run by default, no deletes, idempotent, as for every migration.
 
 Done when:
 
