@@ -1,0 +1,31 @@
+{
+  "name": "the Log of a closed item is written by the tool even with a correction",
+  "repo": "basic",
+  "request": {
+    "id": "261010-j9k0",
+    "name": "Log",
+    "text": "- 2026-10-28: x",
+    "mode": "append",
+    "correction": "no"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "section",
+    "request": {
+      "id": "261010-j9k0",
+      "name": "Log",
+      "text": "- 2026-10-28: x",
+      "mode": "append",
+      "correction": "no"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261010-j9k0 is closed; its Log is written by the tool, not edited, even with a correction",
+      "details": {
+        "reason": "closed_field",
+        "field": "log"
+      }
+    }
+  }
+}

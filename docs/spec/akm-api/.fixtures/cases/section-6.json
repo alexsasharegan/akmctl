@@ -17,7 +17,7 @@
     "ok": false,
     "error": {
       "code": "refused",
-      "message": "261010-j9k0 is closed; its sections are not edited",
+      "message": "261010-j9k0 is closed; the notes section is not edited without a correction: pass correction, a one-line reason, which is written to its Log",
       "details": {
         "reason": "closed"
       }

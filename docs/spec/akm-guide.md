@@ -183,6 +183,8 @@ For each "done when" line, name the test, command or file that proves it, in `##
 
 A "done when" box is a requirement, and `akmctl close <id> done` is refused while one is empty. Tick it with its proof (`akmctl tick <id> <n> --evidence "..."`), including when it was met a different way than written. If the requirement is gone, `akmctl remove <id> <n> --reason "..." --confirm` deletes the box and logs why. Removing loses history: the tool does not track git, so the line is recoverable only from a commit. Commit before you remove if you may want it back. A person decides that; an agent asks the user first. If the whole item is abandoned, close it `dropped`.
 
+A closed item is read-only. `akmctl set` and `akmctl section` refuse it unless you pass `--correction "<why>"`, one line, for a typo or a wrong summary or outcome. The tool then changes only the title, the summary or a prose section, and writes `corrected <what>: <why>` to the Log. Its kind, priority, parent and `blocked_by` are what the item was and are never changed; `keep` is always open. By hand, make the same edit and add the Log line yourself.
+
 ### Stop or hand off
 
 Rewrite `## Next` so a cold agent can resume: where the work stands, the single next step, what to read first. Commit it with the work.

@@ -14,4 +14,4 @@ changed: true
 
 Files changed: the one record; `updated` is set to today.
 
-Errors: `invalid_request` for an empty name or `replace` on `Log`; `refused` with `reason: "closed"` for a record in `done/`; `stale`; `not_found`.
+Errors: `invalid_request` for an empty name or `replace` on `Log`; `refused` with `reason: "closed"` for a record in `done/` unless you pass `--correction "<why>"` (one line: any section but `Log` is then written, and `corrected <section>: <why>` goes to the Log in the same write; `reason: "closed_field"` for the Log); `stale`; `not_found`.

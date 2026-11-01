@@ -1,0 +1,33 @@
+{
+  "name": "a correction does not reach priority or other fields of a closed item",
+  "repo": "basic",
+  "request": {
+    "id": "261010-j9k0",
+    "changes": {
+      "priority": 5
+    },
+    "correction": "wrong rank",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "set",
+    "request": {
+      "id": "261010-j9k0",
+      "changes": {
+        "priority": 5
+      },
+      "correction": "wrong rank",
+      "as_of": "2026-10-28"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261010-j9k0 is closed; priority is never changed on a closed item, even with a correction (only title and summary are)",
+      "details": {
+        "reason": "closed_field",
+        "field": "priority"
+      }
+    }
+  }
+}

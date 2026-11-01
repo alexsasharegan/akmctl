@@ -70,13 +70,16 @@ func TestOpenItemCannotJoinAClosedParent(t *testing.T) {
 	clean(t, root)
 }
 
-func TestClosedItemMayJoinAClosedParent(t *testing.T) {
+// A closed item's parent is part of what it was while open: set refuses it
+// without a correction, and a correction never reaches it (ADR 261101-dxcn).
+func TestClosedItemKeepsItsParent(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	x := newItem(t, root, "finished", "")
 	mustOK(t, root, "section", Request{"id": x, "name": "Goal", "text": "Done when it is done."})
 	mustOK(t, root, "section", Request{"id": x, "name": "Outcome", "text": "Shipped."})
 	mustOK(t, root, "close", Request{"id": x, "status": "done"})
-	mustOK(t, root, "set", Request{"id": x, "changes": map[string]any{"parent": doneItem}})
+	wantCode(t, root, "set", Request{"id": x, "changes": map[string]any{"parent": doneItem}}, "refused", "")
+	wantCode(t, root, "set", Request{"id": x, "changes": map[string]any{"parent": doneItem}, "correction": "wrong parent"}, "refused", "")
 	clean(t, root)
 }
 

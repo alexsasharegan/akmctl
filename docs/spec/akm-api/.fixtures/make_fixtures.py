@@ -203,6 +203,7 @@ def err(op, req, code, msg, **d):
     return dict(api_version="1.0", operation=op, request=req, ok=False, error=e)
 
 E5F6 = "docs/work/261022-e5f6-document-the-exit-codes.md"
+J9K0 = "docs/work/done/261010-j9k0-choose-a-licence.md"
 A2B3 = "docs/work/261020-a2b3-add-json-output-to-ls.md"
 A2B3_DONE = "docs/work/done/261020-a2b3-add-json-output-to-ls.md"
 # the open item that names a2b3 in blocked_by: close reports it as a dependent
@@ -348,6 +349,15 @@ def write_cases(cases, basic):
     case("set", 6, "pin an item with keep", "basic", req, ok("set", req, record=pub(after_rec(files, A2B3)), changed=["keep"]), after={A2B3: text})
     req = dict(id="261022-e5f6", changes=dict(closed="2026-10-28"))
     case("set", 7, "closed is set only by close", "basic", req, err("set", req, "invalid_request", 'changes: "closed" cannot be set on a work (id, created, updated, closed, date and claim fields are managed by the tool)', parameter="changes"))
+    # closed items are read-only except through a logged correction (ADR 261101-dxcn)
+    req = dict(id="261010-j9k0", changes=dict(priority=5))
+    case("set", 12, "a closed item is read-only without a correction", "basic", req, err("set", req, "refused", "261010-j9k0 is closed; priority is not edited without a correction: pass correction, a one-line reason, which is written to its Log", reason="closed"))
+    req = dict(id="261010-j9k0", changes=dict(summary="Chose MIT."), correction="typo in the summary", as_of="2026-10-28")
+    text = basic[J9K0].replace("updated: 2026-10-12\nclosed: 2026-10-12\n---\n", "updated: 2026-10-28\nclosed: 2026-10-12\nsummary: Chose MIT.\n---\n") + "\n## Log\n- 2026-10-28: corrected summary: typo in the summary\n"
+    files = dict(basic); files[J9K0] = text
+    case("set", 13, "a correction changes the summary of a closed item and logs it", "basic", req, ok("set", req, record=pub(after_rec(files, J9K0)), changed=["summary"]), after={J9K0: text})
+    req = dict(id="261010-j9k0", changes=dict(priority=5), correction="wrong rank", as_of="2026-10-28")
+    case("set", 14, "a correction does not reach priority or other fields of a closed item", "basic", req, err("set", req, "refused", "261010-j9k0 is closed; priority is never changed on a closed item, even with a correction (only title and summary are)", reason="closed_field", field="priority"))
     req = dict(id="261026-m1n2", changes=dict(status="ready"), as_of="2026-10-28")
     M1N2 = "docs/work/261026-m1n2-explore-a-plugin-system.md"
     text = basic[M1N2].replace("status: raw\n", "status: ready\n").replace("updated: 2026-10-26\n", "updated: 2026-10-28\n")
@@ -423,7 +433,12 @@ def write_cases(cases, basic):
     req = dict(id="261020-a2b3", name="Log", text="- rewritten")
     case("section", 5, "the Log section cannot be replaced", "basic", req, err("section", req, "invalid_request", "the Log section is append-only: use mode append", parameter="mode"))
     req = dict(id="261010-j9k0", name="Notes", text="Late note.")
-    case("section", 6, "a closed record is refused", "basic", req, err("section", req, "refused", "261010-j9k0 is closed; its sections are not edited", reason="closed"))
+    case("section", 6, "a closed record is refused", "basic", req, err("section", req, "refused", "261010-j9k0 is closed; the notes section is not edited without a correction: pass correction, a one-line reason, which is written to its Log", reason="closed"))
+    req = dict(id="261010-j9k0", name="Outcome", text="MIT, in LICENSE and the header.", correction="the header was missed", as_of="2026-10-28")
+    t8 = set_section(basic[J9K0], "Outcome", req["text"]).replace("updated: 2026-10-12\n", "updated: 2026-10-28\n") + "\n## Log\n- 2026-10-28: corrected outcome: the header was missed\n"
+    sec(8, "a correction edits a section of a closed item and logs it", "basic", req, t8, J9K0, "outcome", req["text"])
+    req = dict(id="261010-j9k0", name="Log", text="- 2026-10-28: x", mode="append", correction="no")
+    case("section", 9, "the Log of a closed item is written by the tool even with a correction", "basic", req, err("section", req, "refused", "261010-j9k0 is closed; its Log is written by the tool, not edited, even with a correction", reason="closed_field", field="log"))
     brf = build("bodyrefusal", bodyrefusal)
     req = dict(id="261022-e5f6", name="Goal", text="New goal.", as_of="2026-10-28")
     ln = next(i for i, l in enumerate(brf[E5F6].split("\n"), 1) if l.startswith("*\ttab step"))

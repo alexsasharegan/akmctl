@@ -29,6 +29,10 @@
         },
         "as_of": {
           "$ref": "common.json#/$defs/date_or_timestamp"
+        },
+        "correction": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [

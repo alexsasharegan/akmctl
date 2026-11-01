@@ -39,6 +39,10 @@
         },
         "dry_run": {
           "type": "boolean"
+        },
+        "correction": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [

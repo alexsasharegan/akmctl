@@ -60,7 +60,7 @@ Why the `warn` and `no` cells: `kind`, `priority` and `parent` describe the item
 
 **Drawer.** A locked field shows as read-only text with its reason in the cell (not hidden: the table shows every field), and a closed item has a "Correct…" action for the allowed targets, which asks for the reason. No "reopen". The controls come from an `edit` member of the record read ([261101-3che](../261101-3che-show-reports-edit-states.md)), so the matrix lives only in the tool.
 
-**Follow-ups filed (raw, waiting on ADR 261101-dxcn):** [261101-3vwz](../261101-3vwz-closed-items-read-only-with-correction.md) (the refusal and `correction`), [261101-3che](../261101-3che-show-reports-edit-states.md) (the `edit` member), [261101-1smq](../261101-1smq-close-repairs-links-to-moved-items.md) (`close` repairs links). 261028-esyt is unblocked and updated.
+**Follow-ups filed (raw, waiting on ADR 261101-dxcn):** [261101-3vwz](261101-3vwz-closed-items-read-only-with-correction.md) (the refusal and `correction`), [261101-3che](../261101-3che-show-reports-edit-states.md) (the `edit` member), [261101-1smq](../261101-1smq-close-repairs-links-to-moved-items.md) (`close` repairs links). 261028-esyt is unblocked and updated.
 
 ## Log
 

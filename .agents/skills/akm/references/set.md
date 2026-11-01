@@ -8,6 +8,8 @@ $ akmctl set 261029-atxk status=ready priority=1 summary="Add a --json flag"
 changed: [priority status summary]
 ```
 
+A closed item is read-only: `set` refuses it (`reason: "closed"`) unless you pass `--correction "<why>"` (one line), and then only `title` and `summary` change, with `corrected <fields>: <why>` added to the Log in the same write. `keep` needs no reason. Use it for a typo or a wrong summary, not to change what the item was (kind, priority, parent and the rest are refused with `closed_field`).
+
 Files changed: the one record; `updated` is set to today.
 
 Errors:

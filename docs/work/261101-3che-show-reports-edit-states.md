@@ -5,7 +5,6 @@ summary: "A record read carries an edit state (yes, warn, no, with a reason) for
 status: ready
 kind: feature
 parent: "261031-gtw6"
-blocked_by: ["261101-3vwz"]
 created: 2026-11-01
 updated: 2026-11-01
 decisions: ["[[261101-dxcn-closed-records-read-only-except-corrections|261101-dxcn]]"]
@@ -24,3 +23,4 @@ The matrix in the Outcome of [261031-z0n8](done/261031-z0n8-spike-field-edit-rul
 ## Log
 
 - 2026-11-01: filed by the spike 261031-z0n8; waits for 261101-3vwz and ADR 261101-dxcn.
+- 2026-11-01 09:45-07:00: unblocked: 261101-3vwz is closed

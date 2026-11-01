@@ -643,6 +643,22 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+	reason, cerr0 := correctionReason(q)
+	if cerr0 != nil {
+		return nil, cerr0
+	}
+	closed := typ == record.Work && repo.IsDone(e.rec.Path)
+	if closed {
+		for _, k := range keys {
+			switch {
+			case k == "keep" || k == "status" || !contains(setFields[typ], k): // status is WK9's to refuse; unknown fields are invalid below
+			case reason == "":
+				return nil, closedRefusal(e.rec.ID, k)
+			case k != "title" && k != "summary":
+				return nil, &Error{"refused", fmt.Sprintf("%s is closed; %s is never changed on a closed item, even with a correction (only title and summary are)", e.rec.ID, k), O("reason", "closed_field", "field", k)}
+			}
+		}
+	}
 	oldStatus := e.rec.Status()
 	var changed []string
 	for _, k := range keys {
@@ -713,6 +729,21 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	} else if newStatus == "superseded" {
 		if v, ok := e.doc.Get("superseded_by"); !ok || v.Kind != frontmatter.String {
 			return nil, refusedRule("A3", "a superseded ADR needs superseded_by")
+		}
+	}
+	if closed && reason != "" {
+		var fixed []string
+		for _, k := range changed {
+			if k != "keep" {
+				fixed = append(fixed, k)
+			}
+		}
+		if len(fixed) > 0 {
+			b, lerr := logInto(e, q, []byte(e.text), fmt.Sprintf("corrected %s: %s", strings.Join(fixed, " and "), reason))
+			if lerr != nil {
+				return nil, lerr
+			}
+			e.text = string(b)
 		}
 	}
 	now := clock(q)
@@ -1020,12 +1051,29 @@ func opSection(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, err
 	}
 	defer unlock()
-	if repo.IsDone(e.rec.Path) {
-		return nil, refused("closed", "%s is closed; its sections are not edited", e.rec.ID)
+	reason, cerr0 := correctionReason(q)
+	if cerr0 != nil {
+		return nil, cerr0
+	}
+	closed := repo.IsDone(e.rec.Path)
+	if closed {
+		switch {
+		case reason == "":
+			return nil, closedRefusal(e.rec.ID, "the "+strings.ToLower(name)+" section")
+		case strings.EqualFold(name, "log"):
+			return nil, &Error{"refused", fmt.Sprintf("%s is closed; its Log is written by the tool, not edited, even with a correction", e.rec.ID), O("reason", "closed_field", "field", "log")}
+		}
 	}
 	text, terr := record.EditSection(e.text, name, q.str("text"), mode == "append", e.eol)
 	if terr != nil {
 		return nil, unsupportedBody(e, terr)
+	}
+	if closed && text != e.text {
+		b, lerr := logInto(e, q, []byte(text), fmt.Sprintf("corrected %s: %s", strings.ToLower(name), reason))
+		if lerr != nil {
+			return nil, lerr
+		}
+		text = string(b)
 	}
 	changed := text != e.text
 	rec := e.rec
@@ -1148,6 +1196,26 @@ func opTick(repo *record.Repo, q Request) (Obj, *Error) {
 		it := items[pos-1]
 		return O("position", pos, "done", it.Done, "text", it.Text)
 	}, "item")
+}
+
+// correctionReason reads the correction parameter: one non-empty line, or ""
+// when the call has none (ADR 261101-dxcn).
+func correctionReason(q Request) (string, *Error) {
+	raw := q.str("correction")
+	if raw == "" {
+		return "", nil
+	}
+	r := strings.Join(strings.Fields(raw), " ")
+	if r == "" || strings.ContainsAny(raw, "\r\n") {
+		return "", invalid("correction", "correction must be one non-empty line")
+	}
+	return r, nil
+}
+
+// closedRefusal is the answer to an edit of a closed work item that carries no
+// correction.
+func closedRefusal(id, what string) *Error {
+	return &Error{"refused", fmt.Sprintf("%s is closed; %s is not edited without a correction: pass correction, a one-line reason, which is written to its Log", id, what), O("reason", "closed")}
 }
 
 // logInto appends line to the Log of body (creating the section when it has
