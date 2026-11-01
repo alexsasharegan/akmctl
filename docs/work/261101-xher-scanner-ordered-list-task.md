@@ -4,7 +4,6 @@ title: "scanner: ordered-list tasks are refused"
 status: raw
 created: 2026-11-01
 updated: 2026-11-01
-blocked_by: [261101-4j86]
 kind: feature
 parent: 261031-gtw6
 summary: "Locate refuses an ordered-list task (1. [ ] x); 2 of the vault's work items have one. Decide: read it as a list item, or keep refusing (local)"
@@ -27,3 +26,4 @@ Not started; waits on 261101-4j86 (the structural/local classification).
 
 - 2026-11-01: filed.
 - 2026-11-01: filed from the refusal census (ADR 261101-tr8e, principle 4).
+- 2026-11-01: 261101-4j86 closed; blocked_by removed.

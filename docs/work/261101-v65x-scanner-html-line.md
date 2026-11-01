@@ -4,7 +4,6 @@ title: "scanner: an HTML line in a record is refused"
 status: raw
 created: 2026-11-01
 updated: 2026-11-01
-blocked_by: [261101-4j86]
 kind: feature
 parent: 261031-gtw6
 summary: Locate refuses any HTML line (structural); 1 of the vault's ADRs has one. Decide whether a comment or inline tag can be claimed, or the refusal stays
@@ -27,3 +26,4 @@ Not started; waits on 261101-4j86 (the structural/local classification).
 
 - 2026-11-01: filed.
 - 2026-11-01: filed from the refusal census (ADR 261101-tr8e, principle 4).
+- 2026-11-01: 261101-4j86 closed; blocked_by removed.

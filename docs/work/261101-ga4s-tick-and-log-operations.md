@@ -7,7 +7,6 @@ updated: 2026-11-01
 kind: feature
 parent: 261031-gtw6
 summary: Add tick and log operations (CLI, API, HTTP) built on body.Tree, with section_etag, per proposed ADR 261101-tr8e
-blocked_by: [261101-4j86]
 ---
 
 # tick and log operations on the section tree
@@ -35,3 +34,4 @@ Not started. Read the spike's Outcome and ADR 261101-tr8e; make ready once the A
 - 2026-11-01: filed.
 - 2026-11-01: filed by spike 261031-6bzq.
 - 2026-11-01: refusal rule narrowed in ADR 261101-tr8e; blocked_by 261101-4j86 (the classification).
+- 2026-11-01: 261101-4j86 closed; blocked_by removed.
