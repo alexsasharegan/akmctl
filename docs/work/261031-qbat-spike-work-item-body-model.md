@@ -2,11 +2,13 @@
 id: "261031-qbat"
 title: spike work item body model
 summary: "Spike: what a work item body contains, how much is schema versus open text, and how extension works"
-status: raw
+status: active
 kind: spike
 parent: "261031-gtw6"
 created: 2026-10-31
 updated: 2026-10-31
+claimed_by: claude
+claimed_at: 2026-11-01T03:39
 ---
 
 # spike work item body model
@@ -27,6 +29,12 @@ Done when:
 - [ ] Options (a) to (c) are tried on a sample of real items, with what each would reject, keep or rewrite.
 - [ ] A recommended model is in `## Outcome`, as a draft schema (section names, node types, cardinality, extension rule) and a round-trip rule; a hard-to-reverse choice has a `proposed` ADR; follow-up items are filed.
 
+## Next
+
+Survey the headings, node types and deviations in `docs/work/` and `docs/work/done/` (counts), then try options (a) to (c) on a sample.
+
 ## Log
 
 - 2026-10-31: filed.
+- 2026-10-31: claimed (claude).
+- 2026-10-31: made ready and claimed to start the spike.
