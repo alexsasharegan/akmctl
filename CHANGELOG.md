@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `close` repairs the relative Markdown links its move into `done/` breaks: the item's own links are re-based and the inline links to it in other records, the roadmap, AGENTS.md and the docs are rewritten. The response has `links_rewritten` and, for a file it could not write, `link_errors`; `commit.paths` lists every file written. Fixture `close-8` in both copies; new package `internal/mdlinks`, which `check` rule L1 now uses too (work item 261031-wjs3).
+
+- A code fence now closes only on the same character and at least as long a run, in `section` and every other heading search, as in the body scanner (work item 261031-2j14).
+
 ## 0.3.3 - 2026-10-31
 
 - `close <parent> dropped` is refused (`open_children`, WK8) while a child is open, as for `done`, and `check` applies WK8 to a `dropped` parent and to open descendants below a settled child. Before, the spec's rule for dropping a parent was not enforced and the open child was left under a closed parent. A repository that already has such a parent now fails `check`: drop or re-parent the open children (work item 261031-6c5n).

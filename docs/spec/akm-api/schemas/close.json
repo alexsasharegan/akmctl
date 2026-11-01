@@ -79,6 +79,41 @@
                 "additionalProperties": false
               }
             },
+            "links_rewritten": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "$ref": "common.json#/$defs/path"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": ["path", "count"],
+                "additionalProperties": false
+              }
+            },
+            "link_errors": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "$ref": "common.json#/$defs/path"
+                  },
+                  "error": {
+                    "type": "string"
+                  }
+                },
+                "required": ["path", "error"],
+                "additionalProperties": false
+              }
+            },
             "commit": {
               "$ref": "common.json#/$defs/commit"
             }

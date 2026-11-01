@@ -23,6 +23,8 @@ open items that were waiting on this one (unblock or re-point each):
 
 Returns a `commit` (message and paths to stage). Use `commit.message` as the commit message exactly as given, with its `AKM-Step` and `AKM-Item` trailers, and stage `commit.paths` with the code that belongs to the step. Do not write your own subject. One commit per step.
 
-Files changed: the record, renamed into `done/`; `updated` and `closed` are set to today.
+The move breaks relative Markdown links in and to the item, so `close` rewrites them (the item's own links, and inline links in other records, the roadmap, AGENTS.md and the docs that point at it) and prints them under `rewrote Markdown links` (`links_rewritten` in JSON). Wikilinks, code and anchors are left alone. A file it cannot write is listed as `link_errors`; fix those by hand.
+
+Files changed: the record, renamed into `done/`, with `updated` and `closed` set to today; every file whose links to it were rewritten. `commit.paths` lists them all.
 
 Errors: `refused` with `reason: "empty_outcome"` or `"open_children"` (a parent closes after its children); `not_found`; `stale`.

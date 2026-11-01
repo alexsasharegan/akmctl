@@ -214,6 +214,12 @@ def claims_layout(files):
 def closable(files):
     files[A2B3] += "\n## Outcome\nShipped.\n"
 
+def closelinks(files):
+    """closable, plus links out of the item and a note with a link to it."""
+    closable(files)
+    files[A2B3] += "\nSee [the parent](261015-c4d5-machine-readable-listings.md#top), [the ADR](../adr/261012-p3q4-store-records-as-markdown-files.md) and [itself](./261020-a2b3-add-json-output-to-ls.md).\n"
+    files["docs/notes/see.md"] = "# Notes\n\nRead [the item](../work/261020-a2b3-add-json-output-to-ls.md#goal).\n\n```\n[not a link](../work/261020-a2b3-add-json-output-to-ls.md)\n```\n"
+
 
 def mkdiff(path, new_path, old, new):
     """The diff member of a dry-run response: unified hunks, 3 lines of context."""
@@ -277,6 +283,7 @@ def set_section(text, name, body, append=False):
 def write_cases(cases, basic):
     clm = build("claims", claims_layout)
     clo = build("closable", closable)
+    cll = build("closelinks", closelinks)
     def after_rec(files, path, removed=()):
         fs = dict(files)
         for r in removed: fs.pop(r, None)
@@ -306,6 +313,16 @@ def write_cases(cases, basic):
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 2, "close moves the file to done/", "closable", req,
          ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("close", "261020-a2b3", "done", A2B3, A2B3_DONE)), after={A2B3_DONE: text}, removed=[A2B3])
+    req = dict(id="261020-a2b3", status="done", as_of="2026-10-28")
+    text = cll[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    text = text.replace("(261015-c4d5-machine-readable-listings.md#top)", "(../261015-c4d5-machine-readable-listings.md#top)").replace("(../adr/261012", "(../../adr/261012").replace("(./261020-a2b3-add-json-output-to-ls.md)", "(./261020-a2b3-add-json-output-to-ls.md)")
+    note = cll["docs/notes/see.md"].replace("(../work/261020-a2b3-add-json-output-to-ls.md#goal)", "(../work/done/261020-a2b3-add-json-output-to-ls.md#goal)")
+    files = dict(cll); del files[A2B3]; files[A2B3_DONE] = text; files["docs/notes/see.md"] = note
+    case("close", 8, "close repairs the Markdown links the move breaks", "closelinks", req,
+         ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS,
+            links_rewritten=[dict(path="docs/notes/see.md", count=1), dict(path=A2B3_DONE, count=2)],
+            commit=commit("close", "261020-a2b3", "done", A2B3, A2B3_DONE, "docs/notes/see.md")),
+         after={A2B3_DONE: text, "docs/notes/see.md": note}, removed=[A2B3])
     req = dict(id="261020-a2b3", status="dropped", as_of="2026-10-28")
     text = clo[A2B3].replace("status: active\n", "status: dropped\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text

@@ -1,0 +1,81 @@
+{
+  "name": "close repairs the Markdown links the move breaks",
+  "repo": "closelinks",
+  "request": {
+    "id": "261020-a2b3",
+    "status": "done",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "close",
+    "request": {
+      "id": "261020-a2b3",
+      "status": "done",
+      "as_of": "2026-10-28"
+    },
+    "ok": true,
+    "record": {
+      "id": "261020-a2b3",
+      "type": "work",
+      "path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+      "id_date": "2026-10-20",
+      "etag": "2a8fe9290110c05b",
+      "fields": {
+        "id": "261020-a2b3",
+        "title": "Add JSON output to ls",
+        "summary": "Print ls results as JSON.",
+        "status": "done",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": 2,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-20",
+        "updated": "2026-10-28",
+        "closed": "2026-10-28",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "moved_from": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+    "moved_to": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+    "dependents": [
+      {
+        "id": "261024-g7h8",
+        "status": "blocked",
+        "title": "Publish the first release",
+        "path": "docs/work/261024-g7h8-publish-the-first-release.md"
+      }
+    ],
+    "links_rewritten": [
+      {
+        "path": "docs/notes/see.md",
+        "count": 1
+      },
+      {
+        "path": "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+        "count": 2
+      }
+    ],
+    "commit": {
+      "step": "close",
+      "item": "261020-a2b3",
+      "detail": "done",
+      "paths": [
+        "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "docs/work/done/261020-a2b3-add-json-output-to-ls.md",
+        "docs/notes/see.md"
+      ],
+      "message": "261020-a2b3(close): done\n\nAKM-Step: close\nAKM-Item: 261020-a2b3"
+    }
+  },
+  "after": {
+    "docs/work/done/261020-a2b3-add-json-output-to-ls.md": "---\nid: 261020-a2b3\ntitle: Add JSON output to ls\nsummary: Print ls results as JSON.\nstatus: done\nparent: 261015-c4d5\npriority: 2\ncreated: 2026-10-20\nupdated: 2026-10-28\nclosed: 2026-10-28\n---\n\n# Add JSON output to ls\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the encoder test.\n\nSaved: 2026-10-27 18:00\n\n## Log\n- 2026-10-20: started.\n\n## Outcome\nShipped.\n\nSee [the parent](../261015-c4d5-machine-readable-listings.md#top), [the ADR](../../adr/261012-p3q4-store-records-as-markdown-files.md) and [itself](./261020-a2b3-add-json-output-to-ls.md).\n",
+    "docs/notes/see.md": "# Notes\n\nRead [the item](../work/done/261020-a2b3-add-json-output-to-ls.md#goal).\n\n```\n[not a link](../work/261020-a2b3-add-json-output-to-ls.md)\n```\n"
+  },
+  "removed": [
+    "docs/work/261020-a2b3-add-json-output-to-ls.md"
+  ]
+}

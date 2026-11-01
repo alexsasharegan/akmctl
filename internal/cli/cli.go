@@ -544,6 +544,22 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if p, ok := resp.Get("moved_to"); ok {
 			fmt.Fprintln(w, "moved to", p)
 		}
+		if lv, ok := resp.Get("links_rewritten"); ok {
+			fmt.Fprintln(w, "rewrote Markdown links the move would break:")
+			for _, o := range lv.([]api.Obj) {
+				p, _ := o.Get("path")
+				n, _ := o.Get("count")
+				fmt.Fprintf(w, "  %v\t%v\n", p, n)
+			}
+		}
+		if ev, ok := resp.Get("link_errors"); ok {
+			fmt.Fprintln(w, "could not rewrite the links in these files (fix by hand; check shows what is broken):")
+			for _, o := range ev.([]api.Obj) {
+				p, _ := o.Get("path")
+				e, _ := o.Get("error")
+				fmt.Fprintf(w, "  %v\t%v\n", p, e)
+			}
+		}
 		if cm, ok := resp.Get("commit"); ok {
 			msg, _ := cm.(api.Obj).Get("message")
 			ps, _ := cm.(api.Obj).Get("paths")

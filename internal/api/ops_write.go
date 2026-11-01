@@ -746,19 +746,45 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 	from := e.rec.Path
 	to := repo.DoneDir() + "/" + path.Base(from)
 	deps := dependents(repo, e.rec.ID)
+	// The move breaks relative Markdown links in the file and to it: plan the
+	// rewrite now, from the files as they are, and write it after the move.
+	whole := string(e.bytes())
+	headLen := len(whole) - len(e.text)
+	moved, selfN := moveSelfLinks(repo, from, to, whole)
+	if selfN > 0 {
+		e.text = moved[headLen:] // the frontmatter is not scanned, so the head is unchanged
+	}
+	inbound := planMovedInbound(repo, from, to)
 	rec, cerr := e.commit(to)
 	if cerr != nil {
 		return nil, cerr
+	}
+	var failed []Obj
+	if !e.dry {
+		failed = applyLinkEdits(repo, inbound)
+		if len(inbound) > 0 {
+			repo.Reload()
+		}
 	}
 	out := O("record", recordObj(repo, rec, nil, true), "moved_from", from, "moved_to", rec.Path)
 	if len(deps) > 0 {
 		out = append(out, KV{"dependents", deps})
 	}
+	if rep := linkReport(rec.Path, selfN, inbound); len(rep) > 0 {
+		out = append(out, KV{"links_rewritten", rep})
+	}
+	if len(failed) > 0 {
+		out = append(out, KV{"link_errors", failed})
+	}
 	step, detail := "close", "done"
 	if status == "dropped" {
 		step, detail = "drop", "dropped"
 	}
-	out = append(out, KV{"commit", commitObj(step, rec.ID, detail, from, rec.Path)})
+	paths := []string{from, rec.Path}
+	for _, ed := range inbound {
+		paths = append(paths, ed.path)
+	}
+	out = append(out, KV{"commit", commitObj(step, rec.ID, detail, paths...)})
 	return e.finish(out), nil
 }
 
