@@ -9,6 +9,8 @@ $ akmctl claim 261029-atxk --as other
 akmctl: refused: 261029-atxk is claimed by demo-agent
 ```
 
+`claimed_at` is UTC (`YYYY-MM-DDTHH:MM`, no `Z`). Dates beside it (`updated`, Log lines) are local days, so a `claimed_at` that looks hours ahead or behind is not a clock error. Do not edit it.
+
 If someone else holds a fresh claim, take another item. `--takeover` is for a stale claim, with the maintainer's say-so.
 
 Returns a `commit` (message and paths to stage). Use `commit.message` as the commit message exactly as given, with its `AKM-Step` and `AKM-Item` trailers, and stage `commit.paths` with the code that belongs to the step. Do not write your own subject. One commit per step.

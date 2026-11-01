@@ -75,7 +75,7 @@ A repository that keeps its records inside another structure, such as a notes va
 
 ### Ids
 
-Every record has an id of the form `YYMMDD-xxxx`, such as `261027-m3qz`: the UTC creation date plus four random characters from a 32-character alphabet (no `i`, `l`, `o`, `u`). ADRs and work items share one id space. The id alone is the reference; the slug in the filename is only a label, so renaming it breaks nothing. The tool mints ids, because agents are poor random-number generators. There is no shared counter, because counters make parallel branches claim the same number and conflict on merge.
+Every record has an id of the form `YYMMDD-xxxx`, such as `261027-m3qz`: the creation day (the writer's local calendar day, ADR 261029-5pe1) plus four random characters from a 32-character alphabet (no `i`, `l`, `o`, `u`). ADRs and work items share one id space. The id alone is the reference; the slug in the filename is only a label, so renaming it breaks nothing. The tool mints ids, because agents are poor random-number generators. There is no shared counter, because counters make parallel branches claim the same number and conflict on merge.
 
 ### Work items
 
@@ -130,6 +130,8 @@ Three more optional fields:
 | `keep`   | `true` or `false`                                                   | `true` marks an item that a later compaction must never fold or archive. `false` and absence mean the same.                                          |
 
 The check rules are WK13 (a warning: an item in `done/` has no `closed`), WK14 (an open item has `closed`), WK15 (`closed` is not a date, or is earlier than `created`), WK16 (`cycle` is not a valid label), WK17 (`keep` is not a boolean) WK18 (the dependency graph, `blocked_by` plus parent-to-child links, has a cycle) and WK19 (a warning: `blocked_by` names one of the item's own descendants, which a parent already waits for).
+
+**Dates and times.** `created`, `updated`, `closed`, an ADR's `date`, the date in an id and the date that starts a Log line are the local calendar day of the machine that writes them, as `YYYY-MM-DD`. The one timestamp is `claimed_at` (claims extension), and it is **UTC**: `YYYY-MM-DDTHH:MM`, with no `Z` and no offset. So a `claimed_at` of `2026-11-01T05:02` written at 22:02 on 2026-10-31 in Arizona (UTC-7) is correct, not a clock error. The tool compares `claimed_at` in UTC for the 24-hour staleness rule, which is why it is not local. Read it as UTC and do not edit it to match the local days beside it (ADR 261029-5pe1).
 
 ### Decision records (ADRs)
 

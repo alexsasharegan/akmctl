@@ -1,14 +1,13 @@
 ---
 id: "261031-mr2q"
 title: claimed_at is UTC but nothing an agent reads says so
-status: active
+status: done
 created: 2026-10-31
 updated: 2026-11-01
+closed: 2026-11-01
 kind: chore
 summary: claimed_at is UTC, stated in the spec but not in the guide or skills agents read; fix by documenting it, with a Z suffix recorded as the alternative
 decisions: [261029-5pe1, 261101-gw7b]
-claimed_by: claude
-claimed_at: 2026-11-01T08:37
 ---
 
 # claimed_at is UTC but nothing an agent reads says so
@@ -29,13 +28,23 @@ Option 1 now. It removes the ambiguity for readers at no compatibility cost. Opt
 
 Done when:
 
-- [ ] `docs/spec/akm-guide.md`, `.agents/skills/akm/references/claim.md` and `.agents/skills/akm-track-work/SKILL.md` say `claimed_at` is UTC and that dates beside it are local days.
-- [ ] The embedded copy under `internal/initrepo/templates/skills` matches (`go test ./internal/initrepo`).
-- [ ] `akmctl check` and `npm run format:check` pass.
+- [x] `docs/spec/akm-guide.md`, `.agents/skills/akm/references/claim.md` and `.agents/skills/akm-track-work/SKILL.md` say `claimed_at` is UTC and that dates beside it are local days.
+- [x] The embedded copy under `internal/initrepo/templates/skills` matches (`go test ./internal/initrepo`).
+- [x] `akmctl check` and `npm run format:check` pass.
 
 ## Next
 
-Not started. Edit the three files named in Goal (option 1), mirror the skill changes into internal/initrepo/templates/skills, run go test ./... and the records check, and close with Decision: none (option 2 stays recorded here, not rejected).
+Done; ready to close.
+
+## Outcome
+
+Option 1 done.
+
+- Guide: new "Dates and times" paragraph in `docs/spec/akm-guide.md` says `claimed_at` is UTC and the dates beside it are local days; the id paragraph said "UTC creation date" and now says local day, as ADR 261029-5pe1 decided.
+- Skills: `references/claim.md` and the claim step of `akm-track-work` say the same; the embedded copies match (`go test ./internal/initrepo`).
+- Checks: `akmctl check` and `npm run format:check` pass.
+
+Decision: none (option 2, a `Z` suffix, stays recorded in this item, not rejected).
 
 ## Log
 
