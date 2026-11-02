@@ -1,11 +1,12 @@
 ---
 id: "261101-y3ch"
 title: A pattern-checked parameter's error does not say the expected form
-status: raw
+status: ready
 created: 2026-11-01
 updated: 2026-11-01
 kind: bug
 summary: log --at 09:46 fails with 'has the wrong form' and never says what form is valid; the same message serves every pattern parameter
+parent: 261101-vs5c
 ---
 
 # A pattern-checked parameter's error does not say the expected form
@@ -16,6 +17,10 @@ summary: log --at 09:46 fails with 'has the wrong form' and never says what form
 
 - [ ] Each pattern parameter carries a short description of its form (for `at`: `YYYY-MM-DD HH:MM`), and the error appends it.
 - [ ] A test fails for a pattern parameter that has no description.
+
+## Next
+
+Add a form description field beside the pattern in internal/api/params.go, append it in checkString, add the failing test for a pattern without one.
 
 ## Log
 
