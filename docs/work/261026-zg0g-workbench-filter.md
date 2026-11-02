@@ -2,7 +2,6 @@
 id: 261026-zg0g
 type: task
 status: ready
-project: Project Notes
 origin: 261025-g68j
 created: 2026-10-26
 updated: 2026-10-26

@@ -36,7 +36,7 @@ Conformance cases `close-2` to `close-6`, `close-8`; `TestCommitsFlagsAnUnlabell
 
 ## Review
 
-Proposed 2026-11-01 under the agent-rails umbrella 261101-vs5c. Accepted by merging the branch that implements it, if Alexander agrees.
+Proposed 2026-11-01 under the agent-rails project 261101-vs5c. Accepted by merging the branch that implements it, if Alexander agrees.
 
 ## Revert
 

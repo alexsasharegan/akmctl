@@ -12,7 +12,7 @@ updated: 2026-10-31
 
 ## Goal
 
-The umbrella for one redesign with two halves, from Alexander's notes of 2026-10-31. It starts as spikes; the build items come from their outcomes.
+The project for one redesign with two halves, from Alexander's notes of 2026-10-31. It starts as spikes; the build items come from their outcomes.
 
 1. **The body is a schema, not a text dump.** A work item already has a de facto body shape (`## Goal` with a "Done when" checklist, `## Next`, `## Log`, `## Outcome`). Decide how much of that is schematized and how much stays open for extension, and make the tool the only writer of it, so an agent never fights Markdown formatting or spends tokens getting it right.
 2. **The drawer becomes a first-class editor.** Today it is a narrow panel off to the side. It should keep the iOS-sheet feel (the user never leaves the board) at a width that suits reading and editing (half, two-thirds or centered), and edit the body and the fields in place, with edits allowed only when they make sense for the item's status.

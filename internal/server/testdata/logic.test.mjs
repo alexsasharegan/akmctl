@@ -466,14 +466,14 @@ assert.equal(L.projectTarget("  plain  "), "plain");
 assert.equal(L.projectTarget(null), "");
 assert.equal(L.projectTarget("[[]]"), "");
 {
-  const rs = [work("a", { project: "[[Acme Fabrication]]" }), work("b", { project: "[[Acme Fabrication|Acme]]" }), work("c", { project: "[[Project Notes]]" }), work("d", {}), adr("z", {})];
+  const rs = [work("P", { title: "Alpha" }), work("a", { parent: "P" }), work("b", { parent: "a" }), work("Q", { title: "Beta" }), work("c", { parent: "Q" }), work("d", {}), adr("z", {})];
   const c = L.projectCounts(rs);
-  assert.deepEqual(c.list, [{ target: "Acme Fabrication", count: 2 }, { target: "Project Notes", count: 1 }]);
+  assert.deepEqual(c.list, [{ target: "P", label: "Alpha", count: 3 }, { target: "Q", label: "Beta", count: 2 }]);
   assert.equal(c.none, 1);
   assert.equal(L.hasProjects(rs), true);
   assert.equal(L.hasProjects([work("d", {}), adr("z", {})]), false);
   assert.deepEqual(L.filterByProject(rs, null), rs);
-  assert.deepEqual(L.filterByProject(rs, "Acme Fabrication").map((r) => r.id), ["a", "b", "z"]);
+  assert.deepEqual(L.filterByProject(rs, "P").map((r) => r.id), ["P", "a", "b", "z"]);
   assert.deepEqual(L.filterByProject(rs, L.NO_PROJECT).map((r) => r.id), ["d", "z"]);
   assert.deepEqual(L.filterByProject(rs, "Nope").map((r) => r.id), ["z"]);
 }

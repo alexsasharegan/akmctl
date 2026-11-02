@@ -41,11 +41,11 @@ export function mountProjectFilter(host, ctx) {
   });
   function refresh() {
     const { list, none } = projectCounts(ctx.records());
-    // no project field in this repository: nothing to filter on
+    // no parent with children in this repository: nothing to filter on
     wrap.hidden = list.length === 0;
     const sel = ctx.get();
     const opts = [el("option", { value: "", text: "All projects" })];
-    for (const p of list) opts.push(el("option", { value: p.target, text: p.target + " (" + p.count + ")" }));
+    for (const p of list) opts.push(el("option", { value: p.target, text: p.label + " (" + p.count + ")" }));
     if (none > 0) opts.push(el("option", { value: NO_PROJECT, text: "No project (" + none + ")" }));
     // a selection with no records any more stays selectable, so it can be cleared
     if (sel !== null && sel !== NO_PROJECT && !list.some((p) => p.target === sel)) opts.push(el("option", { value: sel, text: sel + " (0)" }));

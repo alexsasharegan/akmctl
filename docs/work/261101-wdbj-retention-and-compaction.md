@@ -5,7 +5,7 @@ status: raw
 created: 2026-11-01
 updated: 2026-11-01
 kind: feature
-summary: "Umbrella for retention and compaction: keep the active working set small, keep the knowledge, keep the way back"
+summary: "Project for retention and compaction: keep the active working set small, keep the knowledge, keep the way back"
 ---
 
 # retention and compaction

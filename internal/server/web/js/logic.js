@@ -304,34 +304,62 @@ export function projectTarget(v) {
   return inner.split("|")[0].split("#")[0].trim();
 }
 
-/** Work records that have the project field set to something, as targets with counts: most first, then by name. */
+/**
+ * The project a work record belongs to: the top of its parent chain, or the
+ * record itself when it is a parent with children. "" for work with neither.
+ */
+function projectOf(r, byId, hasKids) {
+  let cur = r;
+  const seen = new Set();
+  while (cur && !seen.has(cur.id)) {
+    seen.add(cur.id);
+    const p = projectTarget(field(cur, "parent"));
+    const up = p ? byId.get(p) : null;
+    if (!up || !isWork(up)) break;
+    cur = up;
+  }
+  return cur !== r || hasKids.has(r.id) ? cur.id : "";
+}
+
+function projectIndex(records) {
+  const byId = new Map(records.map((r) => [r.id, r]));
+  const hasKids = new Set();
+  for (const r of records) if (isWork(r)) hasKids.add(projectTarget(field(r, "parent")));
+  return { byId, hasKids };
+}
+
+/** The projects (parents with children, read from \`parent\`) as targets with titles and counts: most first, then by title. */
 export function projectCounts(records) {
+  const { byId, hasKids } = projectIndex(records);
   const n = new Map();
   let none = 0;
   for (const r of records) {
     if (!isWork(r)) continue;
-    const t = projectTarget(field(r, "project"));
-    if (t) n.set(t, (n.get(t) || 0) + 1);
+    const id = projectOf(r, byId, hasKids);
+    if (id) n.set(id, (n.get(id) || 0) + 1);
     else none++;
   }
-  const list = [...n].map(([target, count]) => ({ target, count })).sort((a, b) => b.count - a.count || a.target.localeCompare(b.target));
+  const list = [...n]
+    .map(([target, count]) => ({ target, label: String(field(byId.get(target), "title") || target), count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
   return { list, none };
 }
 
-/** Whether a repository uses the project field at all (so the control is worth showing). */
+/** Whether a repository has any parent with children (so the control is worth showing). */
 export const hasProjects = (records) => projectCounts(records).list.length > 0;
 
 /**
- * Narrow the work records to one project. `sel` is null for all, NO_PROJECT
- * for work without a project, or a target. Records that are not work (ADRs)
- * always pass.
+ * Narrow the work records to one project. \`sel\` is null for all, NO_PROJECT
+ * for work outside every project, or a project's id. Records that are not work
+ * (ADRs) always pass.
  */
 export function filterByProject(records, sel) {
   if (sel === null || sel === undefined) return records;
+  const { byId, hasKids } = projectIndex(records);
   return records.filter((r) => {
     if (!isWork(r)) return true;
-    const t = projectTarget(field(r, "project"));
-    return sel === NO_PROJECT ? t === "" : t === sel;
+    const id = projectOf(r, byId, hasKids);
+    return sel === NO_PROJECT ? id === "" : id === sel;
   });
 }
 
