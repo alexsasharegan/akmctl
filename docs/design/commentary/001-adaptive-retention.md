@@ -9,6 +9,10 @@ updated: 2026-11-02
 parent: "261101-tpj2"
 ---
 
+# Retention and Compaction — Commentary 001
+
+The output of architectural brainstorming Session 001 against [Design: Retention and Compaction](../retention-and-compaction.md).
+
 ## Session Guidance
 
 This commentary establishes working context for subsequent architectural exploration, not immutable architectural requirements.
@@ -28,10 +32,6 @@ This commentary establishes working context for subsequent architectural explora
 Focus on how AKM should determine what knowledge to retain, where to place it, and which signals should influence those decisions.
 
 Build upon the foundations of attention management, exposure efficiency, and memory consolidation established in this commentary. The objective is to develop the adaptive retention model, not yet finalize its implementation.
-
-# Retention and Compaction — Commentary 001
-
-The output of architectural brainstorming Session 001 against [Design: Retention and Compaction](../retention-and-compaction.md).
 
 ## Adaptive Retention and Attention Management
 
