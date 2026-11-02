@@ -76,6 +76,7 @@ func TestCustomDocsDirEndToEnd(t *testing.T) {
 	}
 	callOK(t, base, "section", Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [x] it works"})
 	callOK(t, base, "set", Request{"id": id, "changes": map[string]any{"status": "ready"}})
+	callOK(t, base, "section", Request{"id": id, "name": "Next", "text": "Close it."})
 	callOK(t, base, "claim", Request{"id": id, "as": "agent"})
 	if !exists(base, "knowledge/.akm.lock") {
 		t.Error("the lock is not in the docs dir")

@@ -266,6 +266,8 @@ func TestClaimAndRelease(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-1"}, "refused", "extension_off")
 	root = copyRepo(t, "basic", "extension.claims: 0.3.0\n")
+	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-1"}, "refused", "rule")
+	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	resp := mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	if pv, _ := resp.Get("previous_holder"); pv != nil {
 		t.Fatalf("previous %v", pv)
@@ -307,6 +309,7 @@ func TestClaimAndRelease(t *testing.T) {
 // claim by the same identity) keeps one 'claimed' line in its log.
 func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
 	root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
+	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "blocked", "blocked_by": []any{"waiting on review"}}, "as_of": "2026-10-28"})
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "active", "blocked_by": nil}, "as_of": "2026-10-29"})

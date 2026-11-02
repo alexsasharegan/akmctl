@@ -236,6 +236,11 @@ func TestWriteRoutes(t *testing.T) {
 		t.Fatal(r.body)
 	}
 	et = strings.Trim(r.h.Get("ETag"), `"`)
+	r = do(t, ts, "PUT", "/api/v1/records/"+id+"/sections/Next", `{"text":"Try it."}`, map[string]string{"If-Match": et})
+	if r.status != 200 {
+		t.Fatal(r.body)
+	}
+	et = strings.Trim(r.h.Get("ETag"), `"`)
 	r = do(t, ts, "POST", "/api/v1/records/"+id+"/claim", `{"as":"http-agent","as_of":"2026-10-28T10:00"}`, map[string]string{"If-Match": et})
 	if r.status != 200 {
 		t.Fatalf("claim: %d %v", r.status, r.body)

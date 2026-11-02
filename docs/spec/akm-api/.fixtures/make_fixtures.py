@@ -211,7 +211,12 @@ A2B3_DEPENDENTS = [dict(id="261024-g7h8", status="blocked", title="Publish the f
 
 def claims_layout(files):
     files["docs/.layout"] += "extension.claims: 0.3.0\n"
+    files[E5F6] = files[E5F6].rstrip("\n") + "\n\n## Next\nWrite the exit-code table.\n"
     files[A2B3] = files[A2B3].replace("updated: 2026-10-27\n---", "updated: 2026-10-27\nclaimed_by: agent-9\nclaimed_at: 2026-10-28T08:00\n---")
+
+def claims_no_next(files):
+    claims_layout(files)
+    files[E5F6] = files[E5F6].split("\n\n## Next")[0] + "\n"
 
 def closable(files):
     files[A2B3] += "\n## Outcome\nShipped.\n"
@@ -292,6 +297,7 @@ def set_section(text, name, body, append=False):
 
 def write_cases(cases, basic):
     clm = build("claims", claims_layout)
+    cnn = build("claimsnonext", claims_no_next)
     clo = build("closable", closable)
     cll = build("closelinks", closelinks)
     def after_rec(files, path, removed=()):
@@ -381,6 +387,8 @@ def write_cases(cases, basic):
     text = text.rstrip("\n") + "\n\n## Log\n- 2026-10-28 09:30+00:00: claimed (agent-1).\n"
     files = dict(clm); files[E5F6] = text
     case("claim", 1, "claim a ready item", "claims", req, ok("claim", req, record=pub(after_rec(files, E5F6)), previous_holder=None, commit=commit("claim", "261022-e5f6", "claimed by agent-1", E5F6)), after={E5F6: text})
+    req = dict(id="261022-e5f6", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
+    case("claim", 3, "an item with an empty Next is refused", "claimsnonext", req, err("claim", req, "refused", "261022-e5f6 has an empty ## Next; write it with section, then claim", reason="rule", rule="WK6"))
     req = dict(id="261020-a2b3", **{"as": "agent-1"}, as_of="2026-10-28T09:30")
     case("claim", 2, "another holder's fresh claim refuses", "claims", req, err("claim", req, "refused", "261020-a2b3 is claimed by agent-9", reason="claimed"))
     req = dict(id="261020-a2b3", as_of="2026-10-28")

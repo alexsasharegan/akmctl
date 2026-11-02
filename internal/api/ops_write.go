@@ -952,6 +952,11 @@ func opClaim(repo *record.Repo, q Request) (Obj, *Error) {
 	if st != "ready" && st != "active" {
 		return nil, refused("status", "%s is %s; only ready or active items can be claimed", e.rec.ID, st)
 	}
+	// An active item needs a ## Next (WK6). Unlike set, claim can ask for it first:
+	// the item is still ready and section writes it.
+	if _, text := record.Sections(e.rec.Body); strings.TrimSpace(text["next"]) == "" {
+		return nil, refusedRule("WK6", "%s has an empty ## Next; write it with section, then claim", e.rec.ID)
+	}
 	now := clock(q)
 	who := q.str("as")
 	prev := e.rec.Str("claimed_by")
