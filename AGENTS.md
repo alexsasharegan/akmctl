@@ -10,7 +10,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Release archives: `scripts/release.sh <version>`; CI runs it on a `v*` tag. The steps are in `docs/release.md`.
 - Records check: build the tool as above, then `/tmp/akmctl check` (this repo is its own test case; use the build of the current branch, not an installed copy).
 - Format records and schemas: `npm ci` once, then `npm run format:check` and `npm run schemas` (Prettier 3.9.10 and Ajv 8 are dev dependencies in `package.json`); `/tmp/akmctl index` regenerates `docs/adr/README.md`.
-- Full check before a commit: the test, records check and format commands above.
+- Full check before a commit: the test (with `-race`), records check and format commands above. If the sandbox blocks the Go build cache, Git or the network, ask for the escalation; never skip a check or report one as run that was not.
 
 ## Where things live
 
@@ -26,14 +26,15 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 ## Rules
 
 - Before starting, list the open work. Resume the `active` item you hold; if you hold none, take the top `ready` item; if several `active` items are unclaimed, ask. The `claims` extension is on: use `claim` and `release`.
-- Work only under a work item. If none fits, create a `raw` one (`akmctl new work <slug>`) and ask which item to work.
+- Work only under a work item. If none fits, create a `raw` one (`akmctl new work <slug>`) and ask which item to work. Before committing a new item, fill its `## Goal` (for a tool failure: the command, the actual and the expected behavior, a checkable done-when); `new` leaves it empty and `check` allows a `raw` item to be.
+- A request only to find or recommend work gets an answer, not a claim. A branch and its pull request carry one work item (items you file in passing ride along); once a branch has a claim commit it keeps that item, and a different item means releasing this one and starting a new branch.
 - A hard-to-reverse choice, or one that rejects a real alternative, needs an ADR draft with status `proposed`. Never edit the body of an `accepted` ADR; supersede it.
 - Update the item's `## Next` and `## Log` in the same commit as the code.
 - A change a user or a client can see (a command, the API, the spec, a rule, a fixture) gets an entry under `## Unreleased` in `CHANGELOG.md` in the same commit as the code, as the entries there do: what changed, who is affected, the work item and ADR ids. A fix with no visible change does not.
 - Mint ids with `akmctl new`. Without the tool: `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"`, then `ls docs/work docs/work/done docs/adr | grep "^$id-"` must print nothing.
 - Surface every `akmctl` failure: a crash, a wrong result, an error that does not say what to do next, or a refusal you did not expect. Tell the maintainer in your next message and file it at once as at least a `raw` work item (`akmctl new work <slug>`; read the `similar` list and add to an existing item if one fits). Do this before you work around it. A refusal that did what the spec says and told you why (a cycle, a closed item) is the tool working: no item.
 - Code and tests win over prose. When a document is wrong, fix it or say so.
-- This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path, one logical commit per step (the `akm-commit` skill is on here). Push verified commits to origin; the skill's default of never pushing does not apply in this repository. Tags, releases and visibility changes still need the maintainer.
+- This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path, one logical commit per step (the `akm-commit` skill is on here). Land work on a branch through a pull request, never by pushing to `main`, unless the maintainer asks you to merge it locally; push the verified branch (the skill's default of never pushing does not apply in this repository) and do not merge the pull request yourself. Keep the configured Git author and end each commit message with `Co-Authored-By: <agent and model> <noreply address>` after the `AKM-` trailers, and each pull request description with one line naming the agent. Tags, releases and visibility changes still need the maintainer.
 - Without the tool: decisions are in `docs/adr/README.md`; `grep -lE '^status: ?"?active"?$' docs/work/*.md` lists active work (same for `ready`, `blocked`); close an item by setting `status`, writing `## Outcome`, setting `updated` and `git mv` to `docs/work/done/`. Never hand-edit the ADR index.
 - The `akmctl` binary must work on macOS and Linux. Windows is best effort and not required below 1.0.0 (ADR 261029-eegx): CI runs it without blocking.
 
