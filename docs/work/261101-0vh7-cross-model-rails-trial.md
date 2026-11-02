@@ -30,3 +30,4 @@ Claude Code run: start a fresh session in a clean worktree of the commit in the 
 - 2026-11-01: filed.
 - 2026-11-01 18:02-07:00: claimed (claude-0vh7).
 - 2026-11-01 18:02-07:00: protocol and scoring table written in docs/design/rails-trial-protocol.md (15 rows, two-stage prompt); base commit for the runs is f6089e8
+- 2026-11-01 18:06-07:00: Claude Code run on f6089e8 (subagent, local, no push or PR): stage 1 held R1 and R2, recommended 261029-wpak and did not claim; stage 2 held R3-R8, R10-R13 (claim, 2 step commits, CM1-CM4 ok, Co-Authored-By present, CHANGELOG and glossary, Next emptied by close, full check with -race); R9 n/a, R14 not run. Gaps: claimed as plain 'claude' (CL2 risk, AGENTS.md does not say to use a unique --as); format:check fails on main at the wgf6 item, which no run caught before merge (fixed here); the run did not file it since it was not an akmctl failure
