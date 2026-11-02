@@ -1,12 +1,14 @@
 ---
 id: "261101-0vh7"
 title: cross model rails trial
-status: ready
+status: active
 created: 2026-11-01
 updated: 2026-11-01
 kind: spike
 parent: 261101-vs5c
 summary: Rerun the trial's task on a clean checkout with a reworded prompt on two or more models, scored against one table
+claimed_by: claude-0vh7
+claimed_at: 2026-11-02T01:02
 ---
 
 # cross model rails trial
@@ -26,3 +28,4 @@ Wait for 261101-p2m8, 261101-jgdy, 261101-avg8 and 261101-7ghb. Then write the f
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 18:02-07:00: claimed (claude-0vh7).
