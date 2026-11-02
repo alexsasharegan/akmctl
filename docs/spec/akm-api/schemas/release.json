@@ -18,9 +18,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "response": {
@@ -50,13 +48,7 @@
               "$ref": "common.json#/$defs/commit"
             }
           },
-          "required": [
-            "api_version",
-            "operation",
-            "request",
-            "ok",
-            "record"
-          ],
+          "required": ["api_version", "operation", "request", "ok", "record"],
           "additionalProperties": false
         },
         {

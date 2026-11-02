@@ -23,10 +23,7 @@
               ]
             },
             "keep": {
-              "type": [
-                "boolean",
-                "null"
-              ]
+              "type": ["boolean", "null"]
             },
             "closed": false
           }
@@ -45,10 +42,7 @@
           "minLength": 1
         }
       },
-      "required": [
-        "id",
-        "changes"
-      ],
+      "required": ["id", "changes"],
       "additionalProperties": false
     },
     "response": {

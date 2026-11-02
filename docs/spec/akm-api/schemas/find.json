@@ -47,13 +47,7 @@
               "minLength": 1
             }
           },
-          "required": [
-            "api_version",
-            "operation",
-            "request",
-            "ok",
-            "path"
-          ],
+          "required": ["api_version", "operation", "request", "ok", "path"],
           "additionalProperties": false
         },
         {

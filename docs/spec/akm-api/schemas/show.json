@@ -12,9 +12,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "response": {
@@ -56,10 +54,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "name",
-                "text"
-              ],
+              "required": ["name", "text"],
               "additionalProperties": false
             }
           },

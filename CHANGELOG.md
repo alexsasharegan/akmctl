@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `close` empties a non-empty `## Next` (the heading stays), because a closed item has no next step; a plan left there only misleads. `commits` has a new rule, CM4: a commit with no AKM step that changes the `status` or `claimed_by` of an open work item in place is reported instead of skipped; use the message the command printed. A run without `--range` may now report old hand-made status edits. API 1.x: a client that read `## Next` of an item it just closed gets it empty. Fixtures `close-2`..`6` and `close-8` in both copies (work item 261101-avg8, ADR 261101-8cd9).
+
 - `akmctl log` warns on stderr when the shell passed several words instead of one quoted message, showing the line it joined (`joined 3 words into one Log line: "..."`), and still writes it. An unquoted `;`, `&`, `|` or `>` cuts a message short and runs the rest as another command; the warning makes that visible. CLI binding only: stdout, the exit code and the API are unchanged. The `log` reference in the skills now shows a quoted message (work item 261101-jgdy, ADR 261101-5k3t).
 
 - `claim` is refused (`reason: "rule"`, `rule: "WK6"`) when the item's `## Next` is empty, instead of making it `active` and leaving `check` to fail. Write the section first (`akmctl section <id> Next --text "..."`), then claim. API 1.x: a client that claimed a `ready` item with no `Next` now gets this error. Fixture `claim-3` with a new repository `claimsnonext`, and `claim-1` now claims an item that has a `Next`, in both copies (work item 261101-p2m8, ADR 261101-09yd).

@@ -10,7 +10,7 @@ $ akmctl commits --range origin/main..HEAD
 2 AKM step commits checked, 5 other commits skipped
 ```
 
-It examines commits whose subject is `<id>(<step>): <detail>` or that carry an `AKM-` trailer, and skips the rest. Rules CM1 (subject), CM2 (the two trailers agree with the subject) and CM3 (the diff does what the step says) are in the API specification. `--limit` caps the count (default 50).
+It examines commits whose subject is `<id>(<step>): <detail>` or that carry an `AKM-` trailer, and skips the rest. Rules CM1 (subject), CM2 (the two trailers agree with the subject) and CM3 (the diff does what the step says) are in the API specification. A commit with no step that changes an open item's `status` or `claimed_by` is not skipped: CM4 reports it, because a status change belongs in a step commit with the message the command printed. `--limit` caps the count (default 50).
 
 Files changed: none.
 

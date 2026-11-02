@@ -276,6 +276,10 @@ def mkdiff(path, new_path, old, new):
         k = stop
     return dict(path=path, new_path=new_path, hunks=hunks)
 
+def clear_next(text):
+    """close empties a non-empty ## Next (a closed item has no next step)."""
+    return set_section(text, "Next", "") if re.search(r"^## Next\n(?!\s*\n## |\s*$)", text, re.M) else text
+
 def set_section(text, name, body, append=False):
     """Reference for the section operation, for the sample files only: no code fences, LF."""
     lines = text.rstrip("\n").split("\n")
@@ -326,11 +330,13 @@ def write_cases(cases, basic):
     case("close", 1, "an empty Outcome refuses", "basic", req, err("close", req, "refused", "261020-a2b3 has no ## Outcome; write it before closing", reason="empty_outcome"))
     req = dict(id="261020-a2b3", status="done", as_of="2026-10-28")
     text = clo[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    text = clear_next(text)
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 2, "close moves the file to done/", "closable", req,
          ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("close", "261020-a2b3", "done", A2B3, A2B3_DONE)), after={A2B3_DONE: text}, removed=[A2B3])
     req = dict(id="261020-a2b3", status="done", as_of="2026-10-28")
     text = cll[A2B3].replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    text = clear_next(text)
     text = text.replace("(261015-c4d5-machine-readable-listings.md#top)", "(../261015-c4d5-machine-readable-listings.md#top)").replace("(../adr/261012", "(../../adr/261012").replace("(./261020-a2b3-add-json-output-to-ls.md)", "(./261020-a2b3-add-json-output-to-ls.md)")
     note = cll["docs/notes/see.md"].replace("(../work/261020-a2b3-add-json-output-to-ls.md#goal)", "(../work/done/261020-a2b3-add-json-output-to-ls.md#goal)")
     files = dict(cll); del files[A2B3]; files[A2B3_DONE] = text; files["docs/notes/see.md"] = note
@@ -341,6 +347,7 @@ def write_cases(cases, basic):
          after={A2B3_DONE: text, "docs/notes/see.md": note}, removed=[A2B3])
     req = dict(id="261020-a2b3", status="dropped", as_of="2026-10-28")
     text = clo[A2B3].replace("status: active\n", "status: dropped\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    text = clear_next(text)
     files = dict(clo); del files[A2B3]; files[A2B3_DONE] = text
     case("close", 6, "dropping an item also writes closed", "closable", req,
          ok("close", req, record=pub(after_rec(files, A2B3_DONE)), moved_from=A2B3, moved_to=A2B3_DONE, dependents=A2B3_DEPENDENTS, commit=commit("drop", "261020-a2b3", "dropped", A2B3, A2B3_DONE)), after={A2B3_DONE: text}, removed=[A2B3])
@@ -406,6 +413,7 @@ def write_cases(cases, basic):
          ok("set", req, record=pub(rec), changed=["priority", "summary"], diff=mkdiff(E5F6, E5F6, basic[E5F6], text)), would_be={E5F6: text})
     req = dict(id="261020-a2b3", status="done", outcome="Shipped in 0.2.", dry_run=True, as_of="2026-10-28")
     text = set_section(basic[A2B3], "Outcome", "Shipped in 0.2.").replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    text = clear_next(text)
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = after_rec(files, A2B3_DONE); rec["etag"] = next(r for r in load(basic) if r["path"] == A2B3)["etag"]
     case("close", 4, "dry run of a close with an outcome: the diff names the new path", "basic", req,
@@ -558,6 +566,7 @@ def vault_write_cases(case, basic):
     # close moves the file to done/ inside the configured work folder
     req = dict(id="261020-a2b3", status="done", outcome="Shipped in 0.2.", as_of="2026-10-28")
     text = set_section(basic[A2B3], "Outcome", "Shipped in 0.2.").replace("status: active\n", "status: done\n").replace("updated: 2026-10-27\n", "updated: 2026-10-28\nclosed: 2026-10-28\n")
+    text = clear_next(text)
     files = dict(basic); del files[A2B3]; files[A2B3_DONE] = text
     rec = dict(next(r for r in load(files) if r["path"] == A2B3_DONE), path=relocate(A2B3_DONE))
     case("close", 5, "close moves the file to done/ under the configured work folder", "vault", req,

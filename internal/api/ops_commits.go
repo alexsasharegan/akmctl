@@ -96,7 +96,8 @@ func runGit(root string, args ...string) (string, error) {
 }
 
 // verifyCommit returns the report of one commit, or false when the commit makes
-// no claim to be an AKM step (no AKM- trailer and no step subject).
+// no claim to be an AKM step (no AKM- trailer and no step subject) and does not
+// change an open item's status or claim (CM4).
 func verifyCommit(repo *record.Repo, sha, msg string) (Obj, bool) {
 	lines := strings.Split(msg, "\n")
 	subject := lines[0]
@@ -112,7 +113,7 @@ func verifyCommit(repo *record.Repo, sha, msg string) (Obj, bool) {
 	}
 	m := reCommitSubject.FindStringSubmatch(subject)
 	if m == nil && len(stepTr) == 0 && len(itemTr) == 0 {
-		return nil, false
+		return unlabelledChange(repo, sha, subject)
 	}
 	var problems []Obj
 	add := func(rule, format string, a ...any) {
@@ -177,19 +178,7 @@ func diffProblems(repo *record.Repo, sha, step, item string) []string {
 			cur = &touched[i]
 		}
 	}
-	state := func(rev, path string) (status string, claimed bool, ok bool) {
-		out, err := runGit(repo.Root, "show", rev+":./"+path)
-		if err != nil {
-			return "", false, false
-		}
-		doc, perr := frontmatter.Parse([]byte(out))
-		if perr != nil {
-			return "", false, false
-		}
-		v, _ := doc.Get("status")
-		cb, has := doc.Get("claimed_by")
-		return v.Str, has && cb.Kind == frontmatter.String && cb.Str != "", true
-	}
+	state := func(rev, path string) (string, bool, bool) { return recordState(repo, rev, path) }
 	switch step {
 	case "file":
 		if cur == nil || cur.status[0] != 'A' {
@@ -247,6 +236,58 @@ func diffProblems(repo *record.Repo, sha, step, item string) []string {
 		return []string{step + ": " + bad}
 	}
 	return nil
+}
+
+// recordState reads a record's status and whether it holds a claim at a revision.
+func recordState(repo *record.Repo, rev, path string) (status string, claimed bool, ok bool) {
+	out, err := runGit(repo.Root, "show", rev+":./"+path)
+	if err != nil {
+		return "", false, false
+	}
+	doc, perr := frontmatter.Parse([]byte(out))
+	if perr != nil {
+		return "", false, false
+	}
+	v, _ := doc.Get("status")
+	cb, has := doc.Get("claimed_by")
+	return v.Str, has && cb.Kind == frontmatter.String && cb.Str != "", true
+}
+
+// unlabelledChange reports a commit that makes no claim to be an AKM step but
+// changes the status or the claim of an open work item in place (rule CM4).
+// Such a change belongs in a step commit with the message the tool returned.
+func unlabelledChange(repo *record.Repo, sha, subject string) (Obj, bool) {
+	raw, err := runGit(repo.Root, "diff-tree", "-r", "--no-commit-id", "--name-status", "--relative", "-z", sha)
+	if err != nil {
+		return nil, false
+	}
+	var problems []Obj
+	var ids []string
+	for _, c := range parseNameStatus(raw) {
+		if c.status != "M" || !repo.InWork(c.path) || repo.IsDone(c.path) || !strings.HasSuffix(c.path, ".md") {
+			continue
+		}
+		after, aClaim, aok := recordState(repo, sha, c.path)
+		before, bClaim, bok := recordState(repo, sha+"^", c.path)
+		if !aok || !bok || (after == before && aClaim == bClaim) {
+			continue
+		}
+		base := c.path[strings.LastIndex(c.path, "/")+1:]
+		id := base
+		if len(base) >= 11 {
+			id = base[:11]
+		}
+		ids = append(ids, id)
+		what := "status " + quote(before) + " to " + quote(after)
+		if after == before {
+			what = "claimed_by " + present(bClaim) + " to " + present(aClaim)
+		}
+		problems = append(problems, O("rule", "CM4", "message", fmt.Sprintf("%s changes %s but the commit is not an AKM step; commit it with the message the command returned", id, what)))
+	}
+	if len(problems) == 0 {
+		return nil, false
+	}
+	return O("sha", sha, "subject", subject, "step", "", "item", ids[0], "ok", false, "problems", problems), true
 }
 
 func quote(s string) string { return "\"" + s + "\"" }

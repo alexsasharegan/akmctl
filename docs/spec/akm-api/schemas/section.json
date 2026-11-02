@@ -16,10 +16,7 @@
           "type": "string"
         },
         "mode": {
-          "enum": [
-            "replace",
-            "append"
-          ]
+          "enum": ["replace", "append"]
         },
         "if_match": {
           "$ref": "common.json#/$defs/etag"
@@ -35,11 +32,7 @@
           "minLength": 1
         }
       },
-      "required": [
-        "id",
-        "name",
-        "text"
-      ],
+      "required": ["id", "name", "text"],
       "additionalProperties": false
     },
     "response": {

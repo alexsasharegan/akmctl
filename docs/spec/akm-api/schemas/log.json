@@ -29,10 +29,7 @@
           "$ref": "common.json#/$defs/date_or_timestamp"
         }
       },
-      "required": [
-        "id",
-        "text"
-      ],
+      "required": ["id", "text"],
       "additionalProperties": false
     },
     "response": {
@@ -71,9 +68,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "text"
-              ],
+              "required": ["text"],
               "additionalProperties": false
             }
           },

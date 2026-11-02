@@ -829,6 +829,13 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 			return nil, rerr
 		}
 	}
+	// A closed item has no next step: the plan that was in ## Next would only mislead.
+	if strings.TrimSpace(text["next"]) != "" {
+		var terr error
+		if e.text, terr = record.EditSection(e.text, "Next", "", false, e.eol); terr != nil {
+			return nil, unsupportedBody(e, terr)
+		}
+	}
 	if serr := e.doc.Set("status", frontmatter.NewString(status)); serr != nil {
 		return nil, unreadable(serr)
 	}

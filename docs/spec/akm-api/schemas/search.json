@@ -35,9 +35,7 @@
           "minimum": 0
         }
       },
-      "required": [
-        "text"
-      ],
+      "required": ["text"],
       "additionalProperties": false
     },
     "response": {
