@@ -1,9 +1,11 @@
 ---
+id: "261101-tpj2"
+title: "Design: Retention and Compaction"
+summary: "Defines the architecture and mechanics for retaining, compacting, and recovering AKM knowledge records while preserving their integrity and relationships."
 type: design
 status: draft
 created_at: 2026-11-01
 updated_at: 2026-11-01
-authored_by: human
 ---
 
 # AKM: Archiving, Compaction, and Knowledge Lifecycle
