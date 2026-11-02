@@ -1,10 +1,11 @@
 ---
 id: "261101-ft79"
 title: step trailers not git trailers
-status: raw
+status: ready
 created: 2026-11-01
 updated: 2026-11-01
 parent: 261101-vs5c
+priority: 1
 ---
 
 # step trailers not git trailers
@@ -15,6 +16,10 @@ In the Codex rerun of 261101-0vh7 the agent passed each line of the tool's commi
 
 - [ ] `commits` reports a step commit whose AKM- trailers are not in the final trailer block (a new CM rule or a CM1 extension), with a test.
 - [ ] Every command that returns a commit message says to pass it whole (`git commit -F -`), in the skill reference and the printed block.
+
+## Next
+
+Add the CM rule to the commits check (extend CM1 or add a rule); then the wording in the skill reference and the printed block; test both.
 
 ## Log
 
