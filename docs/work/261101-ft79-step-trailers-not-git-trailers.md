@@ -4,6 +4,7 @@ title: step trailers not git trailers
 status: raw
 created: 2026-11-01
 updated: 2026-11-01
+parent: 261101-vs5c
 ---
 
 # step trailers not git trailers

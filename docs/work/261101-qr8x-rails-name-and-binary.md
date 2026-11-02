@@ -4,6 +4,7 @@ title: rails name and binary
 status: raw
 created: 2026-11-01
 updated: 2026-11-01
+parent: 261101-vs5c
 ---
 
 # rails name and binary
