@@ -23,9 +23,10 @@ The trial of 2026-11-01 had one model, one loose prompt and no baseline. Done wh
 
 ## Next
 
-Wait for 261101-p2m8, 261101-jgdy, 261101-avg8 and 261101-7ghb. Then write the fixed prompt and the scoring table from docs/design/first-codex-trial.md, and run it on Codex and Claude Code.
+Claude Code run: start a fresh session in a clean worktree of the commit in the Log, send the two stage prompts from docs/design/rails-trial-protocol.md, score the log. Codex run: the maintainer runs the same prompts; then read its rollout log and score it. Record each deviated row per model here and file gap items.
 
 ## Log
 
 - 2026-11-01: filed.
 - 2026-11-01 18:02-07:00: claimed (claude-0vh7).
+- 2026-11-01 18:02-07:00: protocol and scoring table written in docs/design/rails-trial-protocol.md (15 rows, two-stage prompt); base commit for the runs is f6089e8
