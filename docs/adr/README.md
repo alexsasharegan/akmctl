@@ -41,6 +41,7 @@
 
 ## Proposed
 
-| id                                                        | title                                                        | date       | scope | summary                                                      | supersedes / superseded_by |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ | -------------------------- |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0) |                            |
+| id                                                        | title                                                        | date       | scope                                   | summary                                                                                                                         | supersedes / superseded_by |
+| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |                                         | Work items gain closed, cycle and keep fields (layout 0.3.0)                                                                    |                            |
+| [261101-09yd](261101-09yd-claim-without-next-contract.md) | claim refuses a ready item that has no Next                  | 2026-11-01 | docs/spec/akm-api-spec.md, internal/api | Proposed: claim is refused when the item's Next is empty, so claim cannot create a WK6 error; read before changing claim or WK6 |                            |
