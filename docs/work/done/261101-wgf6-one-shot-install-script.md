@@ -1,13 +1,12 @@
 ---
 id: "261101-wgf6"
 title: one shot install script
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-01
+closed: 2026-11-01
 kind: feature
 summary: A one-line curl install script that downloads, verifies and installs the latest release archive
-claimed_by: claude
-claimed_at: 2026-11-02T00:52
 ---
 
 # one shot install script
@@ -24,7 +23,10 @@ Done when:
 
 ## Next
 
-Push, run the real curl one-liner against main, then close.
+
+## Outcome
+
+Shipped `scripts/install.sh` and a README install section that leads with `curl -fsSL .../main/scripts/install.sh | sh`. Checked: the one-liner run from `main` installed v0.3.3 (`akmctl version` printed 0.3.3), v0.3.2 installed with `AKMCTL_VERSION`, and a missing version fails with a message. The `release` workflow needed no change.
 
 ## Log
 
