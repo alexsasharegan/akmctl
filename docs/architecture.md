@@ -26,6 +26,8 @@ The words used here are defined in [glossary.md](glossary.md).
 
 ## Invariants
 
+These invariants serve a broader design goal: **knowledge-system integrity**. `akmctl` must preserve user-authored records beyond the spans it intentionally edits, keep its specification, validation and mutation behavior in agreement, and keep externally observable behavior aligned with the contracts and documentation that describe it. A change that breaks any of these relationships can leave the records, the tool, or its consumers with conflicting understandings of the same information.
+
 - Standard library only in the tool; `go.yaml.in/yaml/v3` is a test oracle and never linked into the binary.
 - Large specifications (YAML, Markdown) are read by our own narrow implementation of the subset the records use, checked against an oracle library that is test-only, and the tool fails closed outside that subset: it refuses and names the construct, and writes nothing (ADR 261031-nvka).
 - `init` never overwrites a file; versions in what it writes come from the tool's constants (`check.LayoutVersion`), not from templates. `internal/initrepo/templates/skills` is a copy of `.agents/skills`, kept equal by a test.
