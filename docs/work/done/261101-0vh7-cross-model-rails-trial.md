@@ -22,7 +22,6 @@ The trial of 2026-11-01 had one model, one loose prompt and no baseline. Done wh
 
 ## Next
 
-
 ## Outcome
 
 Both models held most rows. Codex found work with ls and board unaided and claimed under a unique name; Claude claimed as plain claude. Gaps: step trailers outside git's trailer block (261101-ft79), a unique --as and which binary to use (261101-qr8x). Caveats: the Claude run used a two-stage prompt, not the maintainer's, and was not repeated; the PR row was not reached on either. Scores are in the Log and docs/design/rails-trial-protocol.md.
