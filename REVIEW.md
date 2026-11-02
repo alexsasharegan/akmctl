@@ -13,7 +13,7 @@ Each Blocking rule is marked _(behavior)_ or _(process)_. A _(behavior)_ finding
 
 ## Invariants
 
-1. **Bytes outside an edit never change.** _Blocking (behavior)._ A write is a splice into the span it edits. Unknown frontmatter keys, comments, quoting and line endings survive. Flag a write that re-serialises a record.
+1. **Bytes outside an edit never change.** _Blocking (behavior)._ A write is a splice into the span it edits. Unknown frontmatter keys, comments, quoting and line endings survive. Flag a write that re-serialises a record, or a new editable construct without a round-trip test.
 2. **One scanner, one fence rule.** _Blocking (behavior)._ In work-item and ADR bodies, heading, section and fence detection live in `internal/body` (`FenceTracker`, `Locate`). Flag a new loop outside it that finds them by testing line prefixes (` ``` `, `~~~`, `## `); name a body, such as a four-backtick fence, where it disagrees with `FenceTracker`.
 3. **Fail closed.** _Blocking (process)._ When the tool cannot read a construct it refuses, names it and writes nothing. A change that makes the scanner or the YAML-lite parser accept a new construct needs `FuzzAgainstOracle` (`internal/body`, `internal/frontmatter`) and the oracle battery tests (`internal/body/battery_test.go`, `internal/frontmatter/oracle_test.go`) to pass, and the work item's Outcome to name the verification run. A unit test alone is not enough.
 4. **Writes: lock, reload, check any supplied `if_match`, then write atomically.** _Blocking (behavior)._ A write path takes `fsx.LockRepo`, reloads, checks the etag when one was supplied, and writes through `fsx.WriteAtomic`. Flag a write to a file inside the repository root by `os.WriteFile`, `os.Rename` or `os.Create` outside `internal/fsx`, except in `internal/migrate`, `internal/api/ops_migrate.go` and `internal/initrepo`. A file outside the root, such as the `--out` handoff file, is not covered.
@@ -43,4 +43,4 @@ Commit trailers, claims and the one-item-per-branch rule (`akmctl check` and `ak
 
 ## Output
 
-Start with `N actionable findings` (or `No actionable findings.`). Group under **Blocking** then **Note**. Each finding: `file:line`, the failure scenario or the missing artifact, why the diff causes it, and a fix. Do not invent findings.
+Start with `N actionable findings` (or `No actionable findings.`). Group under **Blocking** then **Note**. Each finding identifies the relevant `file:line` or missing artifact, explains the failure scenario or rule violation, why the diff causes it, and a fix.
