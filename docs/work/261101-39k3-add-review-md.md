@@ -1,9 +1,11 @@
 ---
 id: "261101-39k3"
 title: Add a repository REVIEW.md review policy
-status: ready
+status: active
 created: 2026-11-01
 updated: 2026-11-01
+claimed_by: claude-39k3
+claimed_at: 2026-11-02T06:03
 ---
 
 # Add a repository REVIEW.md review policy
@@ -25,3 +27,4 @@ Write REVIEW.md on this branch, check it, commit it.
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 23:03-07:00: claimed (claude-39k3).
