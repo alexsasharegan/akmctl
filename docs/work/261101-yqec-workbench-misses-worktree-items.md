@@ -4,7 +4,6 @@ title: workbench misses worktree items
 status: raw
 created: 2026-11-01
 updated: 2026-11-01
-parent: 261101-vs5c
 ---
 
 # workbench misses worktree items
@@ -19,3 +18,4 @@ The maintainer could not open 261101-qr8x in the workbench UI while it existed o
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 20:26-07:00: detached from 261101-vs5c; workbench scope, not a rails gap

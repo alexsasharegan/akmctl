@@ -5,7 +5,7 @@ status: ready
 created: 2026-11-01
 updated: 2026-11-01
 kind: feature
-summary: "Umbrella from the first Codex trial: make the repository's rails steer any model to the expected output"
+summary: "Project from the first Codex trial: make the repository's rails steer any model to the expected output"
 ---
 
 # agent rails hardening
@@ -27,8 +27,9 @@ Done when:
 
 ## Next
 
-Take 261101-p2m8 (claim refuses an item with no Next), then 261101-jgdy, 261101-avg8 and 261101-7ghb; 261101-0vh7 reruns the trial last. Read docs/design/first-codex-trial.md first.
+Round 1 is done. Round 2 from the rerun: take 261101-qr8x and 261101-ft79 (the two gaps that decide whether Codex and Claude behave the same), then 261101-w82x and 261101-y3ch. Then repeat the 0vh7 protocol on the PR row, which neither model reached. 261101-wghm (upgrade path) needs an answer before the next release. 261101-4gk3, kngg and yqec are not rails gaps: consider moving them to their own parent.
 
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 20:05-07:00: triage: promoted ft79, qr8x, w82x, y3ch to ready with a Next; round 2 order set; 4gk3, kngg, yqec flagged as off-theme for this project; wghm and the rerun of the PR row stay open

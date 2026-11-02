@@ -19,3 +19,4 @@ Maintainer question: how do changes in the agent rails reach existing users? The
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 20:26-07:00: Found: 'akmctl skills update' exists and refreshes skills and retires renamed ones, so the skills channel has a path. Still unanswered: AGENTS.md (never touched by init), new refusals (claim with empty Next, close empties Next, CM4) and where CHANGELOG notes reach users. Needs: the Goal narrowed to an answer written in docs/guide, plus one filed gap per channel.
