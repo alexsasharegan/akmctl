@@ -1,9 +1,11 @@
 ---
 id: "261101-nsmy"
 title: Revise REVIEW.md after the critical review
-status: ready
+status: active
 created: 2026-11-01
 updated: 2026-11-01
+claimed_by: claude-nsmy
+claimed_at: 2026-11-02T06:19
 ---
 
 # Revise REVIEW.md after the critical review
@@ -23,3 +25,4 @@ Commit the revised REVIEW.md on a branch of its own, then claim and close this i
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 23:19-07:00: claimed (claude-nsmy).
