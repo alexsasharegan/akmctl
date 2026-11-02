@@ -7,7 +7,7 @@ updated: 2026-11-01
 kind: spike
 parent: 261101-vs5c
 summary: Rerun the trial's task on a clean checkout with a reworded prompt on two or more models, scored against one table
-blocked_by: [261101-jgdy, 261101-avg8, 261101-7ghb]
+blocked_by: [261101-avg8, 261101-7ghb]
 ---
 
 # cross model rails trial
