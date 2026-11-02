@@ -2,6 +2,10 @@
 
 ## Now
 
+Agent rails hardening, from the first Codex trial (children in order: p2m8, jgdy, avg8, 7ghb, then the rerun 0vh7):
+
+- [261101-vs5c] Agent rails hardening
+
 ## Next
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
