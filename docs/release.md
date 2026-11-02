@@ -31,11 +31,14 @@ git push origin v<version>
 
 Pushing a `v*` tag is the trigger. The `release` workflow (`.github/workflows/release.yml`) runs `scripts/release.sh`, which runs `go vet` and `go test`, builds the archives for darwin and linux (amd64, arm64) and windows (amd64), and links the version in with `-X .../internal/cli.Version`. It then creates the GitHub release with the archives, `SHA256SUMS` and generated notes. A run takes about two minutes.
 
+`scripts/install.sh` is what the README tells users to pipe to `sh`. It is read from `main` and finds the newest release itself, so a release needs no change to it; a change to the archive names in `release.sh` does.
+
 ## Verify and close
 
 1. `gh release view v<version>` lists the five archives and `SHA256SUMS`.
-2. `go install github.com/alexsasharegan/akmctl/cmd/akmctl@v<version> && akmctl version` prints `<version>`.
-3. Close the release item with an Outcome that names both checks, take it off the roadmap, and commit.
+2. `curl -fsSL https://raw.githubusercontent.com/alexsasharegan/akmctl/main/scripts/install.sh | AKMCTL_VERSION=<version> AKMCTL_INSTALL_DIR=$(mktemp -d) sh` installs the archive for this machine.
+3. `go install github.com/alexsasharegan/akmctl/cmd/akmctl@v<version> && akmctl version` prints `<version>`.
+4. Close the release item with an Outcome that names the checks, take it off the roadmap, and commit.
 
 ## If it goes wrong
 

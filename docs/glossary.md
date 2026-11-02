@@ -4,15 +4,16 @@ The words this project uses, and the ones it avoids. Every new feature, command 
 
 ## Project and names
 
-| Term                     | Aliases                                         | Meaning                                                                                                                                     |
-| ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AKM**                  | agent knowledge management; avoid: the template | Agent knowledge management: the standard for keeping a repository's decisions, direction and work as Markdown records.                      |
-| **`akmctl`**             | the tool, the CLI                               | The command-line tool, and the name of this repository and its binary. It implements AKM.                                                   |
-| **The kit**              | none                                            | AKM, `akmctl`, the skills and the workbench together. Say "the standard" for AKM alone and "the tool" for `akmctl` alone.                   |
-| **Specification** (spec) | spec                                            | `docs/spec/agent-ready-repo-spec.md`. The **guide** is the plain introduction; the **API spec** describes the operations.                   |
-| **Repository**           | avoid: repo, project                            | The folder (usually a git repository) that holds a project and its records. Say "repository", not "repo" or "project", in user-facing text. |
-| **Docs dir**             | docs folder; avoid: notes dir                   | The folder inside the repository that holds the records, the roadmap and the manifest. `docs` by default (`init --docs-dir`).               |
-| **Unstable**             | pre-1.0; avoid: beta                            | Any release below 1.0.0. The layout or the tool may change.                                                                                 |
+| Term                     | Aliases                                         | Meaning                                                                                                                                                            |
+| ------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **AKM**                  | agent knowledge management; avoid: the template | Agent knowledge management: the standard for keeping a repository's decisions, direction and work as Markdown records.                                             |
+| **`akmctl`**             | the tool, the CLI                               | The command-line tool, and the name of this repository and its binary. It implements AKM.                                                                          |
+| **The kit**              | none                                            | AKM, `akmctl`, the skills and the workbench together. Say "the standard" for AKM alone and "the tool" for `akmctl` alone.                                          |
+| **Specification** (spec) | spec                                            | `docs/spec/agent-ready-repo-spec.md`. The **guide** is the plain introduction; the **API spec** describes the operations.                                          |
+| **Repository**           | avoid: repo, project                            | The folder (usually a git repository) that holds a project and its records. Say "repository", not "repo" or "project", in user-facing text.                        |
+| **Docs dir**             | docs folder; avoid: notes dir                   | The folder inside the repository that holds the records, the roadmap and the manifest. `docs` by default (`init --docs-dir`).                                      |
+| **Install script**       | one-command install; avoid: installer           | `scripts/install.sh`: the script the README pipes from `curl` to `sh`. It installs the latest release archive after checking `SHA256SUMS` (work item 261101-wgf6). |
+| **Unstable**             | pre-1.0; avoid: beta                            | Any release below 1.0.0. The layout or the tool may change.                                                                                                        |
 
 ## Files
 

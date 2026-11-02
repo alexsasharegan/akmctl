@@ -32,7 +32,15 @@ Why bother:
 
 ## Install
 
-Pick one method.
+### One command (macOS and Linux)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/alexsasharegan/akmctl/main/scripts/install.sh | sh
+```
+
+This downloads the latest release for your system (Apple silicon or Intel Mac, 64-bit Linux on either CPU), checks it against the release's `SHA256SUMS` and installs `akmctl` into `~/.local/bin`. It tells you if that folder is not on your `PATH`. Fetching with `curl` keeps macOS from quarantining the binary, as it does for a browser download. Set `AKMCTL_VERSION=0.3.3` to pick a version and `AKMCTL_INSTALL_DIR=/usr/local/bin` to pick the folder. Read the [script](scripts/install.sh) first if you prefer; it is short.
+
+Or pick another method.
 
 ### Go install
 

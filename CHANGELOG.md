@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New `scripts/install.sh`, a one-command install for macOS and Linux: `curl -fsSL https://raw.githubusercontent.com/alexsasharegan/akmctl/main/scripts/install.sh | sh` downloads the latest release archive for the machine, verifies it against `SHA256SUMS` and installs `akmctl` into `~/.local/bin` (`AKMCTL_VERSION`, `AKMCTL_INSTALL_DIR`). The README install section leads with it. No change to the tool or the API (work item 261101-wgf6).
+
 - `close` empties a non-empty `## Next` (the heading stays), because a closed item has no next step; a plan left there only misleads. `commits` has a new rule, CM4: a commit with no AKM step that changes the `status` or `claimed_by` of an open work item in place is reported instead of skipped; use the message the command printed. A run without `--range` may now report old hand-made status edits. API 1.x: a client that read `## Next` of an item it just closed gets it empty. Fixtures `close-2`..`6` and `close-8` in both copies (work item 261101-avg8, ADR 261101-8cd9).
 
 - `akmctl log` warns on stderr when the shell passed several words instead of one quoted message, showing the line it joined (`joined 3 words into one Log line: "..."`), and still writes it. An unquoted `;`, `&`, `|` or `>` cuts a message short and runs the rest as another command; the warning makes that visible. CLI binding only: stdout, the exit code and the API are unchanged. The `log` reference in the skills now shows a quoted message (work item 261101-jgdy, ADR 261101-5k3t).
