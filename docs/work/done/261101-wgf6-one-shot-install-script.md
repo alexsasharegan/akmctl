@@ -23,7 +23,6 @@ Done when:
 
 ## Next
 
-
 ## Outcome
 
 Shipped `scripts/install.sh` and a README install section that leads with `curl -fsSL .../main/scripts/install.sh | sh`. Checked: the one-liner run from `main` installed v0.3.3 (`akmctl version` printed 0.3.3), v0.3.2 installed with `AKMCTL_VERSION`, and a missing version fails with a message. The `release` workflow needed no change.
