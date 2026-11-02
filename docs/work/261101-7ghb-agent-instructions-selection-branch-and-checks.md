@@ -21,6 +21,7 @@ Four gaps in `AGENTS.md` from the first Codex trial. Each is one concrete senten
 - [ ] The attribution convention for an agent's commit (a trailer after the `AKM-` ones) is decided and written, with the PR-description line if one is wanted.
 - [ ] `akmctl check` and the skill mirrors still pass; `AGENTS.md` stays short enough to read in one pass.
 - [x] `AGENTS.md` says a visible change gets a `CHANGELOG.md` entry under Unreleased in the same commit.
+- [ ] `AGENTS.md` says to fill a new item's `## Goal` (reproduction, actual and expected, done-when) before committing it, since no rule can: `raw` may be empty (ADR 261101-8cd9).
 
 ## Next
 

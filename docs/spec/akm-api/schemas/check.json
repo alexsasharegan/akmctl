@@ -69,9 +69,7 @@
                   }
                 }
               },
-              "required": [
-                "state"
-              ],
+              "required": ["state"],
               "additionalProperties": false
             }
           },

@@ -50,11 +50,7 @@
                     }
                   }
                 },
-                "required": [
-                  "status",
-                  "count",
-                  "records"
-                ],
+                "required": ["status", "count", "records"],
                 "additionalProperties": false
               }
             },

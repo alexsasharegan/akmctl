@@ -6,12 +6,7 @@
       "type": "object",
       "properties": {
         "mode": {
-          "enum": [
-            "report",
-            "plan",
-            "apply_safe",
-            "handoff"
-          ]
+          "enum": ["report", "plan", "apply_safe", "handoff"]
         },
         "target": {
           "$ref": "common.json#/$defs/version"

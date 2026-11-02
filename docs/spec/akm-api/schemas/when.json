@@ -12,9 +12,7 @@
           "$ref": "common.json#/$defs/date"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "response": {

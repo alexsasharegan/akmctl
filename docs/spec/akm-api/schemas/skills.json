@@ -6,11 +6,7 @@
       "type": "object",
       "properties": {
         "mode": {
-          "enum": [
-            "status",
-            "install",
-            "update"
-          ]
+          "enum": ["status", "install", "update"]
         },
         "dry_run": {
           "type": "boolean"
@@ -43,11 +39,7 @@
               "const": true
             },
             "mode": {
-              "enum": [
-                "status",
-                "install",
-                "update"
-              ]
+              "enum": ["status", "install", "update"]
             },
             "clean": {
               "type": "boolean"
@@ -88,18 +80,10 @@
                           "minLength": 1
                         },
                         "state": {
-                          "enum": [
-                            "missing",
-                            "current",
-                            "outdated",
-                            "edited"
-                          ]
+                          "enum": ["missing", "current", "outdated", "edited"]
                         }
                       },
-                      "required": [
-                        "path",
-                        "state"
-                      ],
+                      "required": ["path", "state"],
                       "additionalProperties": false
                     }
                   },
@@ -119,11 +103,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "name",
-                  "path",
-                  "state"
-                ],
+                "required": ["name", "path", "state"],
                 "additionalProperties": false
               }
             },
@@ -136,12 +116,7 @@
                     "type": "string"
                   },
                   "action": {
-                    "enum": [
-                      "write",
-                      "replace",
-                      "marker",
-                      "remove"
-                    ]
+                    "enum": ["write", "replace", "marker", "remove"]
                   },
                   "path": {
                     "$ref": "common.json#/$defs/path"
@@ -153,12 +128,7 @@
                     "$ref": "common.json#/$defs/diff"
                   }
                 },
-                "required": [
-                  "skill",
-                  "action",
-                  "path",
-                  "needs_confirm_edited"
-                ],
+                "required": ["skill", "action", "path", "needs_confirm_edited"],
                 "additionalProperties": false
               }
             },
@@ -198,10 +168,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "skill",
-                  "reason"
-                ],
+                "required": ["skill", "reason"],
                 "additionalProperties": false
               }
             },

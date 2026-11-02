@@ -36,11 +36,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "id",
-        "item",
-        "reason"
-      ],
+      "required": ["id", "item", "reason"],
       "additionalProperties": false
     },
     "response": {
@@ -98,20 +94,12 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "position",
-                      "done",
-                      "text"
-                    ],
+                    "required": ["position", "done", "text"],
                     "additionalProperties": false
                   }
                 }
               },
-              "required": [
-                "position",
-                "text",
-                "items"
-              ],
+              "required": ["position", "text", "items"],
               "additionalProperties": false
             }
           },

@@ -131,6 +131,25 @@ func TestCommitsSkipsOrdinaryCommits(t *testing.T) {
 	}
 }
 
+// A commit with no AKM step that changes an open item's status or claim is CM4;
+// one that edits only its prose is an ordinary commit.
+func TestCommitsFlagsAnUnlabelledStatusChange(t *testing.T) {
+	root := commitsRepo(t, "claims")
+	mustOK(t, root, "section", Request{"id": "261022-e5f6", "name": "Next", "text": "Write the table."})
+	gitIn(t, root, "add", "-A")
+	gitIn(t, root, "commit", "-q", "-m", "261022-e5f6: wrote the plan")
+	if clean, probs, checked, skipped := commitsReport(t, root); !clean || len(probs) != 0 || checked != 0 || skipped != 2 {
+		t.Fatalf("a prose edit was flagged: clean=%v %v checked=%d skipped=%d", clean, probs, checked, skipped)
+	}
+	mustOK(t, root, "claim", Request{"id": "261022-e5f6", "as": "agent-1", "as_of": "2026-10-28T09:30"})
+	gitIn(t, root, "add", "-A")
+	gitIn(t, root, "commit", "-q", "-m", "261022-e5f6: started")
+	clean, probs, checked, _ := commitsReport(t, root)
+	if clean || checked != 1 || len(probs) != 1 || probs[0] != "CM4" {
+		t.Fatalf("an unlabelled claim: clean=%v %v checked=%d", clean, probs, checked)
+	}
+}
+
 func TestCommitsRefusesWhatIsNotGitOrNotARange(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "commits", Request{}, "refused", "not_git")

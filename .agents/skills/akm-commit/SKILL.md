@@ -33,7 +33,7 @@ One commit per logical step:
 
 `akmctl check` is what catches a loop in `parent` or `blocked_by` that was written by hand; run it before each commit (step 1 above), as a git pre-commit hook or in CI.
 
-Before a push, `akmctl commits --range origin/main..HEAD` checks that each step commit's subject, trailers and diff agree (rules CM1 to CM3). Fix a failing commit with a new commit; do not rewrite history.
+Before a push, `akmctl commits --range origin/main..HEAD` checks that each step commit's subject, trailers and diff agree (rules CM1 to CM3), and flags a commit with no step that changes an item's status or claim (CM4). Fix a failing commit with a new commit; do not rewrite history.
 
 ## Never
 

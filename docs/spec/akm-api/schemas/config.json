@@ -6,9 +6,7 @@
       "type": "object",
       "properties": {
         "key": {
-          "enum": [
-            "git_commits"
-          ]
+          "enum": ["git_commits"]
         },
         "value": {
           "type": "boolean"
@@ -49,9 +47,7 @@
                 "type": "object",
                 "properties": {
                   "key": {
-                    "enum": [
-                      "git_commits"
-                    ]
+                    "enum": ["git_commits"]
                   },
                   "value": {
                     "type": "boolean"
@@ -67,19 +63,12 @@
                     }
                   }
                 },
-                "required": [
-                  "key",
-                  "value",
-                  "description",
-                  "paths"
-                ],
+                "required": ["key", "value", "description", "paths"],
                 "additionalProperties": false
               }
             },
             "key": {
-              "enum": [
-                "git_commits"
-              ]
+              "enum": ["git_commits"]
             },
             "value": {
               "type": "boolean"
@@ -115,11 +104,7 @@
                   }
                 }
               },
-              "required": [
-                "write",
-                "remove",
-                "modify"
-              ],
+              "required": ["write", "remove", "modify"],
               "additionalProperties": false
             },
             "edits": {
@@ -129,13 +114,7 @@
               }
             }
           },
-          "required": [
-            "api_version",
-            "operation",
-            "request",
-            "ok",
-            "settings"
-          ],
+          "required": ["api_version", "operation", "request", "ok", "settings"],
           "additionalProperties": false
         },
         {

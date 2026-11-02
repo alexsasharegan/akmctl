@@ -25,10 +25,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "id",
-        "as"
-      ],
+      "required": ["id", "as"],
       "additionalProperties": false
     },
     "response": {
@@ -52,10 +49,7 @@
               "$ref": "common.json#/$defs/record"
             },
             "previous_holder": {
-              "type": [
-                "string",
-                "null"
-              ]
+              "type": ["string", "null"]
             },
             "diff": {
               "$ref": "common.json#/$defs/diff"

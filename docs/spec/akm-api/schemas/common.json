@@ -35,14 +35,7 @@
       "minLength": 1
     },
     "work_status": {
-      "enum": [
-        "raw",
-        "ready",
-        "active",
-        "blocked",
-        "done",
-        "dropped"
-      ]
+      "enum": ["raw", "ready", "active", "blocked", "done", "dropped"]
     },
     "any_status": {
       "enum": [
@@ -60,23 +53,13 @@
       ]
     },
     "record_type": {
-      "enum": [
-        "work",
-        "adr"
-      ]
+      "enum": ["work", "adr"]
     },
     "severity": {
-      "enum": [
-        "E",
-        "W"
-      ]
+      "enum": ["E", "W"]
     },
     "finding_class": {
-      "enum": [
-        "auto",
-        "manual",
-        "info"
-      ]
+      "enum": ["auto", "manual", "info"]
     },
     "reconcile_state": {
       "enum": [
@@ -90,14 +73,7 @@
     },
     "record": {
       "type": "object",
-      "required": [
-        "id",
-        "type",
-        "path",
-        "id_date",
-        "etag",
-        "fields"
-      ],
+      "required": ["id", "type", "path", "id_date", "etag", "fields"],
       "properties": {
         "id": {
           "$ref": "common.json#/$defs/id"
@@ -118,10 +94,7 @@
           "type": "object"
         },
         "next_line": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "matches": {
           "type": "array",
@@ -132,10 +105,7 @@
                 "type": "string"
               },
               "line": {
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": ["integer", "null"],
                 "minimum": 1
               },
               "snippet": {
@@ -143,11 +113,7 @@
                 "maxLength": 160
               }
             },
-            "required": [
-              "field",
-              "line",
-              "snippet"
-            ],
+            "required": ["field", "line", "snippet"],
             "additionalProperties": false
           }
         }
@@ -164,23 +130,14 @@
           "$ref": "common.json#/$defs/severity"
         },
         "file": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "line": {
-          "type": [
-            "integer",
-            "null"
-          ],
+          "type": ["integer", "null"],
           "minimum": 1
         },
         "id": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "message": {
           "type": "string"
@@ -229,10 +186,7 @@
           "type": "object"
         }
       },
-      "required": [
-        "code",
-        "message"
-      ],
+      "required": ["code", "message"],
       "additionalProperties": false
     },
     "migrate_step": {
@@ -254,11 +208,7 @@
           }
         },
         "status": {
-          "enum": [
-            "pending",
-            "applied",
-            "skipped"
-          ]
+          "enum": ["pending", "applied", "skipped"]
         },
         "notes": {
           "type": "array",
@@ -278,31 +228,17 @@
                 "$ref": "#/$defs/path"
               }
             },
-            "required": [
-              "from",
-              "to"
-            ],
+            "required": ["from", "to"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "id",
-        "kind",
-        "class",
-        "files",
-        "status"
-      ],
+      "required": ["id", "kind", "class", "files", "status"],
       "additionalProperties": false
     },
     "envelope_ok": {
       "type": "object",
-      "required": [
-        "api_version",
-        "operation",
-        "request",
-        "ok"
-      ],
+      "required": ["api_version", "operation", "request", "ok"],
       "properties": {
         "api_version": {
           "const": "1.0"
@@ -320,13 +256,7 @@
     },
     "envelope_error": {
       "type": "object",
-      "required": [
-        "api_version",
-        "operation",
-        "request",
-        "ok",
-        "error"
-      ],
+      "required": ["api_version", "operation", "request", "ok", "error"],
       "properties": {
         "api_version": {
           "const": "1.0"
@@ -371,53 +301,31 @@
                   "type": "object",
                   "properties": {
                     "op": {
-                      "enum": [
-                        "ctx",
-                        "add",
-                        "rem"
-                      ]
+                      "enum": ["ctx", "add", "rem"]
                     },
                     "text": {
                       "type": "string"
                     },
                     "old": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
+                      "type": ["integer", "null"],
                       "minimum": 1
                     },
                     "new": {
-                      "type": [
-                        "integer",
-                        "null"
-                      ],
+                      "type": ["integer", "null"],
                       "minimum": 1
                     }
                   },
-                  "required": [
-                    "op",
-                    "text",
-                    "old",
-                    "new"
-                  ],
+                  "required": ["op", "text", "old", "new"],
                   "additionalProperties": false
                 }
               }
             },
-            "required": [
-              "header",
-              "lines"
-            ],
+            "required": ["header", "lines"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "path",
-        "new_path",
-        "hunks"
-      ],
+      "required": ["path", "new_path", "hunks"],
       "additionalProperties": false
     },
     "section_text": {
@@ -431,10 +339,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "text"
-      ],
+      "required": ["name", "text"],
       "additionalProperties": false
     },
     "migration_step": {
@@ -461,11 +366,7 @@
           ]
         },
         "class": {
-          "enum": [
-            "auto",
-            "manual",
-            "info"
-          ]
+          "enum": ["auto", "manual", "info"]
         },
         "description": {
           "type": "string"
@@ -477,11 +378,7 @@
           }
         },
         "scope": {
-          "enum": [
-            "work",
-            "adr",
-            "all"
-          ]
+          "enum": ["work", "adr", "all"]
         },
         "field": {
           "type": "string"
@@ -536,10 +433,7 @@
           "type": "string"
         },
         "slug_from": {
-          "enum": [
-            "name",
-            "title"
-          ]
+          "enum": ["name", "title"]
         },
         "max_slug": {
           "type": "integer",
@@ -547,11 +441,7 @@
           "maximum": 100
         }
       },
-      "required": [
-        "id",
-        "kind",
-        "class"
-      ],
+      "required": ["id", "kind", "class"],
       "additionalProperties": false
     },
     "migration": {
@@ -571,11 +461,7 @@
           }
         }
       },
-      "required": [
-        "from",
-        "to",
-        "steps"
-      ],
+      "required": ["from", "to", "steps"],
       "additionalProperties": false
     },
     "commit": {
@@ -613,13 +499,7 @@
           "pattern": "^\\d{6}-[0-9a-hjkmnp-tv-z]{4}\\([a-z]+\\): .+\\n\\nAKM-Step: [a-z]+\\nAKM-Item: \\d{6}-[0-9a-hjkmnp-tv-z]{4}$"
         }
       },
-      "required": [
-        "step",
-        "item",
-        "detail",
-        "paths",
-        "message"
-      ],
+      "required": ["step", "item", "detail", "paths", "message"],
       "additionalProperties": false
     },
     "section_etag_text": {
@@ -636,11 +516,7 @@
           "$ref": "#/$defs/etag"
         }
       },
-      "required": [
-        "name",
-        "text",
-        "etag"
-      ],
+      "required": ["name", "text", "etag"],
       "additionalProperties": false
     }
   }

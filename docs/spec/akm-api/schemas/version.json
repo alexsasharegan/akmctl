@@ -35,10 +35,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "name",
-                "version"
-              ],
+              "required": ["name", "version"],
               "additionalProperties": false
             },
             "api_versions": {
@@ -81,10 +78,7 @@
                       }
                     },
                     "reference_style": {
-                      "enum": [
-                        "id",
-                        "wikilink"
-                      ]
+                      "enum": ["id", "wikilink"]
                     },
                     "claim_stale_hours": {
                       "type": "integer",

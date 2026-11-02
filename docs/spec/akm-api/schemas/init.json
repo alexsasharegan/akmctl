@@ -72,12 +72,7 @@
               "type": "boolean"
             },
             "git": {
-              "enum": [
-                "none",
-                "initialised",
-                "existing",
-                "failed"
-              ]
+              "enum": ["none", "initialised", "existing", "failed"]
             },
             "git_error": {
               "type": "string",
