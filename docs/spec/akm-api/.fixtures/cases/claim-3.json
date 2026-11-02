@@ -1,0 +1,27 @@
+{
+  "name": "an item with an empty Next is refused",
+  "repo": "claimsnonext",
+  "request": {
+    "id": "261022-e5f6",
+    "as": "agent-1",
+    "as_of": "2026-10-28T09:30"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "claim",
+    "request": {
+      "id": "261022-e5f6",
+      "as": "agent-1",
+      "as_of": "2026-10-28T09:30"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "261022-e5f6 has an empty ## Next; write it with section, then claim",
+      "details": {
+        "reason": "rule",
+        "rule": "WK6"
+      }
+    }
+  }
+}

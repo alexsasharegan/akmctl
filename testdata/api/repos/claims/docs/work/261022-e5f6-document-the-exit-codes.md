@@ -13,3 +13,6 @@ updated: 2026-10-22
 Do the thing.
 
 - [ ] It is done.
+
+## Next
+Write the exit-code table.

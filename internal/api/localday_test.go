@@ -35,6 +35,7 @@ func TestNewAndClaimUseTheLocalDay(t *testing.T) {
 		t.Fatalf("as_of ignored: %v", id)
 	}
 	// claim: the log line uses the local day, claimed_at the UTC timestamp
+	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1"})
 	text = read(t, root, "docs/work/261022-e5f6-document-the-exit-codes.md")
 	for _, want := range []string{"claimed_at: 2026-10-30T01:30\n", "- 2026-10-29 18:30-07:00: claimed (agent-1)."} {
