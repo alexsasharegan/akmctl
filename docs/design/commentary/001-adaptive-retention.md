@@ -31,7 +31,7 @@ Build upon the foundations of attention management, exposure efficiency, and mem
 
 # Retention and Compaction — Commentary 001
 
-The output of architectural brainstorming Session 001 against `261101-tpj2` ().
+The output of architectural brainstorming Session 001 against [Design: Retention and Compaction](../retention-and-compaction.md).
 
 ## Adaptive Retention and Attention Management
 
