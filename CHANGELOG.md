@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `akmctl log` warns on stderr when the shell passed several words instead of one quoted message, showing the line it joined (`joined 3 words into one Log line: "..."`), and still writes it. An unquoted `;`, `&`, `|` or `>` cuts a message short and runs the rest as another command; the warning makes that visible. CLI binding only: stdout, the exit code and the API are unchanged. The `log` reference in the skills now shows a quoted message (work item 261101-jgdy, ADR 261101-5k3t).
+
 - `claim` is refused (`reason: "rule"`, `rule: "WK6"`) when the item's `## Next` is empty, instead of making it `active` and leaving `check` to fail. Write the section first (`akmctl section <id> Next --text "..."`), then claim. API 1.x: a client that claimed a `ready` item with no `Next` now gets this error. Fixture `claim-3` with a new repository `claimsnonext`, and `claim-1` now claims an item that has a `Next`, in both copies (work item 261101-p2m8, ADR 261101-09yd).
 
 - `akmctl <command> --help` (or `-h`) and `akmctl help <command>` print the command's flags and one example and exit 0, instead of failing with `unknown parameter "help"` (work item 261101-m3pv). A test fails for any command without an example.

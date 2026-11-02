@@ -227,6 +227,11 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 		if len(pos) > 1 {
 			req["text"] = strings.Join(pos[1:], " ")
 		}
+		if len(pos) > 2 {
+			// the shell split the message: an unquoted ; & | or > ends it early, and
+			// the rest ran as another command. The line is still written, as before.
+			fmt.Fprintf(stderr, "akmctl log: joined %d words into one Log line: %q; quote the whole message as one argument (an unquoted ; & | > cuts it short)\n", len(pos)-1, req["text"])
+		}
 	case op == "tick" || op == "remove":
 		if len(pos) > 2 {
 			fmt.Fprintf(stderr, "akmctl %s: unexpected argument %q\n", op, pos[2])

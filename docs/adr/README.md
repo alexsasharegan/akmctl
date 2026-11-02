@@ -42,6 +42,7 @@
 
 ## Proposed
 
-| id                                                        | title                                                        | date       | scope | summary                                                      | supersedes / superseded_by |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ | -------------------------- |
-| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0) |                            |
+| id                                                        | title                                                        | date       | scope | summary                                                                                                                  | supersedes / superseded_by |
+| --------------------------------------------------------- | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
+| [261029-sg82](261029-sg82-work-item-closed-cycle-keep.md) | Work items gain closed, cycle and keep fields (layout 0.3.0) | 2026-10-29 |       | Work items gain closed, cycle and keep fields (layout 0.3.0)                                                             |                            |
+| [261101-5k3t](261101-5k3t-log-warns-on-split-words.md)    | log warns when the shell split the message, and still writes | 2026-11-01 |       | The log command warns on stderr when it joins several words, showing what it wrote; it does not refuse or change the API |                            |

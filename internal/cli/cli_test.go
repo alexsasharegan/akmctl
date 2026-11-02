@@ -32,6 +32,17 @@ func TestJSONOutputIsOneLine(t *testing.T) {
 	}
 }
 
+func TestLogWarnsWhenTheShellSplitTheMessage(t *testing.T) {
+	code, _, errs := run(t, "log", "261022-e5f6", "tests", "written", "--dry-run")
+	if code != 0 || !strings.Contains(errs, `joined 2 words into one Log line: "tests written"`) || !strings.Contains(errs, "quote the whole message") {
+		t.Fatalf("code %d, stderr %q", code, errs)
+	}
+	code, _, errs = run(t, "log", "261022-e5f6", "tests written", "--dry-run")
+	if code != 0 || errs != "" {
+		t.Fatalf("a quoted message warned: code %d, stderr %q", code, errs)
+	}
+}
+
 func TestFlagsMapToParameters(t *testing.T) {
 	code, out, _ := run(t, "ls", "--format=json", "--count-only", "--no-next", "--type", "work", "--limit=2")
 	if code != 0 {
