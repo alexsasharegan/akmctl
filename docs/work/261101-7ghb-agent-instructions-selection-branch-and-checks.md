@@ -20,7 +20,13 @@ Four gaps in `AGENTS.md` from the first Codex trial. Each is one concrete senten
 - [ ] The full-check line includes `-race` on Linux and macOS, and says what to do when the sandbox blocks the Go cache or Git (ask for the escalation; do not skip the check).
 - [ ] The attribution convention for an agent's commit (a trailer after the `AKM-` ones) is decided and written, with the PR-description line if one is wanted.
 - [ ] `akmctl check` and the skill mirrors still pass; `AGENTS.md` stays short enough to read in one pass.
+- [x] `AGENTS.md` says a visible change gets a `CHANGELOG.md` entry under Unreleased in the same commit.
+
+## Next
+
+Four boxes remain (find-work requests, one item per branch, -race and sandbox note, attribution). Take them when 261101-jgdy and 261101-avg8 are done.
 
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-01 17:33-07:00: ticked "`AGENTS.md` says a visible change gets a `CHANGELOG.md` entry under Unreleased in the same commit.": AGENTS.md Rules, added with 261101-p2m8 after Codex's PR 1 changed visible output with no entry.

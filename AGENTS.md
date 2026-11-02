@@ -29,6 +29,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Work only under a work item. If none fits, create a `raw` one (`akmctl new work <slug>`) and ask which item to work.
 - A hard-to-reverse choice, or one that rejects a real alternative, needs an ADR draft with status `proposed`. Never edit the body of an `accepted` ADR; supersede it.
 - Update the item's `## Next` and `## Log` in the same commit as the code.
+- A change a user or a client can see (a command, the API, the spec, a rule, a fixture) gets an entry under `## Unreleased` in `CHANGELOG.md` in the same commit as the code, as the entries there do: what changed, who is affected, the work item and ADR ids. A fix with no visible change does not.
 - Mint ids with `akmctl new`. Without the tool: `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom | head -c 4)"`, then `ls docs/work docs/work/done docs/adr | grep "^$id-"` must print nothing.
 - Surface every `akmctl` failure: a crash, a wrong result, an error that does not say what to do next, or a refusal you did not expect. Tell the maintainer in your next message and file it at once as at least a `raw` work item (`akmctl new work <slug>`; read the `similar` list and add to an existing item if one fits). Do this before you work around it. A refusal that did what the spec says and told you why (a cycle, a closed item) is the tool working: no item.
 - Code and tests win over prose. When a document is wrong, fix it or say so.
