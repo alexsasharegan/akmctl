@@ -6,7 +6,7 @@ type: design
 status: draft
 created_at: 2026-11-02
 updated_at: 2026-11-02
-parent: "261101-tpj2"
+parent: 261101-tpj2
 ---
 
 # Adaptive Retention Workloads
@@ -15,15 +15,15 @@ parent: "261101-tpj2"
 
 The preceding architectural exploration established a conceptual foundation for adaptive retention and knowledge management in AKM.
 
-The exploration consists of three chronological documents:
+The exploration consists of three documents:
 
-1. **[Retention and Compaction](https://github.com/alexsasharegan/akmctl/blob/main/docs/design/retention-and-compaction.md)** — The original architectural exploration of work lifecycles, retention, archival, compaction, and recovery.
-2. **[Commentary 001: Adaptive Retention and Attention Management](https://github.com/alexsasharegan/akmctl/blob/main/docs/design/commentary/001-adaptive-retention.md)** — Expands the objective to attention management, exposure efficiency, and knowledge placement.
-3. **[Commentary 002: Adaptive Retention and the Relevance Graph](https://github.com/alexsasharegan/akmctl/blob/main/docs/design/commentary/002-adaptive-retention.md)** — Explores knowledge relationships, progressive formalization, contextual relevance, and refinement.
+1. Retention and Compaction — The original architectural exploration of work lifecycles, retention, archival, compaction, and recovery.
+2. Commentary 001 — Expands the objective to attention management, exposure efficiency, and knowledge placement.
+3. Commentary 002 — Explores knowledge relationships, progressive formalization, contextual relevance, and refinement.
 
 These documents established useful working concepts but deliberately explored a broad solution space.
 
-This document introduces a change in methodology.
+This research phase changes the methodology.
 
 Rather than continuing to elaborate the conceptual architecture, we will evaluate it against realistic usage patterns.
 
@@ -37,11 +37,9 @@ The objective is to discover the smallest coherent architectural model that adeq
 
 Architectural complexity must earn its existence through demonstrated practical value.
 
-Previously explored concepts, mechanisms, and abstractions are hypotheses, not commitments. A concept should survive because it helps solve an observed problem, not because considerable effort went into developing it.
+Previously explored concepts, mechanisms, and abstractions are hypotheses, not commitments. A concept should survive because it solves an observed problem, not because considerable effort went into developing it.
 
 We should be willing to discard nearly everything if a simpler solution achieves the desired outcomes.
-
-This applies equally to domain modeling, retention policies, relationship semantics, indexing, automation, and implementation.
 
 ### 2.2 Workloads, Not Record Types
 
@@ -63,120 +61,95 @@ The case studies are primarily architectural and behavioral explorations.
 
 Implementation ideas may arise naturally, but should remain hypotheses until supported by demonstrated requirements.
 
-For example, Ripgrep may provide sufficiently efficient filesystem-wide discovery of YAML front matter without introducing a dedicated indexing subsystem.
+For example, Ripgrep may provide sufficiently efficient filesystem-wide discovery of YAML front matter without introducing a dedicated indexing subsystem. This is worth investigating, but does not establish an architectural requirement.
 
-This is worth investigating, but does not establish an architectural requirement or implementation commitment.
+## 3. Research Organization
 
-## 3. Case Study Organization
+### 3.1 Document Location
 
-Each workload has its own definition document and dedicated investigation session.
+All workload research documents belong in:
 
-Workload definitions are independent experimental inputs. They must not be bundled together as shared context for individual investigations.
+`docs/research/261101-tpj2-workloads/`
 
-### 3.1 Workload Definitions
+The experiment charter and workload documents are maintained together.
 
-| Workload | Definition              | Findings                         |
-| -------- | ----------------------- | -------------------------------- |
-| Waypoint | `workloads/waypoint.md` | `workloads/waypoint-findings.md` |
-| Atlas    | `workloads/atlas.md`    | `workloads/atlas-findings.md`    |
-| Homebase | `workloads/homebase.md` | `workloads/homebase-findings.md` |
+Each workload has an input document describing its experimental environment. Its investigation produces a separate findings document.
 
-Each definition describes its own fictional environment, history, constraints, scenarios, and research objectives.
+The filename of an input document does not determine its role. In particular, `001-waypoint-findings.md` is the Waypoint workload definition, not an existing investigation report.
 
-### 3.2 Investigation Isolation
+Investigation findings must be created as new sibling documents, using the next available numeric prefix and a descriptive workload-specific filename.
 
-An individual case-study session should have access to:
+Do not assume paths from previous directory conventions or invent filenames for documents that have not been identified.
 
-- The original design document.
-- Commentary 001.
-- Commentary 002.
-- This research charter.
+### 3.2 Foundational Documents
+
+Every investigation uses the same architectural foundation:
+
+- `docs/design/retention-and-compaction.md`
+- `docs/design/commentary/001-adaptive-retention.md`
+- `docs/design/commentary/002-adaptive-retention.md`
+
+It also reads:
+
+- This experiment charter.
 - Its assigned workload definition.
 
-It should not read the other workload definitions or findings documents.
+The exact workload input must be supplied by the session's launch prompt.
 
-This is deliberate. The purpose is to evaluate each workload independently, without importing discoveries, assumptions, or proposed solutions from another investigation.
+### 3.3 Investigation Isolation
 
-Each session should be able to develop its own conclusions from the same foundational architectural context.
+Each workload receives a dedicated investigation session.
 
-### 3.3 Investigation Launch Prompts
+An individual session must not read:
 
-The following prompts establish the launch context for each independent session.
+- Other workload definitions.
+- Findings from other workload investigations.
+- Cross-workload synthesis documents.
 
-#### Waypoint
+This is deliberate. Each investigation must develop its conclusions independently, without importing discoveries, assumptions, or proposed solutions from another investigation.
 
-> Conduct the Waypoint case study for AKM's adaptive retention architecture.
->
-> Read the foundational design documents and research charter referenced in `docs/design/workloads.md`, together with `docs/design/workloads/waypoint.md`.
->
-> Treat Waypoint as the sole experimental workload. Do not read the Atlas or Homebase workload definitions or any other case-study findings.
->
-> Explore the workload through realistic events and information flows. Evaluate what the system needs to accomplish, how information should evolve over time, and what should happen when the project is resurrected after prolonged dormancy.
->
-> Treat previously established architectural concepts as hypotheses to evaluate, not requirements to preserve.
->
-> Favor practical behavioral reasoning over premature schema, lifecycle, or algorithm design.
->
-> The governing principle is: **the simplest solution wins.**
->
-> Produce `docs/design/workloads/waypoint-findings.md` as an independently understandable record of the investigation, its discoveries, validated requirements, challenged assumptions, unnecessary machinery, and recommendations.
+The shared architectural foundation is intentional; the isolation of experimental inputs is equally intentional.
 
-#### Atlas
+## 4. Investigation Protocol
 
-> Conduct the Atlas case study for AKM's adaptive retention architecture.
->
-> Read the foundational design documents and research charter referenced in `docs/design/workloads.md`, together with `docs/design/workloads/atlas.md`.
->
-> Treat Atlas as the sole experimental workload. Do not read the Waypoint or Homebase workload definitions or any other case-study findings.
->
-> Explore the workload through realistic events and information flows. Evaluate how knowledge accumulates during continuous development, how relevance changes, and how the system should handle completed work, recurring investigations, architectural evolution, and historical context.
->
-> Treat previously established architectural concepts as hypotheses to evaluate, not requirements to preserve.
->
-> Favor practical behavioral reasoning over premature schema, lifecycle, or algorithm design.
->
-> The governing principle is: **the simplest solution wins.**
->
-> Produce `docs/design/workloads/atlas-findings.md` as an independently understandable record of the investigation, its discoveries, validated requirements, challenged assumptions, unnecessary machinery, and recommendations.
+### 4.1 Discussion Before Documentation
 
-#### Homebase
+An investigation is a collaborative exploration, not a report-generation exercise.
 
-> Conduct the Homebase case study for AKM's adaptive retention architecture.
->
-> Read the foundational design documents and research charter referenced in `docs/design/workloads.md`, together with `docs/design/workloads/homebase.md`.
->
-> Treat Homebase as the sole experimental workload. Do not read the Waypoint or Atlas workload definitions or any other case-study findings.
->
-> Explore the workload through realistic events and information flows. Evaluate persistent responsibilities, finite projects, recurring activities, enduring resources, archival, and contextual rediscovery across seasonal and annual cycles.
->
-> Treat PARA as an organizational lens for exploration, not a predetermined AKM architectural requirement.
->
-> Treat previously established architectural concepts as hypotheses to evaluate, not requirements to preserve.
->
-> Favor practical behavioral reasoning over premature schema, lifecycle, or algorithm design.
->
-> The governing principle is: **the simplest solution wins.**
->
-> Produce `docs/design/workloads/homebase-findings.md` as an independently understandable record of the investigation, its discoveries, validated requirements, challenged assumptions, unnecessary machinery, and recommendations.
+The agent must not immediately produce a findings document, comprehensive analysis, or predetermined architectural recommendation at launch.
 
-## 4. Investigation Methodology
+Instead, it should:
 
-### 4.1 Scenario-Driven Exploration
+1. Establish a shared understanding of the workload.
+2. Introduce realistic scenarios and events.
+3. Examine how information emerges, changes, and accumulates.
+4. Challenge assumptions and explore alternative interpretations.
+5. Ask questions and pursue promising lines of inquiry.
+6. Identify implications for system behavior and architectural responsibilities.
+7. Revisit earlier conclusions when new scenarios challenge them.
 
-Follow each workload through realistic events rather than beginning with an inventory of record types or predetermined lifecycle rules.
+The human and agent should develop the investigation together through discussion.
+
+The agent should lead the exploration where useful, but must leave room for the human to introduce scenarios, challenge reasoning, and redirect attention.
+
+Do not turn the investigation into a sequence of questionnaires. Ask focused questions when an answer would materially influence the direction of exploration.
+
+### 4.2 Scenario-Driven Exploration
+
+Follow the workload through realistic events rather than beginning with an inventory of record types or predetermined lifecycle rules.
 
 For each significant event, consider:
 
-1. **Event:** What happened in the environment?
-2. **Information:** What records or knowledge naturally emerge or change?
-3. **System behavior:** What should AKM do, if anything?
-4. **Temporal evolution:** What happens as information ages, becomes inactive, or is superseded?
-5. **Rediscovery:** What should happen when information becomes relevant again?
-6. **Evaluation:** What is the simplest mechanism that achieves the desired outcome?
+1. Event: What happened in the environment?
+2. Information: What records or knowledge naturally emerge or change?
+3. System behavior: What should AKM do, if anything?
+4. Temporal evolution: What happens as information ages, becomes inactive, or is superseded?
+5. Rediscovery: What should happen when information becomes relevant again?
+6. Evaluation: What is the simplest mechanism that achieves the desired outcome?
 
 Do not force every event to exercise every architectural concept.
 
-### 4.2 Evaluating Architectural Concepts
+### 4.3 Evaluating Architectural Concepts
 
 Classify findings into three categories:
 
@@ -188,7 +161,7 @@ Distinguish observed requirements from proposed implementation approaches.
 
 A workload might demonstrate that old records must be searchable without establishing that AKM needs a relevance graph, dedicated index, or automated retention engine.
 
-### 4.3 Scope Discipline
+### 4.4 Scope Discipline
 
 Avoid prematurely defining:
 
@@ -201,9 +174,25 @@ Avoid prematurely defining:
 
 These may become justified, but should not be assumed.
 
-### 4.4 Findings Documents
+### 4.5 Reaching a Conclusion
 
-Each investigation should produce a findings document containing:
+An investigation should continue as long as meaningful questions remain unexplored.
+
+Do not declare completion merely because the initial scenarios have been discussed or a plausible architecture has emerged.
+
+A meaningful stopping point occurs when:
+
+- The important workload scenarios have been examined.
+- Significant assumptions have been challenged.
+- The major behavioral requirements are understood.
+- Architectural implications have been explored.
+- Remaining uncertainties can be recorded explicitly rather than requiring further immediate discussion.
+
+At that point, the agent should consolidate the investigation into a standalone findings document.
+
+## 5. Findings Documents
+
+Each investigation produces an independently understandable document containing:
 
 1. **Scenario summary:** The workload and events explored.
 2. **Observed requirements:** What the system actually needs to accomplish.
@@ -216,15 +205,48 @@ Each investigation should produce a findings document containing:
 9. **Open questions:** Issues requiring further exploration.
 10. **Recommendations:** The smallest set of capabilities that adequately supports the workload.
 
-Findings should distinguish demonstrated conclusions from hypotheses and unresolved questions.
+Findings should distinguish:
+
+- Demonstrated conclusions.
+- Reasonable inferences.
+- Unvalidated hypotheses.
+- Unresolved questions.
+
+Preserve important reasoning, not merely conclusions. A future reader should understand why a requirement was established and which scenarios support it.
 
 Do not attempt to produce a comprehensive architecture specification within an individual case study.
 
-## 5. Cross-Workload Synthesis
+## 6. Investigation Launch Prompt
 
-Synthesis occurs only after the three independent investigations have produced their findings documents.
+Use the following template to start an independent workload investigation. Supply the exact workload name and document path.
 
-It should take place in a separate conversation, with all three findings documents deliberately introduced as inputs.
+> Investigate the **[WORKLOAD]** workload.
+>
+> Read these documents:
+>
+> - `docs/design/retention-and-compaction.md`
+> - `docs/design/commentary/001-adaptive-retention.md`
+> - `docs/design/commentary/002-adaptive-retention.md`
+> - `docs/research/261101-tpj2-workloads/000-experiment.md`
+> - `[EXACT WORKLOAD DOCUMENT PATH]`
+>
+> Do not read the other workload definitions or their investigation results.
+>
+> Use this as the starting point for a collaborative investigation. Explore the workload through discussion, examining scenarios, challenging assumptions, and identifying implications.
+>
+> Do not jump directly to a report or findings document. Ask questions and pursue promising lines of inquiry. Let the investigation develop through conversation.
+>
+> Treat previously established architectural concepts as hypotheses to evaluate, not requirements to preserve.
+>
+> Favor practical behavioral reasoning over premature schema, lifecycle, or algorithm design.
+>
+> When the investigation reaches a meaningful conclusion, record the findings as a standalone document in the workload research directory, following the experiment charter. Use the next available numeric filename prefix.
+
+## 7. Cross-Workload Synthesis
+
+Synthesis occurs only after all three independent investigations have produced their findings documents.
+
+It takes place in a separate conversation, with all three findings documents deliberately introduced as inputs.
 
 The synthesis should:
 
@@ -242,7 +264,7 @@ The synthesis may require substantial orchestration and should not be assumed to
 
 Its output should inform subsequent architectural commentary or revisions to the original design document.
 
-## 6. Expected Outcome
+## 8. Expected Outcome
 
 This research phase should produce:
 
