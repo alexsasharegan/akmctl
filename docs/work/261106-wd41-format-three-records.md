@@ -16,9 +16,10 @@ claimed_at: 2026-11-06T18:22
 
 ## Next
 
-Run prettier --write on the three files, check that only whitespace changed, run the full check.
+Open the pull request; the maintainer merges.
 
 ## Log
 
 - 2026-11-06: filed.
 - 2026-11-06 11:22-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-06 11:22-07:00: Ran prettier --write on the three files; only blank lines changed.

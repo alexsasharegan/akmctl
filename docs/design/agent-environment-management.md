@@ -21,6 +21,7 @@ Distinguish upstream repository instructions from locally managed additions. Int
 Treat instructions as layered configuration rather than a monolithic `AGENTS.md`.
 
 Potential layers include:
+
 - Universal agent instructions.
 - Repository-owned instructions.
 - Locally managed repository adaptations.
@@ -73,6 +74,7 @@ A useful guide follows the capability adoption journey:
 Not every guide requires every section. Its structure should follow the adoption journey rather than impose a documentation checklist.
 
 Capability guides complement, rather than replace:
+
 - Skills, which provide operational procedures.
 - Instructions, which establish behavioral expectations.
 - Reference documentation, which defines authoritative interfaces and schemas.
