@@ -1,12 +1,11 @@
 ---
 id: "261106-jkj9"
 title: Commits and pull requests say assisted by
-status: active
+status: done
 parent: 261101-vs5c
 created: 2026-11-06
 updated: 2026-11-06
-claimed_by: claude-assisted
-claimed_at: 2026-11-06T17:54
+closed: 2026-11-06
 ---
 
 # Commits and pull requests say assisted by
@@ -17,7 +16,10 @@ Agent attribution in this repository says "assisted by", not "co-authored" or "g
 
 ## Next
 
-Open the pull request; the maintainer merges.
+
+## Outcome
+
+AGENTS.md, the trial protocol and a new ADR (261106-zvpm, superseding 261101-z0mt) now use Assisted-by for commits and Assisted by for pull requests. The user-level setting and the dotfiles instructions say the same. Not changed: older commits keep Co-Authored-By.
 
 ## Log
 
