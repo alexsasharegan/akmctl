@@ -16,7 +16,6 @@ Agent attribution in this repository says "assisted by", not "co-authored" or "g
 
 ## Next
 
-
 ## Outcome
 
 AGENTS.md, the trial protocol and a new ADR (261106-zvpm, superseding 261101-z0mt) now use Assisted-by for commits and Assisted by for pull requests. The user-level setting and the dotfiles instructions say the same. Not changed: older commits keep Co-Authored-By.
