@@ -490,8 +490,19 @@ func (t *Tree) ReplaceSection(name, text, etag string) ([]byte, error) {
 	default:
 		a := ls[first].start
 		b := ls[last].end
-		if repl == "" { // clearing removes the lines whole, so no empty line is left behind
-			b += len(ls[last].eol)
+		if repl == "" {
+			// Clearing removes the lines whole. When the heading is followed by a
+			// blank line (Prettier's style) the blank lines after the text go too,
+			// so one blank line stays between the heading and the next section; a
+			// section that ends the file keeps only its heading.
+			if first > 0 {
+				b = s.End
+				if s.End >= len(t.src) {
+					a = s.Body
+				}
+			} else {
+				b += len(ls[last].eol)
+			}
 		}
 		out = append(out, t.src[:a]...)
 		out = append(out, repl...)

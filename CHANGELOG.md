@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `close` (and `section` with empty text) no longer leaves two blank lines after an emptied `## Next` when the heading is followed by a blank line, so a closed record passes `npm run format:check` without a formatting-only commit; a section that ends the file keeps just its heading. Records written without blank lines after headings are unchanged. API 1.x: the closed file differs by blank lines only (work item 261101-w82x).
+
 - Agents attribute their work with `Assisted-by: <agent and model>` on commits and an `Assisted by <agent>` line on pull requests, in place of `Co-Authored-By`; the rule is in this repository's `AGENTS.md`. Affects agents working here and the trial protocol row R13; no command, API or rule of the tool changes (work item 261106-jkj9, ADR 261106-zvpm, which supersedes 261101-z0mt).
 
 - The `AGENTS.md` template that `init` writes, and the `akm-track-work` and `claim` skill references, now tell an agent to claim with a name unique to its session (`--as <agent>-<model>`, not a bare `claude`) and to treat an `unknown command` as a possible stale binary (`akmctl version`, `akmctl skills update`) before filing a tool bug. The `claim` example in `akmctl help` uses such a name. Existing repositories get the new wording with `akmctl skills update` for the skills; their `AGENTS.md` is never rewritten. No change to any command or the API (work item 261101-qr8x).
