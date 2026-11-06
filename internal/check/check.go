@@ -694,15 +694,24 @@ func (c *checker) skills() {
 			c.add("S2", "E", ".agents/skills/"+e.Name(), 0, "", "skill has no SKILL.md")
 			continue
 		}
+		b, blocks := readSkillFrontmatter(b)
 		doc, err := frontmatter.Parse(b)
 		if err != nil {
 			c.add("S2", "E", rel, 0, "", "SKILL.md frontmatter: %v", err)
 			continue
 		}
-		if v, _ := doc.Get("name"); v.Str != e.Name() {
-			c.add("S2", "E", rel, doc.Line("name"), "", "name %q must equal the directory %q", v.Str, e.Name())
+		name, _ := doc.Get("name")
+		if s, ok := blocks["name"]; ok {
+			name = frontmatter.Value{Kind: frontmatter.String, Str: s}
 		}
-		if v, _ := doc.Get("description"); v.Kind != frontmatter.String || strings.TrimSpace(v.Str) == "" {
+		if got := strings.TrimRight(name.Str, "\n"); got != e.Name() {
+			c.add("S2", "E", rel, doc.Line("name"), "", "name %q must equal the directory %q", got, e.Name())
+		}
+		desc, _ := doc.Get("description")
+		if s, ok := blocks["description"]; ok {
+			desc = frontmatter.Value{Kind: frontmatter.String, Str: s}
+		}
+		if desc.Kind != frontmatter.String || strings.TrimSpace(desc.Str) == "" {
 			c.add("S2", "E", rel, doc.Line("description"), "", "description is missing")
 		}
 	}

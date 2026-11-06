@@ -44,7 +44,6 @@ Items:
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
 - [261029-x4ws] Keep one copy of the API fixtures
 - [261029-z4gk] Rule L2: understand escaped pipes in wikilinks inside tables
-- [261029-wpak] Rule S2: accept block scalars in SKILL.md frontmatter
 - [261029-nkqv] A new ADR made by the done wizard can be orphaned
 
 ### Not promised for 1.0.0
