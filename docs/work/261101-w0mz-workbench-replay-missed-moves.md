@@ -7,8 +7,6 @@ created: 2026-11-01
 updated: 2026-11-06
 kind: feature
 priority: 1
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T19:08
 ---
 
 # workbench replay missed moves
@@ -59,3 +57,4 @@ Decide the shape with the maintainer: client-only (label by claimed_by, keep the
 - 2026-11-01: filed from Alexander's note: the away-and-agent moves matter more than the wish-list polish.
 - 2026-11-06 12:08-07:00: claimed (claude-sonnet-5-5).
 - 2026-11-06 12:11-07:00: Drove the board in the browser and wrote the gap list: id order not move order, bursts over 10 are summarized and lost, a path shows as its net move, 'Outside' never names an agent; claimed_by is available to label agents.
+- 2026-11-06 12:22-07:00: released (claude-sonnet-5-5).
