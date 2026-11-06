@@ -423,9 +423,33 @@ Response: `record` (after), `section` (`{name, text, etag}` after the write), `r
 - **Errors.** `not_found` for a missing section or an item beyond the checklist. `invalid_request` for an `item` below 1 or a missing, blank or multi-line `reason`. `stale` as for `tick`. `refused` with `details.reason` `"closed"` for a closed record, `"unsupported_markdown"` as for `section`, `"ticked_box"` and `"confirm_required"`.
 - Side effect: rewrites one file, unless `dry_run`. CLI: `akmctl remove <id> <n> --reason <text> [--confirm] [--section <name>]`. No HTTP route in 1.x.
 
+### 4.24 `history`
+
+Lists the AKM step commits of a range as moves, oldest first: what happened to which item, when, and who committed it (ADR 261106-60xv). It reads the commits that `commits` checks, and writes nothing; it runs `git log`, `git diff-tree` and `git show`. The workbench uses it to replay what happened while the page was away.
+
+| Parameter | Type    | Meaning                                                                                                                                                                              |
+| --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `range`   | string  | A git revision range such as `<sha>..HEAD`; as for `commits`. Default: `HEAD`, the whole history. Pass `<head>..HEAD` with the `head` of an earlier answer to read only what is new. |
+| `limit`   | integer | At most this many moves, the newest ones, 1 to 500. Default 100.                                                                                                                     |
+| `item`    | id      | Only the moves of this item.                                                                                                                                                         |
+
+Response: `available`, `reason`, `head`, `moves` and `truncated`.
+
+- `available` is false when the history cannot be read as moves: `reason` is `not_git` (the repository is not a git work tree) or `git_commits_off` (the manifest has `git_commits` off, so agents are not told to commit one step at a time). Then `head` is `""`, `moves` is empty and `truncated` is false. This is an answer, not an error. `reason` is present only when `available` is false.
+- `head` is the full SHA of `HEAD`, or `""` in a repository with no commits.
+- `moves` is an array, oldest first, of `{sha, time, author, item, step, from, to, trailers}`:
+  - `sha` is the commit, `time` its author date as ISO 8601 with offset, `author` the author's name.
+  - `item` and `step` come from the subject `<id>(<step>): <detail>`; only a commit whose step is one of the nine steps is a move. An unlabelled commit is not (`commits` reports it as CM4).
+  - `from` and `to` are the item's `status` before and after the commit, read from its file at the parent and at the commit; `from` is `""` for a `file` step and `to` is `""` if the file cannot be read. A `claim` or `release` can leave them equal. Only the item named in the subject is reported, even if the commit touched other files.
+  - `trailers` is an array of the other trailers of the message as `"Key: value"` strings, in order, without `AKM-Step` and `AKM-Item` (for example `Assisted-by: Claude Code`). A client that wants "who" shows the `Assisted-by` value, else `author`.
+- `truncated` is true when older moves in the range were left out by `limit`.
+- Merge commits are not examined. The order is git's commit order, which is not the order the files were edited; several status changes inside one commit are one move.
+- Errors: `invalid_request` for a `range` git cannot read, or an `item` that is not an id. No other error.
+- Side effect: none. CLI: `akmctl history [--range <range>] [--limit <n>] [--item <id>]`. HTTP: `GET /history` with the same query parameters.
+
 ## 5. CLI binding
 
-- The command is `akmctl <operation> [positional] [flags]`. Operation names are the subcommands of the specification (`board`, `check`, `claim`, `close`, `commits`, `config`, `find`, `index`, `init`, `ls`, `migrate`, `new`, `release`, `remove`, `search`, `section`, `set`, `show`, `skills`, `tick`, `log`, `version`, `when`). `ui` is not an API operation.
+- The command is `akmctl <operation> [positional] [flags]`. Operation names are the subcommands of the specification (`board`, `check`, `claim`, `close`, `commits`, `config`, `find`, `history`, `index`, `init`, `ls`, `migrate`, `new`, `release`, `remove`, `search`, `section`, `set`, `show`, `skills`, `tick`, `log`, `version`, `when`). `ui` is not an API operation.
 - Parameter `foo_bar` is the flag `--foo-bar`. A boolean flag with no value means true; `--no-foo-bar` means false. A list is a comma-separated value (`--status ready,active`) or a repeated flag. The required parameter that is a single id or text is positional (`akmctl show <id>`, `akmctl search <text>`, `akmctl find <id>`, `akmctl when <id>`). `new` takes `kind` and `slug` positionally (`akmctl new work add-json-output`). `set` takes `<id> field=value ...` and `close` takes `<id> done|dropped`; `claim` takes `<id> --as <name>`, and `section` takes `<id> <name>` with the text in `--text`; `tick` takes `<id> <n>` (`--undo` clears the box) and `log` takes `<id> <text...>`.
 - `--format json` prints the response object as one JSON document, then a newline, on stdout. The default format is a human text table (a `dry_run` response prints its `diff` in unified form) and is not part of the contract; it does not change with whether stdout is a terminal, so a command prints the same thing in a pipe and by hand. `AGENTS.md` names `--format json` explicitly. `--format ids` prints one `id` per line (for `ls`, `search`, `board`).
 - With `--format json`, a failure also prints the response object (`ok: false`) on stdout, and nothing on stdout otherwise. Diagnostics and progress go to stderr and are never part of the contract.
@@ -458,6 +482,7 @@ Response: `record` (after), `section` (`{name, text, etag}` after the write), `r
 | `GET /records/{id}`                           | `show`             | query: `section`                                                                                                                |
 | `GET /board`                                  | `board`            | query: `statuses`                                                                                                               |
 | `GET /commits`                                | `commits`          | query: `range`, `limit`                                                                                                         |
+| `GET /history`                                | `history`          | query: `range`, `limit`, `item`                                                                                                 |
 | `GET /check`                                  | `check`            | query: `target`, `rules`, `as_of`                                                                                               |
 | `GET /`                                       | the workbench page | no token                                                                                                                        |
 | `GET /find/{id}`                              | `find`             |                                                                                                                                 |
@@ -518,7 +543,7 @@ An implementation conforms to API 1.0 if, for every case in the fixtures it clai
 
 ## 10. Not in 1.0
 
-- **Fixtures for `commits`.** The operation reads git history, which a fixture directory cannot hold (a nested `.git` is not committed). An implementation tests it against repositories it builds with `git`: the tool's own messages are clean, and each rule is broken once.
+- **Fixtures for `commits` and `history`.** The operations read git history, which a fixture directory cannot hold (a nested `.git` is not committed). An implementation tests it against repositories it builds with `git`: the tool's own messages are clean, and each rule is broken once; for `history`, the moves come back in order with the right `from` and `to`.
 - **Exact fixtures for `new`.** Ids are random; `new` is tested for shape only.
 - **More write fixtures.** The set has `set`, `section`, `close`, `claim` and `release` cases; a case for each refusal reason and for the wikilink reference style can be added without changing the contract.
 - **`search` ranking.** Ordered by match count, then id; a real index may want field weights.
