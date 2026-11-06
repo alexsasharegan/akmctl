@@ -329,6 +329,13 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .card.dragging{opacity:.5;border-style:dashed}
 .col.drop-target{outline:var(--focus-w) dashed var(--focus);outline-offset:-3px}
 /* live board: the offline mark, and a card played by the animation queue (js/anim.js) */
+.away{position:fixed;z-index:14;left:var(--s-3);bottom:56px;display:flex;flex-direction:column;max-width:min(560px,calc(100vw - 2*var(--s-3)));max-height:40vh;background:var(--surface);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-md);box-shadow:var(--sh-2);padding:var(--s-3)}
+.away[hidden]{display:none}
+.away-head{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);margin-bottom:var(--s-2)}
+.away-title{margin:0;font:600 var(--fs-sm) var(--font)}
+.away-close{font:var(--fs-xs) var(--font);padding:2px var(--s-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);background:transparent;color:inherit;cursor:pointer}
+.away-list{margin:0;padding-left:1.6em;font-size:var(--fs-sm);overflow:auto}
+.away-list time{font-family:var(--mono);color:var(--text-2)}
 .live-status{font:var(--fs-xs) var(--mono);color:var(--warn-fg);background:var(--warn-bg);border:1px solid var(--warn-fg);border-radius:var(--r-sm);padding:0 .5em;line-height:1.6}
 .card.anim-lift{z-index:3;box-shadow:var(--sh-lg);outline:2px solid var(--accent);outline-offset:1px}
 .card.anim-flying{z-index:3;box-shadow:var(--sh-lg)}

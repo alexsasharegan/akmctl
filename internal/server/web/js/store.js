@@ -188,5 +188,8 @@ export const searchBody = (text, limit = 10) => api("GET", "search", { query: { 
 
 export const check = () => api("GET", "check");
 
+/** The step commits of a range as moves (the `history` operation); { available, head, moves, truncated }. */
+export const fetchHistory = ({ range, limit } = {}) => api("GET", "history", { query: { range, limit }, timeout: 8000 });
+
 /** The cheap listing the live board polls: id, path and etag of every work item, with its status. */
 export const pollWork = () => api("GET", "records", { query: { type: "work", fields: ["status", "updated"], sort: ["id"] }, timeout: 5000 });

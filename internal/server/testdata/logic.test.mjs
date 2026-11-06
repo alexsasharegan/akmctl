@@ -8,6 +8,7 @@ import { diffRows } from "./review.js";
 import * as C from "./capture.js";
 
 import * as V from "./live.js";
+import * as R from "./replay.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -498,3 +499,67 @@ assert.equal(L.wikilinkParts(5), null);
 assert.equal(L.wikilinkParts(null), null);
 assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A|b]]")), "b");
 assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");
+
+// ---- replay of the moves made while away (261101-w0mz) ----
+{
+  const mv = (item, step, from, to, extra) => ({ sha: "s" + item + step, time: "2026-11-06T12:22:15-07:00", author: "Alex Regan", item, step, from, to, trailers: ["Assisted-by: Claude Code"], ...extra });
+  // who: the Assisted-by value, else the author
+  assert.equal(R.whoOf(mv("a", "claim", "ready", "active")), "Claude Code");
+  assert.equal(R.whoOf(mv("a", "claim", "ready", "active", { trailers: [] })), "Alex Regan");
+  assert.equal(R.whoOf(mv("a", "claim", "ready", "active", { trailers: ["Reviewed-by: x"] })), "Alex Regan");
+  // a lane change, a close, a new file and a claim become different events
+  assert.deepEqual(R.moveToEvent(mv("a", "start", "ready", "active")).type, "moved");
+  const closed = R.moveToEvent(mv("a", "close", "active", "done"));
+  assert.equal(closed.type, "moved");
+  assert.equal(closed.closed, true);
+  assert.equal(R.moveToEvent(mv("a", "file", "", "raw")).type, "added");
+  assert.equal(R.moveToEvent(mv("a", "claim", "ready", "ready")).type, "step");
+  assert.equal(R.moveToEvent(mv("a", "claim", "ready", "ready")).source, "outside");
+
+  // the words name who made the move
+  assert.equal(V.describeEvent(R.moveToEvent(mv("a", "start", "ready", "active")), "Title"), "Claude Code moved a Title: ready to active.");
+  assert.equal(V.describeEvent(R.moveToEvent(mv("a", "claim", "ready", "ready")), ""), "Claude Code claimed a.");
+  assert.equal(V.describeEvent(R.moveToEvent(mv("a", "release", "active", "active")), ""), "Claude Code released a.");
+  assert.equal(V.describeEvent({ type: "moved", id: "a", from: "ready", to: "active", source: "outside" }, "Title"), "Outside: a Title moved, ready to active.");
+
+  // ordering: the moves replace the poll's net event, in commit order (not id order), path included
+  const net = [
+    { type: "moved", id: "a", from: "ready", to: "done", closed: true, source: "outside" },
+    { type: "moved", id: "b", from: "ready", to: "active", closed: false, source: "outside" },
+  ];
+  const moves = [mv("b", "start", "ready", "active"), mv("a", "start", "ready", "active"), mv("a", "close", "active", "done")];
+  const merged = R.mergeWithHistory(net, moves);
+  assert.deepEqual(merged.map((e) => e.id + ":" + e.from + ">" + e.to), ["b:ready>active", "a:ready>active", "a:active>done"]);
+  assert.ok(merged.every((e) => e.who === "Claude Code"));
+
+  // what the history does not explain stays as the poll saw it, after the replayed moves
+  const stay = R.mergeWithHistory(
+    [
+      { type: "moved", id: "a", from: "ready", to: "active", source: "outside" },
+      { type: "moved", id: "c", from: "ready", to: "blocked", source: "outside" }, // never committed
+      { type: "edited", id: "d", source: "outside" },
+      { type: "moved", id: "e", from: "ready", to: "active", source: "you" }, // this page's own move
+    ],
+    [mv("a", "start", "ready", "active"), mv("e", "start", "ready", "active")],
+  );
+  assert.deepEqual(stay.map((e) => e.id + ":" + e.type + ":" + (e.who ? "history" : e.source)), ["a:moved:history", "c:moved:outside", "d:edited:outside", "e:moved:you"]);
+
+  // a history that ends somewhere else than the poll does not replace it
+  const off = R.mergeWithHistory([{ type: "moved", id: "a", from: "ready", to: "done", closed: true, source: "outside" }], [mv("a", "start", "ready", "active")]);
+  assert.deepEqual(off.map((e) => e.source), ["outside"]);
+  assert.equal(off[0].who, undefined);
+  assert.deepEqual(R.mergeWithHistory(net, []), net);
+  assert.deepEqual(R.mergeWithHistory(net, null), net);
+
+  // the batching rule: the animator plays at most AWAY_MAX, so the panel lists what it will not
+  assert.equal(R.AWAY_MAX, 10);
+  assert.equal(R.AWAY_MAX, 10);
+  assert.equal(R.awayHeading(1, false), "1 move while you were away");
+  assert.equal(R.awayHeading(12, true), "12 moves while you were away (older ones are not listed)");
+  const lines = R.awayLines([R.moveToEvent(mv("a", "start", "ready", "active"))], () => "T", new Date("2026-11-06T20:00:00Z"));
+  assert.deepEqual(lines, [{ time: "12:22", text: "Claude Code moved a T: ready to active." }]);
+  assert.equal(R.timeLabel("2026-11-05T09:03:00-07:00", new Date("2026-11-06T20:00:00Z")), "2026-11-05 09:03");
+  assert.equal(R.timeLabel("", new Date()), "");
+  // a burst summary counts claims and releases
+  assert.equal(V.summarize([{ type: "step", source: "outside" }, { type: "moved", source: "outside" }]), "2 changes outside (1 moved, 1 claimed or released).");
+}
