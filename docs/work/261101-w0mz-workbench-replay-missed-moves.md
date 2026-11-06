@@ -2,12 +2,14 @@
 id: "261101-w0mz"
 title: workbench replay missed moves
 summary: When you return to the workbench, play the moves that happened while you were away (agents, the shell) as animations so none pass unseen
-status: ready
+status: active
 created: 2026-11-01
 updated: 2026-11-06
 kind: feature
 priority: 1
 blocked_by: [261106-sdnr]
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T19:37
 ---
 
 # workbench replay missed moves
@@ -59,3 +61,4 @@ Decide the shape with the maintainer: client-only (label by claimed_by, keep the
 - 2026-11-06 12:08-07:00: claimed (claude-sonnet-5-5).
 - 2026-11-06 12:11-07:00: Drove the board in the browser and wrote the gap list: id order not move order, bursts over 10 are summarized and lost, a path shows as its net move, 'Outside' never names an agent; claimed_by is available to label agents.
 - 2026-11-06 12:22-07:00: released (claude-sonnet-5-5).
+- 2026-11-06 12:37-07:00: claimed (claude-sonnet-5-5).
