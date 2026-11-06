@@ -1,10 +1,12 @@
 ---
 id: "261106-jkj9"
 title: Commits and pull requests say assisted by
-status: ready
+status: active
 parent: 261101-vs5c
 created: 2026-11-06
 updated: 2026-11-06
+claimed_by: claude-assisted
+claimed_at: 2026-11-06T17:54
 ---
 
 # Commits and pull requests say assisted by
