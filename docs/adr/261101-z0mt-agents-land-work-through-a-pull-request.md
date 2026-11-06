@@ -2,7 +2,8 @@
 id: "261101-z0mt"
 title: Agents land work through a pull request
 summary: An agent pushes a branch and opens a pull request; it merges to main only when the maintainer asks; commits carry a Co-Authored-By trailer
-status: accepted
+status: superseded
+superseded_by: "261106-zvpm"
 date: 2026-11-01
 ---
 
