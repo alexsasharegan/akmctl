@@ -1,11 +1,10 @@
 ---
 id: "261101-abw2"
 title: akmctl agents prints the filled AGENTS.md template
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T20:25
+closed: 2026-11-06
 ---
 
 # akmctl agents prints the filled AGENTS.md template
@@ -20,7 +19,9 @@ Existing repositories cannot see what the shipped `AGENTS.md` template now says 
 
 ## Next
 
-Merge, then hsh4 (the CHANGELOG phrase) can name the command.
+## Outcome
+
+`akmctl agents` prints the AGENTS.md that `init` would write for this repository, read from its manifest, and writes nothing. It is a CLI command, not an API operation. A test compares its output with the file `init` wrote.
 
 ## Log
 
