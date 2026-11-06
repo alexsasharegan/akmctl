@@ -10,8 +10,7 @@ Agent rails hardening, from the first Codex trial (children in order: p2m8, jgdy
 
 Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
 
-- [261106-sdnr] history: a read-only op that lists AKM moves from git (ADR 261106-60xv; w0mz waits for it)
-- [261101-w0mz] Workbench replay missed moves
+- [261101-w0mz] Workbench replay missed moves (reads history, 261106-sdnr)
 - [261029-kb33] Workbench form controls: a custom select and a summary text area with a counter
 - [261029-aezq] Capture modal: header, width, a cycle field and the submit button
 - [261029-bdt9] Workbench parent picker: a searchable list with match highlighting
