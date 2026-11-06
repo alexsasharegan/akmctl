@@ -19,9 +19,8 @@ Then make work decomposition discoverable (the children in order: 3erc, ph53, 72
 
 - [261101-t8h8] Make work decomposition discoverable
 
-Then the upgrade path for existing repositories (guide section 8 says what is planned; abw2 first, hsh4 depends on it):
+Then the upgrade path for existing repositories (guide section 8 says what is planned; `akmctl agents` is done, so hsh4 can name it):
 
-- [261101-abw2] akmctl agents prints the filled AGENTS.md template
 - [261101-hsh4] CHANGELOG names a change to the AGENTS.md template
 
 ## Later
