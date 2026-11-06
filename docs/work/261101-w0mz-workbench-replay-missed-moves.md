@@ -2,11 +2,12 @@
 id: "261101-w0mz"
 title: workbench replay missed moves
 summary: When you return to the workbench, play the moves that happened while you were away (agents, the shell) as animations so none pass unseen
-status: active
+status: blocked
 created: 2026-11-01
 updated: 2026-11-06
 kind: feature
 priority: 1
+blocked_by: [261106-sdnr]
 ---
 
 # workbench replay missed moves
