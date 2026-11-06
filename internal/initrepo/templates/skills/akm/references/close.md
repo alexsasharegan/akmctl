@@ -21,7 +21,7 @@ open items that were waiting on this one (unblock or re-point each):
 
 `close` never edits them: unblock or re-point each with `set`, in the same commit.
 
-Returns a `commit` (message and paths to stage). Use `commit.message` as the commit message exactly as given, with its `AKM-Step` and `AKM-Item` trailers, and stage `commit.paths` with the code that belongs to the step. Do not write your own subject. One commit per step.
+Returns a `commit` (message and paths to stage). Use `commit.message` as the commit message exactly as given, with its `AKM-Step` and `AKM-Item` trailers, and stage `commit.paths` with the code that belongs to the step. Pass the whole message to one `git commit -F -`, not one `-m` per line, or git will not read the trailers. Do not write your own subject. One commit per step.
 
 The move breaks relative Markdown links in and to the item, so `close` rewrites them (the item's own links, and inline links in other records, the roadmap, AGENTS.md and the docs that point at it) and prints them under `rewrote Markdown links` (`links_rewritten` in JSON). Wikilinks, code and anchors are left alone. A file it cannot write is listed as `link_errors`; fix those by hand.
 

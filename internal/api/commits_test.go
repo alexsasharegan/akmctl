@@ -110,6 +110,30 @@ func TestCommitsFlagsWhatDoesNotAgree(t *testing.T) {
 	}
 }
 
+func TestCommitsTrailersMustBeInTheFinalBlock(t *testing.T) {
+	cases := []struct {
+		name string
+		edit func(string) string
+		want string // "" means the commit is clean
+	}{
+		{"one -m per line", func(m string) string { return strings.ReplaceAll(m, "\nAKM-Item", "\n\nAKM-Item") }, "CM5"},
+		{"attribution after a blank line", func(m string) string { return m + "\n\nAssisted-by: agent" }, "CM5"},
+		{"no blank line after the subject", func(m string) string { return strings.Replace(m, "\n\nAKM-Step", "\nAKM-Step", 1) }, "CM5"},
+		{"attribution directly after", func(m string) string { return m + "\nAssisted-by: agent" }, ""},
+		{"a body before the trailers", func(m string) string { return strings.Replace(m, "\n\nAKM-Step", "\n\nWhy.\n\nAKM-Step", 1) }, ""},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			root := commitsRepo(t, "closable")
+			commitWith(t, root, mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "dropped", "outcome": "No.", "as_of": "2026-10-28"}), c.edit)
+			clean, problems, checked, _ := commitsReport(t, root)
+			if checked != 1 || clean != (c.want == "") || has(problems, "CM5") != (c.want == "CM5") {
+				t.Errorf("clean=%v problems=%v checked=%d, want %q", clean, problems, checked, c.want)
+			}
+		})
+	}
+}
+
 func TestCommitsFlagsAStepThatDidNotHappen(t *testing.T) {
 	root := commitsRepo(t, "closable")
 	// a close subject on a commit that only edits the item

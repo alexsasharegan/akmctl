@@ -101,14 +101,30 @@ func runGit(root string, args ...string) (string, error) {
 func verifyCommit(repo *record.Repo, sha, msg string) (Obj, bool) {
 	lines := strings.Split(msg, "\n")
 	subject := lines[0]
+	// git reads trailers only from the last paragraph, which must follow a
+	// blank line after the subject: lines before blockStart are not trailers.
+	blockStart := len(lines)
+	for i := len(lines) - 1; i >= 1; i-- {
+		if strings.TrimSpace(lines[i]) == "" {
+			blockStart = i + 1
+			break
+		}
+	}
 	var stepTr, itemTr []string
-	for _, l := range lines[1:] {
+	stray := 0 // AKM- lines outside the final trailer block (CM5)
+	for i, l := range lines[1:] {
+		claim := true
 		if v, ok := strings.CutPrefix(l, "AKM-Step: "); ok {
 			stepTr = append(stepTr, strings.TrimSpace(v))
 		} else if v, ok := strings.CutPrefix(l, "AKM-Item: "); ok {
 			itemTr = append(itemTr, strings.TrimSpace(v))
 		} else if strings.HasPrefix(l, "AKM-") {
 			stepTr = append(stepTr, l) // an unknown AKM- trailer still counts as a claim
+		} else {
+			claim = false
+		}
+		if claim && i+1 < blockStart {
+			stray++
 		}
 	}
 	m := reCommitSubject.FindStringSubmatch(subject)
@@ -138,6 +154,9 @@ func verifyCommit(repo *record.Repo, sha, msg string) (Obj, bool) {
 		if item != "" && itemTr[0] != item {
 			add("CM2", "AKM-Item is %q but the subject says %q", itemTr[0], item)
 		}
+	}
+	if stray > 0 {
+		add("CM5", "%d AKM- trailer line(s) are not in the last paragraph of the message, which is the only place git reads trailers; pass the whole message to one `git commit -F -`, with any other trailer directly after the AKM- ones and no blank line between", stray)
 	}
 	if step != "" && item != "" {
 		for _, p := range diffProblems(repo, sha, step, item) {
