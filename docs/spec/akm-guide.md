@@ -257,6 +257,19 @@ The tool does not install either; this repository's own CI runs the check on eve
 - Each extension states which layout versions it works with. The tool reports whether a repo is current, behind, ahead, unsupported or in conflict.
 - Because files are the source of truth and the standard is a written spec, anyone can add an extension or write an alternative implementation without changing the core.
 
+### Upgrading an existing repository
+
+A repository that already ran `init` has four things that change at different times. Upgrade them in this order, then run `akmctl check`.
+
+| What                   | How it changes                                                                                                                                     | What you run                                                                                                                                                              | What it leaves alone                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| The binary             | A release. It carries new rules and refusals (for example `claim` on an empty `## Next`, `close` emptying `## Next`, `commits` rules CM4 and CM5). | Install the new release (`scripts/install.sh` again, or the release archive); `akmctl version` shows what you have.                                                       | Every file in the repository.                                                             |
+| The skills             | The binary ships newer skill text. `akmctl skills status` reports a skill as `outdated` when it is behind the binary.                              | `akmctl skills update` (shows the plan and asks; `--dry-run` only shows it).                                                                                              | A skill you edited, or one with no marker, unless you confirm; your records; `AGENTS.md`. |
+| `AGENTS.md`            | `init` writes it once and never overwrites it, because the file is the repository's own. The shipped template may have moved on.                   | Today: run `init` in an empty folder with the same settings and compare. Planned: `akmctl agents` prints the filled template for this repository (work item 261101-abw2). | Your file. Nothing is written; you splice the lines you want.                             |
+| The layout (`.layout`) | Only a MAJOR layout change needs a migration (section 8).                                                                                          | `akmctl migrate --mode report`, then `plan`, as in "An existing repo" above.                                                                                              | Anything the plan does not list.                                                          |
+
+The CHANGELOG is the notice: every entry says who is affected. A release that changes the `AGENTS.md` template or the skill text is meant to say so in a fixed phrase (work item 261101-hsh4), so a maintainer reading the CHANGELOG knows to compare `AGENTS.md`. Until that lands, read the entries for "template" and "skill".
+
 ## 9. Rules of thumb
 
 - Keep `AGENTS.md` short. Put anything long in a doc and link it.
