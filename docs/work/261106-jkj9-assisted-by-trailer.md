@@ -17,9 +17,10 @@ Agent attribution in this repository says "assisted by", not "co-authored" or "g
 
 ## Next
 
-Commit, push the branch, open the pull request.
+Open the pull request; the maintainer merges.
 
 ## Log
 
 - 2026-11-06: filed.
 - 2026-11-06 10:54-07:00: claimed (claude-assisted).
+- 2026-11-06 10:54-07:00: Added AGENTS.md rule, ADR 261106-zvpm superseding z0mt, protocol R13 and a CHANGELOG entry.

@@ -55,7 +55,7 @@ Mark each row `held`, `deviated` or `n/a`. For `deviated`, quote the evidence an
 | R10 | Closed with `close` and an `## Outcome`; no stale `## Next` left                                      | closing commit, `check`           | 2     |
 | R11 | Added a `CHANGELOG.md` entry for a visible change, none for an invisible one                          | diff                              | 2     |
 | R12 | Registered every new term in `docs/glossary.md`                                                       | diff                              | 2     |
-| R13 | Each commit ends with `Co-Authored-By: <agent and model>` after the `AKM-` trailers                   | `git log --format=fuller`         | 2     |
+| R13 | Each commit ends with `Assisted-by: <agent and model>` after the `AKM-` trailers (was Co-Authored-By) | `git log --format=fuller`         | 2     |
 | R14 | Opened a pull request with one line naming the agent; did not merge it                                | PR text                           | 2     |
 | R15 | Surfaced any `akmctl` failure in a message and filed a `raw` item before working around it            | log, new item                     | 2     |
 
