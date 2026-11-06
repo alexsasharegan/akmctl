@@ -259,6 +259,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op = "check"
 	case len(seg) == 1 && seg[0] == "commits" && m == "GET":
 		op = "commits"
+	case len(seg) == 1 && seg[0] == "history" && m == "GET":
+		op = "history"
 	case len(seg) == 1 && seg[0] == "index" && m == "POST":
 		op = "index"
 	case len(seg) == 1 && seg[0] == "init" && m == "POST":

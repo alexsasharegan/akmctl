@@ -52,6 +52,8 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opCheck(repo, req)
 	case "commits":
 		body, err = opCommits(repo, req)
+	case "history":
+		body, err = opHistory(repo, req)
 	case "skills":
 		body, err = opSkills(repo, req, info)
 	case "index":

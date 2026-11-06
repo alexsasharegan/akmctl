@@ -17,6 +17,7 @@ var examples = map[string]string{
 	"claim":   "akmctl claim 261101-m3pv --as claude-sonnet-5-5",
 	"close":   `akmctl close 261101-m3pv done --outcome "What was done and why."`,
 	"commits": "akmctl commits",
+	"history": "akmctl history --range origin/main..HEAD",
 	"config":  "akmctl config git-commits on --dry-run",
 	"find":    "akmctl find 261101-m3pv",
 	"index":   "akmctl index",

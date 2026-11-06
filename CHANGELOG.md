@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New `history` operation, `akmctl history [--range <range>] [--limit <n>] [--item <id>]` and `GET /history`: the AKM step commits of a range as moves, oldest first, each with the item, step, author, time, the item's status before and after and the other trailers (for example `Assisted-by`). Without a git work tree, or with `git_commits` off, it answers `available: false` with a reason instead of failing. Read-only; the workbench replay of missed moves builds on it. API 1.x: a new operation, schema `history.json` and a reference in the `akm` skill (so `skills update` adds `references/history.md`) (work item 261106-sdnr, ADR 261106-60xv).
+
 - The guide has an Upgrading section (`docs/spec/akm-guide.md`, section 8): for the binary, the skills, `AGENTS.md` and the layout, what changes, the command to run and what it leaves alone. Documentation only; no command, API or rule changes (work item 261101-wghm).
 
 - `close` (and `section` with empty text) no longer leaves two blank lines after an emptied `## Next` when the heading is followed by a blank line, so a closed record passes `npm run format:check` without a formatting-only commit; a section that ends the file keeps just its heading. Records written without blank lines after headings are unchanged. API 1.x: the closed file differs by blank lines only (work item 261101-w82x).

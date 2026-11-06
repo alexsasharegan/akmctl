@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/history.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "range": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_./~^@{}-]+(\\.\\.\\.?[A-Za-z0-9_./~^@{}-]+)?$"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "item": {
+          "type": "string",
+          "pattern": "^\\d{6}-[0-9a-hjkmnp-tv-z]{4}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "history"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "available": {
+              "type": "boolean"
+            },
+            "reason": {
+              "enum": ["not_git", "git_commits_off"]
+            },
+            "head": {
+              "type": "string",
+              "pattern": "^([0-9a-f]{40,64})?$"
+            },
+            "truncated": {
+              "type": "boolean"
+            },
+            "moves": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "sha": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40,64}$"
+                  },
+                  "time": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": "string"
+                  },
+                  "item": {
+                    "type": "string",
+                    "pattern": "^\\d{6}-[0-9a-hjkmnp-tv-z]{4}$"
+                  },
+                  "step": {
+                    "enum": [
+                      "file",
+                      "ready",
+                      "start",
+                      "block",
+                      "unblock",
+                      "claim",
+                      "release",
+                      "close",
+                      "drop"
+                    ]
+                  },
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  },
+                  "trailers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "sha",
+                  "time",
+                  "author",
+                  "item",
+                  "step",
+                  "from",
+                  "to",
+                  "trailers"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "available",
+            "head",
+            "moves",
+            "truncated"
+          ],
+          "if": {
+            "properties": {
+              "available": {
+                "const": false
+              }
+            },
+            "required": ["available"]
+          },
+          "then": {
+            "required": ["reason"]
+          },
+          "else": {
+            "not": {
+              "required": ["reason"]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

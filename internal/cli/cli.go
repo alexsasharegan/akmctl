@@ -495,6 +495,32 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if h, ok := resp.Get("handoff"); ok {
 			fmt.Fprintf(w, "\n%v", h)
 		}
+	case "history":
+		if av, _ := resp.Get("available"); av == false {
+			why, _ := resp.Get("reason")
+			fmt.Fprintf(w, "no history: %v\n", map[string]string{"not_git": "the repository is not a git work tree", "git_commits_off": "git_commits is off in the manifest (akmctl config git-commits on)"}[fmt.Sprint(why)])
+			break
+		}
+		ms, _ := resp.Get("moves")
+		for _, m := range ms.([]api.Obj) {
+			t, _ := m.Get("time")
+			id, _ := m.Get("item")
+			step, _ := m.Get("step")
+			from, _ := m.Get("from")
+			to, _ := m.Get("to")
+			who, _ := m.Get("author")
+			if tr, _ := m.Get("trailers"); tr != nil {
+				for _, x := range tr.([]string) {
+					if v, ok := strings.CutPrefix(x, "Assisted-by: "); ok {
+						who = who.(string) + " + " + v
+					}
+				}
+			}
+			fmt.Fprintf(w, "%v\t%v\t%v\t%v to %v\t%v\n", t, id, step, from, to, who)
+		}
+		if tr, _ := resp.Get("truncated"); tr == true {
+			fmt.Fprintln(w, "older moves were left out; raise --limit or narrow --range")
+		}
 	case "commits":
 		cs, _ := resp.Get("commits")
 		for _, c := range cs.([]api.Obj) {
