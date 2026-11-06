@@ -1,9 +1,11 @@
 ---
 id: "261101-abw2"
 title: akmctl agents prints the filled AGENTS.md template
-status: ready
+status: active
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-06
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T20:25
 ---
 
 # akmctl agents prints the filled AGENTS.md template
@@ -23,3 +25,4 @@ Factor the template fill in internal/initrepo/initrepo.go so init and agents sha
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-06 13:25-07:00: claimed (claude-sonnet-5-5).
