@@ -1,13 +1,12 @@
 ---
 id: "261101-w82x"
 title: close leaves blank line after next
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
+closed: 2026-11-06
 parent: 261101-vs5c
 priority: 2
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T18:44
 ---
 
 # close leaves blank line after next
@@ -21,7 +20,9 @@ Since close empties a non-empty ## Next (261101-avg8), the closed file keeps an 
 
 ## Next
 
-Open the pull request; the maintainer merges.
+## Outcome
+
+ReplaceSection with empty text now leaves one blank line between the heading and the next section when the heading is followed by a blank line, and only the heading at the end of a file. Tight-style records are unchanged (conformance fixtures pass). Tests cover three shapes and fail without the fix.
 
 ## Log
 
