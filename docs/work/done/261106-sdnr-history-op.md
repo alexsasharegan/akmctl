@@ -1,12 +1,11 @@
 ---
 id: "261106-sdnr"
 title: "history: a read-only op that lists AKM moves from git"
-status: active
+status: done
 created: 2026-11-06
 updated: 2026-11-06
+closed: 2026-11-06
 kind: feature
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T19:24
 ---
 
 # history: a read-only op that lists AKM moves from git
@@ -22,7 +21,9 @@ Add a read-only `history` operation (ADR 261106-60xv): it lists the AKM step com
 
 ## Next
 
-Open the pull request; the maintainer merges. Then unblock w0mz.
+## Outcome
+
+history lists the AKM step commits of a range as moves, oldest first, with the item's status before and after, the author, time and trailers; unavailable without git or with git_commits off. Spec section 4.24, schema, CLI, HTTP route and skill reference are in; tests cover order, path, two-item commits, range and head, limit, no git and bad input. Not built: a conformance fixture (it needs git; the spec says so), and the workbench replay, which is 261101-w0mz.
 
 ## Log
 
