@@ -42,6 +42,7 @@ const (
 type param struct {
 	kind     string
 	pattern  *regexp.Regexp
+	form     string // what a value matching pattern looks like, for the error
 	enum     []string
 	min      int
 	required bool
@@ -68,16 +69,18 @@ func s(extra ...func(*param)) param {
 	}
 	return p
 }
-func pat(re *regexp.Regexp) func(*param) { return func(p *param) { p.pattern = re } }
-func req(p *param)                       { p.required = true }
-func empty(p *param)                     { p.empty = true }
+func pat(re *regexp.Regexp, form string) func(*param) {
+	return func(p *param) { p.pattern, p.form = re, form }
+}
+func req(p *param)   { p.required = true }
+func empty(p *param) { p.empty = true }
 
 // specs lists the parameters of each read operation.
 var specs = map[string]map[string]param{
 	"version": {},
 	"ls": {
 		"type": {kind: kString, enum: []string{"work", "adr"}}, "status": {kind: kStrings, enum: anyStatus},
-		"parent": s(pat(reID)), "blocked": {kind: kBool}, "scope": s(), "since": s(pat(reDate)), "cycle": s(pat(reCycle)),
+		"parent": s(pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "blocked": {kind: kBool}, "scope": s(), "since": s(pat(reDate, "YYYY-MM-DD")), "cycle": s(pat(reCycle, "letters, digits, dot, dash or underscore, starting with a letter or digit, at most 64 characters")),
 		"sort": {kind: kStrings}, "fields": {kind: kStrings}, "limit": {kind: kInt, min: 1}, "offset": {kind: kInt, min: 0},
 		"count_only": {kind: kBool}, "next": {kind: kBool},
 	},
@@ -85,23 +88,23 @@ var specs = map[string]map[string]param{
 		"text": s(req), "body": {kind: kBool}, "type": {kind: kString, enum: []string{"work", "adr"}}, "status": {kind: kStrings, enum: anyStatus},
 		"fields": {kind: kStrings}, "limit": {kind: kInt, min: 1}, "offset": {kind: kInt, min: 0},
 	},
-	"show":    {"id": s(req, pat(reID)), "section": s()},
+	"show":    {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "section": s()},
 	"board":   {"statuses": {kind: kStrings, enum: workStatus}},
-	"find":    {"id": s(pat(reID)), "name": s()},
-	"when":    {"id": s(req, pat(reID)), "as_of": s(pat(reDate))},
-	"check":   {"target": s(pat(reVersion)), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS))},
+	"find":    {"id": s(pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "name": s()},
+	"when":    {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "as_of": s(pat(reDate, "YYYY-MM-DD"))},
+	"check":   {"target": s(pat(reVersion, "MAJOR.MINOR.PATCH, for example 1.0.0")), "rules": {kind: kStrings}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
 	"skills":  {"mode": {kind: kString, enum: []string{"status", "install", "update"}}, "dry_run": {kind: kBool}, "confirm": {kind: kBool}, "confirm_edited": {kind: kBool}},
 	"commits": {"range": s(), "limit": {kind: kInt, min: 1}},
-	"new":     {"kind": {kind: kString, enum: []string{"work", "adr"}, required: true}, "slug": s(req), "title": s(), "fields": {kind: kObject}, "as_of": s(pat(reDateTS))},
-	"set":     {"id": s(req, pat(reID)), "changes": {kind: kObject, required: true}, "correction": s(), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"section": {"id": s(req, pat(reID)), "name": s(req), "text": s(req, empty), "correction": s(), "mode": {kind: kString, enum: []string{"replace", "append"}}, "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"tick":    {"id": s(req, pat(reID)), "evidence": s(), "item": {kind: kInt, min: 1, required: true}, "section": s(), "done": {kind: kBool}, "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"remove":  {"id": s(req, pat(reID)), "item": {kind: kInt, min: 1, required: true}, "reason": s(req), "confirm": {kind: kBool}, "section": s(), "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"log":     {"id": s(req, pat(reID)), "text": s(req), "at": s(pat(reAt)), "if_match": s(pat(reEtag)), "section_etag": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"close":   {"id": s(req, pat(reID)), "status": {kind: kString, enum: []string{"done", "dropped"}, required: true}, "outcome": s(), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"claim":   {"id": s(req, pat(reID)), "as": s(req), "if_match": s(pat(reEtag)), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"release": {"id": s(req, pat(reID)), "if_match": s(pat(reEtag)), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS))},
-	"migrate": {"mode": {kind: kString, enum: []string{"report", "plan", "apply_safe", "handoff"}}, "target": s(pat(reVersion)), "acknowledge_backup": {kind: kBool}, "migrations": {kind: kObjects}, "as_of": s(pat(reDateTS))},
+	"new":     {"kind": {kind: kString, enum: []string{"work", "adr"}, required: true}, "slug": s(req), "title": s(), "fields": {kind: kObject}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"set":     {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "changes": {kind: kObject, required: true}, "correction": s(), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"section": {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "name": s(req), "text": s(req, empty), "correction": s(), "mode": {kind: kString, enum: []string{"replace", "append"}}, "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"tick":    {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "evidence": s(), "item": {kind: kInt, min: 1, required: true}, "section": s(), "done": {kind: kBool}, "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "section_etag": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"remove":  {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "item": {kind: kInt, min: 1, required: true}, "reason": s(req), "confirm": {kind: kBool}, "section": s(), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "section_etag": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"log":     {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "text": s(req), "at": s(pat(reAt, "YYYY-MM-DD HH:MM (or YYYY-MM-DDTHH:MM), with an optional offset such as +02:00")), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "section_etag": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"close":   {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "status": {kind: kString, enum: []string{"done", "dropped"}, required: true}, "outcome": s(), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"claim":   {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "as": s(req), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"release": {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"migrate": {"mode": {kind: kString, enum: []string{"report", "plan", "apply_safe", "handoff"}}, "target": s(pat(reVersion, "MAJOR.MINOR.PATCH, for example 1.0.0")), "acknowledge_backup": {kind: kBool}, "migrations": {kind: kObjects}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
 	"init":    {"docs_dir": s(), "wikilinks": {kind: kBool}, "dir": s(), "git_commits": {kind: kBool}, "git_init": {kind: kBool}},
 	"config":  {"key": {kind: kString, enum: []string{"git_commits"}}, "value": {kind: kBool}, "dry_run": {kind: kBool}, "confirm": {kind: kBool}, "confirm_edited": {kind: kBool}},
 	"index":   {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
@@ -213,7 +216,7 @@ func checkString(name, v string, p param) *Error {
 		return invalid(name, "%s: unknown value %q", name, v)
 	}
 	if p.pattern != nil && !p.pattern.MatchString(v) {
-		return invalid(name, "%s: %q has the wrong form", name, v)
+		return invalid(name, "%s: %q has the wrong form; expected %s", name, v, p.form)
 	}
 	if p.required && !p.empty && strings.TrimSpace(v) == "" {
 		return invalid(name, "%s must not be empty", name)
