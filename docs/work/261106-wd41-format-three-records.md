@@ -1,9 +1,11 @@
 ---
 id: "261106-wd41"
 title: Format three records so CI format check passes
-status: ready
+status: active
 created: 2026-11-06
 updated: 2026-11-06
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T18:22
 ---
 
 # Format three records so CI format check passes
@@ -19,3 +21,4 @@ Run prettier --write on the three files, check that only whitespace changed, run
 ## Log
 
 - 2026-11-06: filed.
+- 2026-11-06 11:22-07:00: claimed (claude-sonnet-5-5).
