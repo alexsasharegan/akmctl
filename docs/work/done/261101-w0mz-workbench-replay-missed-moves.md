@@ -2,14 +2,13 @@
 id: "261101-w0mz"
 title: workbench replay missed moves
 summary: When you return to the workbench, play the moves that happened while you were away (agents, the shell) as animations so none pass unseen
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
+closed: 2026-11-06
 kind: feature
 priority: 1
 blocked_by: [261106-sdnr]
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T19:37
 ---
 
 # workbench replay missed moves
@@ -53,7 +52,9 @@ What exists to build on: `claimed_by` and `claimed_at` (UTC, to the minute) are 
 
 ## Next
 
-Open the pull request; the maintainer merges.
+## Outcome
+
+Moves made while away are read from history, replayed one at a time in commit order with who made each, including an item's path; a burst over ten or reduced motion shows a summary toast and lists every move in the away panel; a page load lists what was committed since the last visit. Verified in the browser on a scratch repo and by unit tests of the merge, order and batching. Not done: a round trip with no net change is not shown; no history without git or with git_commits off, where the old snapshot diff stays; reduced motion was reasoned from the code, not driven; the filtered-view case waits for the filters.
 
 ## Log
 
