@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- New command `akmctl agents`: prints the `AGENTS.md` that `init` would write for this repository, filled from its manifest (records folder, wikilinks) and read-only, so a repository whose `AGENTS.md` predates a template change can compare the two and keep the lines it judges. Affects: anyone upgrading an existing repository; nothing is written. Work item 261101-abw2.
+
 - The workbench replays moves made while you were away in the order they were committed, naming who made each (the `Assisted-by` value, else the commit author) and showing the path an item took, not only where it ended. It reads the `history` operation, so it needs a git work tree with `git_commits` on; otherwise it falls back to the old snapshot comparison (moves by id, "Outside"). A burst of more than ten moves, or reduced motion, still shows one summary toast and now also lists every move in a panel; a page load lists what was committed since the last visit. Limits: a round trip with no net change is not shown, and a move committed after it was seen live is listed again on the next load (work item 261101-w0mz, ADR 261106-60xv).
 
 - New `history` operation, `akmctl history [--range <range>] [--limit <n>] [--item <id>]` and `GET /history`: the AKM step commits of a range as moves, oldest first, each with the item, step, author, time, the item's status before and after and the other trailers (for example `Assisted-by`). Without a git work tree, or with `git_commits` off, it answers `available: false` with a reason instead of failing. Read-only; the workbench replay of missed moves builds on it. API 1.x: a new operation, schema `history.json` and a reference in the `akm` skill (so `skills update` adds `references/history.md`) (work item 261106-sdnr, ADR 261106-60xv).

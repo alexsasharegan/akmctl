@@ -32,6 +32,7 @@ var examples = map[string]string{
 	"section": `akmctl section 261101-m3pv Next --text "The next step."`,
 	"set":     "akmctl set 261101-m3pv priority=2",
 	"show":    "akmctl show 261101-m3pv",
+	"agents":  "akmctl agents > /tmp/AGENTS.shipped.md",
 	"skills":  "akmctl skills status",
 	"tick":    `akmctl tick 261101-m3pv 1 --evidence "go test passes"`,
 	"ui":      "akmctl ui --open",
@@ -41,7 +42,7 @@ var examples = map[string]string{
 
 // commandNames lists every command help covers: the operations and ui.
 func commandNames() []string {
-	names := append(api.Operations(), "ui")
+	names := append(api.Operations(), "ui", "agents")
 	sort.Strings(names)
 	return names
 }
@@ -50,6 +51,10 @@ func commandNames() []string {
 func commandUsage(w io.Writer, op string) {
 	if op == "ui" {
 		fmt.Fprintf(w, "usage: akmctl ui [flags]\n\nflags:\n  --port <n>  port to listen on (default: any free port)\n  --open      open the workbench in the browser\n\nexample:\n  %s\n", examples[op])
+		return
+	}
+	if op == "agents" {
+		fmt.Fprintf(w, "usage: akmctl agents [--repo <dir>]\n\nPrints the AGENTS.md that init would write for this repository (records folder and wikilinks read from the manifest). Read-only: it never writes AGENTS.md; compare it with yours and keep what you judge.\n\nexample:\n  %s\n", examples[op])
 		return
 	}
 	pos := positional[op]

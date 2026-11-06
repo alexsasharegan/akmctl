@@ -181,6 +181,22 @@ func FilesWith(name string, opt Options) ([]File, error) {
 	return files, nil
 }
 
+// AgentsFile returns the AGENTS.md that init writes for a project called name
+// with these options (the same fill FilesWith does), so a repository that ran
+// init earlier can compare its own file with the shipped template.
+func AgentsFile(name string, opt Options) (string, error) {
+	files, err := FilesWith(name, opt)
+	if err != nil {
+		return "", err
+	}
+	for _, f := range files {
+		if f.Path == "AGENTS.md" {
+			return string(f.Data), nil
+		}
+	}
+	return "", errors.New("the template has no AGENTS.md")
+}
+
 // Init writes the files of a new repository under target, creating the directory
 // when it is absent. A file that exists, whatever it holds, is left alone and
 // listed as skipped.
