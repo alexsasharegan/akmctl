@@ -25,6 +25,8 @@ The design (`docs/design/pkm-workbench-design.md`, "Watch mode and the animation
 - the order and kind (agent or outside) of the events, and whether a move out of a filtered view animates (261026-zg0g)
 - whether a log of moves is needed (the `log` records) rather than a snapshot diff
 
+Scope since 2026-11-06 (ADR 261106-60xv): the order, author and path of moves come from git through a new `history` op (261106-sdnr), so this item is the workbench replay on top of it and waits for that op. Without git the board keeps the snapshot diff and says why there is no replay.
+
 Done when:
 
 - [ ] a gap list says what a returning user sees now, driven in the browser: one move, three, twelve, a multi-step path, after a hidden tab
