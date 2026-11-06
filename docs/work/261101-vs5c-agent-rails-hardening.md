@@ -1,11 +1,13 @@
 ---
 id: "261101-vs5c"
 title: agent rails hardening
-status: ready
+status: active
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-06
 kind: feature
 summary: "Project from the first Codex trial: make the repository's rails steer any model to the expected output"
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T20:19
 ---
 
 # agent rails hardening
@@ -33,3 +35,4 @@ Round 1 is done. Round 2 from the rerun: take 261101-qr8x and 261101-ft79 (the t
 
 - 2026-11-01: filed.
 - 2026-11-01 20:05-07:00: triage: promoted ft79, qr8x, w82x, y3ch to ready with a Next; round 2 order set; 4gk3, kngg, yqec flagged as off-theme for this project; wghm and the rerun of the PR row stay open
+- 2026-11-06 13:19-07:00: claimed (claude-sonnet-5-5).
