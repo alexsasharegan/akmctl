@@ -20,7 +20,6 @@ The rerun showed two wording gaps. Claude claimed as plain `claude` (CL2 risk wh
 
 ## Next
 
-
 ## Outcome
 
 AGENTS.md, the init template and the claim skill text now ask for a unique --as name (<agent>-<model>) and say an unknown command may be a stale binary: use /tmp/akmctl here, run version before filing. Not verified with a model run; the rerun protocol (261101-0vh7) would test it.
