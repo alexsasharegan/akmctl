@@ -141,6 +141,22 @@ func TestLogEntriesAndAppend(t *testing.T) {
 	}
 }
 
+func TestReplaceSectionClearedIsPrettierClean(t *testing.T) {
+	cases := []struct{ name, in, want string }{
+		{"before another section", "# T\n\n## Next\n\nplan\nmore\n\n## Outcome\n\nDone.\n", "# T\n\n## Next\n\n## Outcome\n\nDone.\n"},
+		{"last section", "# T\n\n## Goal\n\ng\n\n## Next\n\nplan\n", "# T\n\n## Goal\n\ng\n\n## Next\n"},
+		{"CRLF", "# T\r\n\r\n## Next\r\n\r\nplan\r\n\r\n## Log\r\n\r\n- x\r\n", "# T\r\n\r\n## Next\r\n\r\n## Log\r\n\r\n- x\r\n"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			out, err := mustSplit(t, c.in).ReplaceSection("Next", "", "")
+			if err != nil || string(out) != c.want {
+				t.Errorf("got %q (%v), want %q", out, err, c.want)
+			}
+		})
+	}
+}
+
 func TestReplaceSection(t *testing.T) {
 	tr := mustSplit(t, sample)
 	out, err := tr.ReplaceSection("Next", "New step.\nSecond.", "")
