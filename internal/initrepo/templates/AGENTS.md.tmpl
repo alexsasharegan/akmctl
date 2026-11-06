@@ -16,11 +16,12 @@ TODO: one sentence on what this is and who uses it.
 
 ## Rules
 
-- Before starting, list the open work. Resume the `active` item you hold; if you hold none, take the top `ready` item; if several `active` items are unclaimed, ask. The `claims` extension is on: use `claim` and `release`.
+- Before starting, list the open work. Resume the `active` item you hold; if you hold none, take the top `ready` item; if several `active` items are unclaimed, ask. The `claims` extension is on: use `claim` and `release`. Claim with a name unique to your session, `--as <agent>-<model>`, never a bare `claude` or `codex`, so two sessions never share a claim.
 - Work only under a work item. If none fits, create a `raw` one (`akmctl new work <slug>`) and ask which item to work.
 - A hard-to-reverse choice, or one that rejects a real alternative, needs an ADR draft with status `proposed`. Never edit the body of an `accepted` ADR; supersede it.
 - Update the item's `## Next` and `## Log` in the same commit as the code.
 - Run `akmctl check` before committing records.
+- An `unknown command` or an unknown flag usually means a stale `akmctl`: run `akmctl version` and update it (`akmctl skills update` refreshes the skills) before reporting a tool bug.
 - Code and tests win over prose. When a document is wrong, fix it or say so.
 - This file wins over a shared skill where they disagree. The tool never stages or commits; stage by path.
 - Without `akmctl`, use the fallbacks below and tell the maintainer to install it.

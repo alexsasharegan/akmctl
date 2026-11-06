@@ -11,7 +11,7 @@ The repository's `AGENTS.md` wins over this skill where they disagree. Fields, s
 
 1. `akmctl ls --status ready,active,blocked`. Without the tool: `grep -lE '^status: ?"?active"?$' docs/work/*.md`.
 2. Resume the `active` item you hold. If you hold none, take the top `ready` item (roadmap order, then `priority`). If several `active` items are unclaimed, ask.
-3. `akmctl claim <id> --as <name>` (claims extension). It refuses an item whose `## Next` is empty: write the `Next` first. If someone else holds a fresh claim, do not work the item: tell the maintainer and take another. `claimed_at` is UTC, while `updated` is a local day and Log lines carry local time with an offset; a difference of hours is not an error.
+3. `akmctl claim <id> --as <agent>-<model>` (claims extension; a name unique to your session, never a bare `claude`). It refuses an item whose `## Next` is empty: write the `Next` first. If someone else holds a fresh claim, do not work the item: tell the maintainer and take another. `claimed_at` is UTC, while `updated` is a local day and Log lines carry local time with an offset; a difference of hours is not an error.
 4. Read `## Goal`, then `## Next`.
 
 ## No item fits
