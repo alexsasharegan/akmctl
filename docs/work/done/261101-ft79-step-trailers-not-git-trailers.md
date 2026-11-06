@@ -1,13 +1,12 @@
 ---
 id: "261101-ft79"
 title: step trailers not git trailers
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
+closed: 2026-11-06
 parent: 261101-vs5c
 priority: 1
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T18:12
 ---
 
 # step trailers not git trailers
@@ -21,7 +20,10 @@ In the Codex rerun of 261101-0vh7 the agent passed each line of the tool's commi
 
 ## Next
 
-Open the pull request; the maintainer merges.
+
+## Outcome
+
+commits reports CM5 when a step commit's AKM- trailers are not in the last paragraph, with tests for one -m per line, a blank line before attribution and a missing blank line after the subject. The printed block, akm-commit, the command references and AGENTS.md say to pass the whole message with git commit -F -. Not covered: rewriting old commits; a range over old history reports them.
 
 ## Log
 
