@@ -9,6 +9,8 @@ $ akmctl claim 261029-atxk --as other
 akmctl: refused: 261029-atxk is claimed by demo-agent
 ```
 
+Claim with a name unique to the session, such as `claude-sonnet-5-5`: two sessions that share a name look like one holder.
+
 `claimed_at` is UTC (`YYYY-MM-DDTHH:MM`, no `Z`). The dates beside it (`updated`) are local days and the Log line carries local time with its offset, so a `claimed_at` that looks hours ahead or behind is not a clock error. Do not edit it.
 
 An item with an empty `## Next` is refused, because it would become `active` and fail rule WK6: write the `Next` first with `akmctl section <id> Next --text "..."`, then claim.

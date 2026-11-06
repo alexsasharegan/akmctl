@@ -14,7 +14,7 @@ import (
 var examples = map[string]string{
 	"board":   "akmctl board",
 	"check":   "akmctl check",
-	"claim":   "akmctl claim 261101-m3pv --as claude",
+	"claim":   "akmctl claim 261101-m3pv --as claude-sonnet-5-5",
 	"close":   `akmctl close 261101-m3pv done --outcome "What was done and why."`,
 	"commits": "akmctl commits",
 	"config":  "akmctl config git-commits on --dry-run",
