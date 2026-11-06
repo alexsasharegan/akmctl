@@ -19,7 +19,6 @@ Revise the root `REVIEW.md` after the maintainer's critical review of 2026-11-01
 
 ## Next
 
-
 ## Outcome
 
 REVIEW.md revised with the ten agreed changes: check-only rule distinction, behavior and process labels, function-scoped debt, scanner scope, ADR acceptance recorded in the work item Log, wider Records examples, the write-path wording, no Tests section, named oracle tests and the closed work item invariant. Checks: prettier --check REVIEW.md and akmctl check pass. Open: the migrate fence loops (internal/migrate/steps.go, migrate.go) are known debt with no work item yet; the branch is stacked on claude/review-md, which carries an unrelated architecture.md commit. No changelog entry: no user-visible tool change. ADR check: none.

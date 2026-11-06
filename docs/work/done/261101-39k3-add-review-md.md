@@ -21,7 +21,6 @@ Done when:
 
 ## Next
 
-
 ## Outcome
 
 REVIEW.md added at the repository root with the text the maintainer approved. It holds 8 invariants, the Records rule and the output format. Checked: go vet, go test -race, gofmt, format:check, schemas and akmctl check (0 errors). AGENTS.md and CLAUDE.md are unchanged. Open: AGENTS.md forbids any edit to an accepted ADR body while REVIEW.md allows a scrub of private material; aligning AGENTS.md needs separate approval. No changelog entry: no user-visible tool change. ADR check: none.
