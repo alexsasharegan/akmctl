@@ -1,11 +1,13 @@
 ---
 id: "261101-ft79"
 title: step trailers not git trailers
-status: ready
+status: active
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-06
 parent: 261101-vs5c
 priority: 1
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T18:12
 ---
 
 # step trailers not git trailers
@@ -24,3 +26,4 @@ Add the CM rule to the commits check (extend CM1 or add a rule); then the wordin
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-06 11:12-07:00: claimed (claude-sonnet-5-5).
