@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The guide has an Upgrading section (`docs/spec/akm-guide.md`, section 8): for the binary, the skills, `AGENTS.md` and the layout, what changes, the command to run and what it leaves alone. Documentation only; no command, API or rule changes (work item 261101-wghm).
+
 - `close` (and `section` with empty text) no longer leaves two blank lines after an emptied `## Next` when the heading is followed by a blank line, so a closed record passes `npm run format:check` without a formatting-only commit; a section that ends the file keeps just its heading. Records written without blank lines after headings are unchanged. API 1.x: the closed file differs by blank lines only (work item 261101-w82x).
 
 - `commits` has a new rule, CM5: a step commit whose `AKM-` trailers are not in the last paragraph of the message is reported, because git reads trailers only from there (an agent that passes the message as one `git commit -m` per line, or leaves a blank line between the `AKM-` trailers and an `Assisted-by` or `Co-Authored-By` trailer, loses them). Pass the whole message to one `git commit -F -`. The printed block, the `akm-commit` skill and the command references say so. A run over older history reports every commit made that way; use `--range` for the branch. API 1.x: a client of `commits` may now see rule `CM5` (work item 261101-ft79).
