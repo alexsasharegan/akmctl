@@ -2,9 +2,7 @@
 
 ## Now
 
-Agent rails hardening, from the first Codex trial (children in order: p2m8, jgdy, avg8, 7ghb, then the rerun 0vh7):
-
-- [261101-vs5c] Agent rails hardening
+Nothing in flight. Agent rails hardening (261101-vs5c) is done; the rerun on other agent harnesses waits for a first release (261106-xrpr).
 
 ## Next
 

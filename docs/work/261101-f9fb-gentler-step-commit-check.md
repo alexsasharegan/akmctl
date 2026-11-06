@@ -3,8 +3,7 @@ id: "261101-f9fb"
 title: gentler step commit check
 status: raw
 created: 2026-11-01
-updated: 2026-11-01
-parent: 261101-vs5c
+updated: 2026-11-06
 ---
 
 # gentler step commit check
@@ -21,3 +20,4 @@ A maintainer commit with the subject `261101-4gk3(file): ...` and no AKM- traile
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-06 13:19-07:00: Detached from 261101-vs5c on 2026-11-06: it adds a warning severity to commits, an API change that probably needs an ADR, so it is its own item, not a rails gap.
