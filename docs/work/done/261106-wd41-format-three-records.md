@@ -15,7 +15,6 @@ closed: 2026-11-06
 
 ## Next
 
-
 ## Outcome
 
 Prettier --write on the three files; only blank lines changed (git diff --ignore-blank-lines is empty). npm run format:check is clean, so the ubuntu format records step no longer fails on main's files.
