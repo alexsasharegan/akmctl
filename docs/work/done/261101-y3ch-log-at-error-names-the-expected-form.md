@@ -1,14 +1,13 @@
 ---
 id: "261101-y3ch"
 title: A pattern-checked parameter's error does not say the expected form
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
+closed: 2026-11-06
 kind: bug
 summary: log --at 09:46 fails with 'has the wrong form' and never says what form is valid; the same message serves every pattern parameter
 parent: 261101-vs5c
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T18:48
 ---
 
 # A pattern-checked parameter's error does not say the expected form
@@ -22,7 +21,10 @@ claimed_at: 2026-11-06T18:48
 
 ## Next
 
-Open the pull request; the maintainer merges.
+
+## Outcome
+
+Each pattern parameter has a form description in params.go and the invalid_request message appends it ('expected YYYY-MM-DD HH:MM ...'). A test fails for a pattern with no description, and one checks three messages. Not changed: the slug and cycle checks in ops_write.go keep their own messages.
 
 ## Log
 
