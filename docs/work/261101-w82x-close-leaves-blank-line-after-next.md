@@ -1,11 +1,13 @@
 ---
 id: "261101-w82x"
 title: close leaves blank line after next
-status: ready
+status: active
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-06
 parent: 261101-vs5c
 priority: 2
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T18:44
 ---
 
 # close leaves blank line after next
@@ -24,3 +26,4 @@ Fix in the close command where it empties Next: write no trailing blank line aft
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-06 11:44-07:00: claimed (claude-sonnet-5-5).
