@@ -1,11 +1,10 @@
 ---
 id: "261106-wd41"
 title: Format three records so CI format check passes
-status: active
+status: done
 created: 2026-11-06
 updated: 2026-11-06
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T18:22
+closed: 2026-11-06
 ---
 
 # Format three records so CI format check passes
@@ -16,7 +15,10 @@ claimed_at: 2026-11-06T18:22
 
 ## Next
 
-Open the pull request; the maintainer merges.
+
+## Outcome
+
+Prettier --write on the three files; only blank lines changed (git diff --ignore-blank-lines is empty). npm run format:check is clean, so the ubuntu format records step no longer fails on main's files.
 
 ## Log
 
