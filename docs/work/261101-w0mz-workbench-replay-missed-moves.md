@@ -32,11 +32,28 @@ Done when:
 - [ ] reduced motion and a very long batch degrade to a clear summary
 - [ ] unit tests cover the event ordering and the batching rule
 
+## Gap list
+
+Driven on 2026-11-06 in the built-in browser against a scratch repository (14 `ready` items, moves made from the shell with `akmctl set` and `close`; the hidden tab was simulated by overriding `document.visibilityState`).
+
+| Scenario                                                          | What the user sees now                                                                                             | Gap                                                                                                                                            |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| One move                                                          | A toast ("Outside: 261106-08ek Item k moved, ready to active.") and the card lifts, slides to its lane and settles | None. The label says "Outside", never who.                                                                                                     |
+| Three moves between two polls                                     | Three toasts and three slides, one at a time, about 0.9 s apart                                                    | Order is id order, not the order the moves happened in (`diffSnapshots` sorts by id; the listing carries no time of change).                   |
+| Twelve moves                                                      | One toast, "12 changes outside (12 moved).", no animation; the board is simply redrawn                             | The 12 moves are gone: the toast lists none and cannot be played. Over 10 events nothing replays, so the longer the absence the less is shown. |
+| A four-step path on one item (ready, active, ready, active, done) | One move, "ready to done"                                                                                          | The path is invisible: the poll compares two snapshots. `set status` writes no `## Log` line, so no record of the path exists to replay.       |
+| Hidden tab, three moves                                           | No requests while hidden (0 fetches in 9 s); on return one poll, then the three moves play one at a time           | None for a short absence. Over 10 moves the result is the summary above.                                                                       |
+| Reduced motion                                                    | By code, not driven: `push` skips animation and shows the summary, or the single sentence                          | A reduced-motion user gets no way to review the moves either.                                                                                  |
+| A move out of a filtered view                                     | Not driven: the filters (261026-zg0g) do not exist yet                                                             | `cardOf` returns null when the card is not drawn, so the toast shows and nothing animates; settle once filters land.                           |
+
+What exists to build on: `claimed_by` and `claimed_at` (UTC, to the minute) are in the polled listing, so a move of a claimed item can be labelled with the agent that holds it; the etag is the only per-item change marker; nothing in the API says when a status changed.
+
 ## Next
 
-Drive the board in the browser with moves made from the shell while the tab is hidden, and write the gap list.
+Decide the shape with the maintainer: client-only (label by claimed_by, keep the last 10 events for a replay button, order by id) or add a change time to the polled listing (API and spec change) for true order and paths. Then build, with unit tests for ordering and batching in internal/server/testdata/logic.test.mjs.
 
 ## Log
 
 - 2026-11-01: filed from Alexander's note: the away-and-agent moves matter more than the wish-list polish.
 - 2026-11-06 12:08-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-06 12:11-07:00: Drove the board in the browser and wrote the gap list: id order not move order, bursts over 10 are summarized and lost, a path shows as its net move, 'Outside' never names an agent; claimed_by is available to label agents.
