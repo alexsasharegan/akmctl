@@ -26,14 +26,14 @@ One commit per logical step:
 1. Run `akmctl check`; fix errors first.
 2. Stage ONLY by path: the work item, the roadmap, the ADR index and the code files this step changed. Never `git add -A` or `git add .`.
 3. Leave unrelated dirty files alone: do not stage, stash, revert or commit them.
-4. Message: for a status change, use the `commit.message` the command returned, as given: `<id>(<step>): <detail>`, a blank line, then the trailers `AKM-Step` and `AKM-Item`. Stage `commit.paths` and the code the step changed. You may put a body between the subject and the trailers and add other trailers (attribution) after them; do not change the subject or the two `AKM-` trailers. `new`, `claim`, `release`, `close` and a `set` that changes `status` return one (`--format json`, or the block the command prints). For a `## Next` checkpoint, which returns none, write `<id>: <what happened>`.
+4. Message: for a status change, use the `commit.message` the command returned, as given: `<id>(<step>): <detail>`, a blank line, then the trailers `AKM-Step` and `AKM-Item`. Pass the whole message to one `git commit -F -` (a heredoc on stdin), never one `-m` per line: git reads trailers only from the last paragraph. Stage `commit.paths` and the code the step changed. You may put a body between the subject and the trailers and add other trailers (attribution) directly after them, with no blank line between; do not change the subject or the two `AKM-` trailers. `new`, `claim`, `release`, `close` and a `set` that changes `status` return one (`--format json`, or the block the command prints). For a `## Next` checkpoint, which returns none, write `<id>: <what happened>`.
 5. Follow the repository's `AGENTS.md` on attribution lines.
 
 ## Check
 
 `akmctl check` is what catches a loop in `parent` or `blocked_by` that was written by hand; run it before each commit (step 1 above), as a git pre-commit hook or in CI.
 
-Before a push, `akmctl commits --range origin/main..HEAD` checks that each step commit's subject, trailers and diff agree (rules CM1 to CM3), and flags a commit with no step that changes an item's status or claim (CM4). Fix a failing commit with a new commit; do not rewrite history.
+Before a push, `akmctl commits --range origin/main..HEAD` checks that each step commit's subject, trailers and diff agree (rules CM1 to CM3), checks that the `AKM-` trailers sit in the last paragraph where git reads them (CM5), and flags a commit with no step that changes an item's status or claim (CM4). Fix a failing commit with a new commit; do not rewrite history.
 
 ## Never
 

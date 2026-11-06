@@ -609,7 +609,7 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if cm, ok := resp.Get("commit"); ok {
 			msg, _ := cm.(api.Obj).Get("message")
 			ps, _ := cm.(api.Obj).Get("paths")
-			fmt.Fprintln(w, "commit message (use as given; stage these paths and the code):")
+			fmt.Fprintln(w, "commit message (use as given, whole, with git commit -F -; stage these paths and the code):")
 			for _, l := range strings.Split(msg.(string), "\n") {
 				fmt.Fprintln(w, "  "+l)
 			}
