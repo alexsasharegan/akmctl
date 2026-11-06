@@ -1,11 +1,13 @@
 ---
 id: "261101-qr8x"
 title: rails name and binary
-status: ready
+status: active
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-06
 parent: 261101-vs5c
 priority: 1
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T18:00
 ---
 
 # rails name and binary
@@ -24,3 +26,4 @@ Edit AGENTS.md (the Rules section): one sentence for a unique --as name, one for
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-06 11:00-07:00: claimed (claude-sonnet-5-5).
