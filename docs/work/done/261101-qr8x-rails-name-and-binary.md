@@ -1,13 +1,12 @@
 ---
 id: "261101-qr8x"
 title: rails name and binary
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
+closed: 2026-11-06
 parent: 261101-vs5c
 priority: 1
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T18:00
 ---
 
 # rails name and binary
@@ -21,7 +20,10 @@ The rerun showed two wording gaps. Claude claimed as plain `claude` (CL2 risk wh
 
 ## Next
 
-Open the pull request; the maintainer merges.
+
+## Outcome
+
+AGENTS.md, the init template and the claim skill text now ask for a unique --as name (<agent>-<model>) and say an unknown command may be a stale binary: use /tmp/akmctl here, run version before filing. Not verified with a model run; the rerun protocol (261101-0vh7) would test it.
 
 ## Log
 
