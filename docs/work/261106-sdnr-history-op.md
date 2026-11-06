@@ -1,10 +1,12 @@
 ---
 id: "261106-sdnr"
 title: "history: a read-only op that lists AKM moves from git"
-status: ready
+status: active
 created: 2026-11-06
 updated: 2026-11-06
 kind: feature
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-06T19:24
 ---
 
 # history: a read-only op that lists AKM moves from git
@@ -25,3 +27,4 @@ Read how commits.go lists step commits and diffs them; design the response and t
 ## Log
 
 - 2026-11-06: filed.
+- 2026-11-06 12:24-07:00: claimed (claude-sonnet-5-5).
