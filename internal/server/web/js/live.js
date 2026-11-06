@@ -79,8 +79,15 @@ const short = (s, n = 60) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
 
 /** One event as a sentence for a toast. title may be empty. */
 export function describeEvent(ev, title) {
-  const who = ev.source === "you" ? "You" : "Outside";
   const what = ev.id + (title ? " " + short(title) : "");
+  if (ev.who) {
+    // a move read from the history: it names who made it
+    const lanes = ev.type === "moved" ? (ev.closed && ev.from === ev.to ? "closed" : ev.from + " to " + ev.to) : "";
+    if (ev.type === "moved") return ev.who + " moved " + what + ": " + lanes + ".";
+    if (ev.type === "added") return ev.who + " added " + what + (ev.to ? " (" + ev.to + ")." : ".");
+    if (ev.type === "step") return ev.who + " " + (ev.step === "claim" ? "claimed" : ev.step === "release" ? "released" : ev.step) + " " + what + ".";
+  }
+  const who = ev.source === "you" ? "You" : "Outside";
   if (ev.type === "moved") {
     const lanes = ev.closed && ev.from === ev.to ? "closed" : ev.from + " to " + ev.to;
     return ev.source === "you" ? "You moved " + what + ": " + lanes + "." : "Outside: " + what + " moved, " + lanes + ".";
@@ -95,7 +102,7 @@ export function summarize(events) {
   const outside = events.filter((e) => e.source !== "you").length;
   const count = {};
   for (const e of events) count[e.type] = (count[e.type] || 0) + 1;
-  const parts = ["moved", "added", "removed", "edited"].filter((t) => count[t]).map((t) => count[t] + " " + t);
+  const parts = ["moved", "added", "removed", "edited", "step"].filter((t) => count[t]).map((t) => count[t] + " " + (t === "step" ? "claimed or released" : t));
   const who = outside === events.length ? "outside" : outside === 0 ? "of your own" : "(" + outside + " outside)";
   return events.length + " changes " + who + " (" + parts.join(", ") + ").";
 }

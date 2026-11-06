@@ -119,7 +119,8 @@ export function keepSteady(host, redraw, fallback) {
 
 /**
  * ctx: toast(msg), titleOf(id), records(), rerender(touchedIds) draws the
- * views again in place, busy() true while a dialog or a field is active.
+ * views again in place, busy() true while a dialog or a field is active,
+ * listed(events) shows a burst that is not played (optional).
  */
 export function createAnimator(ctx) {
   const queue = [];
@@ -171,8 +172,12 @@ export function createAnimator(ctx) {
       if (!events.length) return;
       if (events.length > BACKLOG || reduced()) {
         // a burst is shown as its result, with one sentence
-        if (events.length > 1) ctx.toast(summarize(events));
-        else ctx.toast(say(events[0]));
+        if (events.length > 1) {
+          ctx.toast(summarize(events));
+          // the moves themselves are listed, so a long absence is not lost and a reader who
+          // asked for reduced motion can still review them
+          if (ctx.listed) ctx.listed(events);
+        } else ctx.toast(say(events[0]));
         for (const e of events) touched.add(e.id);
         settle();
         return;

@@ -1,9 +1,10 @@
 // The workbench: reads the token from the URL fragment, loads the records once
 // and draws the view that the hash route names. Everything from the repository
 // is shown as text, never as HTML.
-import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, state, describeError, ApiError } from "./js/store.js";
+import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, fetchHistory, state, describeError, ApiError } from "./js/store.js";
 import { createLive, mountIndicator } from "./js/live.js";
 import { createAnimator, keepSteady } from "./js/anim.js";
+import { mergeWithHistory, moveToEvent, mountAway, AWAY_MAX } from "./js/replay.js";
 import { parseRoute, routeHref, indexById, TABLES, pageTitle, repoLabel, filterByProject, projectFromHash, withProject } from "./js/logic.js";
 import { mountProjectFilter, recall } from "./js/project.js";
 import { el, isoDate } from "./js/util.js";
@@ -201,13 +202,51 @@ function redrawInPlace() {
   if (drawer.isOpen()) drawer.refresh();
 }
 
+const away = mountAway(document.body);
 const anim = createAnimator({
   toast,
   titleOf: (id) => titleOfNow(id) || titleMemory.get(id) || "",
   records: () => state.records,
   rerender: redrawInPlace,
   busy: () => overlayOpen() || typing(document.activeElement),
+  listed: (events) => away.show(events, { titleOf: (id) => titleOfNow(id) || titleMemory.get(id) || "" }),
 });
+
+// ---- the move log: git history says in what order, and by whom (ADR 261106-60xv) ----
+
+const SEEN_KEY = () => "akm-seen-head:" + (state.config.root || "");
+const rememberHead = (h) => {
+  try {
+    if (h) localStorage.setItem(SEEN_KEY(), h);
+  } catch (e) {
+    /* storage may be blocked: the next visit then lists nothing */
+  }
+};
+const lastSeenHead = () => {
+  try {
+    return localStorage.getItem(SEEN_KEY()) || "";
+  } catch (e) {
+    return "";
+  }
+};
+let historyHead = ""; // the head of the last history answer this page dealt with; "" when there is no history
+
+/** On a visit: say what was committed since the last one, and remember where the history stands. */
+async function catchUp() {
+  try {
+    const now = await fetchHistory({ limit: 1 });
+    if (!now.available) return;
+    historyHead = now.head;
+    const seen = lastSeenHead();
+    if (seen && now.head && seen !== now.head) {
+      const since = await fetchHistory({ range: seen + "..HEAD", limit: 100 });
+      if (since.available && since.moves.length) away.show(since.moves.map(moveToEvent), { truncated: since.truncated, titleOf: titleOfNow });
+    }
+    rememberHead(now.head);
+  } catch (e) {
+    /* the history is an extra: a range that git no longer knows, or a server that is busy, costs nothing here */
+  }
+}
 
 const projectFilter = mountProjectFilter(document.querySelector(".top-actions"), {
   records: () => state.records,
@@ -223,9 +262,25 @@ const live = createLive({
     await loadSnapshot(); // throws on a hiccup: live.js then offers the same events again
     byIdCache = indexById(state.records);
     projectFilter.refresh();
-    anim.push(events);
+    anim.push(await withHistory(events));
   },
 });
+
+/** The poll's events in the order the commits were made, naming who; unchanged when there is no history. */
+async function withHistory(events) {
+  if (!historyHead || !events.some((e) => e.type === "moved" && e.source !== "you")) return events;
+  try {
+    const h = await fetchHistory({ range: historyHead + "..HEAD", limit: 100 });
+    if (!h.available) return events;
+    if (h.head) {
+      historyHead = h.head;
+      rememberHead(h.head);
+    }
+    return mergeWithHistory(events, h.moves);
+  } catch (e) {
+    return events;
+  }
+}
 
 const NAV_KEYS = { 1: { name: "board" }, 2: { name: "tables" }, 3: { name: "adrs" }, 4: { name: "check" } };
 
@@ -328,7 +383,10 @@ async function start() {
   // the hash wins over what was remembered for this repository
   project = projectFromHash(location.hash) !== null ? projectFromHash(location.hash) : recall(state.config.root);
   await reload(false);
-  if (loaded) live.start(state.records);
+  if (loaded) {
+    live.start(state.records);
+    catchUp();
+  }
   if (!location.hash) history.replaceState(null, "", location.pathname + location.search + routeHref(base));
 }
 
