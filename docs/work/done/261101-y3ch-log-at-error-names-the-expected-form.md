@@ -21,7 +21,6 @@ parent: 261101-vs5c
 
 ## Next
 
-
 ## Outcome
 
 Each pattern parameter has a form description in params.go and the invalid_request message appends it ('expected YYYY-MM-DD HH:MM ...'). A test fails for a pattern with no description, and one checks three messages. Not changed: the slug and cycle checks in ops_write.go keep their own messages.
