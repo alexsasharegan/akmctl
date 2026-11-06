@@ -1,12 +1,11 @@
 ---
 id: "261101-wghm"
 title: upgrade path for existing users
-status: active
+status: done
 created: 2026-11-01
 updated: 2026-11-06
+closed: 2026-11-06
 parent: 261101-vs5c
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-06T19:05
 ---
 
 # upgrade path for existing users
@@ -21,7 +20,9 @@ How do changes to the agent rails reach a repository that already ran `init`? Sk
 
 ## Next
 
-Open the pull request; the maintainer merges.
+## Outcome
+
+The guide's section 8 has an Upgrading table for the binary, the skills, AGENTS.md and the layout. skills status already reports 'outdated' (checked on a scratch repo), so no item was filed for it. The two gaps, akmctl agents (261101-abw2) and the CHANGELOG phrase (261101-hsh4), already existed and are now on the roadmap under Next. Until abw2 ships, the guide tells a user to compare against a fresh init.
 
 ## Log
 
