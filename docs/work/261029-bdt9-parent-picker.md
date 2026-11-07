@@ -1,12 +1,14 @@
 ---
 id: "261029-bdt9"
 title: "Workbench parent picker: a searchable list with match highlighting"
-status: ready
+status: active
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-07
 kind: feature
 priority: 0
 summary: Replace the capture modal's native datalist parent input with a searchable list that shows what matched and enough of each item to choose well
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-07T08:14
 ---
 
 # Workbench parent picker: a searchable list with match highlighting
@@ -42,3 +44,4 @@ Ready to start after 261029-kb33 (shared control styles); stage 1 can begin earl
 ## Log
 
 - 2026-10-29: filed.
+- 2026-11-07 01:14-07:00: claimed (claude-sonnet-5-5).
