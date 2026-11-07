@@ -2,6 +2,7 @@
 // are those of pkm-workbench (filler words dropped, six words, 48 characters).
 import { el } from "./util.js";
 import { api, describeError } from "./store.js";
+import { createSelect, createSummary } from "./controls.js";
 
 const MAX_WORDS = 6;
 const MAX_TITLE_SLUG = 48;
@@ -122,8 +123,8 @@ export function openCapture(deps, spec) {
   const title = input("cap-title", { maxlength: "200" });
   const slug = input("cap-slug", { spellcheck: "false", "aria-describedby": "cap-note" });
   const note = el("p", { id: "cap-note", class: "help", "aria-live": "polite" });
-  const summary = input("cap-summary", { maxlength: "160" });
-  const kind = el("select", { id: "cap-kind" }, el("option", { value: "", text: "(default: chore)" }), KINDS.map((k) => el("option", { value: k, text: k })));
+  const summary = createSummary({ id: "cap-summary", onSubmit: () => form.requestSubmit() });
+  const kind = createSelect({ id: "cap-kind", value: "", options: [{ value: "", label: "(default: chore)" }, ...KINDS.map((k) => ({ value: k, label: k }))] });
   const priority = input("cap-priority", { inputmode: "numeric", placeholder: "0", size: "6" });
   const parent = input("cap-parent", { list: "cap-parents", placeholder: "none" });
   const parents = el("datalist", { id: "cap-parents" }, spec.parents.map((p) => el("option", { value: p.id, label: p.title })));
@@ -132,7 +133,8 @@ export function openCapture(deps, spec) {
   let dirty = false;
   let busy = false;
 
-  const field = (label, help, control) => el("div", { class: "field" }, el("label", { class: "label", for: control.id, text: label }), help ? el("span", { class: "help", text: help }) : null, control);
+  // control: an element, or a custom control ({ root }) whose id is on `id`
+  const field = (label, help, control, id = control.id) => el("div", { class: "field" }, el("label", { class: "label", for: id, text: label }), help ? el("span", { class: "help", text: help }) : null, control.root || control);
 
   function preview() {
     const made = slugify(title.value);
@@ -155,8 +157,8 @@ export function openCapture(deps, spec) {
       { class: "dlg-body" },
       field("What is it?", "A short title. You shape it later, when you move it out of raw.", title),
       el("div", { class: "field" }, el("label", { class: "label", for: "cap-slug", text: "Name" }), el("span", { class: "help", text: "Made from the title. Edit it to word it yourself." }), slug, note),
-      field("Summary (optional)", "One line, at most 160 characters.", summary),
-      el("div", { class: "row3" }, field("Kind", "", kind), field("Priority", "", priority), field("Parent", "", parent), parents),
+      field("Summary (optional)", "One line, at most 160 characters.", summary, "cap-summary"),
+      el("div", { class: "row3" }, field("Kind", "", kind, "cap-kind"), field("Priority", "", priority), field("Parent", "", parent), parents),
       err,
     ),
     el("footer", { class: "dlg-foot" }, el("button", { type: "button", class: "btn quiet", onclick: () => deps.closeDialog() }, "Cancel ", el("kbd", { text: "Esc" })), submit),

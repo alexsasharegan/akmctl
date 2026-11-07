@@ -9,6 +9,7 @@ import * as C from "./capture.js";
 
 import * as V from "./live.js";
 import * as R from "./replay.js";
+import * as K from "./controls.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -562,4 +563,54 @@ assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");
   assert.equal(R.timeLabel("", new Date()), "");
   // a burst summary counts claims and releases
   assert.equal(V.summarize([{ type: "step", source: "outside" }, { type: "moved", source: "outside" }]), "2 changes outside (1 moved, 1 claimed or released).");
+}
+
+// shared controls: the summary counter
+{
+  const lv = (n) => K.counterState(n).level;
+  assert.equal(lv(0), "ok");
+  assert.equal(lv(143), "ok"); // 90% of 160 is 144
+  assert.equal(lv(144), "near");
+  assert.equal(lv(159), "near");
+  assert.equal(lv(160), "limit");
+  assert.equal(lv(161), "over");
+  assert.equal(K.counterState(150).text, "150 / 160 - 10 left");
+  assert.equal(K.counterState(160).text, "160 / 160 - limit reached");
+  assert.equal(K.counterState(165).text, "165 / 160 - 5 over the limit");
+  assert.equal(K.counterState(9, 10).level, "near"); // another limit: ceil(9) = 9
+  assert.equal(K.oneLine("a\nb\r\n  c"), "a b c");
+
+  // the select's key handling
+  const opts = [{ value: "", label: "(default: chore)" }, { value: "feature", label: "feature" }, { value: "bug", label: "bug" }, { value: "chore", label: "chore" }, { value: "spike", label: "spike" }];
+  const closed = { open: false, active: 0, buf: "", at: 0 };
+  const open = (active) => ({ open: true, active, buf: "", at: 0 });
+  const press = (st, key, now = 0) => K.selectKey(st, key, opts, now);
+  assert.deepEqual([press(closed, "ArrowDown").st.open, press(closed, "ArrowDown").st.active], [true, 0]); // opens first, on the chosen option
+  assert.equal(press(closed, "Enter").st.open, true);
+  assert.equal(press(closed, " ").handled, true);
+  assert.equal(press(open(0), "ArrowDown").st.active, 1);
+  assert.equal(press(open(4), "ArrowDown").st.active, 4); // stops at the end
+  assert.equal(press(open(0), "ArrowUp").st.active, 0);
+  assert.equal(press(open(2), "Home").st.active, 0);
+  assert.equal(press(open(2), "End").st.active, 4);
+  const pick = press(open(2), "Enter");
+  assert.deepEqual([pick.choose, pick.st.open], [2, false]);
+  assert.equal(press(open(2), " ").choose, 2);
+  // Escape closes an open list and is used; on a closed select it is left to the dialog
+  assert.deepEqual([press(open(2), "Escape").st.open, press(open(2), "Escape").handled, press(open(2), "Escape").choose], [false, true, null]);
+  assert.equal(press(closed, "Escape").handled, false);
+  // Tab closes without choosing and is not swallowed
+  const tab = press(open(2), "Tab");
+  assert.deepEqual([tab.st.open, tab.handled, tab.choose], [false, false, null]);
+  // type-ahead: a prefix typed fast, a restart after a pause, one letter repeated cycles
+  assert.equal(press(open(0), "b", 1000).st.active, 2);
+  const s = press(open(0), "s", 1000);
+  assert.equal(s.st.active, 4);
+  assert.equal(press(s.st, "p", 1100).st.active, 4); // "sp" -> spike
+  assert.equal(press(s.st, "f", 1100).st.active, 4); // nothing starts with "sf": the active option stays
+  assert.equal(press(open(1), "c", 1000).st.active, 3);
+  assert.equal(press({ ...open(3), buf: "c", at: 1000 }, "c", 1100).st.active, 3); // only one c option: stays
+  // a modified key and an unrelated one are not handled
+  assert.equal(press(open(0), "F5").handled, false);
+  assert.equal(press(open(0), "x", 1000).st.active, 0); // no match leaves the active option
 }
