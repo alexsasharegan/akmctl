@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The workbench capture modal has a custom select for the kind (open with Enter, Space or the arrows, Escape closes it, type a letter to jump) and a summary text area that wraps and counts: the counter warns from 144 of 160 characters and says "limit reached" at 160, in words as well as colour. A pasted line break becomes a space, and Enter in the summary captures as before. Affects people using the workbench; the controls are shared with the drawer editor (261028-esyt) to come. Work item 261029-kb33.
+
 - New command `akmctl agents`: prints the `AGENTS.md` that `init` would write for this repository, filled from its manifest (records folder, wikilinks) and read-only, so a repository whose `AGENTS.md` predates a template change can compare the two and keep the lines it judges. Affects: anyone upgrading an existing repository; nothing is written. Work item 261101-abw2.
 
 - The workbench replays moves made while you were away in the order they were committed, naming who made each (the `Assisted-by` value, else the commit author) and showing the path an item took, not only where it ended. It reads the `history` operation, so it needs a git work tree with `git_commits` on; otherwise it falls back to the old snapshot comparison (moves by id, "Outside"). A burst of more than ten moves, or reduced motion, still shows one summary toast and now also lists every move in a panel; a page load lists what was committed since the last visit. Limits: a round trip with no net change is not shown, and a move committed after it was seen live is listed again on the next load (work item 261101-w0mz, ADR 261106-60xv).
