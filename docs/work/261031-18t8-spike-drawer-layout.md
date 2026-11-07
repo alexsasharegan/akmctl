@@ -19,7 +19,7 @@ The drawer is a preview at a constrained width or a third of the screen, and it 
 - The layout inside: fields in a header block, the body as sections, the log and outcome last; sticky header and actions; read mode and edit mode (one surface or two).
 - Navigation: opening from a card, a link or the palette; going to a parent, child or linked record without closing it (a back stack); the URL for a drawer state so a link opens it.
 - Keyboard and focus: open, close, move between records, save and cancel; unsaved changes and a stale-record warning.
-- Constraints: the workbench has no dependencies and is plain JavaScript (see [261029-kb33](261029-kb33-workbench-form-controls.md)); light and dark; no reliance on colour alone.
+- Constraints: the workbench has no dependencies and is plain JavaScript (see [261029-kb33](done/261029-kb33-workbench-form-controls.md)); light and dark; no reliance on colour alone.
 
 Done when:
 
