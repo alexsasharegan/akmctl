@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The workbench capture modal's parent field is now a searchable list: type to search open work items by id, title or summary, with what matched marked, each row showing the id, title, status and summary; arrows and Enter choose, Escape closes only the list. It replaces the browser's plain suggestion list. Affects people using the workbench; the picker is shared with the drawer editor (261028-esyt) to come, and a multi-select for `blocked_by` is the next stage. Work item 261029-bdt9.
+
 - The workbench capture modal has a custom select for the kind (open with Enter, Space or the arrows, Escape closes it, type a letter to jump) and a summary text area that wraps and counts: the counter warns from 144 of 160 characters and says "limit reached" at 160, in words as well as colour. A pasted line break becomes a space, and Enter in the summary captures as before. Affects people using the workbench; the controls are shared with the drawer editor (261028-esyt) to come. Work item 261029-kb33.
 
 - New command `akmctl agents`: prints the `AGENTS.md` that `init` would write for this repository, filled from its manifest (records folder, wikilinks) and read-only, so a repository whose `AGENTS.md` predates a template change can compare the two and keep the lines it judges. Affects: anyone upgrading an existing repository; nothing is written. Work item 261101-abw2.

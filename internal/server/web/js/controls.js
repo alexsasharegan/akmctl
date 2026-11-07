@@ -75,6 +75,28 @@ export function selectKey(st, key, opts, now = 0) {
 let uid = 0;
 
 /**
+ * Open `list` (inside `root`) below `anchor`, or above it when there is more room
+ * there. Room is measured in the nearest scrolling box: a dialog body clips what
+ * overflows it. Sets the "up" class on root and the list's max-height.
+ */
+export function placeList(anchor, list, root) {
+  const r = anchor.getBoundingClientRect();
+  const box = anchor.closest(".dlg-body, .drawer");
+  const b = box ? box.getBoundingClientRect() : { top: 0, bottom: innerHeight };
+  const below = b.bottom - r.bottom - 8;
+  const above = r.top - b.top - 8;
+  const up = below < 180 && above > below;
+  root.classList.toggle("up", up);
+  list.style.maxHeight = Math.max(96, Math.min(224, up ? above : below)) + "px";
+}
+
+/** Keep `li` inside the visible part of its scrolling `list`. */
+export function keepInView(list, li) {
+  if (li.offsetTop < list.scrollTop) list.scrollTop = li.offsetTop;
+  else if (li.offsetTop + li.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = li.offsetTop + li.offsetHeight - list.clientHeight;
+}
+
+/**
  * A custom select. props: { id, options: [{ value, label }], value, onChange(value) }.
  * Returns { root, button, value (get and set), focus() }. The button carries the id,
  * so a <label for> names it; the list is a listbox opened under it.
@@ -123,26 +145,11 @@ export function createSelect(props) {
     if (st.open) {
       button.setAttribute("aria-activedescendant", items[st.active].id);
       place();
-      keepInView(items[st.active]);
+      keepInView(list, items[st.active]);
     } else button.removeAttribute("aria-activedescendant");
     label.textContent = opts[sel] ? opts[sel].label : "";
   }
-  // The list opens below the button, or above when there is more room there. Room is
-  // measured in the nearest scrolling box (a dialog body clips what overflows it).
-  function place() {
-    const r = button.getBoundingClientRect();
-    const box = button.closest(".dlg-body, .drawer");
-    const b = box ? box.getBoundingClientRect() : { top: 0, bottom: innerHeight };
-    const below = b.bottom - r.bottom - 8;
-    const above = r.top - b.top - 8;
-    const up = below < 180 && above > below;
-    root.classList.toggle("up", up);
-    list.style.maxHeight = Math.max(96, Math.min(224, up ? above : below)) + "px";
-  }
-  function keepInView(li) {
-    if (li.offsetTop < list.scrollTop) list.scrollTop = li.offsetTop;
-    else if (li.offsetTop + li.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = li.offsetTop + li.offsetHeight - list.clientHeight;
-  }
+  const place = () => placeList(button, list, root);
   function choose(i) {
     const changed = i !== sel;
     sel = i;

@@ -31,17 +31,18 @@ Only open work items are offered for parent (the existing rule); closed items ar
 
 Done when:
 
-- [ ] stage 1: replaces the datalist in the capture modal, with highlighting of id and title matches, keyboard use (arrows, Enter, Escape) and screen reader support
-- [ ] stage 2: result rows show id, title, status and summary
+- [x] stage 1: replaces the datalist in the capture modal, with highlighting of id and title matches, keyboard use (arrows, Enter, Escape) and screen reader support
+- [x] stage 2: result rows show id, title, status and summary
 - [ ] stage 3: a multi-select variant for blocked_by
-- [ ] unit tests for the matching and highlighting; checked in the browser in light and dark
-- [ ] new terms are registered in docs/glossary.md
+- [x] unit tests for the matching and highlighting; checked in the browser in light and dark
+- [x] new terms are registered in docs/glossary.md
 
 ## Next
 
-Ready to start after 261029-kb33 (shared control styles); stage 1 can begin earlier.
+Stages 1 and 2 are done (`js/picker.js`, used by the capture modal). Stage 3 is next: a multi-select variant for `blocked_by`, with removable chips; the drawer editor (261028-esyt) needs it.
 
 ## Log
 
 - 2026-10-29: filed.
+- 2026-11-07: stages 1 and 2: `js/picker.js` (`createPicker`, with the pure `searchItems`, `matchRanges` and `highlight`) replaces the datalist in the capture modal; rows show id, title, status and the summary with matches marked. Checked in the browser, light and dark. Stage 3 remains, so the item stays active.
 - 2026-11-07 01:14-07:00: claimed (claude-sonnet-5-5).
