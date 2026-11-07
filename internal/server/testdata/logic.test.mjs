@@ -10,6 +10,7 @@ import * as C from "./capture.js";
 import * as V from "./live.js";
 import * as R from "./replay.js";
 import * as K from "./controls.js";
+import * as P from "./picker.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -613,4 +614,42 @@ assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");
   // a modified key and an unrelated one are not handled
   assert.equal(press(open(0), "F5").handled, false);
   assert.equal(press(open(0), "x", 1000).st.active, 0); // no match leaves the active option
+}
+
+// the parent picker: matching, ranking and highlighting
+{
+  const items = [
+    { id: "261029-bdt9", title: "Workbench parent picker: a searchable list", summary: "Replace the datalist" },
+    { id: "261028-esyt", title: "Show and edit a record's fields in the drawer", summary: "A typed table" },
+    { id: "261029-kb33", title: "Workbench form controls", summary: "A custom select and a parent field helper" },
+    { id: "261101-4n0v", title: "Spike animations", summary: "" },
+  ];
+  const ids = (q) => P.searchItems(items, q).map((r) => r.item.id);
+  assert.deepEqual(P.tokens("  Foo  bar "), ["foo", "bar"]);
+  assert.deepEqual(P.matchRanges("Parent parent", ["parent"]), [[0, 6], [7, 13]]);
+  assert.deepEqual(P.matchRanges("abcd", ["ab", "bc"]), [[0, 3]]); // overlapping ranges merge
+  assert.deepEqual(P.matchRanges("abc", []), []);
+  assert.deepEqual(P.highlight("Hello world", [[0, 5]]), [{ text: "Hello", hit: true }, { text: " world", hit: false }]);
+  assert.deepEqual(P.highlight("a<b>c", [[1, 4]]), [{ text: "a", hit: false }, { text: "<b>", hit: true }, { text: "c", hit: false }]); // text stays text
+  assert.deepEqual(P.highlight("", []), []);
+  // no query lists everything as given
+  assert.deepEqual(ids(""), items.map((i) => i.id));
+  // an id match, by a prefix first
+  assert.deepEqual(ids("261028"), ["261028-esyt"]);
+  assert.deepEqual(ids("esyt"), ["261028-esyt"]);
+  assert.equal(P.searchItems(items, "esyt")[0].where.join(), "id");
+  // every token must match somewhere: title and summary together
+  assert.deepEqual(ids("workbench parent"), ["261029-bdt9", "261029-kb33"]);
+  assert.deepEqual(ids("workbench datalist"), ["261029-bdt9"]);
+  // a title match from a word start before a match inside a word; a summary-only match last
+  assert.deepEqual(ids("pick"), ["261029-bdt9"]);
+  assert.deepEqual(ids("parent"), ["261029-bdt9", "261029-kb33"]);
+  assert.deepEqual(P.searchItems(items, "parent").map((r) => r.where.join()), ["title", "summary"]);
+  assert.deepEqual(ids("nothing here"), []);
+  // case does not matter; the limit applies
+  assert.deepEqual(ids("TYPED"), ["261028-esyt"]);
+  assert.equal(P.searchItems(items, "", 2).length, 2);
+  assert.equal(P.countText(0), "No open work item matches");
+  assert.equal(P.countText(1), "1 result");
+  assert.equal(P.countText(7), "7 results");
 }
