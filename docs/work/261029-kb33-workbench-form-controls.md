@@ -1,12 +1,14 @@
 ---
 id: "261029-kb33"
 title: "Workbench form controls: a custom select and a summary text area with a counter"
-status: ready
+status: active
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-06
 kind: feature
 priority: 1
 summary: A custom select and a summary text area with a character counter for the workbench forms, in plain JavaScript, used by capture and the drawer
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-07T04:38
 ---
 
 # Workbench form controls: a custom select and a summary text area with a counter
@@ -39,3 +41,4 @@ Ready to start; no dependencies.
 ## Log
 
 - 2026-10-29: filed.
+- 2026-11-06 21:38-07:00: claimed (claude-sonnet-5-5).
