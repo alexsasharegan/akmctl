@@ -1,12 +1,14 @@
 ---
 id: "261108-rzr3"
 title: windows install zip steps
-status: raw
+status: active
 kind: chore
 parent: 261108-2ncf
 priority: 2
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-win
+claimed_at: 2026-11-08T21:09
 ---
 
 # windows install zip steps
@@ -21,6 +23,11 @@ Done when:
 - [ ] `scripts/install.sh` points at it instead of only at the releases page.
 - [ ] The steps were run on a Windows machine (the CI runner is enough).
 
+## Next
+
+Write the README Windows block, point install.sh at it, run the steps on the runner (download v0.3.3 zip, Get-FileHash vs SHA256SUMS, unpack, PATH, run) in a CI step, decide install.ps1 in the item.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 14:09-07:00: claimed (claude-sonnet-5-5-win).
