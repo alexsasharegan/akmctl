@@ -103,6 +103,17 @@ func TestNewWork(t *testing.T) {
 	clean(t, root)
 }
 
+func TestNewWorkWithCycle(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "in-a-sprint", "title": "In a sprint", "as_of": "2026-10-28", "fields": map[string]any{"cycle": "2026-s3"}})
+	p, _ := resp.Get("path")
+	if text := read(t, root, p.(string)); !strings.Contains(text, "cycle: 2026-s3\n") {
+		t.Errorf("no cycle in\n%s", text)
+	}
+	wantCode(t, root, "new", Request{"kind": "work", "slug": "x", "fields": map[string]any{"cycle": "-bad cycle"}}, "invalid_request", "")
+	clean(t, root)
+}
+
 func TestNewADRNeedsIndexRun(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "new", Request{"kind": "adr", "slug": "use-sqlite", "title": "Use SQLite", "as_of": "2026-10-28", "fields": map[string]any{"scope": []any{"src/store/"}}})

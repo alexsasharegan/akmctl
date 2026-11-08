@@ -285,7 +285,12 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .btn.primary kbd,.toast .btn kbd{color:var(--kbd-fg)}
 .dlg-foot{display:flex;justify-content:flex-end;gap:var(--s-3);padding:var(--s-4) var(--dlg-pad);border-top:1px solid var(--line);background:var(--bg);flex:none}
 .dialog.wizard{--dlg-w:860px}
-.dialog.capture{--dlg-w:560px}
+.dialog.capture{--dlg-w:720px}
+.dlg-head h2 .raw-word{font-family:var(--font-note);font-weight:700;font-style:italic;color:var(--accent);margin-right:.2em}
+.cap-sub{margin-top:var(--s-1)}
+.cap-go{padding:var(--s-2) var(--s-5);font-size:var(--fs-base);letter-spacing:.02em;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.cap-go:focus-visible{outline:var(--focus-w) solid var(--focus);outline-offset:3px}
+.cap-go[disabled]{box-shadow:none}
 .dialog form{display:flex;flex-direction:column;min-height:0;flex:1}
 .field{display:flex;flex-direction:column;gap:var(--s-1)}
 .field .label{font-weight:700}
@@ -293,6 +298,7 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .field input[type=text],.field textarea,.field select{width:100%;font:var(--fs-base) var(--font);color:var(--text);background:var(--input-bg);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:var(--s-2) var(--s-3)}
 .field textarea{resize:vertical;line-height:var(--lh)}
 .row3{display:grid;grid-template-columns:1.4fr 6em 1fr;gap:var(--s-3)}
+@media (max-width:560px){.row3{grid-template-columns:1fr 1fr}.row3 .field:first-child{grid-column:1 / -1}}
 /* shared controls (js/controls.js): the custom select and the summary text area */
 .sel{position:relative}
 .sel-btn{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);width:100%;text-align:left;cursor:pointer;font:var(--fs-base) var(--font);line-height:normal;color:var(--text);background:var(--input-bg);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:var(--s-2) var(--s-3)}

@@ -51,19 +51,26 @@ Moved to other items: the summary field and the kind select (261029-kb33); the p
 
 Done when:
 
-- [ ] the header reads heading first, with the muted subtitle below, and the heading uses Radon; contrast passes in light and dark
-- [ ] the modal is wider on desktop and its label descriptions no longer wrap awkwardly
-- [ ] an optional Cycle field files the item with that cycle, and a bad label shows the API's error on the field
-- [ ] the submit button has its own style with visible focus in both themes
-- [ ] unit tests cover the cycle field's request; checked in the browser in light and dark
-- [ ] new terms are registered in docs/glossary.md
+- [x] the header reads heading first, with the muted subtitle below, and the heading uses Radon; contrast passes in light and dark
+- [x] the modal is wider on desktop and its label descriptions no longer wrap awkwardly
+- [x] an optional Cycle field files the item with that cycle, and a bad label shows the API's error on the field
+- [x] the submit button has its own style with visible focus in both themes
+- [x] unit tests cover the cycle field's request; checked in the browser in light and dark
+- [x] new terms are registered in docs/glossary.md
 
 ## Next
 
-Ready. Do 261029-kb33 first if the select and summary should look right inside the new layout.
+All boxes are ticked: close it once the pull request is merged or the maintainer is happy with the look. The dark-mode focus ring on the submit button was not checked by eye (it uses the `--focus` token).
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: refined with Alexander; the summary, kind and parent parts moved to separate items.
 - 2026-11-07 22:34-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-07 22:37-07:00: ticked "the header reads heading first, with the muted subtitle below, and the heading uses Radon; contrast passes in light and dark": heading first with the muted New work item line below; Raw in Radon; contrast 9.8 and 7.8 to 1 in dark and light
+- 2026-11-07 22:37-07:00: ticked "the modal is wider on desktop and its label descriptions no longer wrap awkwardly": dialog 720px (was 560); parent search on its own row; checked at 375px
+- 2026-11-07 22:37-07:00: ticked "an optional Cycle field files the item with that cycle, and a bad label shows the API's error on the field": new now accepts fields.cycle; the modal filed cycle: 2026-s3; a bad label shows the error on the field
+- 2026-11-07 22:37-07:00: ticked "the submit button has its own style with visible focus in both themes": cap-go style; 3px focus ring checked in light (dark uses --focus), button contrast 8.8 to 1
+- 2026-11-07 22:37-07:00: ticked "unit tests cover the cycle field's request; checked in the browser in light and dark": buildCapture cycle cases in logic.test.mjs, TestNewWorkWithCycle; browser checked in light and dark
+- 2026-11-07 22:37-07:00: ticked "new terms are registered in docs/glossary.md": glossary Capture modal row extended
+- 2026-11-07: reworked the modal: heading first with Raw in Radon and the muted subtitle, 720px wide, Cycle field beside Priority, Parent on its own row, and a `cap-go` submit style. `new` now accepts `fields.cycle` for a work item (spec, test, changelog), which the Cycle field needs.

@@ -340,7 +340,7 @@ func mintID(repo *record.Repo, now time.Time) (string, error) {
 func newRecordText(repo *record.Repo, kind, title string, f map[string]any, now time.Time) (string, string, *Error) {
 	allowed := map[string]bool{"summary": true}
 	if kind == record.Work {
-		for _, k := range []string{"kind", "parent", "priority", "blocked_by", "decisions"} {
+		for _, k := range []string{"kind", "parent", "priority", "cycle", "blocked_by", "decisions"} {
 			allowed[k] = true
 		}
 	} else {
@@ -379,7 +379,7 @@ func newRecordText(repo *record.Repo, kind, title string, f map[string]any, now 
 		set("status", frontmatter.NewString("raw"))
 		var parentID string
 		var blockers []frontmatter.Value
-		for _, k := range []string{"kind", "parent", "priority", "blocked_by", "decisions"} {
+		for _, k := range []string{"kind", "parent", "priority", "cycle", "blocked_by", "decisions"} {
 			v, ok := f[k]
 			if !ok {
 				continue

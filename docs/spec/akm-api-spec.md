@@ -186,13 +186,13 @@ Response: `id`, `date`, `weekday` (English name), `age_days` (integer, negative 
 
 ### 4.10 `new`
 
-| Parameter | Type            | Meaning                                                                                                                                                      |
-| --------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `kind`    | `work` or `adr` | **required**                                                                                                                                                 |
-| `slug`    | string          | **required**. Lowercase kebab-case, at most 60 characters.                                                                                                   |
-| `title`   | string          | Default: the slug with hyphens as spaces.                                                                                                                    |
-| `fields`  | object          | Initial values: for `work`, `summary`, `kind`, `parent`, `priority`, `blocked_by`, `decisions`; for `adr`, `summary`, `scope`. Others are `invalid_request`. |
-| `as_of`   | timestamp       | The clock for the id's date. Tests set it.                                                                                                                   |
+| Parameter | Type            | Meaning                                                                                                                                                               |
+| --------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kind`    | `work` or `adr` | **required**                                                                                                                                                          |
+| `slug`    | string          | **required**. Lowercase kebab-case, at most 60 characters.                                                                                                            |
+| `title`   | string          | Default: the slug with hyphens as spaces.                                                                                                                             |
+| `fields`  | object          | Initial values: for `work`, `summary`, `kind`, `parent`, `priority`, `cycle`, `blocked_by`, `decisions`; for `adr`, `summary`, `scope`. Others are `invalid_request`. |
+| `as_of`   | timestamp       | The clock for the id's date. Tests set it.                                                                                                                            |
 
 A `parent` that is `done` or `dropped` is `refused` with `details.rule` `WK8`, since the new item is open. A `blocked_by` entry that would make the new item wait, through its parent, for itself is `refused` with `details.rule` `WK18`. Response: `record` and `path`. The new file comes from the template, with a fresh id, `created` and `updated` (or `date`) set to today, status `raw` (work) or `proposed` (ADR). A `parent` that does not resolve is `not_found`. The id is chosen so that no existing file in the three directories has it. For `kind: work`, the response also has `similar` when open items resemble the new one, and omits it otherwise (a response with no match is as it was before `similar`). `new` never refuses because of a match.
 
