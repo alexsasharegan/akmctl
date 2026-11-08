@@ -1,20 +1,19 @@
 ---
 id: "261108-3kse"
 title: fixture update mode and gap cases
-status: active
+status: done
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5-rest
-claimed_at: 2026-11-08T20:30
+closed: 2026-11-08
 ---
 
 # fixture update mode and gap cases
 
 ## Goal
 
-Findings F9, F10, F14, F16 and F17 of [the audit](../design/test-strategy-audit.md), from [261030-456q](done/261030-456q-test-strategy-and-coverage-audit.md): the expected responses of the conformance fixtures are edited by hand, and about half the request parameters, the `ls` filters `blocked`, `scope` and `since`, a stale case for each write and six `refused` reasons have no fixture. Add an update mode to the fixture runner first, then add the missing cases, then sync the copy (`scripts/sync-fixtures.sh`).
+Findings F9, F10, F14, F16 and F17 of [the audit](../../design/test-strategy-audit.md), from [261030-456q](261030-456q-test-strategy-and-coverage-audit.md): the expected responses of the conformance fixtures are edited by hand, and about half the request parameters, the `ls` filters `blocked`, `scope` and `since`, a stale case for each write and six `refused` reasons have no fixture. Add an update mode to the fixture runner first, then add the missing cases, then sync the copy (`scripts/sync-fixtures.sh`).
 
 Done when:
 
@@ -25,7 +24,9 @@ Done when:
 
 ## Next
 
-Close after review. Left for later: the other parameters F16 counts as unnamed, and if_match_required (261108-f1tv, both bindings).
+## Outcome
+
+TestConformance has an -update flag that rewrites expected (and after, would_be) from the tool's output in both fixture copies; verified by breaking an etag and an after text and getting the files back byte for byte. 20 cases added (ls blocked, scope, since; stale for seven writes; dry_run for claim, log, release; five refusal reasons) with fixture repositories commitson and nomanifest; scopeMatch has a unit test. if_match_required is an HTTP reason and waits for 261108-f1tv; the rest of F16's unnamed parameters are not covered.
 
 ## Log
 
