@@ -2,9 +2,9 @@
 id: "261101-4n0v"
 title: spike workbench move and close animations
 summary: Spike a set of playful lane-move and completion animations, including a confetti cannon on done, as opt-in themes
-status: raw
+status: ready
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-07
 kind: spike
 priority: -1
 ---
@@ -30,8 +30,9 @@ Done when:
 
 ## Next
 
-Refine with Alexander, then mark ready after 261101-w0mz.
+Ready. Scope agreed: a confetti cannon on `done` and one lane-move theme (a Tetris-style drop) as prototypes behind an opt-in switch, then the Outcome.
 
 ## Log
 
 - 2026-11-01: filed. The idea lived only in the design doc's brainstorm; Alexander added the confetti cannon.
+- 2026-11-07 22:52-07:00: Refined with Alexander: the spike builds a confetti cannon on done and one lane-move theme, a Tetris-style drop, to show how a theme plugs into the anim.js queue; the Outcome files the feature items. w0mz (replay of missed moves) is done.
