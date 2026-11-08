@@ -1,9 +1,10 @@
 // The record drawer: the fields of one record, what points at it, and its
 // sections read from the API one at a time. Body text is shown as text.
 import { el, text } from "./util.js";
-import { field, isId, childrenOf, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
+import { field, isId, isOpenWork, childrenOf, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
 import { show, findNote, describeError, state } from "./store.js";
 import { claimControls } from "./flow.js";
+import { fieldTable } from "./fields.js";
 
 // Sections that start collapsed (everything else starts open).
 const COLLAPSED = new Set(["log"]);
@@ -90,11 +91,13 @@ export function createDrawer(drawerEl, viewEl, ctx) {
 
   function render(r, sections, mySeq) {
     const byId = ctx.byId();
-    const dl = el("dl", { class: "fields" });
-    for (const [k, v] of Object.entries(r.fields)) {
-      if (v === null || v === undefined || k === "id" || k === "title" || (Array.isArray(v) && !v.length)) continue;
-      dl.append(el("dt", { text: k }), el("dd", {}, valueNodes(v, byId)));
-    }
+    const dl = fieldTable(r, {
+      valueNodes,
+      byId,
+      // the open work items a parent or blocker may be, in the shape the picker reads
+      records: () => ctx.records().filter(isOpenWork).map((x) => ({ id: x.id, title: text(field(x, "title")), status: text(field(x, "status")), summary: text(field(x, "summary")) })),
+      reload: () => self && self.refresh(true),
+    });
     const kids = r.type === "work" ? childrenOf(ctx.records(), r.id) : [];
     const parts = [
       el(
@@ -166,8 +169,10 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       }
     },
     /** Draw the open record again from the file, keeping scroll, open sections and focus. For the live board. */
-    async refresh() {
+    async refresh(force = false) {
       if (current === null) return;
+      // an edit in progress is not redrawn under the writer; saving it shows the conflict if the file moved
+      if (!force && drawerEl.querySelector(".fm-edit")) return;
       const id = current;
       const mySeq = ++seq;
       const top = drawerEl.scrollTop;

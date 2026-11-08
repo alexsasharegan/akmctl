@@ -11,6 +11,7 @@ import * as V from "./live.js";
 import * as R from "./replay.js";
 import * as K from "./controls.js";
 import * as P from "./picker.js";
+import * as F from "./fields.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -659,4 +660,77 @@ assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");
   assert.deepEqual(P.removeChip(["a"], "z"), ["a"]);
   assert.deepEqual(P.offered(items, ["261029-bdt9"], "261028-esyt").map((i) => i.id), ["261029-kb33", "261101-4n0v"]); // not chosen, not itself
   assert.deepEqual(P.offered(items, []).length, 4);
+}
+
+// the drawer's field table: value types, edit rules, edit requests
+{
+  assert.equal(F.valueType("2026-11-07"), "date");
+  assert.equal(F.valueType("2026-11-07T20:59"), "date");
+  assert.equal(F.valueType(3), "number");
+  assert.equal(F.valueType(false), "flag");
+  assert.equal(F.valueType(["a"]), "list");
+  assert.equal(F.valueType("[[a note]]"), "link");
+  assert.equal(F.valueType("261029-bdt9"), "id");
+  assert.equal(F.valueType("feature"), "text");
+  assert.equal(F.valueType("2026-11-07x"), "text");
+  assert.equal(F.valueType("[[x]]", () => false), "text"); // the caller says what a wikilink is
+
+  const st = (n, t, s) => F.editState(n, t, s).state;
+  // an open work item
+  for (const s of ["raw", "ready", "active", "blocked"]) {
+    for (const f of ["summary", "blocked_by", "cycle", "keep"]) assert.equal(st(f, "work", s), "yes", f + " " + s);
+  }
+  assert.equal(st("kind", "work", "raw"), "yes");
+  assert.equal(st("kind", "work", "ready"), "yes");
+  assert.equal(st("kind", "work", "active"), "warn");
+  assert.equal(st("kind", "work", "blocked"), "warn");
+  assert.equal(st("priority", "work", "ready"), "yes");
+  assert.equal(st("priority", "work", "active"), "warn");
+  assert.equal(st("priority", "work", "blocked"), "yes");
+  assert.equal(st("parent", "work", "active"), "warn");
+  assert.equal(st("parent", "work", "raw"), "yes");
+  assert.match(F.editState("kind", "work", "active").why, /rewrites/);
+  // a closed item keeps only `keep`
+  for (const f of ["summary", "kind", "priority", "parent", "blocked_by", "cycle"]) assert.equal(st(f, "work", "done"), "no", f);
+  assert.equal(st("keep", "work", "dropped"), "yes");
+  // the tool's own fields, and ADRs
+  for (const f of ["id", "created", "updated", "closed", "status", "claimed_by", "claimed_at"]) assert.equal(st(f, "work", "ready"), "no", f);
+  assert.match(F.editState("claimed_by", "work", "active").why, /claim/);
+  assert.equal(st("summary", "adr", "accepted"), "no");
+  assert.equal(st("origin", "work", "ready"), "no"); // no control
+
+  // edit requests
+  const ctx = { ids: ["261029-bdt9", "261028-esyt"], self: "261028-esyt" };
+  const ch = (n, v) => F.buildChanges(n, v, ctx);
+  assert.deepEqual(ch("summary", " a line "), { changes: { summary: "a line" } });
+  assert.deepEqual(ch("summary", ""), { changes: { summary: null } });
+  assert.match(ch("summary", "x".repeat(161)).error, /161 characters/);
+  assert.deepEqual(ch("kind", "bug"), { changes: { kind: "bug" } });
+  assert.match(ch("kind", "epic").error, /one of/);
+  assert.deepEqual(ch("priority", "2"), { changes: { priority: 2 } });
+  assert.deepEqual(ch("priority", "-1"), { changes: { priority: -1 } });
+  assert.deepEqual(ch("priority", ""), { changes: { priority: null } });
+  assert.match(ch("priority", "1.5").error, /whole number/);
+  assert.match(ch("priority", "01").error, /whole number/);
+  assert.deepEqual(ch("parent", "261029-bdt9"), { changes: { parent: "261029-bdt9" } });
+  assert.deepEqual(ch("parent", ""), { changes: { parent: null } });
+  assert.match(ch("parent", "261028-esyt").error, /own parent/);
+  assert.match(ch("parent", "261000-zzzz").error, /No open work item/);
+  assert.deepEqual(ch("blocked_by", ["261029-bdt9", "a few words"]), { changes: { blocked_by: ["261029-bdt9", "a few words"] } });
+  assert.deepEqual(ch("blocked_by", []), { changes: { blocked_by: null } });
+  assert.deepEqual(ch("cycle", "2026-w45"), { changes: { cycle: "2026-w45" } });
+  assert.deepEqual(ch("cycle", ""), { changes: { cycle: null } });
+  assert.match(ch("cycle", "-bad").error, /label/);
+  assert.deepEqual(ch("keep", true), { changes: { keep: true } });
+  assert.deepEqual(ch("keep", false), { changes: { keep: false } });
+  assert.match(ch("status", "done").error, /cannot be edited/);
+
+  // the rows: present fields in file order, no title, then the editable ones it lacks
+  const rec = { type: "work", id: "x", fields: { id: "x", title: "T", status: "ready", kind: "bug", summary: null, blocked_by: [], created: "2026-11-07" } };
+  assert.deepEqual(F.rowNames(rec), ["id", "status", "kind", "created", "summary", "priority", "parent", "blocked_by", "cycle", "keep"]);
+  const done = { type: "work", id: "x", fields: { id: "x", title: "T", status: "done", kind: "bug" } };
+  assert.deepEqual(F.rowNames(done), ["id", "status", "kind", "keep"]);
+  const adr = { type: "adr", id: "a", fields: { id: "a", title: "T", status: "accepted" } };
+  assert.deepEqual(F.rowNames(adr), ["id", "status"]);
+  assert.equal(F.TYPE_LEGEND.length, 7);
 }
