@@ -255,7 +255,7 @@ func TestRepoInsideARepositoryIsRefused(t *testing.T) {
 	os.MkdirAll(inner, 0o755)
 	var out, errb bytes.Buffer
 	code := Run([]string{"ls", "--repo", inner, "--format", "json"}, &out, &errb, ".")
-	if code != 2 || !strings.Contains(out.String(), "has no manifest, but "+root+" does") {
+	if code != 2 || !strings.Contains(out.String(), "has no manifest, but "+strings.ReplaceAll(root, `\`, `\\`)+" does") {
 		t.Fatalf("%d %s", code, out.String())
 	}
 	// leaving --repo out climbs from the working directory, as before
