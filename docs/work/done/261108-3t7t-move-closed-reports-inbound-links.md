@@ -1,13 +1,12 @@
 ---
 id: "261108-3t7t"
 title: move closed reports inbound links
-status: active
+status: done
 kind: feature
 priority: 4
 created: 2026-11-08
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5-rest
-claimed_at: 2026-11-08T21:21
+closed: 2026-11-08
 ---
 
 # move closed reports inbound links
@@ -23,7 +22,9 @@ Done when:
 
 ## Next
 
-Read the links of all moves in one pass before any file moves, report them as move_file does, bound the list at 50 lines, test, spec line, changelog.
+## Outcome
+
+move_closed lists the relative links and path-qualified wikilinks it leaves broken in notes, in move_file's form, read in one pass before any file moves; links between records that move together are not listed; the list ends at 50 lines with a count. Tested with a link to a moved record, a link between two moved records and the bound. Like move_file it reads docs/ and AGENTS.md only.
 
 ## Log
 
