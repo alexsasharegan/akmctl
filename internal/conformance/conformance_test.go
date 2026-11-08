@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -94,14 +95,37 @@ func TestConformance(t *testing.T) {
 	}
 }
 
-// snapshot is the files under root without the version control directory and
-// the lock file.
+// snapshot is the files under root without the version control directory (git
+// may still write there, for example its automatic maintenance) and the lock file.
 func snapshot(t *testing.T, root string) map[string]string {
-	m := testutil.Snapshot(t, root)
-	for p := range m {
-		if strings.HasPrefix(p, ".git/") || p == "docs/.akm.lock" {
-			delete(m, p)
+	t.Helper()
+	m := map[string]string{}
+	err := filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
+		rel, err := filepath.Rel(root, p)
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			if d.Name() == ".git" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if rel = filepath.ToSlash(rel); rel == "docs/.akm.lock" {
+			return nil
+		}
+		b, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		m[rel] = string(b)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("snapshot %s: %v", root, err)
 	}
 	return m
 }
@@ -124,6 +148,8 @@ func replayGit(t *testing.T, root string, commits []gitCommit) {
 	git(nil, "init", "-q", "-b", "main")
 	git(nil, "config", "commit.gpgsign", "false")
 	git(nil, "config", "core.autocrlf", "false")
+	git(nil, "config", "gc.auto", "0")
+	git(nil, "config", "maintenance.auto", "false")
 	for _, c := range commits {
 		var paths []string
 		for p, text := range c.Files {
