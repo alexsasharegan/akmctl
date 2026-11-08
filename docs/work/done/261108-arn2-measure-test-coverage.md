@@ -15,7 +15,7 @@ summary: "Part 3 of the test audit: measured coverage per package, an operation 
 
 ## Goal
 
-Part 3 of the audit in [261030-456q](../261030-456q-test-strategy-and-coverage-audit.md): coverage, measured and not guessed. Run `go test -cover` per package; build a matrix of operations by parameter and error code against the fixtures; build a matrix of `check` rule ids against tests (a case that trips the rule and a case that does not); list the spec's own "not tested" admissions.
+Part 3 of the audit in [261030-456q](261030-456q-test-strategy-and-coverage-audit.md): coverage, measured and not guessed. Run `go test -cover` per package; build a matrix of operations by parameter and error code against the fixtures; build a matrix of `check` rule ids against tests (a case that trips the rule and a case that does not); list the spec's own "not tested" admissions.
 
 It adds a "Coverage" section to `docs/design/test-strategy-audit.md` (create the file if it is missing). Every figure comes from a command recorded in this item's Log, run on the audit's date. It is an audit: no test is written except to measure something.
 

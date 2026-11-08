@@ -51,7 +51,13 @@ Workbench and polish:
 
 Hardening and small rules:
 
-- [261030-456q] Test strategy and coverage audit
+- [261108-z9n8] CI hardening for skipped tests and scripts
+- [261108-3kse] Fixture update mode and gap cases
+- [261108-qv1w] CLI and check test gaps
+- [261108-rwqj] Shared test helpers and run time
+- [261108-f1tv] Run fixtures through both bindings
+- [261108-79t5] Skill text checks
+- [261108-xajw] Workbench page tests
 - [261107-1gha] help lists --fields and --changes flags that refuse a JSON object
 - [261029-q8z3] TestCompareAndSwapRace is flaky on Windows CI
 - [261028-jzsx] Cover the Windows path beyond CI
