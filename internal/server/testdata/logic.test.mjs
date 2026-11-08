@@ -12,6 +12,7 @@ import * as R from "./replay.js";
 import * as K from "./controls.js";
 import * as P from "./picker.js";
 import * as F from "./fields.js";
+import * as X from "./effects.js";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -736,4 +737,20 @@ assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");
   const adr = { type: "adr", id: "a", fields: { id: "a", title: "T", status: "accepted" } };
   assert.deepEqual(F.rowNames(adr), ["id", "status"]);
   assert.equal(F.TYPE_LEGEND.length, 7);
+}
+
+// effects: opt-in preferences and the confetti pieces (work item 261101-4n0v)
+assert.deepEqual(X.parsePrefs(""), { theme: "quiet", confetti: false });
+assert.deepEqual(X.parsePrefs("{not json"), { theme: "quiet", confetti: false });
+assert.deepEqual(X.parsePrefs('{"theme":"tetris","confetti":true}'), { theme: "tetris", confetti: true });
+assert.deepEqual(X.parsePrefs('{"theme":"mario","confetti":"yes"}'), { theme: "quiet", confetti: false });
+assert.equal(X.nextTheme("quiet"), "tetris");
+assert.equal(X.nextTheme("tetris"), "quiet");
+assert.equal(X.nextTheme("nope"), "quiet");
+assert.deepEqual(X.confettiPieces(10, 7), X.confettiPieces(10, 7));
+assert.notDeepEqual(X.confettiPieces(10, 7), X.confettiPieces(10, 8));
+assert.equal(X.confettiPieces(70, 1).length, 70);
+for (const p of X.confettiPieces(70, 3)) {
+  assert.ok(X.CONFETTI_COLORS.includes(p.color));
+  assert.ok(p.rise > -1 && p.fall > 0 && p.dur >= 1100 && p.delay >= 0);
 }

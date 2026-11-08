@@ -410,6 +410,10 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .live-status{font:var(--fs-xs) var(--mono);color:var(--warn-fg);background:var(--warn-bg);border:1px solid var(--warn-fg);border-radius:var(--r-sm);padding:0 .5em;line-height:1.6}
 .card.anim-lift{z-index:3;box-shadow:var(--sh-lg);outline:2px solid var(--accent);outline-offset:1px}
 .card.anim-flying{z-index:3;box-shadow:var(--sh-lg)}
+/* the confetti cannon (js/effects.js): opt-in, never under prefers-reduced-motion */
+.fx-layer{position:fixed;inset:0;z-index:30;pointer-events:none;overflow:hidden}
+.fx-bit{position:absolute;display:block;border-radius:1px;will-change:transform,opacity}
+@media (prefers-reduced-motion:reduce){.fx-layer{display:none}}
 @media (prefers-reduced-motion:no-preference){
   .card.anim-lift{transform:scale(1.03) rotate(1deg);transition:transform 220ms var(--ease),box-shadow 220ms var(--ease)}
   .card.anim-settle,tr.row.anim-settle{animation:settle 900ms var(--ease)}

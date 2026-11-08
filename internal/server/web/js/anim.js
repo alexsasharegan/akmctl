@@ -9,6 +9,7 @@
 import { el } from "./util.js";
 import { LANES, lanes } from "./logic.js";
 import { describeEvent, summarize } from "./live.js";
+import { loadPrefs, savePrefs, burst, THEMES } from "./effects.js";
 
 export const BACKLOG = 10;
 const IDLE_MS = 1500;
@@ -43,6 +44,16 @@ const play = (card, frames, opts) => {
   return Promise.race([card.animate(frames, opts).finished.catch(() => {}), wait(opts.duration + 200)]);
 };
 
+/** Put `card` into lane `to` where the refreshed order says it belongs. */
+function slotInto(card, to, id, status, ctx) {
+  const body = to.querySelector(".col-body");
+  const order = (lanes(ctx.records()).find((l) => l.status === status) || { records: [] }).records.map((r) => r.id);
+  const after = order.slice(order.indexOf(id) + 1);
+  const ref = [...body.querySelectorAll(".card")].find((c) => after.includes(c.dataset.id)) || null;
+  body.querySelector(".empty-col")?.remove();
+  body.insertBefore(card, ref);
+}
+
 // ---- themes ----
 // A theme is async (event, ctx) => boolean: true if it drew something.
 // ctx: records() the refreshed records. "quiet" is the only one.
@@ -70,16 +81,56 @@ export const themes = {
     const first = card.getBoundingClientRect();
     card.classList.remove("anim-lift");
     card.classList.add("anim-flying");
-    // its place in the new lane: before the next card of the refreshed order that is on the board
-    const body = to.querySelector(".col-body");
-    const order = (lanes(ctx.records()).find((l) => l.status === ev.to) || { records: [] }).records.map((r) => r.id);
-    const after = order.slice(order.indexOf(ev.id) + 1);
-    const ref = [...body.querySelectorAll(".card")].find((c) => after.includes(c.dataset.id)) || null;
-    body.querySelector(".empty-col")?.remove();
-    body.insertBefore(card, ref);
+    slotInto(card, to, ev.id, ev.to, ctx);
     if (focused) card.focus({ preventScroll: true });
     const last = card.getBoundingClientRect();
     await play(card, [{ transform: "translate(" + (first.left - last.left) + "px," + (first.top - last.top) + "px)" }, { transform: "none" }], { duration: 480, easing: "cubic-bezier(.2,.7,.2,1)" });
+    card.classList.remove("anim-flying");
+    recount(from);
+    recount(to);
+    return true;
+  },
+
+  /**
+   * A Tetris-style drop: the card lifts, slides across the top to its lane in three
+   * steps, drops to its place in discrete rows and lands with a small squash. It shows
+   * how a theme plugs in: it gets the move event and the refreshed records, moves the
+   * card itself, and returns true. A card that leaves the board falls back to "quiet".
+   */
+  async tetris(ev, ctx) {
+    const card = cardOf(ev.id);
+    if (!card) return false;
+    const from = card.closest(".col");
+    const to = ev.closed ? null : laneCol(ev.to);
+    if (!to) return themes.quiet(ev, ctx);
+    if (from === to) return false;
+    const focused = document.activeElement === card;
+    card.classList.add("anim-lift");
+    await wait(200);
+    if (!card.isConnected) return true;
+    const first = card.getBoundingClientRect();
+    card.classList.remove("anim-lift");
+    card.classList.add("anim-flying");
+    slotInto(card, to, ev.id, ev.to, ctx);
+    if (focused) card.focus({ preventScroll: true });
+    const last = card.getBoundingClientRect();
+    // a lane can be long: keep the whole path near the card, so it is a drop and not a flight
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const dx = first.left - last.left;
+    const dy = clamp(first.top - last.top, -400, 400);
+    const top = -clamp(last.height + 80, 120, 320); // the height it falls from
+    const at = (x, y, extra = "") => "translate(" + x + "px," + y + "px)" + extra;
+    await play(
+      card,
+      [
+        { transform: at(dx, dy), offset: 0, easing: "steps(3, end)" },
+        { transform: at(0, top), offset: 0.3, easing: "steps(7, end)" },
+        { transform: at(0, 0), offset: 0.85 },
+        { transform: at(0, 0, " scale(1.05,.9)"), offset: 0.93 },
+        { transform: "none", offset: 1 },
+      ],
+      { duration: 900 },
+    );
     card.classList.remove("anim-flying");
     recount(from);
     recount(to);
@@ -128,7 +179,7 @@ export function createAnimator(ctx) {
   const holds = [];
   let playing = false;
   let settling = false;
-  let theme = "quiet";
+  let prefs = loadPrefs();
 
   const busy = () => !!(ctx.busy && ctx.busy()) || !!document.querySelector(".card.dragging") || holds.some((f) => f());
   const say = (ev) => describeEvent(ev, ctx.titleOf(ev.id));
@@ -137,8 +188,12 @@ export function createAnimator(ctx) {
     ctx.toast(say(ev));
     touched.add(ev.id);
     if (skip || ev.type !== "moved" || reduced()) return;
+    if (prefs.confetti && ev.to === "done") {
+      const c = cardOf(ev.id);
+      if (c) burst(c.getBoundingClientRect());
+    }
     try {
-      await (themes[theme] || themes.quiet)(ev, ctx);
+      await (themes[prefs.theme] || themes.quiet)(ev, ctx);
     } catch (e) {
       /* the re-draw makes the board right anyway */
     }
@@ -185,8 +240,23 @@ export function createAnimator(ctx) {
       queue.push(...events);
       drain();
     },
+    /** The reader's choices: { theme, confetti }. */
+    prefs: () => ({ ...prefs }),
     use(name) {
-      if (themes[name]) theme = name;
+      if (THEMES.includes(name) && themes[name]) {
+        prefs = { ...prefs, theme: name };
+        savePrefs(prefs);
+      }
+    },
+    confetti(on) {
+      prefs = { ...prefs, confetti: !!on };
+      savePrefs(prefs);
+    },
+    /** Fire the cannon from the middle of the page, so a reader can see what it looks like. */
+    preview() {
+      if (reduced()) return false;
+      burst({ left: innerWidth / 2, top: innerHeight * 0.6, width: 0, height: 0 });
+      return true;
     },
     /** Another module (a drag, a form) says: not now, while fn() is true. */
     holdWhile(fn) {

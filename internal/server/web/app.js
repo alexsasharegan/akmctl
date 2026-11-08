@@ -4,6 +4,7 @@
 import { initToken, parseToken, hasToken, loadSnapshot, loadConfig, loadClosed, check, fetchHistory, state, describeError, ApiError } from "./js/store.js";
 import { createLive, mountIndicator } from "./js/live.js";
 import { createAnimator, keepSteady } from "./js/anim.js";
+import { nextTheme } from "./js/effects.js";
 import { mergeWithHistory, moveToEvent, mountAway, AWAY_MAX } from "./js/replay.js";
 import { parseRoute, routeHref, indexById, TABLES, pageTitle, repoLabel, filterByProject, projectFromHash, withProject } from "./js/logic.js";
 import { mountProjectFilter, recall } from "./js/project.js";
@@ -303,6 +304,31 @@ function onKey(e) {
 /** The record a move key acts on: the open record, else the focused card of the board. */
 const currentId = () => (drawer.isOpen() ? drawer.id() : view && view.current ? view.current() : null);
 
+/** The opt-in animations (work item 261101-4n0v): a move theme, a confetti cannon on done, a preview. */
+const animationActions = () => {
+  const p = anim.prefs();
+  return [
+    {
+      label: "Animations: move theme is " + p.theme + ", switch to " + nextTheme(p.theme),
+      keys: [],
+      run: () => {
+        anim.use(nextTheme(p.theme));
+        toast("Move animation: " + nextTheme(p.theme) + ".");
+      },
+    },
+    {
+      label: "Animations: confetti on done is " + (p.confetti ? "on, turn off" : "off, turn on"),
+      keys: [],
+      run: () => {
+        anim.confetti(!p.confetti);
+        toast("Confetti on done is " + (!p.confetti ? "on" : "off") + ".");
+        if (!p.confetti && !anim.preview()) toast("Reduced motion is on in your system, so nothing will play.");
+      },
+    },
+    { label: "Animations: try the confetti", keys: [], run: () => !anim.preview() && toast("Reduced motion is on in your system, so nothing plays.") },
+  ];
+};
+
 const actions = () => [
   { label: "Go to Board", keys: ["1"], run: () => go({ name: "board" }) },
   { label: "Go to Tables", keys: ["2"], run: () => go({ name: "tables" }) },
@@ -313,6 +339,7 @@ const actions = () => [
   { label: "Show all projects", keys: [], run: () => project !== null && chooseProject(null) },
   { label: "Reload the records", keys: ["r"], run: () => reload(true) },
   { label: "Switch light and dark", keys: ["t"], run: toggleTheme },
+  ...animationActions(),
   { label: "Show keyboard shortcuts", keys: ["?"], run: openHelp },
 ];
 
