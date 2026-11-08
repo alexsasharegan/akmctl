@@ -59,6 +59,7 @@ func putOutcome(t *testing.T, root string) {
 // A dry run changes nothing on disk: not a file, not a modification time, and
 // no lock file either.
 func TestDryRunNeverTouchesTheRepository(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "claims", "")
 	putOutcome(t, root)
 	// age every file, so that a rewrite would show in the mtime
@@ -103,6 +104,7 @@ func TestDryRunNeverTouchesTheRepository(t *testing.T) {
 
 // A write without dry_run has no diff member.
 func TestNoDiffWithoutDryRun(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"priority": 9}})
 	if _, ok := resp.Get("diff"); ok {
@@ -113,6 +115,7 @@ func TestNoDiffWithoutDryRun(t *testing.T) {
 // The record of a dry run is the would-be state with the current etag, and the
 // next real write with the same request produces exactly that state.
 func TestDryRunPreviewMatchesTheWrite(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	putOutcome(t, root)
 	req := Request{"id": a2b3, "status": "done", "outcome": "Shipped in 0.2.", "as_of": "2026-10-28"}
@@ -148,6 +151,7 @@ func TestDryRunPreviewMatchesTheWrite(t *testing.T) {
 }
 
 func TestDryRunStillChecksTheEtagAndRules(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"priority": 1}, "if_match": "0000000000000000", "dry_run": true}, "stale", "")
 	wantCode(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "blocked"}, "dry_run": true}, "refused", "rule")
@@ -165,6 +169,7 @@ func TestDryRunStillChecksTheEtagAndRules(t *testing.T) {
 }
 
 func TestSection(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	// replace, with updated set
 	mustOK(t, root, "section", Request{"id": e5f6, "name": "goal", "text": "New goal.", "as_of": "2026-10-28"})
@@ -218,6 +223,7 @@ func TestSection(t *testing.T) {
 }
 
 func TestSectionKeepsCRLF(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := filepath.Join(root, e5f6File)
 	b, _ := os.ReadFile(p)
@@ -230,6 +236,7 @@ func TestSectionKeepsCRLF(t *testing.T) {
 }
 
 func TestCloseWithOutcome(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "close", Request{"id": a2b3, "status": "done", "outcome": "Shipped in 0.2.", "as_of": "2026-10-28"})
 	to, _ := resp.Get("moved_to")
@@ -262,6 +269,7 @@ func TestCloseWithOutcome(t *testing.T) {
 }
 
 func TestVersionRepository(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "claims", "claim_stale_hours: 6\nreference_style: wikilink\n")
 	resp := mustOK(t, root, "version", Request{})
 	r, _ := resp.Get("repository")
@@ -285,6 +293,7 @@ func TestVersionRepository(t *testing.T) {
 // (never a partial one), a dry run never fails with unreadable, and the lock
 // file is not needed to read. Run with -race.
 func TestWritesAndDryRunsRace(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	var wg sync.WaitGroup
 	errs := make(chan string, 200)

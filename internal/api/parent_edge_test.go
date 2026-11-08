@@ -39,6 +39,7 @@ func wantRule(t *testing.T, err *Error, rule string, in ...string) {
 }
 
 func TestSetRefusesParentLoopsAtAnyDepth(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	a := newItem(t, root, "tier-one", "")
 	b := newItem(t, root, "tier-two", a)
@@ -55,12 +56,14 @@ func TestSetRefusesParentLoopsAtAnyDepth(t *testing.T) {
 }
 
 func TestSetKeepsAnExistingLoopEditable(t *testing.T) {
+	t.Parallel()
 	// a violation that is already present is not a reason to refuse an unrelated change
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "set", Request{"id": "261015-c4d5", "changes": map[string]any{"priority": 1}})
 }
 
 func TestOpenItemCannotJoinAClosedParent(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	open := newItem(t, root, "open-one", "")
 	_, err := call(t, root, "set", Request{"id": open, "changes": map[string]any{"parent": doneItem}})
@@ -73,6 +76,7 @@ func TestOpenItemCannotJoinAClosedParent(t *testing.T) {
 // A closed item's parent is part of what it was while open: set refuses it
 // without a correction, and a correction never reaches it (ADR 261101-dxcn).
 func TestClosedItemKeepsItsParent(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	x := newItem(t, root, "finished", "")
 	mustOK(t, root, "section", Request{"id": x, "name": "Goal", "text": "Done when it is done."})
@@ -94,6 +98,7 @@ func block(t *testing.T, root, id string, by ...string) *Error {
 }
 
 func TestSetRefusesBlockedByCycles(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	a := newItem(t, root, "item-a", "")
 	b := newItem(t, root, "item-b", "")
@@ -114,6 +119,7 @@ func TestSetRefusesBlockedByCycles(t *testing.T) {
 }
 
 func TestBlockedByCyclesThroughTheParentTree(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := newItem(t, root, "project", "")
 	c := newItem(t, root, "child", p)
@@ -139,6 +145,7 @@ func TestBlockedByCyclesThroughTheParentTree(t *testing.T) {
 }
 
 func TestParentEdgeCannotCompleteADependencyCycle(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := newItem(t, root, "project", "")
 	c := newItem(t, root, "stray", "")
@@ -154,6 +161,7 @@ func TestParentEdgeCannotCompleteADependencyCycle(t *testing.T) {
 }
 
 func TestCloseDroppedRefusesOpenChildren(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := newItem(t, root, "project", "")
 	c := newItem(t, root, "child", p)
@@ -172,6 +180,7 @@ func TestCloseDroppedRefusesOpenChildren(t *testing.T) {
 }
 
 func TestNewRefusesACycleFromParentAndBlockedBy(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := newItem(t, root, "project", "")
 	x := newItem(t, root, "other", "")

@@ -7,6 +7,7 @@ import (
 )
 
 func TestFindByNote(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	write := func(rel, text string) {
 		full := filepath.Join(root, filepath.FromSlash(rel))

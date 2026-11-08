@@ -10,6 +10,7 @@ import (
 // TestSetTitleRenamesTheHeading is work item 261108-kdz1: set title= left the
 // "# heading" as it was, so check warned WK12 and set said nothing.
 func TestSetTitleRenamesTheHeading(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "set", Request{"id": e5f6ID, "changes": map[string]any{"title": "Explain the exit codes"}, "as_of": "2026-10-28"})
 	text := read(t, root, e5f6Path)

@@ -12,6 +12,7 @@ import (
 // relative Markdown links the move breaks, in the item and to it (work item
 // 261031-wjs3).
 func TestCloseRewritesLinks(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	item := "docs/work/261020-a2b3-add-json-output-to-ls.md"
 	write := func(rel, text string) {
@@ -95,6 +96,7 @@ func TestCloseRewritesLinks(t *testing.T) {
 // TestCloseReportsLinkWriteFailure: a file whose links cannot be rewritten does
 // not undo the move or stop the other files; it is reported in link_errors.
 func TestCloseReportsLinkWriteFailure(t *testing.T) {
+	t.Parallel()
 	if os.Geteuid() == 0 || runtime.GOOS == "windows" {
 		t.Skip("needs a folder that refuses writes")
 	}

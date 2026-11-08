@@ -18,6 +18,7 @@ func TestEveryPatternParameterDescribesItsForm(t *testing.T) {
 }
 
 func TestPatternErrorNamesTheExpectedForm(t *testing.T) {
+	t.Parallel()
 	root := commitsRepo(t, "claims")
 	cases := []struct{ op, param, value, want string }{
 		{"log", "at", "09:46", "YYYY-MM-DD HH:MM"},

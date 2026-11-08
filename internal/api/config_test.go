@@ -74,6 +74,7 @@ func planOf(resp Obj, k string) []string {
 }
 
 func TestConfigList(t *testing.T) {
+	t.Parallel()
 	root := cfgRepo(t, false)
 	resp := cfgOK(t, root, Request{})
 	ss, _ := resp.Get("settings")
@@ -93,6 +94,7 @@ func TestConfigList(t *testing.T) {
 }
 
 func TestConfigOnOffIdempotent(t *testing.T) {
+	t.Parallel()
 	root := cfgRepo(t, true)
 	on := Request{"key": "git_commits", "value": true}
 	resp := cfgOK(t, root, on)
@@ -146,6 +148,7 @@ func TestConfigOnOffIdempotent(t *testing.T) {
 }
 
 func TestConfigEditedNeedsSecondConfirm(t *testing.T) {
+	t.Parallel()
 	root := cfgRepo(t, true)
 	cfgOK(t, root, Request{"key": "git_commits", "value": true})
 	skill := filepath.Join(root, filepath.FromSlash(skillFile))
@@ -180,6 +183,7 @@ func TestConfigEditedNeedsSecondConfirm(t *testing.T) {
 }
 
 func TestConfigConflicts(t *testing.T) {
+	t.Parallel()
 	// a file where the directory goes
 	root := cfgRepo(t, true)
 	os.MkdirAll(filepath.Join(root, ".agents", "skills"), 0o755)
@@ -221,6 +225,7 @@ func TestConfigConflicts(t *testing.T) {
 }
 
 func TestConfigNeedsGitWorkTree(t *testing.T) {
+	t.Parallel()
 	root := cfgRepo(t, false)
 	cfgRefused(t, root, Request{"key": "git_commits", "value": true}, "not_a_git_repo")
 	if exists(root, ".agents") || strings.Contains(layoutText(t, root), "git_commits") {
@@ -231,12 +236,14 @@ func TestConfigNeedsGitWorkTree(t *testing.T) {
 }
 
 func TestConfigNeedsManifest(t *testing.T) {
+	t.Parallel()
 	root := cfgRepo(t, true)
 	os.Remove(filepath.Join(root, "docs", ".layout"))
 	cfgRefused(t, root, Request{"key": "git_commits", "value": true}, "no_manifest")
 }
 
 func TestConfigRepairsBadValue(t *testing.T) {
+	t.Parallel()
 	root := cfgRepo(t, true)
 	os.WriteFile(filepath.Join(root, "docs", ".layout"), []byte(layoutText(t, root)+"git_commits: maybe\n"), 0o644)
 	cfgOK(t, root, Request{"key": "git_commits", "value": true})

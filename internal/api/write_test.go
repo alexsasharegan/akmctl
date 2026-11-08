@@ -81,6 +81,7 @@ const (
 )
 
 func TestNewWork(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "add-a-thing", "title": "Add a thing", "as_of": "2026-10-28T09:30",
 		"fields": map[string]any{"summary": "One line.", "parent": c4d5, "priority": 1, "kind": "feature"}})
@@ -98,6 +99,7 @@ func TestNewWork(t *testing.T) {
 }
 
 func TestNewWorkWithCycle(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "in-a-sprint", "title": "In a sprint", "as_of": "2026-10-28", "fields": map[string]any{"cycle": "2026-s3"}})
 	p, _ := resp.Get("path")
@@ -109,6 +111,7 @@ func TestNewWorkWithCycle(t *testing.T) {
 }
 
 func TestNewADRNeedsIndexRun(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "new", Request{"kind": "adr", "slug": "use-sqlite", "title": "Use SQLite", "as_of": "2026-10-28", "fields": map[string]any{"scope": []any{"src/store/"}}})
 	repo, _ := record.Load(root)
@@ -121,6 +124,7 @@ func TestNewADRNeedsIndexRun(t *testing.T) {
 }
 
 func TestNewRejects(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "new", Request{"kind": "work", "slug": "Bad Slug"}, "invalid_request", "")
 	wantCode(t, root, "new", Request{"kind": "work", "slug": "x", "fields": map[string]any{"status": "done"}}, "invalid_request", "")
@@ -130,6 +134,7 @@ func TestNewRejects(t *testing.T) {
 }
 
 func TestNewIDsAreUnique(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	seen := map[string]bool{}
 	for i := 0; i < 40; i++ {
@@ -144,6 +149,7 @@ func TestNewIDsAreUnique(t *testing.T) {
 }
 
 func TestSetChangesOnlyWhatItMust(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	before := read(t, root, "docs/work/261022-e5f6-document-the-exit-codes.md")
 	resp := mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"priority": 4, "summary": "Document them."}, "as_of": "2026-10-28"})
@@ -168,6 +174,7 @@ func TestSetChangesOnlyWhatItMust(t *testing.T) {
 }
 
 func TestSetRemovesAndRefuses(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "set", Request{"id": a2b3, "changes": map[string]any{"priority": nil}})
 	if strings.Contains(read(t, root, "docs/work/261020-a2b3-add-json-output-to-ls.md"), "priority") {
@@ -188,6 +195,7 @@ func TestSetRemovesAndRefuses(t *testing.T) {
 }
 
 func TestSetADRStatusDate(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "set", Request{"id": "261018-r5s6", "changes": map[string]any{"status": "accepted"}, "as_of": "2026-10-29"})
 	if !strings.Contains(read(t, root, "docs/adr/261018-r5s6-use-a-local-server-for-the-ui.md"), "date: 2026-10-29\n") {
@@ -197,6 +205,7 @@ func TestSetADRStatusDate(t *testing.T) {
 }
 
 func TestStaleEtag(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	repo, _ := record.Load(root)
 	etag := repo.ByID(e5f6)[0].Etag
@@ -209,6 +218,7 @@ func TestStaleEtag(t *testing.T) {
 
 // Two writers with the same etag: exactly one wins.
 func TestCompareAndSwapRace(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	repo, _ := record.Load(root)
 	etag := repo.ByID(e5f6)[0].Etag
@@ -237,6 +247,7 @@ func TestCompareAndSwapRace(t *testing.T) {
 }
 
 func TestClose(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "close", Request{"id": a2b3, "status": "done"}, "refused", "empty_outcome")
 	// give the item an outcome
@@ -259,6 +270,7 @@ func TestClose(t *testing.T) {
 }
 
 func TestCloseParentWithOpenChildren(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := filepath.Join(root, "docs/work/261015-c4d5-machine-readable-listings.md")
 	b, _ := os.ReadFile(p)
@@ -268,6 +280,7 @@ func TestCloseParentWithOpenChildren(t *testing.T) {
 }
 
 func TestClaimAndRelease(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-1"}, "refused", "extension_off")
 	root = copyRepo(t, "basic", "extension.claims: 0.3.0\n")
@@ -313,6 +326,7 @@ func TestClaimAndRelease(t *testing.T) {
 // A claimed item that is blocked and then unblocked to active (set, then
 // claim by the same identity) keeps one 'claimed' line in its log.
 func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
 	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
@@ -328,6 +342,7 @@ func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
 }
 
 func TestCloseClearsClaim(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
 	mustOK(t, root, "claim", Request{"id": a2b3, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	p := filepath.Join(root, "docs/work/261020-a2b3-add-json-output-to-ls.md")
@@ -341,6 +356,7 @@ func TestCloseClearsClaim(t *testing.T) {
 }
 
 func TestWikilinkReferenceStyle(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "reference_style: wikilink\n")
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"parent": a2b3}})
 	text := read(t, root, "docs/work/261022-e5f6-document-the-exit-codes.md")
@@ -357,6 +373,7 @@ func TestWikilinkReferenceStyle(t *testing.T) {
 }
 
 func TestNoTempFilesLeft(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"priority": 9}})
 	ents, _ := os.ReadDir(filepath.Join(root, "docs/work"))
