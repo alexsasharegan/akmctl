@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/initrepo"
+	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
 func skillState(t *testing.T, resp Obj, name string) string {
@@ -156,5 +157,83 @@ func TestSkillsRefusals(t *testing.T) {
 	}
 	if b, _ := os.ReadFile(skillPath(root, ".agents")); string(b) != "x" {
 		t.Fatal("the conflicting file changed")
+	}
+}
+
+func TestSkillsNewerThanTheBinary(t *testing.T) {
+	root := copyRepo(t, "basic", "")
+	mustOK(t, root, "skills", Request{"mode": "install", "confirm": true})
+	run := func(version string, req Request) Obj {
+		t.Helper()
+		repo, err := record.Load(root)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp, aerr := Run(repo, Info{"akmctl", version}, "skills", req)
+		if aerr != nil {
+			t.Fatal(aerr)
+		}
+		return resp
+	}
+	// a skill written by a newer tool than the running one
+	name := "akm-track-work"
+	managed, _ := initrepo.Managed("docs/work", "docs/adr", false)
+	for _, m := range managed {
+		if m.Name == name {
+			os.WriteFile(skillPath(root, initrepo.SkillDir(name)+"/"+initrepo.MarkerName), m.Marker("0.4.0"), 0o644)
+		}
+	}
+	resp := run("0.3.4-0.20261108200140-e4537d4a1b5d", Request{})
+	notes, _ := resp.Get("notes")
+	if n, _ := notes.([]string); len(n) == 0 || !strings.Contains(n[0], "install akmctl 0.4.0 or newer") {
+		t.Fatalf("no note naming the version: %v", resp)
+	}
+	if c, _ := resp.Get("clean"); c != false {
+		t.Fatalf("clean with skills from a newer tool: %v", resp)
+	}
+	sl, _ := resp.Get("skills")
+	for _, s := range sl.([]Obj) {
+		got, _ := s.Get("requires_tool")
+		if n, _ := s.Get("name"); (n == name) != (got == "0.4.0") {
+			t.Errorf("%v: requires_tool %v", n, got)
+		}
+	}
+	// update leaves such a skill alone
+	os.WriteFile(skillPath(root, initrepo.SkillDir(name)+"/SKILL.md"), []byte("newer text\n"), 0o644)
+	resp = run("0.3.4", Request{"mode": "update", "confirm": true})
+	if b, _ := os.ReadFile(skillPath(root, initrepo.SkillDir(name)+"/SKILL.md")); string(b) != "newer text\n" {
+		t.Fatal("update downgraded a skill")
+	}
+	if sk, _ := resp.Get("skipped"); len(sk.([]Obj)) != 1 {
+		t.Fatalf("skipped %v", sk)
+	}
+	// the same tool, a newer one, a development stamp and an unknown version raise nothing
+	for _, v := range []string{"0.4.0", "0.4.1", "1.0.0", "0.0.0-dev+0123456", "test", ""} {
+		if n, _ := run(v, Request{}).Get("notes"); n != nil && strings.Contains(strings.Join(n.([]string), ""), "newer than this") {
+			t.Errorf("version %q: noted a newer skill", v)
+		}
+	}
+}
+
+func TestToolNewer(t *testing.T) {
+	for _, c := range []struct {
+		a, b string
+		want bool
+	}{
+		{"0.4.0", "0.3.4", true},
+		{"0.3.4", "0.4.0", false},
+		{"0.3.4", "0.3.4", false},
+		{"v0.3.4", "0.3.4-0.20261108200140-e4537d4a1b5d", true},
+		{"0.3.4-0.20261108200141-aaaaaaaaaaaa", "0.3.4-0.20261108200140-e4537d4a1b5d", true},
+		{"0.3.4-0.20261108200140-e4537d4a1b5d", "0.3.4-0.20261108200141-aaaaaaaaaaaa", false},
+		{"0.3.5-0.20261108200140-e4537d4a1b5d", "0.3.4", true},
+		{"1.0.0", "0.0.0-dev+abc", false},
+		{"", "0.3.4", false},
+		{"0.3.4", "", false},
+		{"nonsense", "0.3.4", false},
+	} {
+		if got := toolNewer(c.a, c.b); got != c.want {
+			t.Errorf("toolNewer(%q, %q) = %v, want %v", c.a, c.b, got, c.want)
+		}
 	}
 }

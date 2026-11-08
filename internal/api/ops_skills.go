@@ -3,10 +3,12 @@ package api
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -27,7 +29,9 @@ type skillInfo struct {
 	files    []Obj  // {path, state}
 	stale    []string
 	hasMark  bool
-	unmarked bool // edited, but only because there is no marker to compare with
+	markTool string // the tool version the marker records, "" without one
+	requires string // markTool when it is newer than the running tool
+	unmarked bool   // edited, but only because there is no marker to compare with
 }
 
 // planAction is one change a write mode would make.
@@ -84,10 +88,17 @@ func opSkills(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 		}
 	}
 	var infos []*skillInfo
+	needTool := ""
 	for _, sk := range managed {
 		si, err := inspectSkill(repo.Root, sk, parentConflict)
 		if err != nil {
 			return nil, unreadable(err)
+		}
+		if toolNewer(si.markTool, tool) {
+			si.requires = si.markTool
+			if needTool == "" || toolNewer(si.markTool, needTool) {
+				needTool = si.markTool
+			}
 		}
 		infos = append(infos, si)
 	}
@@ -100,7 +111,7 @@ func opSkills(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 	clean := true
 	for _, si := range infos {
 		reports = append(reports, si.obj())
-		if si.state != "current" {
+		if si.state != "current" || si.requires != "" {
 			clean = false
 		}
 	}
@@ -109,6 +120,9 @@ func opSkills(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 		clean = false
 	}
 	var notes []string
+	if needTool != "" {
+		notes = append(notes, fmt.Sprintf("the skills here were written by akmctl %s, newer than this akmctl %s: install akmctl %s or newer and run akmctl skills status again (update from this binary would downgrade them, so it leaves them)", needTool, tool, needTool))
+	}
 	if !repo.GitCommits() {
 		notes = append(notes, "the optional skill akm-commit is not installed (git_commits is off): it tells an agent to commit one step at a time; akmctl config git-commits on installs it")
 	}
@@ -131,6 +145,10 @@ func opSkills(repo *record.Repo, q Request, info Info) (Obj, *Error) {
 			if strings.HasSuffix(f.Path, "/"+initrepo.MarkerName) {
 				marker = f
 			}
+		}
+		if si.requires != "" && mode != "status" {
+			skip(si.skill.Name, "newer_tool")
+			continue
 		}
 		switch si.state {
 		case "current":
@@ -265,6 +283,9 @@ func (si *skillInfo) obj() Obj {
 	if len(si.stale) > 0 {
 		o = append(o, KV{"stale", si.stale})
 	}
+	if si.requires != "" {
+		o = append(o, KV{"requires_tool", si.requires})
+	}
 	return o
 }
 
@@ -314,8 +335,8 @@ func inspectSkill(root string, sk initrepo.Skill, parentConflict bool) (*skillIn
 	}
 	var recorded map[string]string
 	if b, rerr := os.ReadFile(abs(si.dir + "/" + initrepo.MarkerName)); rerr == nil {
-		if _, files, ok := initrepo.ParseMarker(b); ok {
-			recorded, si.hasMark = files, true
+		if tool, files, ok := initrepo.ParseMarker(b); ok {
+			recorded, si.hasMark, si.markTool = files, true, tool
 		}
 	}
 	shipped := map[string]bool{}
@@ -435,4 +456,71 @@ func inspectRenamed(root string, managed []initrepo.Skill) ([]renamedInfo, error
 		out = append(out, ri)
 	}
 	return out, nil
+}
+
+// toolNewer reports whether version a is newer than version b, comparing them as
+// semantic versions with Go pseudo-versions as pre-releases. A version that is
+// empty, unparsable or a development stamp (0.0.0-dev) is unknown and never
+// newer or older.
+func toolNewer(a, b string) bool {
+	ac, ap, aok := parseTool(a)
+	bc, bp, bok := parseTool(b)
+	if !aok || !bok {
+		return false
+	}
+	for i := range ac {
+		if ac[i] != bc[i] {
+			return ac[i] > bc[i]
+		}
+	}
+	switch {
+	case ap == "" && bp == "":
+		return false
+	case ap == "":
+		return true
+	case bp == "":
+		return false
+	}
+	as, bs := strings.Split(ap, "."), strings.Split(bp, ".")
+	for i := 0; i < len(as) && i < len(bs); i++ {
+		if as[i] == bs[i] {
+			continue
+		}
+		an, aerr := strconv.ParseUint(as[i], 10, 64)
+		bn, berr := strconv.ParseUint(bs[i], 10, 64)
+		switch {
+		case aerr == nil && berr == nil:
+			return an > bn
+		case aerr == nil:
+			return false // a number sorts before text
+		case berr == nil:
+			return true
+		}
+		return as[i] > bs[i]
+	}
+	return len(as) > len(bs)
+}
+
+// parseTool splits "v1.2.3-pre+build" into its numbers and pre-release.
+func parseTool(v string) (core [3]uint64, pre string, ok bool) {
+	v = strings.TrimPrefix(v, "v")
+	if i := strings.IndexByte(v, '+'); i >= 0 {
+		v = v[:i]
+	}
+	v, pre, _ = strings.Cut(v, "-")
+	if v == "0.0.0" && pre == "dev" {
+		return core, "", false
+	}
+	parts := strings.Split(v, ".")
+	if len(parts) != 3 {
+		return core, "", false
+	}
+	for i, p := range parts {
+		n, err := strconv.ParseUint(p, 10, 64)
+		if err != nil {
+			return core, "", false
+		}
+		core[i] = n
+	}
+	return core, pre, true
 }
