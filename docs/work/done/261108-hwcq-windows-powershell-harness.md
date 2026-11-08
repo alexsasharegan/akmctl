@@ -20,7 +20,7 @@ Done when:
 
 - [x] The script runs in CI on `windows-latest` and fails the job on any wrong exit code or output.
 - [x] It covers a file move with links, a write while a reader holds the file, and a repository path with spaces and backslashes.
-- [x] `docs/architecture.md` says what the harness covers (with [261028-jzsx](../261028-jzsx-windows-path-local-test.md)).
+- [x] `docs/architecture.md` says what the harness covers (with [261028-jzsx](261028-jzsx-windows-path-local-test.md)).
 
 ## Next
 
@@ -35,5 +35,5 @@ scripts/windows-smoke.ps1 runs the built akmctl.exe through init, new, set, sect
 - 2026-11-08 13:08-07:00: claimed (claude-sonnet-5-5-win).
 - 2026-11-08 13:21-07:00: ticked "The script runs in CI on `windows-latest` and fails the job on any wrong exit code or output.": PR 51: the windows smoke step passed on windows-latest and failed there on a wrong flag, a wrong exit code and two real faults while being built
 - 2026-11-08 13:21-07:00: ticked "It covers a file move with links, a write while a reader holds the file, and a repository path with spaces and backslashes.": windows-smoke.ps1: close moves and rewrites the link, two reader cases, repo path 'sub dir' with spaces, backslashes and a mixed-separator --repo
-- 2026-11-08 13:21-07:00: ticked "`docs/architecture.md` says what the harness covers (with [261028-jzsx](../261028-jzsx-windows-path-local-test.md)).": docs/architecture.md, Platform coverage
+- 2026-11-08 13:21-07:00: ticked "`docs/architecture.md` says what the harness covers (with [261028-jzsx](261028-jzsx-windows-path-local-test.md)).": docs/architecture.md, Platform coverage
 - 2026-11-08 13:21-07:00: the run found two faults, filed as 261108-mwtr (write refused while a reader holds the record) and 261108-ma45 (check A4 on a CRLF ADR index); the harness asserts both as known faults and fails when either is fixed
