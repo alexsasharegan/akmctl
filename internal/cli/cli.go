@@ -777,7 +777,7 @@ func parseFieldValue(key, raw string) any {
 	switch key {
 	case "blocked_by", "decisions", "scope":
 		var out []any
-		for _, x := range splitList(raw) {
+		for _, x := range listEntries(raw) {
 			out = append(out, x)
 		}
 		if out == nil {
@@ -797,6 +797,24 @@ func parseFieldValue(key, raw string) any {
 		}
 	}
 	return raw
+}
+
+// listEntries reads the value of a list field given on the command line. The plain form is
+// `a,b`. A JSON array (`["a","b"]`) and a bare bracketed list (`[a,b]`) are read as lists too,
+// so their brackets and quotes never become part of an entry. An entry that is itself a wikilink
+// (`[[a]]`, `[[a]],[[b]]`) is left alone: two brackets are not a list (work item 261108-h7ds).
+func listEntries(raw string) []string {
+	t := strings.TrimSpace(raw)
+	if strings.HasPrefix(t, "[") && strings.HasSuffix(t, "]") {
+		var arr []string
+		if json.Unmarshal([]byte(t), &arr) == nil {
+			return arr
+		}
+		if !strings.HasPrefix(t, "[[") && !strings.HasSuffix(t, "]]") {
+			return splitList(t[1 : len(t)-1])
+		}
+	}
+	return splitList(raw)
 }
 
 // insideRepository explains an explicit --repo that names a folder with no

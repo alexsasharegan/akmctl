@@ -8,6 +8,8 @@ $ akmctl set 261029-atxk status=ready priority=1 summary="Add a --json flag"
 changed: [priority status summary]
 ```
 
+A list field (`blocked_by`, `decisions`, `scope`) takes entries separated by commas: `akmctl set <id> blocked_by=261029-aaaa,261029-bbbb`. A JSON array (`'blocked_by=["a","b"]'`) or a bracketed list (`blocked_by=[a,b]`) is read as the same list. `blocked_by=null` empties it.
+
 A closed item is read-only: `set` refuses it (`reason: "closed"`) unless you pass `--correction "<why>"` (one line), and then only `title` and `summary` change, with `corrected <fields>: <why>` added to the Log in the same write. `keep` needs no reason. Use it for a typo or a wrong summary, not to change what the item was (kind, priority, parent and the rest are refused with `closed_field`).
 
 Files changed: the one record; `updated` is set to today.
