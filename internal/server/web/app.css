@@ -313,6 +313,13 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .counter[data-level=limit],.counter[data-level=over]{color:var(--err-fg);background:var(--err-bg);font-weight:700;padding:0 .5em;border-radius:var(--r-sm)}
 .pick{position:relative}
 .pick-input{width:100%}
+.pick-box{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-1);background:var(--input-bg);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:var(--s-1) var(--s-2)}
+.pick-box:focus-within{outline:var(--focus-w) solid var(--focus);outline-offset:1px}
+.pick-box .pick-input,.field .pick-box input[type=text]{flex:1 1 8rem;width:auto;min-width:6rem;border:0;outline:0;background:transparent;padding:var(--s-1)}
+.pick-chips{display:contents}
+.pick-chip{display:inline-flex;align-items:center;gap:var(--s-1);font:var(--fs-xs) var(--mono);background:var(--accent-soft);color:var(--text);border:1px solid var(--accent);border-radius:var(--r-sm);padding:0 0 0 .5em}
+.pick-x{font:inherit;line-height:1;color:inherit;background:transparent;border:0;border-left:1px solid var(--accent);padding:.25em .5em;cursor:pointer}
+.pick-x:hover{background:var(--accent);color:var(--accent-fg)}
 .pick-list{position:absolute;z-index:5;right:0;top:calc(100% + 2px);width:min(30rem,calc(100vw - 4rem));margin:0;padding:var(--s-1);list-style:none;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-md);box-shadow:var(--sh-lg)}
 .pick.up .pick-list{top:auto;bottom:calc(100% + 2px)}
 .pick-list[hidden]{display:none}
