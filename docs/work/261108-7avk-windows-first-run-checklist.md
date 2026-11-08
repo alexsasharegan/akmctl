@@ -24,9 +24,10 @@ Done when:
 
 ## Next
 
-Write docs/windows-first-run.md (PowerShell checklist plus what to send back), link it from the README, run its block on the runner in CI. The first real user run is the maintainer's to arrange: leave that box open.
+Waiting for the first Windows user to run docs/windows-first-run.md (maintainer arranges). Then tick Goal box 1, file each failure under 261108-2ncf (box 2) and close. CI already runs the block on the runner.
 
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 14:32-07:00: claimed (claude-sonnet-5-5-win).
+- 2026-11-08 14:38-07:00: docs/windows-first-run.md written and linked from the README; CI runs its command block on windows-latest (green, no failures found). Open: a person runs it by hand
