@@ -25,7 +25,7 @@ die() {
 case $(uname -s) in
 Darwin) os=darwin ;;
 Linux) os=linux ;;
-*) die "unsupported system $(uname -s); on Windows download the .zip from https://github.com/$repo/releases" ;;
+*) die "unsupported system $(uname -s); on Windows follow the PowerShell steps in the README: https://github.com/$repo#windows" ;;
 esac
 case $(uname -m) in
 arm64 | aarch64) arch=arm64 ;;
