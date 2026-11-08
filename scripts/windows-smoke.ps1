@@ -136,6 +136,29 @@ function Run-Mode([string]$AutoCrlf) {
   $r = Akm $Work @('ls', '--format', 'ids', '--repo', $repo)
   Expect 'ls with a native --repo' $r 0 $alpha | Out-Null
 
+  # Path audit (work item 261108-kbve): the forms a Windows user types for --repo, and the paths printed back.
+  $parent = Split-Path -Parent $repo
+  $leaf = Split-Path -Leaf $repo
+  $forms = [ordered]@{
+    'trailing backslash'   = ($repo + '\')
+    'forward slashes'      = ($repo -replace '\\', '/')
+    'dot segments'         = ($repo + '\docs\..')
+    'doubled separators'   = ($repo -replace '\\', '\\')
+  }
+  foreach ($k in $forms.Keys) {
+    $r = Akm $Work @('show', $alpha, '--repo', $forms[$k])
+    Expect "--repo with $k" $r 0 $alpha | Out-Null
+  }
+  # A relative --repo with a backslash, from the parent directory.
+  $r = Akm $parent @('show', $alpha, '--repo', ".\$leaf")
+  Expect '--repo relative with a backslash' $r 0 $alpha | Out-Null
+  $r = Akm $repo @('find', $alpha)
+  if ($r.Code -ne 0 -or $r.Out -match '\\') { Fail "find prints a path with a backslash or fails:`n$($r.Out)" } else { Pass 'find prints a forward-slash path' }
+  # A note name written with a backslash is refused with a message, not a crash.
+  $r = Akm $repo @('find', '--name', 'docs\work\smoke-alpha')
+  Write-Host "     find --name with backslashes: exit $($r.Code): $($r.Out)"
+  if ($r.Out -match '(?i)panic|goroutine') { Fail 'find --name with backslashes crashed' }
+
   # Close: moves the file into done/ and rewrites the link in beta.
   $r = Akm $repo @('section', $alpha, 'Outcome', '--text', 'Smoke outcome.')
   Expect 'section Outcome' $r 0 | Out-Null
