@@ -18,15 +18,16 @@ Findings F15, F18 and F19 of [the audit](../design/test-strategy-audit.md), from
 
 Done when:
 
-- [ ] Golden-output tests cover the text view of `ls`, `show`, `close`, `split` and the commit message block.
-- [ ] Each `check` rule has a case that must not raise it, next to the case that does.
-- [ ] A smoke test runs the built binary with `version` and `help`; `migrate.Plan` and `record.SetMetaDir` are tested or deleted.
+- [x] Golden-output tests cover the text view of `ls`, `show`, `close`, `split` and the commit message block.
+- [x] Each `check` rule has a case that must not raise it, next to the case that does.
+- [x] A smoke test runs the built binary with `version` and `help`; `migrate.Plan` and `record.SetMetaDir` are tested or deleted.
 
 ## Next
 
-Start with golden-output tests for `ls` and `show` (F15).
+Close after review. Not covered: runUI and openBrowser.
 
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 13:43-07:00: claimed (claude-sonnet-5-5-rest).
+- 2026-11-08 13:46-07:00: Golden files for the text view (internal/cli/testdata/golden, go test ./internal/cli -run TestTextView -update): ls, ls --tree (progress counts), show, board, search, check, close and set and claim dry runs with the commit block, split. Near misses: internal/check/near_miss_test.go has a boundary case for 38 rules, three (SF1, SF3, SF4) point at tests that already hold theirs, and a test fails when a rule of the spec table has none. cmd/akmctl smoke test builds the binary and runs version, help and an unknown command. Dead code deleted: record.SetMetaDir; migrate.Plan folded into PlanEnv. Not tested: runUI and openBrowser (a browser cannot open in a test).

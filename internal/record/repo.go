@@ -121,9 +121,6 @@ func (r *Repo) MetaDir() string {
 	return DefaultMetaDir
 }
 
-// SetMetaDir sets the meta folder (for a repository that does not exist on disk yet).
-func (r *Repo) SetMetaDir(d string) { r.metaDir = d }
-
 // ManifestPath is the repository-relative path of the manifest.
 func (r *Repo) ManifestPath() string { return r.MetaDir() + "/" + ManifestName }
 

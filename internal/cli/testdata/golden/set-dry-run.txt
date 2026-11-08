@@ -1,0 +1,15 @@
+exit 0
+261022-e5f6	2026-10-22	ready	Document the exit codes
+--- docs/work/261022-e5f6-document-the-exit-codes.md
++++ docs/work/261022-e5f6-document-the-exit-codes.md
+@@ -4,7 +4,8 @@
+ status: ready
+ parent: 261015-c4d5
+ created: 2026-10-22
+-updated: 2026-10-22
++updated: 2026-10-28
++priority: 1
+ ---
+ 
+ # Document the exit codes
+changed: [priority]

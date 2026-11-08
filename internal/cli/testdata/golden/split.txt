@@ -1,0 +1,21 @@
+exit 0
+261028-xxxx	2026-10-28	raw	parse flags
+docs/work/261028-xxxx-parse-flags.md
+commit message (use as given, whole, with git commit -F -; stage these paths and the code):
+  261028-xxxx(file): parse flags
+  
+  AKM-Step: file
+  AKM-Item: 261028-xxxx
+  stage: docs/work/261028-xxxx-parse-flags.md
+261028-xxxx	2026-10-28	raw	write docs
+docs/work/261028-xxxx-write-docs.md
+commit message (use as given, whole, with git commit -F -; stage these paths and the code):
+  261028-xxxx(file): write docs
+  
+  AKM-Step: file
+  AKM-Item: 261028-xxxx
+  stage: docs/work/261028-xxxx-write-docs.md
+left for the parent 261015-c4d5 (split changed none of it):
+  1. write its ## Goal as a list of the children (plain bullets with links, in dependency order) and move each old box to the child that owns it: akmctl section 261015-c4d5 Goal
+  2. write a ## Next that points at the first child: akmctl section 261015-c4d5 Next
+  3. set it ready (a parent waits for its children; an unclaimed active item makes the next agent ask): akmctl set 261015-c4d5 status=ready
