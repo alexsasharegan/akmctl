@@ -115,3 +115,87 @@ func TestHomebrewFormula(t *testing.T) {
 		t.Errorf("missing checksum: %v %s", err, b)
 	}
 }
+
+// fakeTools writes gh, go and akmctl stand-ins into a folder for
+// install-latest.sh: gh lists the runs in FAKE_RUNS and answers per-run queries
+// from FAKE_SHA_<id>, FAKE_OK_<id> and FAKE_TOTAL_<id>; go records its arguments
+// in $FAKE_LOG; akmctl prints FAKE_VERSION.
+func fakeTools(t *testing.T) (dir, log string) {
+	t.Helper()
+	dir = t.TempDir()
+	log = filepath.Join(t.TempDir(), "go.log")
+	write := func(name, body string) {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte("#!/bin/sh\n"+body), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("gh", `
+if [ "$1 $2" = "run list" ]; then printf '%s\n' $FAKE_RUNS; exit 0; fi
+id=$3
+for last; do :; done
+case $last in
+*headSha*) eval "echo \$FAKE_SHA_$id" ;;
+*select*) eval "echo \$FAKE_OK_$id" ;;
+*) eval "echo \$FAKE_TOTAL_$id" ;;
+esac
+`)
+	write("go", `echo "$GOPROXY $GOFLAGS $*" >> "$FAKE_LOG"`)
+	write("akmctl", `[ -n "$FAKE_VERSION" ] && echo "$FAKE_VERSION"; exit 0`)
+	return dir, log
+}
+
+func runInstallLatest(t *testing.T, dir, log string, env []string, args ...string) (string, error) {
+	t.Helper()
+	cmd := exec.Command("sh", append([]string{"install-latest.sh"}, args...)...)
+	cmd.Env = append([]string{"PATH=" + dir + ":/usr/bin:/bin", "FAKE_LOG=" + log, "HOME=" + t.TempDir()}, env...)
+	b, err := cmd.CombinedOutput()
+	return string(b), err
+}
+
+// TestInstallLatest is work item 261108-8m4a: the script installs the newest
+// main commit whose every job passed, by commit, and does nothing when that
+// commit is installed.
+func TestInstallLatest(t *testing.T) {
+	sh(t)
+	dir, log := fakeTools(t)
+	sha1 := "1111111111111111111111111111111111111111" // newest run, but a job failed
+	sha2 := "2222222222222222222222222222222222222222" // newest fully green
+	env := []string{
+		"FAKE_RUNS=101 102 103",
+		"FAKE_SHA_101=" + sha1, "FAKE_OK_101=2", "FAKE_TOTAL_101=3",
+		"FAKE_SHA_102=" + sha2, "FAKE_OK_102=3", "FAKE_TOTAL_102=3",
+		"FAKE_SHA_103=3333333333333333333333333333333333333333", "FAKE_OK_103=3", "FAKE_TOTAL_103=3",
+	}
+	logged := func() string { b, _ := os.ReadFile(log); return string(b) }
+
+	// an older or dirty build is replaced by the newest green commit, by its full hash
+	out, err := runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-aaaaaaaaaaaa+dirty (API 1.0)"))
+	if err != nil || !strings.HasPrefix(logged(), "direct -mod=mod install github.com/alexsasharegan/akmctl/cmd/akmctl@"+sha2) {
+		t.Fatalf("install: %v\n%s\nlog: %s", err, out, logged())
+	}
+	if strings.Contains(logged(), sha1) {
+		t.Errorf("installed the commit with a failed job: %s", logged())
+	}
+
+	// the same commit is left alone
+	os.Remove(log)
+	out, err = runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-222222222222 (API 1.0)"))
+	if err != nil || !strings.Contains(out, "up to date at 222222222222") || logged() != "" {
+		t.Errorf("up to date: %v\n%s\nlog: %s", err, out, logged())
+	}
+
+	// --dry-run changes nothing
+	out, err = runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-aaaaaaaaaaaa (API 1.0)"), "--dry-run")
+	if err != nil || !strings.Contains(out, "would install") || logged() != "" {
+		t.Errorf("dry run: %v\n%s\nlog: %s", err, out, logged())
+	}
+
+	// no fully green run is an error and installs nothing
+	out, err = runInstallLatest(t, dir, log, []string{"FAKE_RUNS=101", "FAKE_SHA_101=" + sha1, "FAKE_OK_101=2", "FAKE_TOTAL_101=3"})
+	if err == nil || !strings.Contains(out, "no green ci run") || logged() != "" {
+		t.Errorf("no green run: %v\n%s\nlog: %s", err, out, logged())
+	}
+	if _, err := runInstallLatest(t, dir, log, nil, "--bad"); err == nil {
+		t.Error("a bad flag was accepted")
+	}
+}

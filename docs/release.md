@@ -49,6 +49,33 @@ Package manifests are generated from a release, and CI checks the generators; no
 
 **Homebrew.** `scripts/homebrew-formula.sh <version> SHA256SUMS Formula/akmctl.rb` writes the formula for the four macOS and Linux archives. CI packages the published v0.3.3 and installs it from a local tap (`brew tap-new --no-git local/akm`, copy the file into its `Formula/` folder, `brew install local/akm/akmctl`) on the macOS and Ubuntu runners, then runs `akmctl version`. To publish, once decided: the maintainer creates the repository `alexsasharegan/homebrew-tap`, commits the generated `Formula/akmctl.rb` for each release (users then run `brew install alexsasharegan/tap/akmctl`), and, to automate it, adds a token with write access to that repository as an Actions secret for a `release.yml` step. No credential belongs in this repository. **Never run `brew test` or `brew audit` on a maintainer's Mac.** They write into `/opt/homebrew/Library/Homebrew` (they install development gems into its tracked `vendor/bundle`) and left `brew` unable to run some commands (work item 261108-43gk). CI does not run them either. To check the formula beyond the install, use a CI job, a container or a throwaway user.
 
+## The development channel
+
+Users get tagged releases. The maintainer's own machine, and the threads that work on other projects there, run the **development channel**: the newest commit of `main` whose `ci` run passed in every job (macOS, Ubuntu and Windows). `scripts/install-latest.sh` finds that commit with `gh`, skips if the installed `akmctl version` already ends in its 12-character hash, and otherwise runs `GOPROXY=direct go install github.com/alexsasharegan/akmctl/cmd/akmctl@<commit>` from a temporary folder. A build from a clean checkout is never stamped `+dirty`, and nobody installs from a working tree (AGENTS.md). `--dry-run` says what it would do. It needs `gh` logged in and `go`; it exits 1 when no green run exists.
+
+To run it on a schedule, the maintainer adds a launchd agent (an agent does not install it). Save this as `~/Library/LaunchAgents/com.alexsasharegan.akmctl-install-latest.plist` with the clone's path, then `launchctl load` it; it checks every 15 minutes and logs to `~/Library/Logs/akmctl-install-latest.log`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.alexsasharegan.akmctl-install-latest</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>PATH=/opt/homebrew/bin:/usr/local/bin:$HOME/golang/bin:/usr/bin:/bin /Users/YOU/github.com/alexsasharegan/akmctl/scripts/install-latest.sh</string>
+  </array>
+  <key>StartInterval</key><integer>900</integer>
+  <key>StandardOutPath</key><string>/Users/YOU/Library/Logs/akmctl-install-latest.log</string>
+  <key>StandardErrorPath</key><string>/Users/YOU/Library/Logs/akmctl-install-latest.log</string>
+</dict>
+</plist>
+```
+
+Do not also install a Homebrew release on the same machine: whichever comes first on `PATH` wins, and a release build would hide the development channel.
+
 ## If it goes wrong
 
 - The `publish` step fails with an HTTP 5xx from GitHub and no release exists (`gh release view v<version>` says not found): re-run the failed job (`gh run rerun <id> --failed`). It reuses the same tag; v0.3.2 needed this once.
