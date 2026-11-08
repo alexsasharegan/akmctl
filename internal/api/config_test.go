@@ -2,13 +2,13 @@ package api
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 const skillFile = ".agents/skills/akm-commit/SKILL.md"
@@ -274,9 +274,7 @@ func TestInitGitCommitsAndGitInit(t *testing.T) {
 		t.Error("skill or key missing")
 	}
 	// git init in a new directory, then the skill goes in
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("no git on PATH")
-	}
+	testutil.RequireTool(t, "git")
 	base = t.TempDir()
 	resp = run(t, base, Request{"dir": "proj", "git_commits": true, "git_init": true})
 	if g, _ := resp.Get("git"); g != "initialised" {
@@ -293,9 +291,7 @@ func TestInitGitCommitsAndGitInit(t *testing.T) {
 }
 
 func TestInitGitInitFailureIsNotFatal(t *testing.T) {
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("no git on PATH")
-	}
+	testutil.RequireTool(t, "git")
 	t.Setenv("PATH", t.TempDir()) // git is gone
 	resp, e := Run(&record.Repo{Root: t.TempDir()}, Info{"akmctl", "test"}, "init", Request{"git_init": true, "git_commits": true})
 	if e != nil {

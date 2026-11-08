@@ -4,6 +4,8 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 func gitIn(t *testing.T, root string, args ...string) string {
@@ -20,9 +22,7 @@ func gitIn(t *testing.T, root string, args ...string) string {
 // the starting state.
 func commitsRepo(t *testing.T, fixture string) string {
 	t.Helper()
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git is not installed")
-	}
+	testutil.RequireTool(t, "git")
 	root := copyRepo(t, fixture, "")
 	gitIn(t, root, "init", "-q", "-b", "main")
 	gitIn(t, root, "add", "-A")

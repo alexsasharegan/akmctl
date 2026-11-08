@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/migrate"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // fakeRegistry is a migration from a made-up layout 0.1.0, where records used
@@ -27,9 +28,7 @@ func fakeRegistry(t *testing.T) {
 
 func gitRepo(t *testing.T, root string) {
 	t.Helper()
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git not installed")
-	}
+	testutil.RequireTool(t, "git")
 	for _, args := range [][]string{{"init", "-q", "-b", "main"}, {"add", "-A"}, {"-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "start"}} {
 		cmd := exec.Command("git", append([]string{"-C", root}, args...)...)
 		if out, err := cmd.CombinedOutput(); err != nil {

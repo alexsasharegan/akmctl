@@ -9,6 +9,9 @@
 #
 #   AKMCTL_VERSION=0.3.3     install that version instead of the latest
 #   AKMCTL_INSTALL_DIR=DIR   install into DIR
+#   AKMCTL_BASE_URL=URL      fetch the archive and SHA256SUMS from URL (a directory,
+#                            for example file:///path/to/dist/1.2.3) instead of the
+#                            GitHub release; CI installs a dummy release this way
 set -eu
 
 repo=alexsasharegan/akmctl
@@ -43,7 +46,7 @@ case $version in
 esac
 
 name=akmctl_${version}_${os}_${arch}
-base=https://github.com/$repo/releases/download/v$version
+base=${AKMCTL_BASE_URL:-https://github.com/$repo/releases/download/v$version}
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
