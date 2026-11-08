@@ -30,9 +30,10 @@ function Init-With([string]$Name, [string]$Stdin) {
   New-Item -ItemType Directory -Force -Path $dir | Out-Null
   $outFile = Join-Path $Work "$Name.out"
   $errFile = Join-Path $Work "$Name.err"
-  $p = Start-Process -FilePath $Exe -ArgumentList @('init', ('"' + $dir + '"')) -RedirectStandardInput $Stdin `
-    -RedirectStandardOutput $outFile -RedirectStandardError $errFile -PassThru -NoNewWindow
-  if (-not $p.WaitForExit(60000)) { $p.Kill(); Fail "init with $Name did not finish in 60 seconds (it waits for input)"; return }
+  # cmd.exe does the redirection, as a user or a script would.
+  $cmdline = '"' + $Exe + '" init "' + $dir + '" < "' + $Stdin + '" > "' + $outFile + '" 2> "' + $errFile + '"'
+  $p = Start-Process -FilePath cmd.exe -ArgumentList @('/c', ('"' + $cmdline + '"')) -PassThru -NoNewWindow
+  if (-not $p.WaitForExit(60000)) { & taskkill /F /T /PID $p.Id | Out-Null; Fail "init with $Name did not finish in 60 seconds (it waits for input)"; return }
   $text = (Get-Content -Raw $outFile) + (Get-Content -Raw $errFile)
   Write-Host "     init with ${Name}: exit $($p.ExitCode), asked: $($text -match '\[[Yy]/[Nn]\]')"
   if ($p.ExitCode -ne 0) { Fail "init with $Name exit $($p.ExitCode)`n$text"; return }
