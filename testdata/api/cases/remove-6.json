@@ -1,0 +1,32 @@
+{
+  "name": "a ticked box is not removed",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "item": 1,
+    "reason": "no longer needed",
+    "confirm": true,
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "remove",
+    "request": {
+      "as_of": "2026-10-28",
+      "confirm": true,
+      "id": "261020-a2b3",
+      "item": 1,
+      "reason": "no longer needed"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "item 1 (\"It is done.\") is ticked, which records that the work was done; it is not removed. Say more with log, or change the Goal with section",
+      "details": {
+        "reason": "ticked_box",
+        "item": 1,
+        "text": "It is done."
+      }
+    }
+  }
+}

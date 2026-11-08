@@ -1,0 +1,36 @@
+{
+  "name": "turning git_commits off needs a confirm",
+  "repo": "commitson",
+  "request": {
+    "key": "git_commits",
+    "value": false
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "config",
+    "request": {
+      "key": "git_commits",
+      "value": false
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "removing .agents/skills/akm-commit needs confirm: true",
+      "details": {
+        "reason": "needs_confirmation",
+        "edited": false,
+        "plan": {
+          "write": [],
+          "remove": [
+            ".agents/skills/akm-commit/.akm-skill.json",
+            ".agents/skills/akm-commit/SKILL.md"
+          ],
+          "modify": [
+            "docs/.layout"
+          ]
+        },
+        "edits": []
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "since keeps records updated on or after the date",
+  "repo": "basic",
+  "request": {
+    "since": "2026-10-26"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "since": "2026-10-26"
+    },
+    "ok": true,
+    "total": 3,
+    "count": 3,
+    "records": [
+      {
+        "id": "261015-c4d5",
+        "type": "work",
+        "path": "docs/work/261015-c4d5-machine-readable-listings.md",
+        "id_date": "2026-10-15",
+        "etag": "acae08a2f3cf6b27",
+        "fields": {
+          "id": "261015-c4d5",
+          "title": "Machine-readable listings",
+          "summary": "Make listings available as JSON for tools.",
+          "status": "active",
+          "kind": "feature",
+          "parent": null,
+          "priority": 3,
+          "updated": "2026-10-26"
+        }
+      },
+      {
+        "id": "261020-a2b3",
+        "type": "work",
+        "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "id_date": "2026-10-20",
+        "etag": "16e7c0aededa652c",
+        "fields": {
+          "id": "261020-a2b3",
+          "title": "Add JSON output to ls",
+          "summary": "Print ls results as JSON.",
+          "status": "active",
+          "kind": null,
+          "parent": "261015-c4d5",
+          "priority": 2,
+          "updated": "2026-10-27"
+        }
+      },
+      {
+        "id": "261026-m1n2",
+        "type": "work",
+        "path": "docs/work/261026-m1n2-explore-a-plugin-system.md",
+        "id_date": "2026-10-26",
+        "etag": "c04c7e0e447bc6e9",
+        "fields": {
+          "id": "261026-m1n2",
+          "title": "Explore a plugin system",
+          "summary": null,
+          "status": "raw",
+          "kind": null,
+          "parent": null,
+          "priority": null,
+          "updated": "2026-10-26"
+        }
+      }
+    ]
+  }
+}

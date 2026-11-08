@@ -1,0 +1,28 @@
+{
+  "name": "a stale etag writes nothing",
+  "repo": "basic",
+  "request": {
+    "id": "261020-a2b3",
+    "text": "tests written.",
+    "if_match": "0000000000000000",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "log",
+    "request": {
+      "as_of": "2026-10-28",
+      "id": "261020-a2b3",
+      "if_match": "0000000000000000",
+      "text": "tests written."
+    },
+    "ok": false,
+    "error": {
+      "code": "stale",
+      "message": "the record changed since it was read",
+      "details": {
+        "etag": "16e7c0aededa652c"
+      }
+    }
+  }
+}

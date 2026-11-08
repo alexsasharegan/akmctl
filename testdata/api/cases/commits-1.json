@@ -1,0 +1,18 @@
+{
+  "name": "commits outside a git work tree is refused",
+  "repo": "basic",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "commits",
+    "request": {},
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "the repository is not a git work tree",
+      "details": {
+        "reason": "not_git"
+      }
+    }
+  }
+}

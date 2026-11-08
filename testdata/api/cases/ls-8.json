@@ -1,0 +1,38 @@
+{
+  "name": "blocked true lists the work items that wait",
+  "repo": "basic",
+  "request": {
+    "type": "work",
+    "blocked": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "blocked": true,
+      "type": "work"
+    },
+    "ok": true,
+    "total": 1,
+    "count": 1,
+    "records": [
+      {
+        "id": "261024-g7h8",
+        "type": "work",
+        "path": "docs/work/261024-g7h8-publish-the-first-release.md",
+        "id_date": "2026-10-24",
+        "etag": "3a839cf44a210de1",
+        "fields": {
+          "id": "261024-g7h8",
+          "title": "Publish the first release",
+          "summary": null,
+          "status": "blocked",
+          "kind": null,
+          "parent": null,
+          "priority": 1,
+          "updated": "2026-10-25"
+        }
+      }
+    ]
+  }
+}
