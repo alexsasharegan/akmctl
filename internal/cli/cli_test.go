@@ -414,3 +414,31 @@ func TestSetBlockedByStoresACleanList(t *testing.T) {
 		}
 	}
 }
+
+// TestFormatIDsPrintsTheRecordOfAWrite is work item 261108-nrv4: --format ids
+// printed nothing for a write, so a script that captured the new id got an empty
+// string and an agent retried and filed a duplicate.
+func TestFormatIDsPrintsTheRecordOfAWrite(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	run := func(args ...string) (int, string) {
+		var out, errb bytes.Buffer
+		code := Run(append(args, "--repo", root, "--format", "ids"), &out, &errb, ".")
+		return code, strings.TrimSpace(out.String())
+	}
+	code, id := run("new", "work", "capture-me")
+	if code != 0 || strings.Contains(id, "\n") || len(id) != len("261108-abcd") {
+		t.Fatalf("new: %d %q", code, id)
+	}
+	for _, args := range [][]string{
+		{"set", id, "priority=2"},
+		{"log", id, "a note"},
+	} {
+		if code, got := run(args...); code != 0 || got != id {
+			t.Errorf("%v: %d %q, want %q", args, code, got, id)
+		}
+	}
+	if code, got := run("close", id, "dropped", "--outcome", "test"); code != 0 || got != id {
+		t.Errorf("close: %d %q", code, got)
+	}
+}

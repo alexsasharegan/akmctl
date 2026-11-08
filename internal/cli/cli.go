@@ -430,6 +430,12 @@ func print(stdout, stderr io.Writer, format, op string, resp api.Obj, ok bool) {
 }
 
 func recordsOf(resp api.Obj) []api.Obj {
+	// A write returns the one record it created or changed as "record".
+	if v, ok := resp.Get("record"); ok {
+		if r, ok := v.(api.Obj); ok {
+			return []api.Obj{r}
+		}
+	}
 	if v, ok := resp.Get("records"); ok {
 		if rs, ok := v.([]api.Obj); ok {
 			return rs
