@@ -1,11 +1,13 @@
 ---
 id: "261108-xajw"
 title: workbench page tests
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T22:35
 ---
 
 # workbench page tests
@@ -26,3 +28,4 @@ Try `boot.js` under Node with a fake `document` and see how far it gets.
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 15:35-07:00: claimed (claude-sonnet-5-5-rest).
