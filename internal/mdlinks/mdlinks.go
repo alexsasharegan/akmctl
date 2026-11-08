@@ -199,7 +199,8 @@ func splitPath(p string) []string {
 
 // Files lists the Markdown files whose links are read, relative to the
 // repository root: AGENTS.md, every Markdown file under the manifest, work and
-// ADR folders, and the roadmap.
+// ADR folders, and the roadmap. A folder whose name starts with a dot is skipped, as
+// Obsidian skips it (work item 261029-z4gk).
 func Files(repo *record.Repo) []string {
 	var files []string
 	seen := map[string]bool{}
@@ -213,7 +214,11 @@ func Files(repo *record.Repo) []string {
 		add("AGENTS.md")
 	}
 	for _, dir := range roots(repo) {
-		filepath.WalkDir(filepath.Join(repo.Root, filepath.FromSlash(dir)), func(p string, d fs.DirEntry, err error) error {
+		top := filepath.Join(repo.Root, filepath.FromSlash(dir))
+		filepath.WalkDir(top, func(p string, d fs.DirEntry, err error) error {
+			if err == nil && d.IsDir() && p != top && strings.HasPrefix(d.Name(), ".") {
+				return filepath.SkipDir // a hidden folder (.trash, .fixtures) is not part of the notes
+			}
 			if err == nil && !d.IsDir() && strings.HasSuffix(d.Name(), ".md") {
 				rel, _ := filepath.Rel(repo.Root, p)
 				add(filepath.ToSlash(rel))

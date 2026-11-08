@@ -424,7 +424,8 @@ func withID(b []byte, doc *frontmatter.Doc, hasFM bool, id, eol string) ([]byte,
 }
 
 // findReferences reports Markdown files that mention an old file name, as a
-// wikilink or as a path or link ending in the name. Nothing is rewritten.
+// wikilink or as a path or link ending in the name. Nothing is rewritten. A wikilink in a table
+// cell writes its alias pipe as \| (Obsidian), so the name may be followed by a backslash.
 func findReferences(root string, items []mintItem) []string {
 	type target struct {
 		old, base string
@@ -440,7 +441,7 @@ func findReferences(root string, items []mintItem) []string {
 		moved[it.oldRel] = it.newRel
 		base := strings.TrimSuffix(path.Base(it.oldRel), path.Ext(it.oldRel))
 		q := regexp.QuoteMeta(base)
-		ts = append(ts, target{it.oldRel, base, regexp.MustCompile(`\[\[(?:[^\]|#\n]*/)?` + q + `(?:\.md)?(?:[\]|#])|(?:^|[^A-Za-z0-9_.\-])` + q + `\.md\b`), it.newRel})
+		ts = append(ts, target{it.oldRel, base, regexp.MustCompile(`\[\[(?:[^\]|#\n]*/)?` + q + `(?:\.md)?(?:\\?\||[\]#])|(?:^|[^A-Za-z0-9_.\-])` + q + `\.md\b`), it.newRel})
 	}
 	if len(ts) == 0 {
 		return nil
