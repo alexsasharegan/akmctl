@@ -114,6 +114,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $done = Get-ChildItem (Join-Path $HOME 'akm-first-run\docs\work\done') -Filter '*first-task.md'
           if (-not $done) { throw "the closed item is not in docs\work\done" }
+      - name: windows interactive commands
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          go build -o "$env:RUNNER_TEMP\akmctl-ui.exe" ./cmd/akmctl
+          pwsh -NoProfile -File scripts/windows-interactive.ps1 -Exe "$env:RUNNER_TEMP\akmctl-ui.exe"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: winget manifests
         if: runner.os == 'Windows'
         shell: pwsh
