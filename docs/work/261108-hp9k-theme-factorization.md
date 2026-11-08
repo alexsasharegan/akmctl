@@ -1,12 +1,14 @@
 ---
 id: "261108-hp9k"
 title: theme factorization
-status: ready
+status: active
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
 summary: Refactor the workbench styling so a theme is one self-contained token set and adding one touches no other file
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T22:48
 ---
 
 # theme factorization
@@ -46,3 +48,4 @@ Findings from the palette discovery (details in each theme item's Discovery sect
 - 2026-11-08: filed.
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
+- 2026-11-08 15:48-07:00: claimed (claude-sonnet-5-5).
