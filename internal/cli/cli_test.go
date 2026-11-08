@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -366,5 +367,50 @@ func TestSplitFilesChildrenUnderTheParent(t *testing.T) {
 	_, ls, _ = run("ls", "--parent", "261015-c4d5", "--format", "ids")
 	if n := len(strings.Fields(ls)); n != 5 {
 		t.Errorf("want 5 children after the refusals, got %d: %s", n, ls)
+	}
+}
+
+func TestListFieldValueForms(t *testing.T) {
+	want := []any{"261015-c4d5", "261020-a2b3"}
+	for _, raw := range []string{
+		"261015-c4d5,261020-a2b3",
+		"261015-c4d5, 261020-a2b3",
+		"[261015-c4d5,261020-a2b3]",
+		`["261015-c4d5","261020-a2b3"]`,
+		`[ "261015-c4d5", "261020-a2b3" ]`,
+	} {
+		if got := parseFieldValue("blocked_by", raw); !reflect.DeepEqual(got, want) {
+			t.Errorf("%q = %#v", raw, got)
+		}
+	}
+	// a wikilink is an entry, not a list
+	if got := parseFieldValue("blocked_by", "[[261015-c4d5]]"); !reflect.DeepEqual(got, []any{"[[261015-c4d5]]"}) {
+		t.Errorf("wikilink = %#v", got)
+	}
+	if got := parseFieldValue("blocked_by", "[[261015-c4d5]],[[261020-a2b3]]"); !reflect.DeepEqual(got, []any{"[[261015-c4d5]]", "[[261020-a2b3]]"}) {
+		t.Errorf("wikilinks = %#v", got)
+	}
+	if got := parseFieldValue("blocked_by", "[]"); !reflect.DeepEqual(got, []any{}) {
+		t.Errorf("empty = %#v", got)
+	}
+	if got := parseFieldValue("blocked_by", "null"); got != nil {
+		t.Errorf("null = %#v", got)
+	}
+}
+
+func TestSetBlockedByStoresACleanList(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	for _, v := range []string{"261015-c4d5,261020-a2b3", "[261015-c4d5,261020-a2b3]", `["261015-c4d5","261020-a2b3"]`} {
+		var out, errb bytes.Buffer
+		code := Run([]string{"set", "261026-m1n2", "blocked_by=" + v, "--repo", root, "--format", "json"}, &out, &errb, ".")
+		if code != 0 {
+			t.Fatalf("%s: %d %s %s", v, code, out.String(), errb.String())
+		}
+		out.Reset()
+		Run([]string{"show", "261026-m1n2", "--repo", root, "--format", "json"}, &out, &errb, ".")
+		if !strings.Contains(out.String(), `"blocked_by":["261015-c4d5","261020-a2b3"]`) {
+			t.Errorf("%s stored %s", v, out.String())
+		}
 	}
 }
