@@ -11,7 +11,7 @@ updated: 2026-11-08
 
 ## Goal
 
-Found by the Windows smoke harness ([261108-hwcq](261108-hwcq-windows-powershell-harness.md)), part of [261108-2ncf](261108-2ncf-basic-windows-support.md).
+Found by the Windows smoke harness ([261108-hwcq](done/261108-hwcq-windows-powershell-harness.md)), part of [261108-2ncf](261108-2ncf-basic-windows-support.md).
 
 Command: `akmctl set <id> priority=3` on `windows-latest` while another process holds the record open for reading with `FileShare.ReadWrite | FileShare.Delete` (an editor, a sync client or a virus scanner does this).
 
