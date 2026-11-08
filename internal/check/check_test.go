@@ -303,6 +303,26 @@ func TestL2EscapedPipeInTableCell(t *testing.T) {
 	}
 }
 
+// A folder whose name starts with a dot (Obsidian's .trash, the fixtures' .fixtures) is not part of
+// the notes: its links are not read and its files do not make a wikilink ambiguous (work item 261029-z4gk).
+func TestHiddenFoldersAreNotScannedForLinks(t *testing.T) {
+	edit := map[string]func(string) string{
+		"AGENTS.md": func(s string) string {
+			return s + "\nSee [[261015-c4d5-machine-readable-listings]].\n"
+		},
+		"docs/.trash/261015-c4d5-machine-readable-listings.md": func(string) string { return "# trashed copy\n" },
+		"docs/.trash/broken.md": func(string) string {
+			return "A [broken link](missing.md) and a [[no such note]].\n"
+		},
+	}
+	res := Run(repoWith(t, edit), Options{AsOf: asOf})
+	for _, f := range res.Findings {
+		if f.Rule == "L1" || f.Rule == "L2" {
+			t.Errorf("%+v", f)
+		}
+	}
+}
+
 func count(res Result, rule string) []Finding {
 	var out []Finding
 	for _, f := range res.Findings {

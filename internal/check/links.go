@@ -95,8 +95,8 @@ func (c *checker) markdownIndex() map[string][]string {
 		if err != nil {
 			return nil
 		}
-		if d.IsDir() && (d.Name() == ".git" || d.Name() == "node_modules") {
-			return filepath.SkipDir
+		if d.IsDir() && (d.Name() == "node_modules" || (p != c.repo.Root && strings.HasPrefix(d.Name(), "."))) {
+			return filepath.SkipDir // hidden folders (.git, .trash, .fixtures) hold no notes Obsidian resolves
 		}
 		if !d.IsDir() && strings.HasSuffix(d.Name(), ".md") {
 			rel, _ := filepath.Rel(c.repo.Root, p)

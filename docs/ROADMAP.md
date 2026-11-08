@@ -17,7 +17,7 @@ Exit criteria (draft, for Alexander to edit). The layout, the API and the spec a
 1. **Adoption works.** An existing repository can be brought into AKM with `migrate`: discovery finds its records, the plan simulates every step, and apply reports what it leaves broken.
 2. **Writes are safe.** A write that changes several files cannot stop half-way, and the last operation can be undone.
 3. **Other layouts are first-class.** `check` can validate a repository against a layout other than the tool's own.
-4. **The standard has no known gaps.** One copy of the API fixtures (done, 261029-x4ws), and the known rule defects (L2, S2, orphaned ADRs from the done wizard) are closed.
+4. **The standard has no known gaps.** One copy of the API fixtures (done, 261029-x4ws), and the known rule defects (L2 done, 261029-z4gk; S2, orphaned ADRs from the done wizard) are closed.
 5. **Compatibility is stated.** The spec says what a MINOR and a MAJOR change to the layout, the API and the extensions mean.
 
 Items:
@@ -28,7 +28,6 @@ Items:
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback
 - [261029-shz5] Undo covers only the last safe move or capture
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
-- [261029-z4gk] Rule L2: understand escaped pipes in wikilinks inside tables
 - [261029-nkqv] A new ADR made by the done wizard can be orphaned
 
 ### Not promised for 1.0.0

@@ -336,3 +336,32 @@ func TestIDDate(t *testing.T) {
 		}
 	}
 }
+
+// Obsidian writes the alias pipe of a wikilink as \| inside a table cell (work item 261029-z4gk):
+// the reference scan must see the name in front of the backslash.
+func TestFindReferencesSeesEscapedPipeInTableCell(t *testing.T) {
+	root := t.TempDir()
+	write := func(rel, s string) {
+		p := filepath.Join(root, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(s), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("docs/notes/alpha-note.md", "# Alpha\n")
+	write("docs/overview.md", strings.Join([]string{
+		"| note | link |",
+		"| --- | --- |",
+		`| a | [[alpha-note\|the note]] |`,
+		`| b | [[alpha-note\|the note]] and [[docs/notes/alpha-note\|again]] |`,
+		"plain [[alpha-note|alias]] and [[alpha-note]] and [[alpha-note#h]]",
+		"[[alpha-notes\\|other]] is a different note",
+	}, "\n"))
+	got := findReferences(root, []mintItem{{oldRel: "docs/notes/alpha-note.md", newRel: "docs/notes/261022-2222-alpha-note.md", renamed: true}})
+	want := "reference not rewritten: docs/overview.md line 3, 4, 5 names alpha-note.md (now 261022-2222-alpha-note.md)"
+	if len(got) != 1 || got[0] != want {
+		t.Errorf("got %q\nwant %q", got, want)
+	}
+}
