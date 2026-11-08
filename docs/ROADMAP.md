@@ -6,10 +6,9 @@ Nothing in flight. Agent rails hardening (261101-vs5c) is done; the rerun on oth
 
 ## Next
 
-Workbench polish and the Obsidian Bases file, in order (the styling freeze is lifted for these):
+Workbench polish, in order (the styling freeze is lifted for these):
 
 - [261029-aezq] Capture modal: header, width, a cycle field and the submit button
-- [261029-kb88] Generate an Obsidian Bases file that mirrors the workbench
 - [261101-4n0v] Spike workbench move and close animations
 
 Then make work decomposition discoverable (the children in order: 3erc, ph53, 72bd):

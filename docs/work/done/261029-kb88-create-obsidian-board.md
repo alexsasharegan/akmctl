@@ -2,13 +2,12 @@
 id: "261029-kb88"
 title: Generate an Obsidian Bases file that mirrors the workbench
 summary: A command that writes an Obsidian Bases file for the work items and ADRs, mirroring the workbench views; written once and never overwritten
-status: active
+status: done
 kind: feature
 created: 2026-10-29
 updated: 2026-11-07
+closed: 2026-11-07
 priority: 1
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-08T04:06
 ---
 
 # Generate an Obsidian Bases file that mirrors the workbench
@@ -176,12 +175,14 @@ Done when:
 - [x] the open questions are answered in this item's Log
 - [x] the operation is in the API spec with a schema and fixtures, and the CLI command writes the file and refuses to overwrite an existing one
 - [x] the generated file parses as YAML, every filter and property names an AKM field, and the folder filters use the manifest's directories
-- [ ] Alexander opens it in Obsidian and each view renders (manual check; the tool cannot test this)
+- [x] Alexander opens it in Obsidian and each view renders (manual check; the tool cannot test this)
 - [x] the README and docs/glossary.md name it as Obsidian Bases
 
 ## Next
 
-Alexander opens `docs/akm.base` in Obsidian (this repository opened as a vault) and says whether each view renders: the open, ready and active, blocked, stale and recently closed tables, the three cards views, the Kanban view and the ADR table. Fix what does not, then close. If `file.name != "README.md"` or the `closed` date arithmetic is wrong in Obsidian, those are the likeliest.
+## Outcome
+
+akmctl bases (POST /bases) writes docs/akm.base once and never overwrites it: five tables, three cards views, a Kanban board and an ADR table, with folder filters from the manifest relative to the nearest .obsidian vault root. Alexander checked every view in Obsidian; all rendered (Blocked showed no rows only because nothing is blocked). Obsidian re-saved the file with its own formatting (comment header dropped, filters unquoted), which the generator's output was compatible with. Not done: the generator still emits the quoted filters and a header comment; harmless.
 
 ## Log
 
@@ -194,3 +195,4 @@ Alexander opens `docs/akm.base` in Obsidian (this repository opened as a vault) 
 - 2026-11-07 21:13-07:00: ticked "the operation is in the API spec with a schema and fixtures, and the CLI command writes the file and refuses to overwrite an existing one": spec 4.25, schemas/bases.json, cases bases-1 to 4, CLI and POST /bases; go test and npm run schemas pass
 - 2026-11-07 21:13-07:00: ticked "the generated file parses as YAML, every filter and property names an AKM field, and the folder filters use the manifest's directories": TestBasesFileParsesAndNamesOnlyAKMFields parses the file and checks every property; TestBasesFileUsesTheManifestsFoldersAndStaleDays checks the folders
 - 2026-11-07 21:13-07:00: ticked "the README and docs/glossary.md name it as Obsidian Bases": README section Obsidian Bases and the glossary row bases
+- 2026-11-07 22:31-07:00: ticked "Alexander opens it in Obsidian and each view renders (manual check; the tool cannot test this)": Alexander opened docs/akm.base in Obsidian (this repository as a vault): every view rendered; Blocked was empty only because no item is blocked
