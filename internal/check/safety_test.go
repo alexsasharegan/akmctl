@@ -150,6 +150,8 @@ func TestSafetyScansRecordsAndRoadmap(t *testing.T) {
 
 // TestSafetyCorpus measures false positives on ordinary Markdown: set
 // AKM_CORPUS to a directory of notes. It prints the findings and never fails.
+// It stays a plain skip under AKM_REQUIRE_TOOLS: it is a manual measurement on
+// notes CI does not have, not a requirement (work item 261108-z9n8).
 func TestSafetyCorpus(t *testing.T) {
 	dir := os.Getenv("AKM_CORPUS")
 	if dir == "" {

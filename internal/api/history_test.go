@@ -1,18 +1,17 @@
 package api
 
 import (
-	"os/exec"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // historyRepo is commitsRepo with git_commits on, which history needs.
 func historyRepo(t *testing.T, fixture string) string {
 	t.Helper()
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git is not installed")
-	}
+	testutil.RequireTool(t, "git")
 	root := copyRepo(t, fixture, "git_commits: true\n")
 	gitIn(t, root, "init", "-q", "-b", "main")
 	gitIn(t, root, "add", "-A")

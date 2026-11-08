@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 const sum = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
@@ -18,11 +20,7 @@ func sh(t *testing.T) string {
 	if runtime.GOOS == "windows" {
 		t.Skip("the scripts are POSIX shell; the Windows job runs the WinGet one with bash in CI")
 	}
-	p, err := exec.LookPath("sh")
-	if err != nil {
-		t.Skip("no sh")
-	}
-	return p
+	return testutil.RequireTool(t, "sh")
 }
 
 func sums(t *testing.T, lines ...string) string {

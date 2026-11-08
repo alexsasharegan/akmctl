@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // The embedded client: every file the page loads is listed here, so a new
@@ -227,10 +229,7 @@ func TestClientImportsResolve(t *testing.T) {
 // The pure modules run under Node when it is installed (CI has it). They are
 // copied next to a package.json that marks them as modules.
 func TestPureModulesUnderNode(t *testing.T) {
-	node, err := exec.LookPath("node")
-	if err != nil {
-		t.Skip("node is not installed")
-	}
+	node := testutil.RequireTool(t, "node")
 	dir := t.TempDir()
 	for _, n := range []string{"util.js", "logic.js", "store.js", "live.js", "moves.js", "project.js", "review.js", "capture.js", "controls.js", "effects.js", "fields.js", "picker.js", "toasts.js", "replay.js"} {
 		if err := os.WriteFile(filepath.Join(dir, n), []byte(readWeb(t, "js/"+n)), 0o644); err != nil {

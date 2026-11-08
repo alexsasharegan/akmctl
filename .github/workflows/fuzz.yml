@@ -1,0 +1,40 @@
+name: fuzz
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      fuzztime:
+        description: Time per fuzz target (a Go duration)
+        default: 1m
+permissions:
+  contents: read
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: fuzz each target
+        env:
+          FUZZTIME: ${{ inputs.fuzztime || '1m' }}
+        run: |
+          # go test -fuzz takes one target of one package per run, so list them.
+          status=0
+          for pkg in $(go list ./...); do
+            for target in $(go test "$pkg" -list '^Fuzz' | grep '^Fuzz'); do
+              echo "::group::$pkg $target"
+              go test "$pkg" -run '^$' -fuzz "^${target}\$" -fuzztime "$FUZZTIME" || status=1
+              echo "::endgroup::"
+            done
+          done
+          exit $status
+      - name: keep failing inputs
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fuzz-corpus
+          path: "**/testdata/fuzz/**"
+          if-no-files-found: ignore
