@@ -31,7 +31,7 @@ Done when:
 
 ## Next
 
-Work the first child, 261108-hp9k (theme factorization): read internal/server/web/app.css, js/boot.js and js/ui.js, then decide how a theme is declared.
+Work the four theme items in any order (Catppuccin 261108-m4a6 first, as the largest): the format is done, docs/theming.md is the how-to. Close this item when all four are done.
 
 ## Discovery
 
