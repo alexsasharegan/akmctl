@@ -1,11 +1,13 @@
 ---
 id: "261108-kdz1"
 title: set title leaves the heading out of sync
-status: raw
+status: active
 kind: bug
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T15:48
 ---
 
 # set title leaves the heading out of sync
@@ -17,6 +19,11 @@ Found by the cold-agent retest of 261101-t8h8. `akmctl set <id> title="New"` cha
 - [ ] `set title=` keeps WK12 quiet (it rewrites the first heading), or prints the heading it left behind and how to change it.
 - [ ] A test covers it; the `set` reference says which.
 
+## Next
+
+Rename the first heading in set when the title changes; test; docs.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 08:48-07:00: claimed (claude-sonnet-5-5).
