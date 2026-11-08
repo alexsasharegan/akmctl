@@ -3,6 +3,7 @@ package api
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -78,7 +79,9 @@ func TestCustomDocsDirEndToEnd(t *testing.T) {
 	callOK(t, base, "set", Request{"id": id, "changes": map[string]any{"status": "ready"}})
 	callOK(t, base, "section", Request{"id": id, "name": "Next", "text": "Close it."})
 	callOK(t, base, "claim", Request{"id": id, "as": "agent"})
-	if !exists(base, "knowledge/.akm.lock") {
+	// The lock file stays on disk after the write only where it is an advisory
+	// flock; on Windows it is created exclusively and removed on release.
+	if runtime.GOOS != "windows" && !exists(base, "knowledge/.akm.lock") {
 		t.Error("the lock is not in the docs dir")
 	}
 	if exists(base, "docs") {
