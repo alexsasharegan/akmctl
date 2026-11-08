@@ -2,10 +2,12 @@
 id: "261107-1gha"
 title: help lists --fields and --changes flags that refuse a JSON object
 summary: new --help and set --help list --fields and --changes, but a JSON object gives 'must be an object'; the CLI takes --field key=value
-status: raw
+status: active
 kind: bug
 created: 2026-11-07
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T15:50
 ---
 
 # help lists --fields and --changes flags that refuse a JSON object
@@ -19,7 +21,12 @@ Done when:
 - [ ] `new --help` and `set --help` list only forms that work, with an example of each
 - [ ] the error for a JSON object names the working form
 
+## Next
+
+Read a JSON object for --fields and --changes in the CLI, merge with --field and key=value, say how to fix a bad value; test; changelog.
+
 ## Log
 
 - 2026-11-07: filed.
 - 2026-11-08 00:03-07:00: The cold-agent retest of 261101-t8h8 also hit this: 'set <id> --changes {"priority":2}' returns 'changes must be an object' for an object. Related: 261108-h7ds (bracketed blocked_by lists).
+- 2026-11-08 08:50-07:00: claimed (claude-sonnet-5-5).
