@@ -1,10 +1,12 @@
 ---
 id: "261101-hsh4"
 title: CHANGELOG names a change to the AGENTS.md template
-status: ready
+status: active
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-07
 blocked_by: [261101-abw2]
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T06:09
 ---
 
 # CHANGELOG names a change to the AGENTS.md template
@@ -23,3 +25,4 @@ Depends on 261101-abw2 for the command name. Add the phrase and the Prepare step
 ## Log
 
 - 2026-11-01: filed.
+- 2026-11-07 23:09-07:00: claimed (claude-sonnet-5-5).
