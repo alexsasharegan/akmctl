@@ -50,6 +50,13 @@ Then try the two things that differ on Windows:
 1. Open the work item in your editor, change a word and save it. Run `akmctl set $id priority=2` while the file is still open in the editor. It should work; if it says `Access is denied`, that is the known fault 261108-mwtr: close the file in the editor and run it again, and tell us which editor you used.
 2. Run `akmctl check` again after saving. If your editor changed the line endings to CRLF it should still say `0 errors`.
 
+## 3. The two things only a person can check
+
+CI has no console and no browser, so these two steps are yours (work item 261108-ct4s). Do each once in Windows Terminal and once in plain PowerShell (the blue window).
+
+1. The questions. In a new empty folder, run `akmctl init` with no flags. It should ask a few plain questions (`[y/N]` and a choice of folder name); answer them, press Enter for the defaults. It should finish and print what it wrote. If it hangs, prints strange characters, or ignores Enter, that is a finding.
+2. The workbench. In the folder from step 2, run `akmctl ui --open`. Your browser should open a page with the board and your `first-task`. Go back to the terminal and press Ctrl+C: the server should stop and the prompt come back. If no browser opens, copy the `open:` line the command printed into your browser.
+
 ## If a step fails
 
 Copy this into the message, with the failing command and its full output:
@@ -68,4 +75,4 @@ Known faults, so you do not have to report them again: 261108-mwtr (a write is r
 
 ## For the maintainer
 
-CI runs the block between the `first-run` markers on the Windows runner on every push, so the commands here are known to work there. What CI cannot do is stand in for a person: a real machine, a real editor, OneDrive, antivirus and SmartScreen. Work item 261108-7avk stays open until someone has done the checklist by hand.
+CI runs the block between the `first-run` markers on the Windows runner on every push, so the commands here are known to work there. What CI cannot do is stand in for a person: a real machine, a real console, a browser opening, a real editor, OneDrive, antivirus and SmartScreen. Work item 261108-7avk stays open until someone has done the checklist by hand.
