@@ -415,6 +415,41 @@ func TestSetBlockedByStoresACleanList(t *testing.T) {
 	}
 }
 
+// TestJSONObjectFlags is work item 261107-1gha: help listed --fields and
+// --changes, and a JSON object for either was refused as "must be an object".
+func TestJSONObjectFlags(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	run := func(args ...string) (int, string, string) {
+		var out, errb bytes.Buffer
+		code := Run(append(args, "--repo", root), &out, &errb, ".")
+		return code, out.String(), errb.String()
+	}
+	code, out, errs := run("new", "work", "from-json", "--fields", `{"kind":"bug","priority":2}`, "--field", "summary=mixed", "--format", "json")
+	if code != 0 || !strings.Contains(out, `"kind":"bug"`) || !strings.Contains(out, `"priority":2`) || !strings.Contains(out, `"summary":"mixed"`) {
+		t.Fatalf("new --fields: %d %s %s", code, out, errs)
+	}
+	code, out, errs = run("set", "261022-e5f6", "--changes", `{"priority":4}`, "status=active", "--format", "json")
+	if code != 0 || !strings.Contains(out, `"priority":4`) || !strings.Contains(out, `"status":"active"`) {
+		t.Fatalf("set --changes: %d %s %s", code, out, errs)
+	}
+	for _, c := range [][]string{
+		{"set", "261022-e5f6", "--changes", "priority=4"},
+		{"set", "261022-e5f6", "--changes", "[1]"},
+		{"new", "work", "x", "--fields", "not json"},
+	} {
+		code, _, errs := run(c...)
+		if code != 2 || !strings.Contains(errs, "needs a JSON object") || !strings.Contains(errs, "key=value") {
+			t.Errorf("%v: exit %d, %q", c, code, errs)
+		}
+	}
+	var help bytes.Buffer
+	Run([]string{"set", "--help"}, &help, &help, ".")
+	if !strings.Contains(help.String(), "--changes <json>") {
+		t.Errorf("help: %s", help.String())
+	}
+}
+
 // TestFormatIDsPrintsTheRecordOfAWrite is work item 261108-nrv4: --format ids
 // printed nothing for a write, so a script that captured the new id got an empty
 // string and an agent retried and filed a duplicate.

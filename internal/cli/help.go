@@ -89,12 +89,14 @@ func commandUsage(w io.Writer, op string) {
 			fmt.Fprintf(w, "  %s <a,b>\n", flag)
 		case "int":
 			fmt.Fprintf(w, "  %s <n>\n", flag)
+		case "object":
+			fmt.Fprintf(w, "  %s <json>  (a JSON object, for example '{\"priority\":2}')\n", flag)
 		default:
 			fmt.Fprintf(w, "  %s <text>\n", flag)
 		}
 	}
 	if op == "set" {
-		fmt.Fprintf(w, "  fields are key=value arguments; a list field takes commas: blocked_by=a,b (a JSON array or [a,b] is read as the same list; null empties it)\n")
+		fmt.Fprintf(w, "  fields are key=value arguments (or --changes with a JSON object); a list field takes commas: blocked_by=a,b (a JSON array or [a,b] is read as the same list; null empties it)\n")
 	}
 	if op == "new" {
 		fmt.Fprintf(w, "  --parent <id>  --kind <kind>  --priority <n>  (a work item's fields; any other field: --field key=value)\n")

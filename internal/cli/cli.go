@@ -202,6 +202,21 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			} else {
 				req[pname] = n
 			}
+		case "object":
+			v, _ := value()
+			var obj map[string]any
+			if err := json.Unmarshal([]byte(v), &obj); err != nil || obj == nil {
+				fmt.Fprintf(stderr, "akmctl: --%s needs a JSON object such as '{\"priority\":2}' (or use key=value arguments, --field key=value)\n", name)
+				return 2
+			}
+			m, _ := req[pname].(map[string]any)
+			if m == nil {
+				m = map[string]any{}
+			}
+			for k, x := range obj {
+				m[k] = x
+			}
+			req[pname] = m
 		case "strings":
 			v, _ := value()
 			prev, _ := req[pname].([]string)
@@ -238,7 +253,11 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 				}
 				changes[k] = parseFieldValue(k, raw)
 			}
-			if len(changes) > 0 {
+			if m, _ := req["changes"].(map[string]any); m != nil {
+				for k, x := range changes {
+					m[k] = x
+				}
+			} else if len(changes) > 0 {
 				req["changes"] = changes
 			}
 		}
