@@ -2,11 +2,13 @@
 id: "261030-456q"
 title: Test strategy and coverage audit
 summary: Audit how akmctl is tested (strategy, maintainability, coverage), list the gaps as numbered findings, and file linked tickets for each group.
-status: ready
+status: active
 kind: spike
 priority: 3
 created: 2026-10-30
-updated: 2026-10-30
+updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T07:57
 ---
 
 # Test strategy and coverage audit
@@ -41,6 +43,11 @@ Done when:
 - [ ] The ADR drafts that the findings call for (a decision on how to fixture non-deterministic or git-dependent operations, for instance) are listed in the report, not decided here.
 - [ ] The roadmap lists the filed items in an order the report recommends.
 
+## Next
+
+Split into four spike children (strategy, maintainability, coverage, report), then work them in order; the parent closes after the report child.
+
 ## Log
 
 - 2026-10-30: filed, from the maintainer's request after `commits` shipped without fixtures; output is an audit report and linked tickets.
+- 2026-11-08 00:57-07:00: claimed (claude-sonnet-5-5).
