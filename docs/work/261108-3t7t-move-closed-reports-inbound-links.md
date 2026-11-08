@@ -1,11 +1,13 @@
 ---
 id: "261108-3t7t"
 title: move closed reports inbound links
-status: raw
+status: active
 kind: feature
 priority: 4
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T21:21
 ---
 
 # move closed reports inbound links
@@ -19,6 +21,11 @@ Done when:
 - [ ] `move_closed` lists the inbound links it leaves broken, in `notes`, in the form `move_file` uses, without one line per record growing past a bound (decide the bound, as `mint_ids` does for references).
 - [ ] A test with a link to a record that moves.
 
+## Next
+
+Read the links of all moves in one pass before any file moves, report them as move_file does, bound the list at 50 lines, test, spec line, changelog.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 14:21-07:00: claimed (claude-sonnet-5-5-rest).
