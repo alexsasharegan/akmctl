@@ -1,11 +1,13 @@
 ---
 id: "261108-nrv4"
 title: format ids prints nothing for writes
-status: raw
+status: active
 kind: bug
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T15:45
 ---
 
 # format ids prints nothing for writes
@@ -22,6 +24,11 @@ Done when:
 - [ ] A test pins the choice for `new` and `set`, and the help text for `--format` says what `ids` means for a write.
 - [ ] The other write commands (`claim`, `close`, `log`, `tick`, `release`, `section`) are checked and the same rule holds.
 
+## Next
+
+In internal/cli/cli.go, make recordsOf return the single record of a write response; add a test; update the --format help.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 08:45-07:00: claimed (claude-sonnet-5-5).
