@@ -52,7 +52,38 @@ Needs Go 1.27 or later. The binary lands in `$(go env GOBIN)`, or in `$(go env G
 
 ### Download a release
 
-Download the archive for your system from the [Releases](https://github.com/alexsasharegan/akmctl/releases) page (`akmctl_<version>_<os>_<arch>.tar.gz`, or `.zip` for Windows), unpack it and put `akmctl` on your `PATH`. The binaries are not code-signed, so macOS may block one that a browser downloaded; fetching it with `curl` avoids that, or use Go install.
+Download the archive for your system from the [Releases](https://github.com/alexsasharegan/akmctl/releases) page (`akmctl_<version>_<os>_<arch>.tar.gz`), unpack it and put `akmctl` on your `PATH`. On macOS and Linux `scripts/install.sh` does this and checks the download against `SHA256SUMS`. The binaries are not code-signed, so macOS may block one that a browser downloaded; fetching it with `curl` avoids that, or use Go install. Windows has its own steps below.
+
+### Windows
+
+In PowerShell, no administrator rights needed. This downloads the newest release zip (`akmctl_<version>_windows_amd64.zip`), checks it against `SHA256SUMS`, copies `akmctl.exe` to `%LOCALAPPDATA%\Programs\akmctl` and adds that folder to your user `PATH`:
+
+```powershell
+$version = (Invoke-RestMethod https://api.github.com/repos/alexsasharegan/akmctl/releases/latest).tag_name.TrimStart('v')
+$zip = "akmctl_${version}_windows_amd64.zip"
+$base = "https://github.com/alexsasharegan/akmctl/releases/download/v$version"
+$tmp = Join-Path ([IO.Path]::GetTempPath()) "akmctl-$version"
+New-Item -ItemType Directory -Force $tmp | Out-Null
+Invoke-WebRequest "$base/$zip" -OutFile "$tmp\$zip"
+Invoke-WebRequest "$base/SHA256SUMS" -OutFile "$tmp\SHA256SUMS"
+$want = ((Select-String -Path "$tmp\SHA256SUMS" -SimpleMatch $zip).Line -split '\s+')[0]
+$got = (Get-FileHash "$tmp\$zip" -Algorithm SHA256).Hash
+if ($got -ne $want) { throw "checksum mismatch for ${zip}: got $got, want $want" }
+Expand-Archive "$tmp\$zip" -DestinationPath $tmp -Force
+$dir = Join-Path $env:LOCALAPPDATA "Programs\akmctl"
+New-Item -ItemType Directory -Force $dir | Out-Null
+Copy-Item "$tmp\akmctl_${version}_windows_amd64\akmctl.exe" $dir -Force
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+if (($userPath -split ';') -notcontains $dir) { [Environment]::SetEnvironmentVariable("Path", "$userPath;$dir", "User") }
+$env:Path += ";$dir"
+akmctl version
+```
+
+Open a new terminal for other programs to see the new `PATH`. To update, run the block again. To remove, delete the folder and take it out of your user `PATH`.
+
+The binary is not code-signed. A file saved by `Invoke-WebRequest` carries no download mark, so Windows SmartScreen usually stays quiet; one saved by a browser may show "Windows protected your PC". Choose "More info", then "Run anyway", or run `Unblock-File "$dir\akmctl.exe"`. Only do this for a file whose checksum matches. A checksum mismatch means the download is damaged or changed: do not run it.
+
+WinGet manifests exist (`scripts/winget-manifests.sh`) but are not submitted to `winget-pkgs` yet, so `winget install akmctl` does not work today.
 
 ### Build from source
 
