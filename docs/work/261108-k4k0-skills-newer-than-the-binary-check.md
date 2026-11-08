@@ -18,15 +18,16 @@ A project that carries the skills of a newer `akmctl` while the global binary is
 
 Done when:
 
-- [ ] Running an older binary on a repository whose skills need a newer one prints one clear line naming the needed version.
-- [ ] A test covers it with a skill that needs a version above the binary's.
-- [ ] The `akm` skill tells an agent what to do on that line.
+- [x] Running an older binary on a repository whose skills need a newer one prints one clear line naming the needed version.
+- [x] A test covers it with a skill that needs a version above the binary's.
+- [x] The `akm` skill tells an agent what to do on that line.
 
 ## Next
 
-Design: the marker (.akm-skill.json) records the tool version that wrote each skill. `skills status` compares it with the running binary; when it is newer it adds a note naming the version to install and a `requires_tool` field, and `update` skips that skill. Then the `akm` skill (both copies) says what to do on the line.
+Close after merge review. Possible follow-up: a check warning for skills newer than the binary (needs the version in check and a rule id).
 
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 13:08-07:00: claimed (claude-sonnet-5-5-rest).
+- 2026-11-08 13:10-07:00: Skills status now notes skills whose marker names a newer tool than the running one (requires_tool, clean false, update skips them). Tests TestSkillsNewerThanTheBinary and TestToolNewer; akm skill (both copies) says what to do. check was not changed: it does not read markers, so the line is on skills status only.

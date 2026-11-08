@@ -90,6 +90,10 @@
                   "note": {
                     "type": "string"
                   },
+                  "requires_tool": {
+                    "type": "string",
+                    "minLength": 1
+                  },
                   "stale": {
                     "type": "array",
                     "items": {

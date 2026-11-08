@@ -46,5 +46,6 @@ Read the reference before the first use of a command.
 ## Habits
 
 - Run `akmctl check` before a commit; fix errors, read warnings.
+- If `akmctl skills` says the repository's skills are newer than your `akmctl`, read `references/skills.md` before you go on.
 - A refusal (`refused`, `stale`, `ambiguous`) is information: read `details.reason`, do not retry blindly.
 - `--format json` gives the full response when the text form is not enough.
