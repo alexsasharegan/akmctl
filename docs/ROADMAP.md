@@ -57,7 +57,6 @@ Hardening and small rules:
 - [261108-f1tv] Run fixtures through both bindings
 - [261108-79t5] Skill text checks
 - [261108-xajw] Workbench page tests
-- [261107-1gha] help lists --fields and --changes flags that refuse a JSON object
 - [261029-q8z3] TestCompareAndSwapRace is flaky on Windows CI
 - [261028-jzsx] Cover the Windows path beyond CI
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
