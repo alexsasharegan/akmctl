@@ -1,0 +1,32 @@
+exit 0
+261022-e5f6	2026-10-22	active	Document the exit codes
+--- docs/work/261022-e5f6-document-the-exit-codes.md
++++ docs/work/261022-e5f6-document-the-exit-codes.md
+@@ -1,10 +1,12 @@
+ ---
+ id: 261022-e5f6
+ title: Document the exit codes
+-status: ready
++status: active
+ parent: 261015-c4d5
+ created: 2026-10-22
+-updated: 2026-10-22
++updated: 2026-10-28
++claimed_by: agent-1
++claimed_at: 2026-10-28T09:30
+ ---
+ 
+ # Document the exit codes
+@@ -16,3 +18,6 @@
+ 
+ ## Next
+ Write the exit-code table.
++
++## Log
++- 2026-10-28 09:30+00:00: claimed (agent-1).
+commit message (use as given, whole, with git commit -F -; stage these paths and the code):
+  261022-e5f6(claim): claimed by agent-1
+  
+  AKM-Step: claim
+  AKM-Item: 261022-e5f6
+  stage: docs/work/261022-e5f6-document-the-exit-codes.md

@@ -1,0 +1,8 @@
+exit 0
+== active (2)
+261015-c4d5	2026-10-15	active	Machine-readable listings
+261020-a2b3	2026-10-20	active	Add JSON output to ls
+== blocked (1)
+261024-g7h8	2026-10-24	blocked	Publish the first release
+== ready (1)
+261022-e5f6	2026-10-22	ready	Document the exit codes

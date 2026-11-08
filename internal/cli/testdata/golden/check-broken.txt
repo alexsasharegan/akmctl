@@ -1,0 +1,5 @@
+exit 1
+docs/ROADMAP.md:8: [E] RM1 roadmap entry 261099-bbbb does not resolve to a work item
+docs/work/261020-a2b3-add-json-output-to-ls.md: [E] WK6 status active requires a non-empty ## Next
+docs/work/261022-e5f6-document-the-exit-codes.md:5: [E] WK4 parent 261099-aaaa does not resolve to an existing item
+3 errors, 0 warnings

@@ -39,7 +39,7 @@ func TestMoveFileReportsInboundLinks(t *testing.T) {
 			}
 		}
 	}
-	plan := Plan(repo, []Step{s})
+	plan := PlanEnv(repo, []Step{s}, Env{})
 	check("plan", plan[0].Notes)
 	if !exists(repo, "docs/old/note.md") {
 		t.Fatal("plan moved the file")
