@@ -196,7 +196,7 @@ export async function undo() {
 
 export function capture() {
   if (busy || overlayOpen()) return;
-  const parents = H.records().filter(isOpenWork).map((r) => ({ id: r.id, title: titleOf(r) }));
+  const parents = H.records().filter(isOpenWork).map((r) => ({ id: r.id, title: titleOf(r), status: String(r.fields.status || ""), summary: String(r.fields.summary || "") }));
   openCapture(deps, {
     parents,
     workDir: state.folders.work_dir,
