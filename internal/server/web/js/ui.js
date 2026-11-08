@@ -32,7 +32,7 @@ export function kbd(keys) {
 export const typing = (t) => !!t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable || (t.tagName === "INPUT" && !["checkbox", "radio", "button"].includes(t.type)));
 
 // ---- theme ----
-// Which colour theme, mode and variant show is decided by theme.js; this part
+// Which color theme, mode and variant show is decided by theme.js; this part
 // reads and writes the stored choice, sets <html data-theme data-mode data-variant>
 // and offers the choices in the command palette. boot.js did the first paint.
 
@@ -118,23 +118,23 @@ async function loadThemes() {
   applyTheme();
 }
 
-/** The command-palette entries for the colour theme, mode and variant. */
+/** The command-palette entries for the color theme, mode and variant. */
 export function themeActions() {
   const reg = T.registry;
   if (!reg || !T.prefs) return [];
   const p = T.prefs;
   const out = [];
   for (const t of reg.themes) {
-    out.push({ label: "Colour theme: " + t.name + (t.id === p.theme ? " (current)" : ""), keys: [], run: () => t.id !== p.theme && setThemeId(t.id) });
+    out.push({ label: "Color theme: " + t.name + (t.id === p.theme ? " (current)" : ""), keys: [], run: () => t.id !== p.theme && setThemeId(t.id) });
   }
   for (const m of MODES) {
-    out.push({ label: "Colour mode: " + m + (m === p.mode ? " (current)" : ""), keys: [], run: () => m !== p.mode && setMode(m) });
+    out.push({ label: "Color mode: " + m + (m === p.mode ? " (current)" : ""), keys: [], run: () => m !== p.mode && setMode(m) });
   }
   const here = variantsOf(reg, p.theme, p.resolved);
   if (here.length > 1) {
     here.forEach((v, i) => {
       const on = i === 0 ? !p.variant : v.id === p.variant;
-      out.push({ label: "Colour variant (" + p.resolved + "): " + v.name + (on ? " (current)" : ""), keys: [], run: () => !on && setVariant(i === 0 ? "" : v.id) });
+      out.push({ label: "Color variant (" + p.resolved + "): " + v.name + (on ? " (current)" : ""), keys: [], run: () => !on && setVariant(i === 0 ? "" : v.id) });
     });
   }
   return out;

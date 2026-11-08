@@ -1,4 +1,4 @@
-// Colour themes: which theme, mode and variant the page shows. Pure functions
+// Color themes: which theme, mode and variant the page shows. Pure functions
 // (checked by testdata/logic.test.mjs); ui.js applies and stores the result and
 // boot.js repeats resolvePrefs for the first paint (the test keeps them equal).
 //

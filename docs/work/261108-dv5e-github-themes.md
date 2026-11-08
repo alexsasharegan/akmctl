@@ -13,13 +13,13 @@ summary: "Add GitHub's Primer themes to the workbench: Light and Dark Default fi
 
 ## Goal
 
-Add the GitHub theme to the workbench on the structure the factorization item built. GitHub Light and GitHub Dark (the default pair; the dimmed and high-contrast flavours are out of scope unless they cost nothing). Map the palette onto every token of the theme unit; keep the status colours (raw, ready, active, blocked) and the warning and error pairs distinguishable and readable.
+Add the GitHub theme to the workbench on the structure the factorization item built. GitHub Light and GitHub Dark (the default pair; the dimmed and high-contrast flavours are out of scope unless they cost nothing). Map the palette onto every token of the theme unit; keep the status colors (raw, ready, active, blocked) and the warning and error pairs distinguishable and readable.
 
 Done when:
 
 - [ ] the theme is a self-contained unit that passes the missing-token test
 - [ ] it appears in the picker with its light and dark variants
-- [ ] body text, muted text, the accent and the status colours meet WCAG AA contrast in each variant (record the check)
+- [ ] body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)
 - [ ] checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette
 - [ ] the upstream palette's licence is noted if it needs attribution
 
@@ -29,7 +29,7 @@ Read docs/theming.md, then this item's Discovery. Read the upstream palette name
 
 ## Discovery
 
-Source: Ghostty's bundled theme files (`/Applications/Ghostty.app/Contents/Resources/ghostty/themes/<name>`), read 2026-11-08. These are terminal palettes: background, foreground, cursor, selection and 16 ANSI colours. They fix the base, text and hue families, but not the workbench's surface tiers, lines and muted text (`--surface`, `--surface-2`, `--tray`, `--line`, `--text-2`), which are derived from the upstream palette below. Mapping used: red=ANSI 1, green=2, yellow=3, blue=4, magenta=5, cyan=6, muted=8 (bright black).
+Source: Ghostty's bundled theme files (`/Applications/Ghostty.app/Contents/Resources/ghostty/themes/<name>`), read 2026-11-08. These are terminal palettes: background, foreground, cursor, selection and 16 ANSI colors. They fix the base, text and hue families, but not the workbench's surface tiers, lines and muted text (`--surface`, `--surface-2`, `--tray`, `--line`, `--text-2`), which are derived from the upstream palette below. Mapping used: red=ANSI 1, green=2, yellow=3, blue=4, magenta=5, cyan=6, muted=8 (bright black).
 
 **Variants.** Ghostty carries two generations of GitHub themes. The Primer-based ones are the ones to use: `GitHub Light Default` and `GitHub Dark Default` (the default pair), plus `GitHub Dark Dimmed`, `GitHub Light High Contrast`, `GitHub Dark High Contrast`, `GitHub Light Colorblind` and `GitHub Dark Colorblind`. The older iTerm-era `GitHub` (light, bg #f4f4f4) and `GitHub Dark` (bg #101216) are not Primer palettes: leave them out. Plan: ship Light Default and Dark Default first; the dimmed, high-contrast and colorblind variants are a good fit for the workbench's accessibility, so ship them if the picker handles several variants per theme (the factorization item decides), otherwise file a follow-up.
 
@@ -46,7 +46,7 @@ Source: Ghostty's bundled theme files (`/Applications/Ghostty.app/Contents/Resou
 | ANSI 0         | #24292f       | #484f58      | #545d68     | #0e1116             | #7a828e            |
 | ANSI 8 (muted) | #57606a       | #6e7681      | #636e7b     | #4b535d             | #9ea7b3            |
 
-Colorblind variants (`GitHub Light Colorblind`, `GitHub Dark Colorblind`) swap red and green for orange (#b35900 light, #ec8e2c dark) and blue; they matter for the status colours (raw, ready, active, blocked), which must stay distinguishable. In Ghostty the Light Default yellow (#4d2d00) is a dark brown, not a yellow: the warning colour needs Primer's own attention scale.
+Colorblind variants (`GitHub Light Colorblind`, `GitHub Dark Colorblind`) swap red and green for orange (#b35900 light, #ec8e2c dark) and blue; they matter for the status colors (raw, ready, active, blocked), which must stay distinguishable. In Ghostty the Light Default yellow (#4d2d00) is a dark brown, not a yellow: the warning color needs Primer's own attention scale.
 
 **Upstream.** GitHub Primer primitives (github.com/primer/primitives, `primer/primitives`) and the VS Code theme (github.com/primer/github-vscode-theme) hold the full tokens (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`, `accent.fg`, `attention.*`, `danger.*`) per variant. Licence: MIT. The VS Code extension above is the second source already read; the build step still records the upstream commit it uses.
 
@@ -66,7 +66,7 @@ Colorblind variants (`GitHub Light Colorblind`, `GitHub Dark Colorblind`) swap r
 | diff added fill          | #6fdd8b80     | #3fb9504d    | #57ab5a4d   | #43c66380 | #26cd4d4d | #80ccff80 | #58a6ff4d |
 | diff removed fill        | #ff818266     | #ff7b724d    | #f470674d   | #ee5a5d66 | #ff94924d | #f7993966 | #ec8e2c4d |
 
-The colorblind variants show the status trade-off directly: error becomes orange (#b35900 light, #d47616 dark) and "added" becomes blue, so the status colours (raw, ready, active, blocked) and the review-diff pairs must read from per-variant tokens, not a fixed red and green. High-contrast variants use a strong border (#20252c, #7a828e) and identical text and muted colours; check that nothing relies on muted text being fainter. Colour values are the Primer functional tokens flattened for VS Code; the Primer primitives repo remains the source for names (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`).
+The colorblind variants show the status trade-off directly: error becomes orange (#b35900 light, #d47616 dark) and "added" becomes blue, so the status colors (raw, ready, active, blocked) and the review-diff pairs must read from per-variant tokens, not a fixed red and green. High-contrast variants use a strong border (#20252c, #7a828e) and identical text and muted colors; check that nothing relies on muted text being fainter. Color values are the Primer functional tokens flattened for VS Code; the Primer primitives repo remains the source for names (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`).
 
 ## Log
 

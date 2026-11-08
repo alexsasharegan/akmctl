@@ -1,8 +1,8 @@
-/* Quiet paper: the workbench's own colour theme (the pkm-workbench palette). A colour theme is one file
+/* Quiet paper: the workbench's own color theme (the pkm-workbench palette). A color theme is one file
    in this folder plus an entry in themes.json; docs/theming.md says how. The server joins every *.css here
    into /themes.css. Each variant block must define exactly the tokens below (TestThemeTokens). */
 
-/* light (the default light variant; also the page's colours before any theme is chosen) */
+/* light (the default light variant; also the page's colors before any theme is chosen) */
 :root,
 :root[data-theme="quiet-paper"][data-mode="light"] {
   color-scheme:light;

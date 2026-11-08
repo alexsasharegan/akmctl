@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// The colour themes (work item 261108-hp9k): web/themes/themes.json lists them,
+// The color themes (work item 261108-hp9k): web/themes/themes.json lists them,
 // web/themes/<id>.css holds one token block per variant, and these tests keep a
 // new theme from shipping with a token missing.
 
@@ -184,13 +184,13 @@ func TestThemeRegistryAndTokens(t *testing.T) {
 	}
 }
 
-// app.css holds structure and non-colour tokens only: no colour literal, and
+// app.css holds structure and non-color tokens only: no color literal, and
 // every var(--x) it uses is defined by app.css or by the themes.
-func TestAppCSSHasNoColourOfItsOwn(t *testing.T) {
+func TestAppCSSHasNoColorOfItsOwn(t *testing.T) {
 	css := cssComment.ReplaceAllString(readWeb(t, "app.css"), "")
 	for _, re := range []string{`#[0-9a-fA-F]{3,8}\b`, `\b(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch)\((?:[^v)]|v[^a])`, `prefers-color-scheme`, `data-theme`} {
 		if m := regexp.MustCompile(re).FindString(css); m != "" {
-			t.Fatalf("app.css has %q (%s): colours belong in web/themes", m, re)
+			t.Fatalf("app.css has %q (%s): colors belong in web/themes", m, re)
 		}
 	}
 	defined := map[string]bool{}

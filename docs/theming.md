@@ -1,13 +1,13 @@
-# Adding a colour theme to the workbench
+# Adding a color theme to the workbench
 
-A colour theme is one CSS file and one line of data. No other file changes. The format is decided in ADR 261108-w3xf; the words are in `docs/glossary.md` (colour theme, theme variant, colour mode).
+A color theme is one CSS file and one line of data. No other file changes. The format is decided in ADR 261108-w3xf; the words are in `docs/glossary.md` (color theme, theme variant, color mode).
 
 ## The files
 
 - `internal/server/web/themes/<id>.css`: the tokens, one block per variant.
 - `internal/server/web/themes/themes.json`: the list the picker reads. The server also joins every `themes/*.css` into `/themes.css`, which the page loads before `app.css`.
 
-`app.css` holds structure and the tokens that are not colours (fonts, spacing, radii, durations). It never holds a colour.
+`app.css` holds structure and the tokens that are not colors (fonts, spacing, radii, durations). It never holds a color.
 
 ## Steps
 
@@ -15,7 +15,7 @@ A colour theme is one CSS file and one line of data. No other file changes. The 
 2. Copy `themes/quiet-paper.css` to `themes/<id>.css` and change the selectors and the values.
 3. Add the theme to `themes/themes.json`: its `id`, a `name` for the picker, and its `variants`. Each variant has an `id` (unique within the theme), a `name` and a `mode` (`light` or `dark`). A theme needs at least one of each mode.
 4. Run `go test ./internal/server`. It tells you which token a block misses or adds.
-5. Run `akmctl ui`, open the command palette (`Cmd+K` or `Ctrl+K`), type `colour`, and pick the theme, then each mode and variant. Check the board, a record's drawer, a review diff and the palette itself in light and dark.
+5. Run `akmctl ui`, open the command palette (`Cmd+K` or `Ctrl+K`), type `color`, and pick the theme, then each mode and variant. Check the board, a record's drawer, a review diff and the palette itself in light and dark.
 
 ## The selectors
 
@@ -42,13 +42,13 @@ Every block defines every token, with no extras; the test compares each block wi
 - Warning and error: `--warn-fg`, `--warn-bg`, `--err-fg`, `--err-bg`.
 - Small parts: `--kbd-bg`, `--kbd-fg`, `--pal-sel` (the selected palette row), `--mark-bg` (a search match), `--toast-bg`, `--toast-fg`.
 - Traffic lights (the check summary): `--tl-success`, `--tl-info`, `--tl-warning`, `--tl-error`.
-- Status colours of the board lanes: `--st-raw`, `--st-ready`, `--st-active`, `--st-blocked`. They must stay distinguishable from one another, including for colour-blind readers.
+- Status colors of the board lanes: `--st-raw`, `--st-ready`, `--st-active`, `--st-blocked`. They must stay distinguishable from one another, including for color-blind readers.
 - The review diff: `--add-fg`, `--add-bg`, `--rem-fg`, `--rem-bg`, `--hunk-bg`.
 - Shadows: `--sh-ink` (an `r,g,b` triple), `--sh-sm`, `--sh-lg`, `--sh-2`, `--card-hi` (a highlight inside a card; `none` if the theme has none).
 
 A new token is added to every theme in the same change.
 
-## Where the colours come from
+## Where the colors come from
 
 Take them from the theme's own palette, not from a terminal theme: a terminal palette has no surface steps or borders. Each theme's work item records the sources it used, with their licences. Check the contrast of text on every surface (WCAG AA, 4.5:1 for text) in each variant, and note it in the work item.
 

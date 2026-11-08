@@ -5,7 +5,7 @@ status: ready
 kind: feature
 created: 2026-11-08
 updated: 2026-11-08
-summary: Make the workbench's look themeable so a new colour theme is a small, plug-in addition, then ship the classic themes in light and dark
+summary: Make the workbench's look themeable so a new color theme is a small, plug-in addition, then ship the classic themes in light and dark
 ---
 
 # Workbench theming
@@ -22,7 +22,7 @@ Children, in dependency order:
 - [Atom One themes](261108-pmkp-atom-one-themes.md): light and dark
 - [GitHub themes](261108-dv5e-github-themes.md): light and dark
 
-More themes can be added as children when wanted. A _colour theme_ (this project) is not a _move theme_ (the lane-move animation in `js/anim.js`, see the glossary); the factorization item registers the distinction.
+More themes can be added as children when wanted. A _color theme_ (this project) is not a _move theme_ (the lane-move animation in `js/anim.js`, see the glossary); the factorization item registers the distinction.
 
 Done when:
 

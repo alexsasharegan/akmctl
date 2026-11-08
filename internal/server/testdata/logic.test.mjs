@@ -758,7 +758,7 @@ for (const p of X.confettiPieces(70, 3)) {
   assert.ok(p.rise > -1 && p.fall > 0 && p.dur >= 1100 && p.delay >= 0);
 }
 
-// colour themes (theme.js; boot.js repeats resolvePrefs for the first paint)
+// color themes (theme.js; boot.js repeats resolvePrefs for the first paint)
 const reg = JSON.parse(readFileSync(new URL("./themes.json", import.meta.url), "utf8"));
 assert.equal(reg.default, TH.DEFAULT_THEME);
 assert.deepEqual(TH.resolvePrefs({}, false), { theme: "quiet-paper", mode: "system", resolved: "light", variant: "" });

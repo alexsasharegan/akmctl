@@ -1,4 +1,4 @@
-// Runs before the page paints (a classic script): sets the colour theme so
+// Runs before the page paints (a classic script): sets the color theme so
 // there is no flash. It repeats resolvePrefs from theme.js, which a classic
 // script cannot import; testdata/logic.test.mjs runs both and compares them.
 (function () {

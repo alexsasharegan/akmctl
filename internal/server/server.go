@@ -177,7 +177,7 @@ func (s *Server) tokenOK(auth string) bool {
 	return subtle.ConstantTimeCompare([]byte(auth[len(p):]), []byte(s.Token)) == 1
 }
 
-// themesCSS serves every colour theme as one stylesheet: the files in
+// themesCSS serves every color theme as one stylesheet: the files in
 // web/themes/*.css joined in name order, so a new theme is one new file and
 // no change to the page (ADR 261108-w3xf).
 func (s *Server) themesCSS(w http.ResponseWriter) {

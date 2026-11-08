@@ -188,7 +188,7 @@ export const searchBody = (text, limit = 10) => api("GET", "search", { query: { 
 
 export const check = () => api("GET", "check");
 
-/** The colour themes the page can show (web/themes/themes.json; it holds no data, so no token); null when it cannot be read. */
+/** The color themes the page can show (web/themes/themes.json; it holds no data, so no token); null when it cannot be read. */
 export async function fetchThemes() {
   try {
     const res = await fetch("/themes/themes.json");

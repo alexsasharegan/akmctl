@@ -1,4 +1,4 @@
-/* akmctl workbench: structure and the non-colour tokens. Every colour comes from a colour theme (themes/*.css, joined
+/* akmctl workbench: structure and the non-color tokens. Every color comes from a color theme (themes/*.css, joined
    into /themes.css; docs/theming.md). Monaspace is SIL OFL; the licences are served from /fonts/. local() is tried before the embedded file. */
 @font-face{font-family:"Monaspace Argon";src:local("Monaspace Argon Var"),url("/fonts/monaspace-argon-var.woff2") format("woff2");font-weight:200 800;font-stretch:100% 125%;font-style:oblique 0deg 11deg;font-display:swap}
 @font-face{font-family:"Monaspace Neon";src:local("Monaspace Neon Var"),url("/fonts/monaspace-neon-var.woff2") format("woff2");font-weight:200 800;font-stretch:100% 125%;font-style:oblique 0deg 11deg;font-display:swap}
