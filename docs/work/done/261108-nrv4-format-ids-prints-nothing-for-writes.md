@@ -1,13 +1,12 @@
 ---
 id: "261108-nrv4"
 title: format ids prints nothing for writes
-status: active
+status: done
 kind: bug
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-08T15:45
+closed: 2026-11-08
 ---
 
 # format ids prints nothing for writes
@@ -20,15 +19,18 @@ Actual: empty output, exit 0, a file written. Expected: the ids of the records t
 
 Done when:
 
-- [ ] `new` and `set` with `--format ids` print the record id, one per line, or refuse with a message that says what to use instead.
-- [ ] A test pins the choice for `new` and `set`, and the help text for `--format` says what `ids` means for a write.
-- [ ] The other write commands (`claim`, `close`, `log`, `tick`, `release`, `section`) are checked and the same rule holds.
+- [x] `new` and `set` with `--format ids` print the record id, one per line, or refuse with a message that says what to use instead.
+- [x] A test pins the choice for `new` and `set`, and the help text for `--format` says what `ids` means for a write.
+- [x] The other write commands (`claim`, `close`, `log`, `tick`, `release`, `section`) are checked and the same rule holds.
 
 ## Next
 
-In internal/cli/cli.go, make recordsOf return the single record of a write response; add a test; update the --format help.
+## Outcome
+
+recordsOf in internal/cli reads the single record of a write response, so --format ids prints its id; help says what ids means; test added.
 
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 08:45-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-08 08:45-07:00: probed every write with --format json: each returns one record as record; recordsOf now reads it. Checked new, set, log, close in TestFormatIDsPrintsTheRecordOfAWrite; claim, release, tick, section, remove share the same response shape.
