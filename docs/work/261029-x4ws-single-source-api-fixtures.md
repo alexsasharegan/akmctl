@@ -2,11 +2,13 @@
 id: "261029-x4ws"
 title: Keep one copy of the API fixtures
 summary: testdata/api is a hand-kept copy of docs/spec/akm-api/.fixtures; make one the source and generate or check the other.
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T07:23
 ---
 
 # Keep one copy of the API fixtures
@@ -21,6 +23,11 @@ Done when:
 - [ ] A change to one copy without the other fails `go test` or CI.
 - [ ] `make_fixtures.py` is documented as the way to regenerate, or replaced.
 
+## Next
+
+Spec copy is the source; scripts/sync-fixtures.sh copies it to testdata; a Go test fails on any difference; mark make_fixtures.py as a frozen reference; update README, architecture, AGENTS.md, spec section 9.
+
 ## Log
 
 - 2026-10-29: filed.
+- 2026-11-08 00:23-07:00: claimed (claude-sonnet-5-5).
