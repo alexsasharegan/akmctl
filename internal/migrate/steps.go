@@ -349,6 +349,8 @@ func moveClosed(repo *record.Repo, s Step, dry bool) ([]string, []string, error)
 	if len(closed) == 0 {
 		closed = []string{"done", "dropped"}
 	}
+	type move struct{ from, to string }
+	var moves []move
 	for _, t := range ts {
 		if path.Dir(t.Path) == dest || strings.HasPrefix(t.Path, dest+"/") {
 			continue
@@ -361,20 +363,30 @@ func moveClosed(repo *record.Repo, s Step, dry bool) ([]string, []string, error)
 			continue
 		}
 		to := path.Join(dest, path.Base(t.Path))
-		abs := filepath.Join(repo.Root, filepath.FromSlash(to))
-		if _, err := os.Stat(abs); err == nil {
+		if _, err := os.Stat(filepath.Join(repo.Root, filepath.FromSlash(to))); err == nil {
 			notes = append(notes, t.Path+": left in place, "+to+" exists")
 			continue
 		}
 		files = append(files, to)
-		if dry {
-			continue
-		}
-		if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
-			return files, notes, err
-		}
-		if err := os.Rename(filepath.Join(repo.Root, filepath.FromSlash(t.Path)), abs); err != nil {
-			return files, notes, err
+		moves = append(moves, move{t.Path, to})
+	}
+	// the inbound links are read before any file moves, as move_file reads them
+	byFrom := map[string]string{}
+	for _, m := range moves {
+		byFrom[m.from] = m.to
+	}
+	if len(byFrom) > 0 {
+		notes = append(notes, boundNotes(inboundLinksOfMoves(repo, byFrom), maxInboundNotes)...)
+	}
+	if !dry {
+		for _, m := range moves {
+			abs := filepath.Join(repo.Root, filepath.FromSlash(m.to))
+			if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+				return files, notes, err
+			}
+			if err := os.Rename(filepath.Join(repo.Root, filepath.FromSlash(m.from)), abs); err != nil {
+				return files, notes, err
+			}
 		}
 	}
 	sort.Strings(files)
