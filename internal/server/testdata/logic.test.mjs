@@ -245,6 +245,9 @@ assert.equal(C.buildCapture({ title: "x", priority: "1.5" }).field, "priority");
 assert.equal(C.buildCapture({ title: "x", priority: "-2" }).body.fields.priority, -2);
 assert.equal(C.buildCapture({ title: "x", priority: "007" }).field, "priority");
 assert.equal(C.buildCapture({ title: "x", kind: "epic" }).field, "kind");
+assert.equal(C.buildCapture({ title: "x", cycle: " 2026-s3 " }).body.fields.cycle, "2026-s3");
+assert.equal(C.buildCapture({ title: "x", cycle: "" }).body.fields, undefined);
+for (const bad of ["-s3", "has space", "a/b", "x".repeat(65)]) assert.equal(C.buildCapture({ title: "x", cycle: bad }).field, "cycle");
 assert.equal(C.buildCapture({ title: "x", parent: "261099-zzzz" }, []).field, "parent");
 assert.equal(C.buildCapture({ title: "x", summary: "y".repeat(161) }).field, "summary");
 

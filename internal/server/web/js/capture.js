@@ -8,6 +8,7 @@ import { createPicker } from "./picker.js";
 const MAX_WORDS = 6;
 const MAX_TITLE_SLUG = 48;
 export const MAX_SLUG = 60; // the API's limit
+export const CYCLE = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/; // the API's pattern for a cycle label
 export const KINDS = ["feature", "bug", "chore", "spike"];
 
 // Words left out of a slug made from a title, so the word budget goes to the
@@ -83,7 +84,7 @@ export function fileNote(workDir, typed) {
 
 /**
  * The `new` request for the capture form, or the first problem.
- * f: { title, slug (typed, "" if not edited), summary, kind, priority, parent };
+ * f: { title, slug (typed, "" if not edited), summary, kind, priority, cycle, parent };
  * openIds: ids a parent may be. Returns { body } or { error, field }.
  */
 export function buildCapture(f, openIds = []) {
@@ -104,6 +105,11 @@ export function buildCapture(f, openIds = []) {
   if (pr) {
     if (!/^-?(0|[1-9][0-9]*)$/.test(pr)) return { error: "Priority is a whole number.", field: "priority" };
     fields.priority = Number(pr);
+  }
+  const cycle = String(f.cycle || "").trim();
+  if (cycle) {
+    if (!CYCLE.test(cycle)) return { error: "A cycle starts with a letter or digit and uses letters, digits, dot, dash or underscore, at most 64 characters.", field: "cycle" };
+    fields.cycle = cycle;
   }
   const parent = String(f.parent || "").trim();
   if (parent) {
@@ -127,9 +133,10 @@ export function openCapture(deps, spec) {
   const summary = createSummary({ id: "cap-summary", onSubmit: () => form.requestSubmit() });
   const kind = createSelect({ id: "cap-kind", value: "", options: [{ value: "", label: "(default: chore)" }, ...KINDS.map((k) => ({ value: k, label: k }))] });
   const priority = input("cap-priority", { inputmode: "numeric", placeholder: "0", size: "6" });
+  const cycle = input("cap-cycle", { spellcheck: "false", placeholder: "none", maxlength: "64" });
   const parent = createPicker({ id: "cap-parent", items: spec.parents, placeholder: "none" });
   const err = el("p", { id: "cap-err", class: "err", role: "alert", hidden: true });
-  const submit = el("button", { type: "submit", class: "btn primary" }, "Capture ", el("kbd", { text: "Enter" }));
+  const submit = el("button", { type: "submit", class: "btn primary cap-go" }, "Capture ", el("kbd", { text: "Enter" }));
   let dirty = false;
   let busy = false;
 
@@ -151,14 +158,15 @@ export function openCapture(deps, spec) {
   const form = el(
     "form",
     { id: "cap-form", novalidate: true },
-    el("header", { class: "dlg-head" }, el("div", {}, el("p", { class: "eyebrow", text: "New raw work item" }), el("h2", { id: "cap-t", text: "Capture" }))),
+    el("header", { class: "dlg-head" }, el("div", {}, el("h2", { id: "cap-t" }, el("span", { class: "raw-word", text: "Raw" }), " Capture"), el("p", { class: "eyebrow cap-sub", text: "New work item" }))),
     el(
       "div",
       { class: "dlg-body" },
       field("What is it?", "A short title. You shape it later, when you move it out of raw.", title),
       el("div", { class: "field" }, el("label", { class: "label", for: "cap-slug", text: "Name" }), el("span", { class: "help", text: "Made from the title. Edit it to word it yourself." }), slug, note),
       field("Summary (optional)", "One line, at most 160 characters.", summary, "cap-summary"),
-      el("div", { class: "row3" }, field("Kind", "", kind, "cap-kind"), field("Priority", "", priority), field("Parent", "", parent, "cap-parent")),
+      el("div", { class: "row3" }, field("Kind", "", kind, "cap-kind"), field("Priority", "", priority), field("Cycle", "", cycle)),
+      field("Parent", "Search the open work items by id, title or summary.", parent, "cap-parent"),
       err,
     ),
     el("footer", { class: "dlg-foot" }, el("button", { type: "button", class: "btn quiet", onclick: () => deps.closeDialog() }, "Cancel ", el("kbd", { text: "Esc" })), submit),
@@ -168,13 +176,13 @@ export function openCapture(deps, spec) {
   function show(e, field) {
     err.hidden = !e;
     err.textContent = e || "";
-    const f = { title, slug, summary, kind, priority, parent }[field];
+    const f = { title, slug, summary, kind, priority, cycle, parent }[field];
     if (f) f.focus();
   }
 
   async function send() {
     if (busy) return;
-    const r = buildCapture({ title: title.value, slug: dirty ? slug.value : "", summary: summary.value, kind: kind.value, priority: priority.value, parent: parent.value }, spec.parents.map((p) => p.id));
+    const r = buildCapture({ title: title.value, slug: dirty ? slug.value : "", summary: summary.value, kind: kind.value, priority: priority.value, cycle: cycle.value, parent: parent.value }, spec.parents.map((p) => p.id));
     if (r.error) return show(r.error, r.field);
     busy = true;
     submit.disabled = true;
