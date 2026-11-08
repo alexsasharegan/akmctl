@@ -6,15 +6,9 @@ Nothing in flight. Agent rails hardening (261101-vs5c) is done; the rerun on oth
 
 ## Next
 
-Workbench polish, in order (the styling freeze is lifted for these):
-
-Then make work decomposition discoverable (the children in order: 3erc, ph53, 72bd):
+Make work decomposition discoverable (the children in order: 3erc, ph53, 72bd):
 
 - [261101-t8h8] Make work decomposition discoverable
-
-Then the upgrade path for existing repositories (guide section 8 says what is planned; `akmctl agents` is done, so hsh4 can name it):
-
-- [261101-hsh4] CHANGELOG names a change to the AGENTS.md template
 
 ## Later
 

@@ -15,9 +15,10 @@ Before 1.0.0 there are no hard rules; these are hints, and the maintainer decide
 1. File a `chore` work item for the release (`akmctl new work release-v0-3-2`), claim it, and put it under Now in `docs/ROADMAP.md`. Its done-when: the changelog heading, the tag pushed by the maintainer, the archives attached and `go install` reporting the version. Leave `## Next` as the tag step.
 2. Pick the version. Below 1.0.0 a dot release (`0.3.1` to `0.3.2`) carries fixes and small additions; a MINOR bump (`0.3.x` to `0.4.0`) carries a layout or API change.
 3. In `CHANGELOG.md`, put a `## <version> - <date>` heading under `## Unreleased` and move the entries beneath it. `Unreleased` stays, empty.
-4. Run the full check from AGENTS.md: `go vet ./... && go test ./...`, `gofmt -l .`, `/tmp/akmctl check`, `npm run format:check`, `npm run schemas`.
-5. Optional dry run of the build: `SKIP_TESTS=1 scripts/release.sh <version>` writes `dist/<version>/` (git-ignored) with the five archives and `SHA256SUMS`.
-6. Commit the changelog, the item and the roadmap together, and push `main`. Wait for CI on that commit to pass.
+4. Check the template. Run `git diff --stat <last-tag> -- internal/initrepo/templates/AGENTS.md.tmpl`. If it prints a change, an existing repository's `AGENTS.md` (which `init` never rewrites) is behind, so the release's `CHANGELOG.md` must carry an entry with the fixed phrase **The `AGENTS.md` template changed: run `akmctl agents`** and say what changed. A change to a skill template needs no phrase: `akmctl skills status` reports it. No test enforces this; the step is the check (261101-hsh4).
+5. Run the full check from AGENTS.md: `go vet ./... && go test ./...`, `gofmt -l .`, `/tmp/akmctl check`, `npm run format:check`, `npm run schemas`.
+6. Optional dry run of the build: `SKIP_TESTS=1 scripts/release.sh <version>` writes `dist/<version>/` (git-ignored) with the five archives and `SHA256SUMS`.
+7. Commit the changelog, the item and the roadmap together, and push `main`. Wait for CI on that commit to pass.
 
 ## Tag (the maintainer)
 
