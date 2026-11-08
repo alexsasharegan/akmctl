@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The workbench record drawer shows a record's fields as a typed table (each value labelled text, date, number, flag, list, link or id; lists one item per line) and edits the fields of an open work item in place: summary, kind, priority, parent, blocked_by, cycle and keep, each through `set` with the record's etag. A locked field says why (changing kind or parent on an active item warns), a write refused by the API shows its message beside the field, and a record that changed since it was opened shows a conflict and writes nothing. A closed item stays read-only except `keep`. Affects people using the workbench. Work item 261028-esyt.
+
 - The workbench capture modal's parent field is now a searchable list: type to search open work items by id, title or summary, with what matched marked, each row showing the id, title, status and summary; arrows and Enter choose, Escape closes only the list. It replaces the browser's plain suggestion list. Affects people using the workbench; the picker is shared with the drawer editor (261028-esyt) to come, and its multi-select form for `blocked_by` (chosen items as removable chips) is ready for it. Work item 261029-bdt9.
 
 - The workbench capture modal has a custom select for the kind (open with Enter, Space or the arrows, Escape closes it, type a letter to jump) and a summary text area that wraps and counts: the counter warns from 144 of 160 characters and says "limit reached" at 160, in words as well as colour. A pasted line break becomes a space, and Enter in the summary captures as before. Affects people using the workbench; the controls are shared with the drawer editor (261028-esyt) to come. Work item 261029-kb33.
