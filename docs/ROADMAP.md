@@ -52,7 +52,6 @@ Workbench and polish:
 Hardening and small rules:
 
 - [261108-2ncf] Basic Windows support
-- [261108-79t5] Skill text checks
 - [261108-xajw] Workbench page tests
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column
