@@ -79,3 +79,39 @@ func TestWingetManifests(t *testing.T) {
 		t.Error("bad version accepted")
 	}
 }
+
+// TestHomebrewFormula is work item 261108-43gk: the formula names the archive
+// and checksum of each of the four macOS and Linux targets, and a missing
+// checksum is an error.
+func TestHomebrewFormula(t *testing.T) {
+	shell := sh(t)
+	var lines []string
+	for i, t := range []string{"darwin_arm64", "darwin_amd64", "linux_arm64", "linux_amd64"} {
+		lines = append(lines, strings.Repeat(string(rune('a'+i)), 64)+"  akmctl_9.9.9_"+t+".tar.gz")
+	}
+	out := filepath.Join(t.TempDir(), "f", "akmctl.rb")
+	if b, err := exec.Command(shell, "homebrew-formula.sh", "v9.9.9", sums(t, lines...), out).CombinedOutput(); err != nil {
+		t.Fatalf("%v\n%s", err, b)
+	}
+	b, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := string(b)
+	for i, target := range []string{"darwin_arm64", "darwin_amd64", "linux_arm64", "linux_amd64"} {
+		url := "url \"https://github.com/alexsasharegan/akmctl/releases/download/v9.9.9/akmctl_9.9.9_" + target + ".tar.gz\"\n"
+		sum := "sha256 \"" + strings.Repeat(string(rune('a'+i)), 64) + "\"\n"
+		at := strings.Index(f, url)
+		if at < 0 || !strings.HasPrefix(strings.TrimLeft(f[at+len(url):], " "), sum) {
+			t.Errorf("%s: url and sha256 not together in:\n%s", target, f)
+		}
+	}
+	for _, want := range []string{"class Akmctl < Formula", "version \"9.9.9\"", "bin.install \"akmctl\"", "license \"MIT\""} {
+		if !strings.Contains(f, want) {
+			t.Errorf("formula lacks %q", want)
+		}
+	}
+	if b, err := exec.Command(shell, "homebrew-formula.sh", "9.9.9", sums(t, lines[:3]...), filepath.Join(t.TempDir(), "x.rb")).CombinedOutput(); err == nil || !strings.Contains(string(b), "no checksum") {
+		t.Errorf("missing checksum: %v %s", err, b)
+	}
+}

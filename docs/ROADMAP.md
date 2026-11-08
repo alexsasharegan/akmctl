@@ -46,6 +46,7 @@ Workbench and polish:
 - [261029-mj49] After a capture, offer to open the new record
 - [261107-49ta] Animation settings in the workbench
 - [261107-qsd4] More lane-move themes
+- [261108-gvzn] Workbench theming
 - [261107-7v9y] Dropped fizzle and close streaks
 
 Hardening and small rules:

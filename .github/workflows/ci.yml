@@ -58,3 +58,24 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $env:PATH = [Environment]::GetEnvironmentVariable('PATH','User') + ';' + [Environment]::GetEnvironmentVariable('PATH','Machine')
           akmctl version
+      - name: homebrew formula
+        if: runner.os != 'Windows'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_CLEANUP: "1"
+          HOMEBREW_NO_ANALYTICS: "1"
+        run: |
+          # Package the published release v0.3.3 (a fixed fixture) and install it from a local tap.
+          if ! command -v brew >/dev/null 2>&1 && [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          fi
+          gh release download v0.3.3 --repo alexsasharegan/akmctl --pattern SHA256SUMS --output "$RUNNER_TEMP/SHA256SUMS"
+          scripts/homebrew-formula.sh v0.3.3 "$RUNNER_TEMP/SHA256SUMS" "$RUNNER_TEMP/akmctl.rb"
+          ruby -c "$RUNNER_TEMP/akmctl.rb"
+          if ! command -v brew >/dev/null 2>&1; then echo "brew is not installed on this runner"; exit 0; fi
+          brew tap-new --no-git local/akm
+          mkdir -p "$(brew --repository local/akm)/Formula"
+          cp "$RUNNER_TEMP/akmctl.rb" "$(brew --repository local/akm)/Formula/"
+          brew install local/akm/akmctl
+          akmctl version
