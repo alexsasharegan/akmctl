@@ -1,14 +1,13 @@
 ---
 id: "261108-hp9k"
 title: theme factorization
-status: active
+status: done
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
+closed: 2026-11-08
 summary: Refactor the workbench styling so a theme is one self-contained token set and adding one touches no other file
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-08T22:48
 decisions: [261108-w3xf]
 ---
 
@@ -31,8 +30,6 @@ Done when:
 
 ## Next
 
-Open the pull request for this branch (ADR 261108-w3xf is `proposed`: the maintainer accepts it by merging). After the merge, close this item with an Outcome, then unblock the four theme children (261108-m4a6, 261108-zg9m, 261108-pmkp, 261108-dv5e): set each `ready` and remove this id from `blocked_by`. Read docs/theming.md before the first of them.
-
 ## Discovery
 
 Findings from the palette discovery (details in each theme item's Discovery section):
@@ -43,6 +40,17 @@ Findings from the palette discovery (details in each theme item's Discovery sect
 - Status and warning colours must stay distinguishable in every variant (the GitHub colorblind variants swap red and green for orange and blue).
 
 - A second source, the VS Code themes installed on this machine (Catppuccin, GitHub Primer, Atom One), supplies the tiers a terminal palette lacks. Across all of them the pattern is the same: a page colour, a slightly different sidebar or widget colour, an input colour, a border, a muted text colour, an accent, and soft diff fills. That is the token set to design the theme unit around, and it shows the tiers are chosen per theme (Catppuccin steps through mantle and surface0; GitHub Dark puts the sidebar darker than the page), so deriving them from the base would not reproduce the official look. Lean toward each theme supplying every tier, with a derivation helper only as a convenience.
+
+## Outcome
+
+- A theme is one unit: `internal/server/web/themes/quiet-paper.css` and an entry in `themes.json`; the current palette is converted with no change (in the browser, 42 tokens and `color-scheme` match the old build in both modes).
+- No colour literal is left in `app.css`: `TestAppCSSHasNoColourOfItsOwn`.
+- The picker is the command palette (`colour`): theme, mode (system, light, dark) and variant; kept in `akm-theme`, `akm-mode`, `akm-variant-light`, `akm-variant-dark`; an old `akm-theme` of `light` or `dark` still works (`logic.test.mjs`, and checked in the browser).
+- A variant that omits or adds a token fails `TestThemeRegistryAndTokens` (confirmed by removing one token); the how-to is `docs/theming.md`.
+- `docs/glossary.md` registers colour theme, theme variant, colour mode and theme token.
+- Checked in the browser in light and dark. Not checked: the flash on load (the mechanism, a synchronous head script, is the old one) and a theme with several variants in the picker (the registry has one theme; `logic.test.mjs` covers the logic).
+
+Decision: ADR 261108-w3xf (proposed): a theme is a CSS file of token blocks plus a registry entry, and every theme supplies every token.
 
 ## Log
 
