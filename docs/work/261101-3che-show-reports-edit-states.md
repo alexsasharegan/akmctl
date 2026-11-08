@@ -14,7 +14,7 @@ decisions: ["[[261101-dxcn-closed-records-read-only-except-corrections|261101-dx
 
 ## Goal
 
-The matrix in the Outcome of [261031-z0n8](done/261031-z0n8-spike-field-edit-rules-by-status.md) is data the tool serves, so the drawer ([261028-esyt](261028-esyt-ui-field-editing.md)) holds no copy of it.
+The matrix in the Outcome of [261031-z0n8](done/261031-z0n8-spike-field-edit-rules-by-status.md) is data the tool serves, so the drawer ([261028-esyt](done/261028-esyt-ui-field-editing.md)) holds no copy of it.
 
 - [ ] `show` returns `edit`: for each field and section, `state` (`yes`, `warn`, `no`) and a short `reason` for `warn` and `no`.
 - [ ] The states follow the matrix; a test walks every status and field against it.
