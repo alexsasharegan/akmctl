@@ -28,6 +28,7 @@ Read the reference before the first use of a command.
 | Check step commits against their diff    | `akmctl commits`           | `references/commits.md` |
 | See what happened to the work, in order  | `akmctl history`           | `references/history.md` |
 | Regenerate the ADR index                 | `akmctl index`             | `references/index.md`   |
+| Write an Obsidian Bases file of the work | `akmctl bases`             | `references/bases.md`   |
 | Create a work item or ADR draft          | `akmctl new <kind> <slug>` | `references/new.md`     |
 | Change status, priority or other fields  | `akmctl set <id> k=v`      | `references/set.md`     |
 | Write Goal, Next or Outcome              | `akmctl section <id> <n>`  | `references/section.md` |

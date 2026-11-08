@@ -1,0 +1,6 @@
+filters:
+  and:
+    - status == "ready"
+views:
+  - type: table
+    name: Mine

@@ -1,0 +1,22 @@
+{
+  "name": "a path outside the repository is refused",
+  "repo": "obsidian",
+  "request": {
+    "path": "notes/../x.base"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "bases",
+    "request": {
+      "path": "notes/../x.base"
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "path must stay inside the repository, with no . or .. segment",
+      "details": {
+        "parameter": "path"
+      }
+    }
+  }
+}

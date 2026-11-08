@@ -263,6 +263,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op = "history"
 	case len(seg) == 1 && seg[0] == "index" && m == "POST":
 		op = "index"
+	case len(seg) == 1 && seg[0] == "bases" && m == "POST":
+		op = "bases"
 	case len(seg) == 1 && seg[0] == "init" && m == "POST":
 		op = "init"
 	case len(seg) == 1 && seg[0] == "config" && (m == "GET" || m == "POST"):

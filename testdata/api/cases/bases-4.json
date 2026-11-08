@@ -1,0 +1,22 @@
+{
+  "name": "a file that exists is never overwritten",
+  "repo": "obsidian",
+  "request": {
+    "path": "views/mine.base"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "bases",
+    "request": {
+      "path": "views/mine.base"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "views/mine.base already exists; akmctl never overwrites it. Delete it or pass another path to write a new one",
+      "details": {
+        "reason": "exists"
+      }
+    }
+  }
+}

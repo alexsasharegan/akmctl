@@ -12,6 +12,7 @@ import (
 // examples holds one usage line per command. A command with no entry fails
 // TestEveryCommandHasHelp, so a new command cannot ship without one.
 var examples = map[string]string{
+	"bases":   "akmctl bases",
 	"board":   "akmctl board",
 	"check":   "akmctl check",
 	"claim":   "akmctl claim 261101-m3pv --as claude-sonnet-5-5",

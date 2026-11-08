@@ -1,0 +1,21 @@
+{
+  "name": "a dry run names the file and the vault folders",
+  "repo": "obsidian",
+  "request": {
+    "dry_run": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "bases",
+    "request": {
+      "dry_run": true
+    },
+    "ok": true,
+    "path": "docs/akm.base",
+    "written": false,
+    "vault_root": ".",
+    "vault_found": true,
+    "work_folder": "docs/work",
+    "adr_folder": "docs/adr"
+  }
+}

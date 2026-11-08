@@ -109,6 +109,7 @@ var specs = map[string]map[string]param{
 	"init":    {"docs_dir": s(), "wikilinks": {kind: kBool}, "dir": s(), "git_commits": {kind: kBool}, "git_init": {kind: kBool}},
 	"config":  {"key": {kind: kString, enum: []string{"git_commits"}}, "value": {kind: kBool}, "dry_run": {kind: kBool}, "confirm": {kind: kBool}, "confirm_edited": {kind: kBool}},
 	"index":   {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},
+	"bases":   {"path": s(), "dry_run": {kind: kBool}, "include_content": {kind: kBool}},
 }
 
 // Operations lists the implemented operation names.
