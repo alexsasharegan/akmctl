@@ -49,6 +49,7 @@
 | [261101-8cd9](261101-8cd9-close-clears-next-and-commits-flags-unlabelled-status.md) | close empties Next and commits flags a status change with no step | 2026-11-01 |       | close clears a non-empty Next; commits reports an unlabelled status or claim change (CM4); no check rule for a stale Next or an empty raw Goal          |                            |
 | [261106-60xv](261106-60xv-git-is-the-move-log.md)                                   | Git is the move log                                               | 2026-11-06 |       | The order, author and time of moves come from the step commits in git, read by a new op; a journal file is rejected for now and kept as a spike         |                            |
 | [261106-zvpm](261106-zvpm-assisted-by-trailer.md)                                   | Agents attribute with an Assisted-by trailer                      | 2026-11-06 |       | Commits end with an Assisted-by trailer and pull request descriptions with an "Assisted by" line; the Co-Authored-By trailer of 261101-z0mt is replaced | 261101-z0mt                |
+| [261108-15dw](261108-15dw-fixture-the-clock-ids-and-git-history.md)                 | Fixtures fix the clock, ids and git history with replayed inputs  | 2026-11-08 |       | Conformance fixtures bind random ids and git hashes with matchers and replay git history from the case, so any binding in any language can run them     |                            |
 
 ## Not in force
 

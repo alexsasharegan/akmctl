@@ -8,6 +8,7 @@ created: 2026-11-08
 updated: 2026-11-08
 claimed_by: claude-sonnet-5-5-rest
 claimed_at: 2026-11-08T21:26
+decisions: [261108-15dw]
 ---
 
 # run fixtures through both bindings
@@ -19,14 +20,15 @@ Findings F1 and F2 of [the audit](../design/test-strategy-audit.md), from [26103
 Done when:
 
 - [ ] Every case file runs through the HTTP handler and compares with `expected`; the reads also run through the CLI with `--format json`.
-- [ ] An ADR draft (`proposed`) says how to fixture `new`, `commits`, `history` and `skills`.
+- [x] An ADR draft (`proposed`) says how to fixture `new`, `commits`, `history` and `skills`.
 - [ ] The first fixtures that ADR allows are added, or filed as items.
 
 ## Next
 
-Run the existing cases through the HTTP handler (F1); draft the ADR.
+Wait for the maintainer to accept, change or reject ADR 261108-15dw. Then: matchers and bindings in TestConformance (F1), fixtures for new, commits, history and skills (F2), -update keeps matchers.
 
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 14:26-07:00: claimed (claude-sonnet-5-5-rest).
+- 2026-11-08 14:27-07:00: Drafted ADR 261108-15dw (proposed): matchers ($id, $hash, $any), a replayed git history in the case, one runner for api.Run, the HTTP handler and the CLI reads. Stopped here for the maintainer's decision before building the runners or the new fixtures.
