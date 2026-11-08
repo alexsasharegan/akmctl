@@ -2,11 +2,13 @@
 id: "261029-kb88"
 title: Generate an Obsidian Bases file that mirrors the workbench
 summary: A command that writes an Obsidian Bases file for the work items and ADRs, mirroring the workbench views; written once and never overwritten
-status: ready
+status: active
 kind: feature
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-07
 priority: 1
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T04:06
 ---
 
 # Generate an Obsidian Bases file that mirrors the workbench
@@ -185,3 +187,4 @@ Ready. Start by answering the open questions, because they decide the file's sha
 
 - 2026-10-29: filed.
 - 2026-10-29: refined with Alexander.
+- 2026-11-07 21:06-07:00: claimed (claude-sonnet-5-5).
