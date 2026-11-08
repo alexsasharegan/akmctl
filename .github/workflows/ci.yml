@@ -65,6 +65,37 @@ jobs:
           go build -o "$env:RUNNER_TEMP\akmctl.exe" ./cmd/akmctl
           pwsh -NoProfile -File scripts/windows-smoke.ps1 -Exe "$env:RUNNER_TEMP\akmctl.exe"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: windows zip install (README steps)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Run the README's PowerShell block as a user would, with a token only to avoid the API rate limit.
+          $readme = Get-Content -Raw README.md
+          $m = [regex]::Match($readme, '(?s)### Windows\r?\n.*?```powershell\r?\n(.*?)```')
+          if (-not $m.Success) { throw "README has no Windows PowerShell block" }
+          $block = $m.Groups[1].Value
+          $script = Join-Path $env:RUNNER_TEMP 'install-from-readme.ps1'
+          "`$PSDefaultParameterValues['Invoke-RestMethod:Headers'] = @{ Authorization = 'Bearer ' + `$env:GH_TOKEN }" | Set-Content $script
+          Add-Content $script $block
+          Add-Content $script 'if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }'
+          pwsh -NoProfile -File $script
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # A new shell finds akmctl through the user PATH the block wrote.
+          $env:PATH = [Environment]::GetEnvironmentVariable('PATH','User') + ';' + [Environment]::GetEnvironmentVariable('PATH','Machine')
+          akmctl version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # The checksum check must fail on a damaged download.
+          $bad = $block -replace '\$got = \(Get-FileHash[^\r\n]*', '$got = "0000"'
+          if ($bad -eq $block) { throw "could not build the damaged-download case" }
+          $badScript = Join-Path $env:RUNNER_TEMP 'install-bad.ps1'
+          "`$PSDefaultParameterValues['Invoke-RestMethod:Headers'] = @{ Authorization = 'Bearer ' + `$env:GH_TOKEN }" | Set-Content $badScript
+          Add-Content $badScript $bad
+          pwsh -NoProfile -File $badScript 2>&1 | Out-String | Write-Host
+          if ($LASTEXITCODE -eq 0) { throw "a checksum mismatch did not stop the install" }
+          Write-Host "the damaged download was refused (exit $LASTEXITCODE), as it must be"
+          exit 0
       - name: winget manifests
         if: runner.os == 'Windows'
         shell: pwsh
