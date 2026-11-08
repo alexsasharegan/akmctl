@@ -1,7 +1,8 @@
 // The parent picker: a combobox that searches the open work items and shows what
 // matched. Stages 1 and 2 of work item 261029-bdt9: a results list wide enough to read
 // with the id, title and summary matches marked, and rows that show id, title, status
-// and the summary. The search and the highlighting are pure.
+// and the summary. With `multiple` it is the blocked_by variant (stage 3): chosen items
+// are removable chips. The search, highlighting and chip rules are pure.
 import { el } from "./util.js";
 import { placeList, keepInView } from "./controls.js";
 
@@ -71,6 +72,13 @@ export function searchItems(items, query, limit = MAX_RESULTS) {
   return found.slice(0, limit).map((f) => f.r);
 }
 
+/** The chosen ids with `id` added (once, at the end). */
+export const addChip = (chips, id) => (chips.includes(id) ? chips : [...chips, id]);
+/** The chosen ids without `id`. */
+export const removeChip = (chips, id) => chips.filter((c) => c !== id);
+/** The items still offered: not already chosen, and not `self` (an item cannot block itself). */
+export const offered = (items, chips, self = "") => items.filter((i) => !chips.includes(i.id) && i.id !== self);
+
 /** True when `at` begins a word of `text`. */
 const wordStart = (text, at) => at === 0 || !/[a-z0-9]/i.test(text[at - 1]);
 
@@ -83,8 +91,10 @@ const marked = (text, ranges) => highlight(text, ranges).map((p) => (p.hit ? el(
 let uid = 0;
 
 /**
- * The picker. props: { id, items: [{ id, title, status, summary }], placeholder }.
- * Returns { root, input, value (the text in the box: an id once one is chosen) }.
+ * The picker. props: { id, items: [{ id, title, status, summary }], placeholder,
+ * multiple, values (the chosen ids at first), self (an id never offered) }.
+ * Returns { root, input, value (the text in the box: an id once one is chosen),
+ * values (multiple only: the chosen ids, get and set) }.
  * Only the items given are offered; typing a free id that is not among them is the
  * caller's validation to refuse.
  */
@@ -94,6 +104,7 @@ export function createPicker(props) {
   let results = [];
   let active = -1;
   let open = false;
+  let chips = props.multiple ? [...(props.values || [])] : [];
   const list = el("ul", { class: "pick-list", role: "listbox", id: "pick-list-" + n, "aria-label": "Open work items", hidden: true });
   const input = el("input", {
     id: props.id,
@@ -108,7 +119,8 @@ export function createPicker(props) {
     "aria-controls": list.id,
   });
   const said = el("span", { class: "sr-only", "aria-live": "polite" });
-  const root = el("div", { class: "pick" }, input, list, said);
+  const chipBox = el("span", { class: "pick-chips" });
+  const root = el("div", { class: "pick" + (props.multiple ? " multi" : "") }, props.multiple ? el("div", { class: "pick-box" }, chipBox, input) : input, list, said);
 
   function render() {
     list.replaceChildren(
@@ -159,14 +171,32 @@ export function createPicker(props) {
     mark();
   }
   function search(keepActive = false) {
-    results = searchItems(items, input.value);
+    results = searchItems(props.multiple ? offered(items, chips, props.self) : items, input.value);
     if (!keepActive) active = results.length ? 0 : -1;
     render();
     said.textContent = countText(results.length);
     show(true);
   }
+  function drawChips() {
+    chipBox.replaceChildren(
+      ...chips.map((id) =>
+        el("span", { class: "pick-chip" }, id, el("button", { type: "button", class: "pick-x", "aria-label": "Remove " + id, onclick: () => removeAt(id) }, "\u00D7")),
+      ),
+    );
+  }
+  function removeAt(id) {
+    chips = removeChip(chips, id);
+    drawChips();
+    said.textContent = "Removed " + id;
+    input.focus();
+  }
   function choose(i) {
-    input.value = results[i].item.id;
+    if (props.multiple) {
+      chips = addChip(chips, results[i].item.id);
+      drawChips();
+      input.value = "";
+      said.textContent = "Added " + results[i].item.id;
+    } else input.value = results[i].item.id;
     show(false);
     input.focus();
   }
@@ -189,12 +219,15 @@ export function createPicker(props) {
     } else if (e.key === "Escape" && open) {
       used();
       show(false);
+    } else if (e.key === "Backspace" && props.multiple && !input.value && chips.length) {
+      removeAt(chips[chips.length - 1]);
     } else if (e.key === "Tab") show(false);
   });
   root.addEventListener("focusout", (e) => {
     if (open && !root.contains(e.relatedTarget)) show(false);
   });
 
+  drawChips();
   return {
     root,
     input,
@@ -203,6 +236,13 @@ export function createPicker(props) {
     },
     set value(v) {
       input.value = v;
+    },
+    get values() {
+      return [...chips];
+    },
+    set values(v) {
+      chips = [...v];
+      drawChips();
     },
     focus: () => input.focus(),
   };

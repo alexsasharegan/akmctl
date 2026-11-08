@@ -652,4 +652,11 @@ assert.equal(L.wikilinkLabel(L.wikilinkParts("[[A]]")), "A");
   assert.equal(P.countText(0), "No open work item matches");
   assert.equal(P.countText(1), "1 result");
   assert.equal(P.countText(7), "7 results");
+  // stage 3: the chosen items of a multi-select
+  assert.deepEqual(P.addChip(["a"], "b"), ["a", "b"]);
+  assert.deepEqual(P.addChip(["a"], "a"), ["a"]); // once
+  assert.deepEqual(P.removeChip(["a", "b"], "a"), ["b"]);
+  assert.deepEqual(P.removeChip(["a"], "z"), ["a"]);
+  assert.deepEqual(P.offered(items, ["261029-bdt9"], "261028-esyt").map((i) => i.id), ["261029-kb33", "261101-4n0v"]); // not chosen, not itself
+  assert.deepEqual(P.offered(items, []).length, 4);
 }
