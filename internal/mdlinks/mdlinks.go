@@ -37,6 +37,51 @@ type Link struct {
 // absolute or only an anchor.
 func Scan(text string) []Link {
 	var out []Link
+	walk(text, func(line, lineOff int, masked string) {
+		for _, m := range inline.FindAllStringSubmatchIndex(masked, -1) {
+			raw := masked[m[2]:m[3]]
+			s, e, target, ok := destination(raw)
+			if !ok {
+				continue
+			}
+			out = append(out, Link{Line: line, Raw: raw, Target: target, Start: lineOff + m[2] + s, End: lineOff + m[2] + e})
+		}
+	})
+	return out
+}
+
+var wiki = regexp.MustCompile(`\[\[([^\]\n]*)\]\]`)
+
+// Wikilink is one `[[target]]` link.
+type Wikilink struct {
+	Line   int    // 1-based line of the link
+	Target string // the note it names: no alias, heading, block or ".md"
+}
+
+// Wikilinks lists the wikilinks of a Markdown file, skipping the frontmatter,
+// fenced code blocks and code spans. An alias after `|` (also `\|` in a table
+// cell), a heading after `#` and a trailing `.md` are not part of the target.
+func Wikilinks(text string) []Wikilink {
+	var out []Wikilink
+	walk(text, func(line, _ int, masked string) {
+		for _, m := range wiki.FindAllStringSubmatch(masked, -1) {
+			t := m[1]
+			if i := strings.IndexAny(t, "|#"); i >= 0 {
+				t = t[:i]
+			}
+			t = strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(t), `\`), ".md")
+			if t != "" {
+				out = append(out, Wikilink{Line: line, Target: t})
+			}
+		}
+	})
+	return out
+}
+
+// walk calls fn for each line of text outside the frontmatter and fenced code
+// blocks, with the 1-based line number, the byte offset of the line and the line
+// with its code spans blanked.
+func walk(text string, fn func(line, lineOff int, masked string)) {
 	off := 0
 	var fence body.FenceTracker
 	start := frontmatterEnd(text)
@@ -57,17 +102,8 @@ func Scan(text string) []Link {
 		if fence.In(strings.TrimLeft(l, " ")) {
 			continue
 		}
-		masked := codeSpan.ReplaceAllStringFunc(l, func(s string) string { return strings.Repeat(" ", len(s)) })
-		for _, m := range inline.FindAllStringSubmatchIndex(masked, -1) {
-			raw := masked[m[2]:m[3]]
-			s, e, target, ok := destination(raw)
-			if !ok {
-				continue
-			}
-			out = append(out, Link{Line: line, Raw: raw, Target: target, Start: lineOff + m[2] + s, End: lineOff + m[2] + e})
-		}
+		fn(line, lineOff, codeSpan.ReplaceAllStringFunc(l, func(s string) string { return strings.Repeat(" ", len(s)) }))
 	}
-	return out
 }
 
 // frontmatterEnd is the offset just after the closing "---" line of a leading

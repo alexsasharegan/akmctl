@@ -320,6 +320,7 @@ func runBasic(repo *record.Repo, s Step, dry bool) ([]string, []string, error) {
 			break // never overwrite
 		}
 		files = append(files, s.To)
+		notes = append(notes, inboundLinks(repo, path.Clean(s.From), path.Clean(s.To))...)
 		if !dry {
 			if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
 				return files, notes, err
