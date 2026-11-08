@@ -29,7 +29,7 @@ Filed as one `raw` item. Whether to turn it into a parent with children is decid
 
 Done when:
 
-- [ ] Refinement has decided: one spike with findings per workstream, or a parent with a child spike per workstream (use `split`, [261101-t8h8](261101-t8h8-make-work-decomposition-discoverable.md)).
+- [ ] Refinement has decided: one spike with findings per workstream, or a parent with a child spike per workstream (use `split`, [261101-t8h8](done/261101-t8h8-make-work-decomposition-discoverable.md)).
 - [ ] Each workstream has findings, a recommendation and its open questions answered or filed.
 - [ ] A `proposed` ADR covers each hard-to-reverse choice (archive representation, the `archived` status, record-link vocabulary).
 - [ ] The build items are filed and on the roadmap.

@@ -79,7 +79,7 @@ Every record has an id of the form `YYMMDD-xxxx`, such as `261027-m3qz`: the cre
 
 ### Work items
 
-One Markdown file per item in `docs/work/`. A feature or project is itself a work item that other items name as `parent`.
+One Markdown file per item in `docs/work/`. A feature or project is itself a work item that other items name as `parent`. An item that is too big is split into a parent and children: see "Item too big" in the `akm-track-work` skill (`akmctl split` files the children).
 
 ```markdown
 ---
@@ -268,7 +268,7 @@ A repository that already ran `init` has four things that change at different ti
 | `AGENTS.md`            | `init` writes it once and never overwrites it, because the file is the repository's own. The shipped template may have moved on.                   | `akmctl agents` prints the template as `init` would fill it for this repository; compare it with your file (`akmctl agents \| diff - AGENTS.md`). | Your file. Nothing is written; you splice the lines you want.                             |
 | The layout (`.layout`) | Only a MAJOR layout change needs a migration (section 8).                                                                                          | `akmctl migrate --mode report`, then `plan`, as in "An existing repo" above.                                                                      | Anything the plan does not list.                                                          |
 
-The CHANGELOG is the notice: every entry says who is affected. A release that changes the `AGENTS.md` template or the skill text is meant to say so in a fixed phrase (work item 261101-hsh4), so a maintainer reading the CHANGELOG knows to compare `AGENTS.md`. Until that lands, read the entries for "template" and "skill".
+The CHANGELOG is the notice: every entry says who is affected. A release that changes the `AGENTS.md` template or the skill text is meant to say so in a fixed phrase (work item 261101-hsh4), so a maintainer reading the CHANGELOG knows to compare `AGENTS.md`. The release process checks the template before it tags (`docs/release.md`, Prepare, step 4).
 
 ## 9. Rules of thumb
 

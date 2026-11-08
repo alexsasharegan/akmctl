@@ -6,9 +6,7 @@ Nothing in flight. Agent rails hardening (261101-vs5c) is done; the rerun on oth
 
 ## Next
 
-Make work decomposition discoverable:
-
-- [261101-t8h8] Make work decomposition discoverable
+Nothing queued. Work decomposition (261101-t8h8) is done; raw items wait for triage (`akmctl ls --status raw`).
 
 ## Later
 

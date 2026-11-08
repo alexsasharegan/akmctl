@@ -5,7 +5,7 @@ summary: new --help and set --help list --fields and --changes, but a JSON objec
 status: raw
 kind: bug
 created: 2026-11-07
-updated: 2026-11-07
+updated: 2026-11-08
 ---
 
 # help lists --fields and --changes flags that refuse a JSON object
@@ -22,3 +22,4 @@ Done when:
 ## Log
 
 - 2026-11-07: filed.
+- 2026-11-08 00:03-07:00: The cold-agent retest of 261101-t8h8 also hit this: 'set <id> --changes {"priority":2}' returns 'changes must be an object' for an object. Related: 261108-h7ds (bracketed blocked_by lists).
