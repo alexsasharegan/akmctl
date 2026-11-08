@@ -96,6 +96,24 @@ jobs:
           if ($LASTEXITCODE -eq 0) { throw "a checksum mismatch did not stop the install" }
           Write-Host "the damaged download was refused (exit $LASTEXITCODE), as it must be"
           exit 0
+      - name: windows first-run checklist
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Run the command block of docs/windows-first-run.md with the binary built from this commit.
+          go build -o "$env:RUNNER_TEMP\bin\akmctl.exe" ./cmd/akmctl
+          $env:PATH = "$env:RUNNER_TEMP\bin;$env:PATH"
+          $doc = Get-Content -Raw docs/windows-first-run.md
+          $m = [regex]::Match($doc, '(?s)<!-- first-run:start -->\s*```powershell\r?\n(.*?)```\s*<!-- first-run:end -->')
+          if (-not $m.Success) { throw "the checklist block is missing" }
+          $script = Join-Path $env:RUNNER_TEMP 'first-run.ps1'
+          '$ErrorActionPreference = "Stop"' | Set-Content $script
+          Add-Content $script $m.Groups[1].Value
+          Add-Content $script 'if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }'
+          pwsh -NoProfile -File $script
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $done = Get-ChildItem (Join-Path $HOME 'akm-first-run\docs\work\done') -Filter '*first-task.md'
+          if (-not $done) { throw "the closed item is not in docs\work\done" }
       - name: winget manifests
         if: runner.os == 'Windows'
         shell: pwsh
