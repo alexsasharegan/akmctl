@@ -132,7 +132,7 @@ function Run-Mode([string]$AutoCrlf) {
   # A repository path with mixed separators, and one given as a relative path with backslashes.
   $mixed = ($repo -replace '\\', '/') + '/./'
   $r = Akm $Work @('show', $alpha, '--repo', $mixed)
-  Expect 'show with a mixed-separator --repo' $r 0 'smoke-alpha' | Out-Null
+  Expect 'show with a mixed-separator --repo' $r 0 $alpha | Out-Null
   $r = Akm $Work @('ls', '--format', 'ids', '--repo', $repo)
   Expect 'ls with a native --repo' $r 0 $alpha | Out-Null
 
