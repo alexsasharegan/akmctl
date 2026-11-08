@@ -37,3 +37,24 @@ jobs:
       - name: race
         if: runner.os == 'Linux'
         run: go test -race ./...
+      - name: winget manifests
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Package the published release v0.3.3 (a fixed fixture), validate and install it from the local files.
+          $tmp = $env:RUNNER_TEMP
+          gh release download v0.3.3 --repo alexsasharegan/akmctl --pattern SHA256SUMS --output "$tmp/SHA256SUMS"
+          bash scripts/winget-manifests.sh v0.3.3 "$tmp/SHA256SUMS" "$tmp/winget"
+          Get-ChildItem "$tmp/winget" | Select-Object -ExpandProperty Name
+          $w = Get-Command winget -ErrorAction SilentlyContinue
+          if (-not $w) { Write-Host "winget is not installed on this runner"; exit 0 }
+          winget --version
+          winget validate --manifest "$tmp/winget"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          winget settings --enable LocalManifestFiles
+          winget install --manifest "$tmp/winget" --accept-package-agreements --accept-source-agreements --disable-interactivity
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:PATH = [Environment]::GetEnvironmentVariable('PATH','User') + ';' + [Environment]::GetEnvironmentVariable('PATH','Machine')
+          akmctl version

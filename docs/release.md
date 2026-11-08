@@ -41,6 +41,12 @@ Pushing a `v*` tag is the trigger. The `release` workflow (`.github/workflows/re
 3. `go install github.com/alexsasharegan/akmctl/cmd/akmctl@v<version> && akmctl version` prints `<version>`.
 4. Close the release item with an Outcome that names the checks, take it off the roadmap, and commit.
 
+## Packages (not published yet)
+
+Package manifests are generated from a release, and CI checks the generators; nothing is submitted until the maintainer decides the build has earned it (work item 261108-2ncf).
+
+**WinGet.** After a release, `gh release download v<version> --pattern SHA256SUMS --output SHA256SUMS`, then `scripts/winget-manifests.sh <version> SHA256SUMS out/` writes the three manifests. CI does this for the published v0.3.3 on the Windows runner, runs `winget validate --manifest` and installs from the local files (`winget install --manifest`). To submit, once decided: fork `microsoft/winget-pkgs`, copy the three files to `manifests/a/alexsasharegan/akmctl/<version>/`, and open a pull request; Microsoft's bots validate it and a moderator merges it (the first review takes days). Later versions can be sent with `wingetcreate update alexsasharegan.akmctl --version <version> --urls <zip URL> --submit`, which needs a GitHub token. The maintainer submits; nothing in this repository does.
+
 ## If it goes wrong
 
 - The `publish` step fails with an HTTP 5xx from GitHub and no release exists (`gh release view v<version>` says not found): re-run the failed job (`gh run rerun <id> --failed`). It reuses the same tag; v0.3.2 needed this once.
