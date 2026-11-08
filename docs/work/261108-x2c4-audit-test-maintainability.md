@@ -1,13 +1,15 @@
 ---
 id: "261108-x2c4"
 title: audit test maintainability
-status: ready
+status: active
 kind: spike
 parent: 261030-456q
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Part 2 of the test audit: how hard each suite is to change, which tests depend on time, git or Node, and how long a full run takes"
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T08:14
 ---
 
 # audit test maintainability
@@ -24,6 +26,11 @@ Done when:
 - [ ] Run times are measured with the commands recorded in this item's Log and the date.
 - [ ] Findings are written as candidates in that section, unnumbered, each with an area, a severity (gap, risk or nuisance), the evidence and a recommended fix.
 
+## Next
+
+Measure run times, survey helper duplication and template-coupled tests, write the Maintainability section of the report.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 01:14-07:00: claimed (claude-sonnet-5-5).
