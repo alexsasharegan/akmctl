@@ -49,7 +49,7 @@ func TestClosedItemCorrection(t *testing.T) {
 	if c := closedReason("set", Request{"id": id, "changes": map[string]any{"summary": "x"}, "correction": "a\nb"}); c != "invalid_request/" {
 		t.Errorf("multi-line correction: %s", c)
 	}
-	mustOK(t, root, "set", Request{"id": id, "changes": map[string]any{"summary": "Chose MIT.", "title": "Pick a licence"}, "correction": "wording", "as_of": "2026-10-28"})
+	mustOK(t, root, "set", Request{"id": id, "changes": map[string]any{"summary": "Chose MIT.", "title": "Pick a license"}, "correction": "wording", "as_of": "2026-10-28"})
 	got := read(t, root, closedPath)
 	if !strings.Contains(got, "summary: Chose MIT.") || !strings.Contains(got, "- 2026-10-28: corrected summary and title: wording") {
 		t.Errorf("correction not applied or not logged:\n%s", got)

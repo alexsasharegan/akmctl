@@ -515,9 +515,9 @@ func (t *Tree) ReplaceSection(name, text, etag string) ([]byte, error) {
 
 // AddSection creates the section name with text and returns the new body. It goes
 // before the first "## Log" section, otherwise at the end. The heading is written
-// as given, or capitalised when the name is all lowercase; a section with text has
+// as given, or capitalized when the name is all lowercase; a section with text has
 // a blank line after its heading, as Prettier writes it, and one blank line
-// separates it from its neighbours. It does not check that the name is free:
+// separates it from its neighbors. It does not check that the name is free:
 // callers look first.
 func (t *Tree) AddSection(name, text string) ([]byte, error) {
 	eol := t.fileEOL()

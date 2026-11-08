@@ -181,7 +181,7 @@ ADR numbers unique and contiguous, status in the allowed set; supersession symme
 - **Minimal tier (small CLI or library):** `AGENTS.md`, `docs/decisions/`, one `docs/WORK.md` holding Now/Next/Later/Dropped and active items with a `Next:` line; link check only.
 - **Standard:** full layout, `docs-check`, four skills.
 - **Large:** nested `AGENTS.md` (nearest wins), per-component ADR folders, optional spec/plan/tasks files for big items.
-- **Data or research repos:** add `docs/data.md` for sources, licences and generated versus curated data; mark generated data read-only.
+- **Data or research repos:** add `docs/data.md` for sources, licenses and generated versus curated data; mark generated data read-only.
 
 ### Contract mapping and failure modes
 

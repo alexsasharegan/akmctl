@@ -69,7 +69,7 @@ Folded in, not separate: capture and triage (into C3 and C4), the generated-file
 
 ## Two caveats before reading the tables
 
-- **A is practised; B is a paper design.** B's strength ratings are untested. A's drift (16 items) is real, but Alexander points out it is **not a verdict on A's design**: A grew from his own effort across several agentic tools, without a spec or target architecture to hand them. Spec-less drift is the problem this spike exists to fix, so weigh the drift list as evidence of what a spec must prevent (C7), and weigh A's _design choices_ (names, ownership rules, boundaries) on their merits.
+- **A is practiced; B is a paper design.** B's strength ratings are untested. A's drift (16 items) is real, but Alexander points out it is **not a verdict on A's design**: A grew from his own effort across several agentic tools, without a spec or target architecture to hand them. Spec-less drift is the problem this spike exists to fix, so weigh the drift list as evidence of what a spec must prevent (C7), and weigh A's _design choices_ (names, ownership rules, boundaries) on their merits.
 - **A is not one thing.** The vault and `shavian2tengwar` are the best cases; `mysqlbak` and `pkm-workbench` are the weakest. The tables rate A's _best case_ and its _typical case_.
 
 ## Clause by clause
@@ -113,7 +113,7 @@ Strength: strong, partial, weak, none. A is rated best case / typical.
 | **D4** | Checks                          | CI in one repo                                   | One portable script in every repo                  | Cost of writing the script once, in the skill.                                                                                                                   |
 | **D5** | Where the canonical skill lives | `~/.claude`, outside version control             | Inside each repo                                   | Copies drift (A, items 1 and 2); a shared copy couples repos. A middle path: canonical in `dotfiles`, repos carry a pinned copy or a pointer with fallback text. |
 | **D6** | ADR acceptance                  | Merge of the PR                                  | Owner flips status                                 | Three repos have no remote; "Proposed = open PR" cannot occur there.                                                                                             |
-| **D7** | `AGENTS.md`                     | Long, with structure trees and policies          | At most 60 lines, pointers                         | The one hard study finding favours short; policies and structure trees can live in linked docs.                                                                  |
+| **D7** | `AGENTS.md`                     | Long, with structure trees and policies          | At most 60 lines, pointers                         | The one hard study finding favors short; policies and structure trees can live in linked docs.                                                                   |
 | **D8** | Folder names                    | `docs/adr/`, `docs/projects/`, `docs/ROADMAP.md` | `docs/decisions/`, `docs/work/`, `docs/ROADMAP.md` | A's names exist in four repos; renaming costs more than it gains.                                                                                                |
 
 ## Option C: a mix, proposed

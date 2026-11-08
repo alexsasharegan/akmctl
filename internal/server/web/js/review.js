@@ -1,6 +1,6 @@
 // The diff of a dry run, as rows and as nodes. Added and removed lines are told
 // apart by a sign, a word for screen readers and the border style, not by
-// colour alone. All text goes in as text nodes.
+// color alone. All text goes in as text nodes.
 import { el } from "./util.js";
 
 const SIGN = { add: "+", rem: "−", ctx: " ", hunk: "" };
