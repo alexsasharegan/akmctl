@@ -8,7 +8,7 @@ authored_by: agent
 
 # Test strategy and coverage audit
 
-Draft for [261030-456q](../work/261030-456q-test-strategy-and-coverage-audit.md). Four work items write it: the strategy section below ([261108-dzh4](../work/done/261108-dzh4-audit-test-strategy.md)), a maintainability section ([261108-x2c4](../work/261108-x2c4-audit-test-maintainability.md)), a coverage section ([261108-arn2](../work/261108-arn2-measure-test-coverage.md)), and the closing item that numbers the findings, groups them, files the tickets and orders the roadmap ([261108-kmwm](../work/261108-kmwm-write-audit-report-and-file-tickets.md)). Findings here are candidates: they have no number yet.
+Draft for [261030-456q](../work/261030-456q-test-strategy-and-coverage-audit.md). Four work items write it: the strategy section below ([261108-dzh4](../work/done/261108-dzh4-audit-test-strategy.md)), a maintainability section ([261108-x2c4](../work/done/261108-x2c4-audit-test-maintainability.md)), a coverage section ([261108-arn2](../work/261108-arn2-measure-test-coverage.md)), and the closing item that numbers the findings, groups them, files the tickets and orders the roadmap ([261108-kmwm](../work/261108-kmwm-write-audit-report-and-file-tickets.md)). Findings here are candidates: they have no number yet.
 
 Audit date: 2026-11-08, on `main` at the merge of pull request 35. Counts come from the commands named in each place.
 
@@ -52,3 +52,46 @@ Each has an area, a severity (gap, risk or nuisance), the evidence and a recomme
 | The skills are tested for drift, not for what they tell an agent                                                                                           | Confirmed                              | C6.                                                                                                                                                                                                                                                                                      |
 | `TestCompareAndSwapRace` is flaky on Windows CI (261029-q8z3); `-race` runs only on Linux and macOS; the Windows path beyond CI is uncovered (261028-jzsx) | Partly corrected, partly not rechecked | In CI `-race` runs on Linux only, not macOS (C7). The flaky test lives in `internal/api/write_test.go`; I did not rerun it on Windows, which is on hold. The Windows path is still uncovered, and the whole Windows job fails.                                                           |
 | Whether every `check` rule id has a case that trips it and a case that does not is not recorded anywhere                                                   | Partly corrected                       | The rules table of the spec lists 44 rule ids, and every one is named in at least one `internal/check` test or `check-*` fixture (a script over the spec table and those files). Whether each has both a tripping and a non-tripping case is not recorded; that matrix is 261108-arn2's. |
+
+## Maintainability
+
+Measured on 2026-11-08, `main` at 75c8b7d. How hard each suite is to change, and how long a run takes. Findings are candidates, numbered `M1` and on only until the closing item gives them their `F` numbers.
+
+### Run times
+
+| Run                           | Command                                    | Result                                                                                                                       |
+| ----------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| Local, all packages           | `go clean -testcache; go test ./...`       | 22.0 s real. `internal/api` takes 19.4 s of it; the next is `internal/server` at 3.4 s.                                      |
+| Local, with the race detector | `go clean -testcache; go test -race ./...` | 33.8 s real. `internal/body` takes 31.8 s (1.6 s without `-race`); `internal/api` 22.6 s.                                    |
+| CI, last three runs on `main` | `gh run view <id> --json jobs`             | Linux 73, 108 and 73 s; macOS 49, 54 and 27 s; Windows 101, 115 and 104 s (the Windows job fails, see the strategy section). |
+
+The slowest single test is `TestWritesAndDryRunsRace` at 1.4 s. `internal/api` is slow as a sum: 145 tests and 121 subtests, each of which copies a sample repository into a temporary directory (`user` 9.7 s but `sys` 13.0 s for the whole run: the time is file copying). No test calls `t.Parallel`; packages run in parallel, tests inside a package do not.
+
+### Helpers
+
+Seven places copy a sample repository to a temporary directory: `copyRepo` and `copyTree` in `internal/api`, `copyDir` in `internal/cli`, `copyTree` and `vaultCopy` in `internal/migrate`, `repoWith` in `internal/check`, and an inline walk in `internal/server`. Most discard the errors of `WalkDir`, `ReadFile` and `WriteFile`, so a failed copy gives an empty repository and a confusing failure later. 15 test files call `filepath.WalkDir`. Three snapshot helpers (`snapshot` in `internal/api` and in `internal/initrepo`, and `snap`) read a tree into a map. There is no shared test-helper package.
+
+### Real time, git and Node
+
+One test uses the real clock (`internal/api/dry_test.go` builds a 48-hour-old time); `check` tests pass a fixed `AsOf`, and the write tests pass `as_of`. Tests that need `git` build a real repository with `git init` in a temporary directory (four files skip without it, see C3). The single Node test (`TestPureModulesUnderNode`) copies 14 modules and a test file to a temporary directory and runs them; it does not appear among the slow tests.
+
+### What breaks when a template or a fixture changes
+
+Measured in a throwaway worktree, one edit at a time, running `go test -count=1 ./...`:
+
+| Edit                                                     | Tests that fail                                                                                                                                    |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reword one sentence in `AGENTS.md.tmpl`                  | None.                                                                                                                                              |
+| Rename the `Commands` heading in `AGENTS.md.tmpl`        | `TestCustomDocsDirEndToEnd` (`internal/api`), `TestOptionsCheckClean` and `TestWorkLifecycle` (`internal/initrepo`): the rules check the headings. |
+| Reword the "Item too big" heading in one copy of a skill | `TestSkillsMatchRepository`: by design, the two copies must match.                                                                                 |
+| Add one reference file to both skill copies              | Six `init` conformance cases (`init-1`, `-2`, `-3`, `-6`, `-7`, `-8`), whose written-file lists are fixed text.                                    |
+
+Of the 109 case files, 38 embed an etag. The etag of one sample work item (`261020-a2b3`) appears in 9 case files, so a change to that file changes 9 cases; I found no tool that rewrites them. During work item 261031-72bd the new `close` members meant editing six case files, which I did with a one-off script.
+
+### Findings (candidates)
+
+- **M1. No update mode for the expected responses.** Area: conformance fixtures. Severity: risk. Evidence: 38 of 109 cases embed an etag, 9 embed one item's etag, and a response change in 261031-72bd needed six case files edited by a throwaway script. The generator is a frozen reference (261029-x4ws), so the cases are hand-kept. Fix: a `-update` flag on `TestConformance` that rewrites `expected` from the tool's own output for a human to review in the diff, or a placeholder for the etag that the runner fills in.
+- **M2. Adding a file to the templates breaks six `init` cases by hand.** Area: conformance fixtures, templates. Severity: nuisance. Evidence: the experiment above. Fix: the same update mode (M1) covers it; or make those cases check the set of written files by pattern.
+- **M3. Seven copies of a repository-copy helper and three of a snapshot helper.** Area: tooling and maintainability. Severity: nuisance. Evidence: the helper list above, and the copies ignore their own errors. Fix: one `internal/testutil` package (`CopyTree` that fails the test on error, `Snapshot`, `MustOK`), used by all packages.
+- **M4. `internal/api` is serial and file-copy bound.** Area: tooling. Severity: nuisance. Evidence: 19.4 s of a 22.0 s run; `sys` 13.0 s; no `t.Parallel` anywhere. Fix: `t.Parallel` on tests that copy their own repository, and a copy that links instead of copying where the test only reads.
+- **M5. The race run is dominated by one package.** Area: tooling. Severity: nuisance. Evidence: `internal/body` takes 31.8 s with `-race` and 1.6 s without; the full race run is 33.8 s. Fix: lower the iteration count of the battery under the race detector (`testing.Short` or a build tag), as CI runs it on every pull request.
