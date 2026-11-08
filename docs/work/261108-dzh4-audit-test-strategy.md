@@ -1,13 +1,15 @@
 ---
 id: "261108-dzh4"
 title: audit test strategy
-status: ready
+status: active
 kind: spike
 parent: 261030-456q
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Part 1 of the test audit: what each test layer is for, where layers overlap or leave gaps, and the seed list checked entry by entry"
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T08:01
 ---
 
 # audit test strategy
@@ -24,6 +26,11 @@ Done when:
 - [ ] Findings are written as candidates in that section, unnumbered, each with an area, a severity (gap, risk or nuisance), the evidence and a recommended fix.
 - [ ] Each of the six seed-list entries in the parent's Goal is marked confirmed, corrected or dropped, with the evidence.
 
+## Next
+
+Survey each layer with evidence, check the six seed entries, write the Strategy section of docs/design/test-strategy-audit.md.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 01:01-07:00: claimed (claude-sonnet-5-5).
