@@ -1,11 +1,13 @@
 ---
 id: "261108-qv1w"
 title: cli and check test gaps
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T20:43
 ---
 
 # cli and check test gaps
@@ -27,3 +29,4 @@ Start with golden-output tests for `ls` and `show` (F15).
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 13:43-07:00: claimed (claude-sonnet-5-5-rest).
