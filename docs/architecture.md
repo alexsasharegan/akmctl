@@ -40,6 +40,15 @@ These invariants serve a broader design goal: **knowledge-system integrity**. `a
 - `testdata/` is byte-exact: `.gitattributes` turns line-ending conversion off for it.
 - The API fixtures have one source, `docs/spec/akm-api/.fixtures`; `testdata/api` and `testdata/yaml-lite.json` are a copy that `scripts/sync-fixtures.sh` writes and `TestFixtureCopiesAgree` checks.
 
+## Platform coverage
+
+Windows is checked in CI on the `windows-latest` runner, where the job blocks (ADR 261029-eegx names the tiers). Two layers:
+
+- `go test ./...` runs on all three runners: unit and integration tests, including the lock and rename behavior of the repository writer.
+- The Windows smoke harness (`scripts/windows-smoke.ps1`, run through `pwsh`) is the real behavior: it takes the built `akmctl.exe` and runs init, new, set, section, claim, close (a file move that rewrites links) and check on a temporary repository in a directory with spaces, once with `core.autocrlf=true` (the records are checked out with CRLF) and once with `false`. It also passes a `--repo` with mixed separators, writes while a reader holds a record (one that shares delete, and one that does not), and fails on a wrong exit code, a mixed line ending, a leftover `.akm.lock` or a link that gained a backslash.
+
+Tests that simulate Windows path style and CRLF on any platform are work item 261028-jzsx. The harness also runs on macOS and Linux when `pwsh` is installed.
+
 ## Where the standard lives
 
 This repository holds the whole of AKM: the standard (`docs/spec/agent-ready-repo-spec.md`), the guide (`docs/spec/akm-guide.md`), the API spec (`docs/spec/akm-api-spec.md`) with its schemas, validator and fixtures (`docs/spec/akm-api/`), the decisions that shaped them (`docs/adr/`, `docs/design/agent-ready-repo-decision-log.md`) and the closed work (`docs/work/done/`). `docs/ideas/` holds ideas that are not part of AKM (not records; `check` skips them). There is no template repository; `akmctl init` and `akmctl migrate` are the way in (ADR 261029-j0d0).

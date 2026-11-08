@@ -58,6 +58,13 @@ jobs:
       - name: race
         if: runner.os != 'Windows'
         run: go test -race ./...
+      - name: windows smoke
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          go build -o "$env:RUNNER_TEMP\akmctl.exe" ./cmd/akmctl
+          pwsh -NoProfile -File scripts/windows-smoke.ps1 -Exe "$env:RUNNER_TEMP\akmctl.exe"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: winget manifests
         if: runner.os == 'Windows'
         shell: pwsh
