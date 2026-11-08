@@ -1,13 +1,15 @@
 ---
 id: "261108-kmwm"
 title: write audit report and file tickets
-status: ready
+status: active
 kind: spike
 parent: 261030-456q
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Last part of the test audit: number the findings, group them, file one work item per group, list the ADR drafts and order the roadmap"
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T08:47
 ---
 
 # write audit report and file tickets
@@ -31,3 +33,4 @@ Wait for the strategy, maintainability and coverage children; then number their 
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 01:47-07:00: claimed (claude-sonnet-5-5).
