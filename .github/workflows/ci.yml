@@ -38,3 +38,7 @@ jobs:
       - name: race
         if: runner.os == 'Linux'
         run: go test -race ./...
+      - name: stress compare-and-swap (temporary, 261029-q8z3)
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        run: go test ./internal/api -run 'TestCompareAndSwapRace' -count=300 -v
