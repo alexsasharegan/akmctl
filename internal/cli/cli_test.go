@@ -301,3 +301,70 @@ func TestHelpForAnUnknownCommandFails(t *testing.T) {
 		t.Fatalf("code %d, stderr %q", code, errb.String())
 	}
 }
+
+func TestNewTakesParentKindAndPriorityFlags(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	do := func(args ...string) (int, string) {
+		var out, errb bytes.Buffer
+		code := Run(append(args, "--repo", root, "--format", "json"), &out, &errb, ".")
+		return code, out.String() + errb.String()
+	}
+	code, out := do("new", "work", "flag-child", "--parent", "261015-c4d5", "--kind", "feature", "--priority", "3")
+	if code != 0 || !strings.Contains(out, `"parent":"261015-c4d5"`) || !strings.Contains(out, `"kind":"feature"`) || !strings.Contains(out, `"priority":3`) {
+		t.Fatalf("new with flags: %d %s", code, out)
+	}
+	code, out = do("new", "work", "lost-child", "--parent", "261015-zzzz")
+	if code != 2 || !strings.Contains(out, `"code":"not_found"`) {
+		t.Fatalf("unknown parent: %d %s", code, out)
+	}
+}
+
+func TestSplitFilesChildrenUnderTheParent(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	run := func(args ...string) (int, string, string) {
+		var out, errb bytes.Buffer
+		code := Run(append(args, "--repo", root), &out, &errb, ".")
+		return code, out.String(), errb.String()
+	}
+	// 261015-c4d5 has priority 3 in the fixture; the children take it, and a kind if given
+	code, out, errs := run("split", "261015-c4d5", "parse-flags", "write-docs", "--kind", "chore")
+	if code != 0 {
+		t.Fatalf("split: %d %s %s", code, out, errs)
+	}
+	if n := strings.Count(out, "(file): "); n != 2 {
+		t.Errorf("want one file commit message per child, got %d:\n%s", n, out)
+	}
+	if strings.Index(out, "parse flags") > strings.Index(out, "write docs") {
+		t.Errorf("children out of order:\n%s", out)
+	}
+	if !strings.Contains(out, "left for the parent 261015-c4d5") || !strings.Contains(out, "## Next") || !strings.Contains(out, "status=ready") {
+		t.Errorf("no reminder for the parent:\n%s", out)
+	}
+	_, ls, _ := run("ls", "--parent", "261015-c4d5", "--fields", "priority,kind", "--format", "json")
+	if strings.Count(ls, `"priority":3`) != 2 || strings.Count(ls, `"kind":"chore"`) != 2 {
+		t.Errorf("children did not inherit priority and kind: %s", ls)
+	}
+	// an explicit priority wins
+	_, out, _ = run("split", "261015-c4d5", "late-one", "--priority", "5", "--format", "json")
+	if !strings.Contains(out, `"priority":5`) || !strings.Contains(out, `"parent_left"`) {
+		t.Errorf("explicit priority: %s", out)
+	}
+	// refusals create nothing
+	for _, c := range [][]string{
+		{"split", "261015-c4d5"},
+		{"split", "261015-c4d5", "Bad_Slug"},
+		{"split", "261015-c4d5", "same", "same"},
+		{"split", "261010-j9k0", "x"},
+		{"split", "261015-zzzz", "x"},
+	} {
+		if code, _, _ := run(c...); code != 2 {
+			t.Errorf("%v: exit %d, want 2", c, code)
+		}
+	}
+	_, ls, _ = run("ls", "--parent", "261015-c4d5", "--format", "ids")
+	if n := len(strings.Fields(ls)); n != 5 {
+		t.Errorf("want 5 children after the refusals, got %d: %s", n, ls)
+	}
+}

@@ -55,6 +55,9 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 	if op == "agents" {
 		return runAgents(args[1:], stdout, stderr, cwd)
 	}
+	if op == "split" {
+		return runSplit(args[1:], stdout, stderr, cwd)
+	}
 	known := api.Params(op)
 	if known == nil || !isOp(op) {
 		fmt.Fprintf(stderr, "akmctl: unknown command %q (try: akmctl help)\n", op)
@@ -95,6 +98,22 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 				m = map[string]any{}
 			}
 			m[k] = parseFieldValue(k, raw)
+			req["fields"] = m
+			continue
+		case "parent", "kind", "priority":
+			if op != "new" && op != "split" {
+				break // not a flag of this command: the generic code below reports it
+			}
+			v, ok := value()
+			if !ok {
+				fmt.Fprintf(stderr, "akmctl: --%s needs a value\n", name)
+				return 2
+			}
+			m, _ := req["fields"].(map[string]any)
+			if m == nil {
+				m = map[string]any{}
+			}
+			m[name] = parseFieldValue(name, v)
 			req["fields"] = m
 			continue
 		case "undo":
@@ -742,9 +761,9 @@ func writeDiff(w io.Writer, d api.Obj) {
 }
 
 func usage(w io.Writer) {
-	ops := append(api.Operations(), "ui")
+	ops := append(api.Operations(), "ui", "split")
 	sort.Strings(ops)
-	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir> (the root as given: it must hold the manifest; leave it out to find the root from the working directory)  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nskills: akmctl skills [status|install|update] [--yes] [--dry-run]  (install adds missing skills, update refreshes them and retires renamed ones)\nagents: akmctl agents  (prints the AGENTS.md init would write for this repository; writes nothing)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
+	fmt.Fprintf(w, "usage: akmctl <command> [flags]\n\ncommands: %s\n\nglobal flags: --repo <dir> (the root as given: it must hold the manifest; leave it out to find the root from the working directory)  --format json|table|ids\nmigrate flags: --mode report|plan|apply-safe|handoff  --target <version>  --acknowledge-backup  --migration <file>  --out <file>\ninit: akmctl init [dir] [--docs-dir <name>] [--wikilinks|--no-wikilinks] [--git-commits|--no-git-commits] [--git-init|--no-git-init] [--yes|--no-input]  (writes missing files, never overwrites; asks on a terminal)\nconfig: akmctl config  |  akmctl config git-commits on|off [--yes] [--dry-run]\nskills: akmctl skills [status|install|update] [--yes] [--dry-run]  (install adds missing skills, update refreshes them and retires renamed ones)\nsplit: akmctl split <id> <slug>... [--kind <kind>] [--priority <n>]  (files one raw child per slug under <id>, prints each commit message, then what the parent still needs; changes nothing else)\nagents: akmctl agents  (prints the AGENTS.md init would write for this repository; writes nothing)\nui flags: --port <n> (default: any free port)  --open\n", strings.Join(ops, ", "))
 }
 
 var _ = os.Stdout

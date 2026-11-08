@@ -6,7 +6,7 @@ Nothing in flight. Agent rails hardening (261101-vs5c) is done; the rerun on oth
 
 ## Next
 
-Make work decomposition discoverable (the child left: ph53):
+Make work decomposition discoverable:
 
 - [261101-t8h8] Make work decomposition discoverable
 
