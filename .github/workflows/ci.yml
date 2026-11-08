@@ -94,6 +94,8 @@ jobs:
           Add-Content $badScript $bad
           pwsh -NoProfile -File $badScript 2>&1 | Out-String | Write-Host
           if ($LASTEXITCODE -eq 0) { throw "a checksum mismatch did not stop the install" }
+          Write-Host "the damaged download was refused (exit $LASTEXITCODE), as it must be"
+          exit 0
       - name: winget manifests
         if: runner.os == 'Windows'
         shell: pwsh
