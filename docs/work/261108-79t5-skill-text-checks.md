@@ -1,11 +1,13 @@
 ---
 id: "261108-79t5"
 title: skill text checks
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T22:29
 ---
 
 # skill text checks
@@ -26,3 +28,4 @@ Decide where the procedure lives, then write it from the t8h8 retest.
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 15:29-07:00: claimed (claude-sonnet-5-5-rest).
