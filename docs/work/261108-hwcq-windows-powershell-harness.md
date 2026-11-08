@@ -24,3 +24,4 @@ Done when:
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 10:39-07:00: the GitHub Windows runner with PowerShell is the chosen environment (maintainer, 2026-11-08).

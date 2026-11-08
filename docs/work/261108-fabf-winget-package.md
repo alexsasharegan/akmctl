@@ -1,10 +1,10 @@
 ---
 id: "261108-fabf"
 title: winget package
-status: raw
+status: ready
 kind: chore
 parent: 261108-2ncf
-priority: 3
+priority: 2
 created: 2026-11-08
 updated: 2026-11-08
 ---
@@ -20,6 +20,10 @@ Done when:
 - [ ] The manifest passes `winget validate` and installs from a local manifest (`winget install --manifest`) on the Windows runner or a Windows machine.
 - [ ] The pull request to `winget-pkgs` is open or merged.
 - [ ] `docs/release.md` says how each release updates the package, and the README names the command.
+
+## Next
+
+Write the three manifests for the Windows zip, validate them on the Windows runner, then ask the maintainer to submit to microsoft/winget-pkgs.
 
 ## Log
 
