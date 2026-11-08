@@ -1,0 +1,9 @@
+exit 0
+261010-j9k0	2026-10-10	done	Choose a licence
+261012-p3q4	2026-10-12	accepted	Store records as Markdown files
+261015-c4d5	2026-10-15	active	Machine-readable listings  (0/2 done)
+261020-a2b3	2026-10-20	active	  Add JSON output to ls
+261022-e5f6	2026-10-22	ready	  Document the exit codes
+261018-r5s6	2026-10-18	proposed	Use a local server for the UI
+261024-g7h8	2026-10-24	blocked	Publish the first release
+261026-m1n2	2026-10-26	raw	Explore a plugin system

@@ -134,10 +134,8 @@ type Result struct {
 	Status  string   // pending, applied or skipped
 }
 
-// Plan lists what each step would change, without writing.
-func Plan(repo *record.Repo, steps []Step) []Result { return PlanEnv(repo, steps, Env{}) }
-
-// PlanEnv is Plan with the random source and the clock given. The steps are
+// PlanEnv lists what each step would change, without writing, with the random
+// source and the clock given. The steps are
 // planned in order on a scratch copy of the repository's Markdown files, each
 // applied there after it is planned, so a step that depends on an earlier one
 // (a date field renamed before ids are minted from it, a legacy id renamed

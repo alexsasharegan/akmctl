@@ -1,0 +1,43 @@
+exit 0
+261020-a2b3	2026-10-20	done	Add JSON output to ls
+--- docs/work/261020-a2b3-add-json-output-to-ls.md
++++ docs/work/done/261020-a2b3-add-json-output-to-ls.md
+@@ -2,11 +2,12 @@
+ id: 261020-a2b3
+ title: Add JSON output to ls
+ summary: Print ls results as JSON.
+-status: active
++status: done
+ parent: 261015-c4d5
+ priority: 2
+ created: 2026-10-20
+-updated: 2026-10-27
++updated: 2026-10-28
++closed: 2026-10-28
+ ---
+ 
+ # Add JSON output to ls
+@@ -17,9 +18,10 @@
+ - [x] It is done.
+ 
+ ## Next
+-Write the encoder test.
+ 
+-Saved: 2026-10-27 18:00
++## Outcome
++
++Shipped.
+ 
+ ## Log
+ - 2026-10-20: started.
+moved to docs/work/done/261020-a2b3-add-json-output-to-ls.md
+commit message (use as given, whole, with git commit -F -; stage these paths and the code):
+  261020-a2b3(close): done
+  
+  AKM-Step: close
+  AKM-Item: 261020-a2b3
+  stage: docs/work/261020-a2b3-add-json-output-to-ls.md
+  stage: docs/work/done/261020-a2b3-add-json-output-to-ls.md
+parent 261015-c4d5: 1 open: 261022-e5f6
+open items that were waiting on this one (unblock or re-point each):
+  261024-g7h8	blocked	Publish the first release

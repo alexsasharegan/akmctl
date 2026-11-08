@@ -1,0 +1,4 @@
+exit 0
+261015-c4d5	2026-10-15		Machine-readable listings
+261020-a2b3	2026-10-20		Add JSON output to ls
+261022-e5f6	2026-10-22		Document the exit codes
