@@ -2,7 +2,7 @@
 id: "261108-15dw"
 title: Fixtures fix the clock, ids and git history with replayed inputs
 summary: Conformance fixtures bind random ids and git hashes with matchers and replay git history from the case, so any binding in any language can run them
-status: proposed
+status: accepted
 date: 2026-11-08
 ---
 
@@ -46,7 +46,7 @@ The conformance test runs every case through each binding; a case whose `$id` or
 
 ## Review
 
-Proposed by the agent on 2026-11-08; the maintainer decides.
+Proposed by the agent on 2026-11-08. Accepted by Alexander, 2026-11-08, in conversation.
 
 ## Revert
 
