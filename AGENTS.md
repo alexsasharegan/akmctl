@@ -21,7 +21,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - `docs/release.md`: how a version is cut (prepare, tag, verify); the maintainer tags.
 - `docs/work/`: work items; `docs/work/done/` holds closed ones.
 - `.agents/skills/`: the procedures (`akm`, `akm-track-work`, `akm-record-decision`).
-- `docs/spec/`: the AKM standard, the guide, the API spec and `akm-api/` (schemas, validator, fixtures). `docs/design/`: the design history. `testdata/api/` is a copy of `docs/spec/akm-api/.fixtures`; the spec copy is the source, so change both by hand (work item 261029-x4ws files the fix).
+- `docs/spec/`: the AKM standard, the guide, the API spec and `akm-api/` (schemas, validator, fixtures). `docs/design/`: the design history. `testdata/api/` is a copy of `docs/spec/akm-api/.fixtures`; the spec copy is the source: edit it, run `scripts/sync-fixtures.sh` and commit both (`TestFixtureCopiesAgree` fails otherwise).
 
 ## Rules
 

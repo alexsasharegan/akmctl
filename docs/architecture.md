@@ -38,6 +38,7 @@ These invariants serve a broader design goal: **knowledge-system integrity**. `a
 - Records the tool writes use bare ids unless the manifest sets `reference_style: wikilink`.
 - The CLI and the HTTP binding return the same JSON envelope for the same request.
 - `testdata/` is byte-exact: `.gitattributes` turns line-ending conversion off for it.
+- The API fixtures have one source, `docs/spec/akm-api/.fixtures`; `testdata/api` and `testdata/yaml-lite.json` are a copy that `scripts/sync-fixtures.sh` writes and `TestFixtureCopiesAgree` checks.
 
 ## Where the standard lives
 
