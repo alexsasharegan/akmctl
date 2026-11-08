@@ -1,11 +1,13 @@
 ---
 id: "261108-f1tv"
 title: run fixtures through both bindings
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T21:26
 ---
 
 # run fixtures through both bindings
@@ -27,3 +29,4 @@ Run the existing cases through the HTTP handler (F1); draft the ADR.
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 14:26-07:00: claimed (claude-sonnet-5-5-rest).
