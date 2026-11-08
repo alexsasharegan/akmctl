@@ -1,11 +1,13 @@
 ---
 id: "261108-z9n8"
 title: ci hardening for skipped tests and scripts
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T20:17
 ---
 
 # ci hardening for skipped tests and scripts
@@ -28,3 +30,4 @@ Start with the `AKM_REQUIRE_TOOLS` switch (F3): find each `t.Skip` and route it 
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 13:17-07:00: claimed (claude-sonnet-5-5-rest).
