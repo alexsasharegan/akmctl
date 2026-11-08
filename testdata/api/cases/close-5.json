@@ -43,6 +43,11 @@
     },
     "moved_from": "Notes/tasks/261020-a2b3-add-json-output-to-ls.md",
     "moved_to": "Notes/tasks/done/261020-a2b3-add-json-output-to-ls.md",
+    "parent": "261015-c4d5",
+    "open_siblings": [
+      "261022-e5f6"
+    ],
+    "parent_closable": false,
     "dependents": [
       {
         "id": "261024-g7h8",

@@ -890,6 +890,21 @@ func opClose(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 	}
 	out := O("record", recordObj(repo, rec, nil, true), "moved_from", from, "moved_to", rec.Path)
+	if pid := record.RefID(rec.Str("parent")); pid != "" {
+		if ps := repo.ByID(pid); len(ps) == 1 && ps[0].Type == record.Work {
+			par := ps[0]
+			open := []string{}
+			for _, sib := range childIndex(repo)[pid] {
+				if sib.ID != rec.ID && sib.Status() != "done" && sib.Status() != "dropped" {
+					open = append(open, sib.ID)
+				}
+			}
+			out = append(out, KV{"parent", pid}, KV{"open_siblings", open})
+			if st := par.Status(); st != "done" && st != "dropped" {
+				out = append(out, KV{"parent_closable", len(open) == 0})
+			}
+		}
+	}
 	if len(deps) > 0 {
 		out = append(out, KV{"dependents", deps})
 	}

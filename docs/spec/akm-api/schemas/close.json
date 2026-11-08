@@ -56,6 +56,18 @@
             "diff": {
               "$ref": "common.json#/$defs/diff"
             },
+            "parent": {
+              "$ref": "common.json#/$defs/id"
+            },
+            "open_siblings": {
+              "type": "array",
+              "items": {
+                "$ref": "common.json#/$defs/id"
+              }
+            },
+            "parent_closable": {
+              "type": "boolean"
+            },
             "dependents": {
               "type": "array",
               "minItems": 1,

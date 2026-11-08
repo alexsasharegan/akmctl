@@ -441,7 +441,30 @@ func row(w io.Writer, r api.Obj) {
 	id, _ := r.Get("id")
 	date, _ := r.Get("id_date")
 	status := field(r, "status")
-	fmt.Fprintf(w, "%v\t%v\t%s\t%s\n", id, date, status, field(r, "title"))
+	title := field(r, "title")
+	if d, ok := r.Get("depth"); ok {
+		title = strings.Repeat("  ", d.(int)) + title
+	}
+	if ro, ok := r.Get("progress"); ok {
+		title += "  " + progressText(ro.(api.Obj))
+	}
+	fmt.Fprintf(w, "%v\t%v\t%s\t%s\n", id, date, status, title)
+}
+
+// progressText is the counts of a parent on one line: "2/4 done, 1 dropped".
+func progressText(ro api.Obj) string {
+	n := func(k string) int { v, _ := ro.Get(k); i, _ := v.(int); return i }
+	out := fmt.Sprintf("(%d/%d done", n("children_done"), n("children_total"))
+	if x := n("children_dropped"); x > 0 {
+		out += fmt.Sprintf(", %d dropped", x)
+	}
+	if n("descendants_total") != n("children_total") {
+		out += fmt.Sprintf("; all levels %d/%d", n("descendants_done"), n("descendants_total"))
+		if x := n("descendants_dropped"); x > 0 {
+			out += fmt.Sprintf(", %d dropped", x)
+		}
+	}
+	return out + ")"
 }
 
 func text(w io.Writer, op string, resp api.Obj) {
@@ -474,6 +497,9 @@ func text(w io.Writer, op string, resp api.Obj) {
 			if kv.V != nil {
 				fmt.Fprintf(w, "%s: %v\n", kv.K, kv.V)
 			}
+		}
+		if ro, ok := r.Get("progress"); ok {
+			fmt.Fprintf(w, "children: %s\n", progressText(ro.(api.Obj)))
 		}
 		if b, ok := resp.Get("body"); ok {
 			fmt.Fprintf(w, "\n%s", b)
@@ -655,6 +681,17 @@ func text(w io.Writer, op string, resp api.Obj) {
 			}
 			for _, p := range ps.([]any) {
 				fmt.Fprintln(w, "  stage:", p)
+			}
+		}
+		if pv, ok := resp.Get("parent"); ok {
+			os, _ := resp.Get("open_siblings")
+			left := os.([]string)
+			if c, has := resp.Get("parent_closable"); has && c == true {
+				fmt.Fprintf(w, "parent %v: no open children left; it can be closed now\n", pv)
+			} else if len(left) > 0 {
+				fmt.Fprintf(w, "parent %v: %d open: %s\n", pv, len(left), strings.Join(left, ", "))
+			} else {
+				fmt.Fprintf(w, "parent %v\n", pv)
 			}
 		}
 		if dv, ok := resp.Get("dependents"); ok {
