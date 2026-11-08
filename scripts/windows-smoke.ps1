@@ -60,7 +60,7 @@ function Expect {
   return $true
 }
 
-function Git([string]$Repo, [string[]]$Arguments) {
+function Invoke-Git([string]$Repo, [string[]]$Arguments) {
   $ErrorActionPreference = 'Continue'
   $out = & git -C $Repo @Arguments 2>&1 | ForEach-Object { "$_" }
   if ($LASTEXITCODE -ne 0) { throw "git $($Arguments -join ' ') failed: $($out -join "`n")" }
@@ -79,10 +79,10 @@ function Run-Mode([string]$AutoCrlf) {
   $repo = Join-Path (Join-Path $Work "repo crlf-$AutoCrlf") 'sub dir'
   New-Item -ItemType Directory -Force -Path $repo | Out-Null
 
-  Git $repo @('init', '-q')
-  Git $repo @('config', 'core.autocrlf', $AutoCrlf)
-  Git $repo @('config', 'user.name', 'Smoke Test')
-  Git $repo @('config', 'user.email', 'smoke@example.invalid')
+  Invoke-Git $repo @('init', '-q')
+  Invoke-Git $repo @('config', 'core.autocrlf', $AutoCrlf)
+  Invoke-Git $repo @('config', 'user.name', 'Smoke Test')
+  Invoke-Git $repo @('config', 'user.email', 'smoke@example.invalid')
 
   $r = Akm $repo @('init', '--yes', '--no-input', '.')
   if (-not (Expect 'init' $r 0)) { return }
@@ -98,10 +98,10 @@ function Run-Mode([string]$AutoCrlf) {
   $beta = [regex]::Match($r.Out, 'AKM-Item: (\d{6}-[0-9a-z]{4})').Groups[1].Value
 
   # Put the files through git so core.autocrlf decides their line endings, as for a user who clones.
-  Git $repo @('add', '-A')
-  Git $repo @('commit', '-q', '-m', 'smoke: initial')
+  Invoke-Git $repo @('add', '-A')
+  Invoke-Git $repo @('commit', '-q', '-m', 'smoke: initial')
   Remove-Item -LiteralPath (Join-Path $repo 'docs') -Recurse -Force
-  Git $repo @('checkout', '--', '.')
+  Invoke-Git $repo @('checkout', '--', '.')
   $alphaFile = WorkFile $repo 'smoke-alpha'
   $betaFile = WorkFile $repo 'smoke-beta'
   if (-not $alphaFile -or -not $betaFile) { Fail 'work items missing after checkout'; return }
