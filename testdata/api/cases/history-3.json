@@ -1,0 +1,25 @@
+{
+  "name": "history with git_commits off says so, in a repository that has commits",
+  "repo": "basic",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "history",
+    "request": {},
+    "ok": true,
+    "available": false,
+    "reason": "git_commits_off",
+    "head": "",
+    "moves": [],
+    "truncated": false
+  },
+  "git": [
+    {
+      "message": "Add the exit-codes item",
+      "date": "2026-10-22T10:00:00+00:00",
+      "files": {
+        "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+      }
+    }
+  ]
+}

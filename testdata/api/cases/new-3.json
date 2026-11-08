@@ -1,0 +1,50 @@
+{
+  "name": "a new decision record is a proposed ADR",
+  "repo": "basic",
+  "request": {
+    "kind": "adr",
+    "slug": "choose-a-thing",
+    "as_of": "2026-11-04"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "new",
+    "request": {
+      "as_of": "2026-11-04",
+      "kind": "adr",
+      "slug": "choose-a-thing"
+    },
+    "ok": true,
+    "record": {
+      "id": "$id(261104)",
+      "type": "adr",
+      "path": "docs/adr/$id(261104)-choose-a-thing.md",
+      "id_date": "2026-11-04",
+      "etag": "$any",
+      "fields": {
+        "id": "$id(261104)",
+        "title": "choose a thing",
+        "summary": "choose a thing",
+        "status": "proposed",
+        "date": "2026-11-04",
+        "scope": null,
+        "supersedes": null,
+        "superseded_by": null,
+        "authored_by": null
+      }
+    },
+    "path": "docs/adr/$id(261104)-choose-a-thing.md",
+    "commit": {
+      "step": "file",
+      "item": "$id(261104)",
+      "detail": "choose a thing",
+      "paths": [
+        "docs/adr/$id(261104)-choose-a-thing.md"
+      ],
+      "message": "$id(261104)(file): choose a thing\n\nAKM-Step: file\nAKM-Item: $id(261104)"
+    }
+  },
+  "after": {
+    "docs/adr/$id(261104)-choose-a-thing.md": "---\nid: \"$id(261104)\"\ntitle: choose a thing\nsummary: choose a thing\nstatus: proposed\ndate: 2026-11-04\n---\n\n# choose a thing\n\n## Context\n\n## Considered Options\n\n## Decision\n\n## Consequences\n"
+  }
+}

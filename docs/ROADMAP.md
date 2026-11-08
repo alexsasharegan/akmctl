@@ -52,7 +52,6 @@ Workbench and polish:
 Hardening and small rules:
 
 - [261108-2ncf] Basic Windows support
-- [261108-f1tv] Run fixtures through both bindings
 - [261108-79t5] Skill text checks
 - [261108-xajw] Workbench page tests
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths

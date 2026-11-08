@@ -1,0 +1,50 @@
+{
+  "name": "install without confirm returns the plan and writes nothing",
+  "repo": "basic",
+  "request": {
+    "mode": "install"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "skills",
+    "request": {
+      "mode": "install"
+    },
+    "ok": true,
+    "mode": "install",
+    "clean": false,
+    "skills": [
+      {
+        "name": "akm",
+        "path": ".agents/skills/akm",
+        "state": "missing",
+        "marker": false,
+        "files": "$any"
+      },
+      {
+        "name": "akm-record-decision",
+        "path": ".agents/skills/akm-record-decision",
+        "state": "missing",
+        "marker": false,
+        "files": "$any"
+      },
+      {
+        "name": "akm-track-work",
+        "path": ".agents/skills/akm-track-work",
+        "state": "missing",
+        "marker": false,
+        "files": "$any"
+      }
+    ],
+    "plan": "$any",
+    "applied": false,
+    "needs_confirmation": true,
+    "written": [],
+    "replaced": [],
+    "removed": [],
+    "skipped": [],
+    "notes": [
+      "the optional skill akm-commit is not installed (git_commits is off): it tells an agent to commit one step at a time; akmctl config git-commits on installs it"
+    ]
+  }
+}
