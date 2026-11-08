@@ -8,7 +8,7 @@ authored_by: agent
 
 # Test strategy and coverage audit
 
-Draft for [261030-456q](../work/261030-456q-test-strategy-and-coverage-audit.md). Four work items write it: the strategy section below ([261108-dzh4](../work/done/261108-dzh4-audit-test-strategy.md)), a maintainability section ([261108-x2c4](../work/done/261108-x2c4-audit-test-maintainability.md)), a coverage section ([261108-arn2](../work/261108-arn2-measure-test-coverage.md)), and the closing item that numbers the findings, groups them, files the tickets and orders the roadmap ([261108-kmwm](../work/261108-kmwm-write-audit-report-and-file-tickets.md)). Findings here are candidates: they have no number yet.
+Draft for [261030-456q](../work/261030-456q-test-strategy-and-coverage-audit.md). Four work items write it: the strategy section below ([261108-dzh4](../work/done/261108-dzh4-audit-test-strategy.md)), a maintainability section ([261108-x2c4](../work/done/261108-x2c4-audit-test-maintainability.md)), a coverage section ([261108-arn2](../work/done/261108-arn2-measure-test-coverage.md)), and the closing item that numbers the findings, groups them, files the tickets and orders the roadmap ([261108-kmwm](../work/261108-kmwm-write-audit-report-and-file-tickets.md)). Findings here are candidates: they have no number yet.
 
 Audit date: 2026-11-08, on `main` at the merge of pull request 35. Counts come from the commands named in each place.
 
@@ -95,3 +95,77 @@ Of the 109 case files, 38 embed an etag. The etag of one sample work item (`2610
 - **M3. Seven copies of a repository-copy helper and three of a snapshot helper.** Area: tooling and maintainability. Severity: nuisance. Evidence: the helper list above, and the copies ignore their own errors. Fix: one `internal/testutil` package (`CopyTree` that fails the test on error, `Snapshot`, `MustOK`), used by all packages.
 - **M4. `internal/api` is serial and file-copy bound.** Area: tooling. Severity: nuisance. Evidence: 19.4 s of a 22.0 s run; `sys` 13.0 s; no `t.Parallel` anywhere. Fix: `t.Parallel` on tests that copy their own repository, and a copy that links instead of copying where the test only reads.
 - **M5. The race run is dominated by one package.** Area: tooling. Severity: nuisance. Evidence: `internal/body` takes 31.8 s with `-race` and 1.6 s without; the full race run is 33.8 s. Fix: lower the iteration count of the battery under the race detector (`testing.Short` or a build tag), as CI runs it on every pull request.
+
+## Coverage
+
+Measured on 2026-11-08, `main` at 955895e (pull request 37). Every figure comes from a command in the Log of [261108-arn2](../work/done/261108-arn2-measure-test-coverage.md). Statement coverage says a line ran, not that its result was checked; it finds code no test reaches.
+
+### Per package
+
+`go clean -testcache; go test -count=1 -cover ./...` counts only the tests of the package itself. `go test -count=1 -coverpkg=./... -coverprofile=cover.out ./...` counts every test that reaches a package; its blocks were merged by file and range, since each test binary lists every block (my first merge double-counted, and the total was cross-checked with `go tool cover -func`).
+
+| Package                | Own tests | All tests                   | Statements |
+| ---------------------- | --------- | --------------------------- | ---------- |
+| `cmd/akmctl`           | 0.0 %     | 0.0 %                       | 5          |
+| `internal/api`         | 88.0 %    | 88.4 %                      | 2,615      |
+| `internal/body`        | 87.2 %    | 95.4 %                      | 438        |
+| `internal/check`       | 89.2 %    | 93.0 %                      | 629        |
+| `internal/cli`         | 68.2 %    | 68.2 %                      | 1,023      |
+| `internal/depgraph`    | 75.3 %    | 97.5 %                      | 158        |
+| `internal/frontmatter` | 84.6 %    | 88.6 %                      | 449        |
+| `internal/fsx`         | 38.0 %    | 68.0 %                      | 50         |
+| `internal/index`       | 96.1 %    | 96.1 %                      | 51         |
+| `internal/initrepo`    | 78.7 %    | 89.1 %                      | 202        |
+| `internal/mdlinks`     | 74.2 %    | 98.5 %                      | 132        |
+| `internal/migrate`     | 71.5 %    | 86.3 %                      | 779        |
+| `internal/record`      | 70.9 %    | 95.7 %                      | 302        |
+| `internal/server`      | 92.0 %    | 92.0 %                      | 226        |
+| `internal/width`       | 96.6 %    | 96.6 %                      | 59         |
+| **All**                |           | **86.9 %** (6,184 of 7,118) |            |
+
+Fourteen functions are never run by any test: `main`, `usage`, `runUI` and `openBrowser` (a browser window cannot be opened in a test), `progressText` (the text view of a parent's progress, added by 261031-72bd), `scopeMatch`, `unreadable`, `migrate.Plan`, `record.SetMetaDir`, `present`, `choice`, and three `Error` methods. The weakest functions that do run are `cli.text` and `cli.recordsOf` (30 %: the table view of every command; the tests use `--format json`) and `api.matchesFilters` (54 %).
+
+### Operations against the fixtures
+
+The 25 operations take 120 request parameters in all (`api.Params`). The 109 fixture cases name 73 of them (61 %). The cells that no fixture reaches:
+
+| Operation                | Fixture cases | Parameters no case names                                      |
+| ------------------------ | ------------- | ------------------------------------------------------------- |
+| `ls`                     | 7             | `blocked`, `cycle`, `limit`, `offset`, `scope`, `since`       |
+| `search`                 | 1             | `body`, `fields`, `limit`, `offset`, `status`, `type`         |
+| `claim`                  | 3             | `dry_run`, `if_match`, `takeover`                             |
+| `log`                    | 5             | `dry_run`, `if_match`, `section_etag`                         |
+| `release`                | 1             | `dry_run`, `if_match`                                         |
+| `tick`                   | 6             | `done`, `if_match`, `section`                                 |
+| `remove`                 | 4             | `if_match`, `section`, `section_etag`                         |
+| `close`, `section`       | 9 each        | `if_match`                                                    |
+| `migrate`                | 4             | `acknowledge_backup`, `as_of`, `target`                       |
+| `new`                    | 1             | `as_of`, `title`                                              |
+| `config`, `skills`       | 10 and 0      | `confirm`, `confirm_edited` (`skills` also `dry_run`, `mode`) |
+| `bases`, `board`, `init` | 4, 1, 9       | `include_content`; `statuses`; `git_init`                     |
+| `commits`, `history`     | 0             | all of them (`range`, `limit`, `item`)                        |
+
+`if_match`, the compare-and-swap check of section 7, is named in a fixture only for `set` and `tick`'s stale case; the eight other writes have no stale case. Error codes: the spec lists eight (`invalid_request`, `unauthorized`, `not_found`, `ambiguous`, `stale`, `refused`, `unreadable`, `internal`); the fixtures expect four of them (`invalid_request` 12, `refused` 20, `not_found` 4, `stale` 2). The rest are covered by Go tests (`unauthorized` by the server tests, `ambiguous` and `unreadable` in three and four test files). Of the 18 `refused` reasons the spec names, 12 have a fixture; `extension_off`, `if_match_required`, `needs_confirmation`, `no_manifest`, `not_git` and `ticked_box` are in Go tests only.
+
+Go tests cover more than the fixtures do, so a cell above is a gap in the contract, not necessarily in the code. The code gaps are the ones in the profile: lines 271 to 277, 285 to 287 and 290 to 296 of `internal/api/ops.go` are the bodies of the `ls` filters `blocked`, `scope` and `since`, and no test in the repository runs them. They are in the API spec (section 4.2), so a reader can rely on three filters that nothing checks.
+
+### Rules against the tests
+
+The spec's rules table lists 44 rule ids. The code emits 43 of them from `internal/check`; `S3` comes from `internal/record` (reading the manifest) and is tested in `internal/record` and `internal/api`. `TestRules` has 62 rows covering 38 rules, each a case that raises exactly that rule; `CL1`, `CL2` and `SF1` to `SF4` are raised in their own tests (`TestClaims`, `safety_test.go`). So every rule has a test that raises it. What no test pins is the opposite for a single rule: a near miss that must not raise it. `TestCleanRepository` shows the clean sample raises nothing, which is one negative case for all rules at once; per-rule near misses exist only where a bug put one there (`TestLinksThatResolve`, `TestParentListingItsChildInBlockedByIsNotACycle`, the dot-folder test).
+
+### What the spec says it does not test
+
+- **Section 10, "Fixtures for `commits` and `history`".** A fixture directory cannot hold git history; an implementation builds repositories with `git`. `TestCommits*` and `TestHistory*` do that. No shared contract exists, so a second implementation has nothing to run.
+- **Section 10, "Exact fixtures for `new`".** Ids are random, so `new` is tested for shape only; the one `new` case is a refusal.
+- **Section 10, "More write fixtures".** A case for each refusal reason and for the wikilink reference style: the 6 reasons above, and no wikilink-style case.
+- **Section 7, "Compare and swap".** "An editor that writes the file between the final check and the rename is not covered"; the window is one rename. Not testable without a fault-injection hook.
+- **Section 7, "Atomicity".** The link repair after `close` writes other files one at a time and is not rolled back (work item 261029-xtqj). The failure path is covered by one test of `link_errors` that needs a folder that refuses writes, which it skips as root and on Windows.
+
+### Findings (candidates)
+
+- **V1. Three `ls` filters have no test at all.** Area: API operations. Severity: gap. Evidence: `go tool cover` shows no execution of `matchesFilters` lines 271 to 277 (`blocked`), 285 to 287 (`scope`) and 290 to 296 (`since`); `scopeMatch` is at 0 %. Fix: three fixture cases and a Go test for the path-prefix rule of `scope`.
+- **V2. The text view of the CLI is untested.** Area: CLI. Severity: gap. Evidence: `cli.text` 30 %, `cli.recordsOf` 30 %, `progressText` 0 %; `internal/cli` is at 68 %, the lowest of the large packages. People and agents read this view; the tests read `--format json`. Fix: golden-output tests for `ls`, `show`, `close`, `split` and the commit message block.
+- **V3. 47 of 120 request parameters are never named in a fixture.** Area: conformance fixtures. Severity: gap. Evidence: the table above; `if_match` has no stale case for eight writes, `dry_run` none for `claim`, `log` and `release`. Fix: one case per cell where the behavior is in the contract, starting with the stale case of every write.
+- **V4. Six `refused` reasons exist only in Go tests.** Area: conformance fixtures. Severity: nuisance. Evidence: `extension_off`, `if_match_required`, `needs_confirmation`, `no_manifest`, `not_git`, `ticked_box`. Fix: the "More write fixtures" item of section 10.
+- **V5. No near-miss case per rule.** Area: `check`. Severity: nuisance. Evidence: the rules section above. Fix: for each rule, a case that must not raise it, next to the case that does.
+- **V6. `cmd/akmctl` and `usage` are untested.** Area: CLI. Severity: nuisance. Evidence: `main` and `usage` at 0 %; the 14 zero-coverage functions include `migrate.Plan` and `record.SetMetaDir`, which may be dead code. Fix: a smoke test that runs the built binary with `version` and `help`; delete dead code or test it.
