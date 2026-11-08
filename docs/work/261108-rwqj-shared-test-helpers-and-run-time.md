@@ -1,11 +1,13 @@
 ---
 id: "261108-rwqj"
 title: shared test helpers and run time
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T21:05
 ---
 
 # shared test helpers and run time
@@ -27,3 +29,4 @@ Write `internal/testutil` and move one package onto it (F11).
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 14:05-07:00: claimed (claude-sonnet-5-5-rest).
