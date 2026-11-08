@@ -19,3 +19,5 @@ Errors:
 - `invalid_request`: `status: must be one of raw, ready, active, blocked, done, dropped`; a managed field such as `closed`; a `cycle` that is not a label.
 - `refused`, `reason: "rule"`: `WK5` blocked without `blocked_by`, `WK4` own parent, `WK9` closed item reopened, `A3` superseded without `superseded_by`.
 - `stale`: the file changed since you read it; read it again.
+
+A new `title` on a work item also renames its first `# ` heading when it matched the old title (so `check` does not warn WK12). A heading you changed yourself is left alone.
