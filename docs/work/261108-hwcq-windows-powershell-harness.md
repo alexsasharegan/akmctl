@@ -1,12 +1,14 @@
 ---
 id: "261108-hwcq"
 title: windows powershell harness
-status: raw
+status: active
 kind: chore
 parent: 261108-2ncf
 priority: 2
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-win
+claimed_at: 2026-11-08T20:08
 ---
 
 # windows powershell harness
@@ -21,7 +23,12 @@ Done when:
 - [ ] It covers a file move with links, a write while a reader holds the file, and a repository path with spaces and backslashes.
 - [ ] `docs/architecture.md` says what the harness covers (with [261028-jzsx](261028-jzsx-windows-path-local-test.md)).
 
+## Next
+
+Write scripts/windows-smoke.ps1 (init, new, set, claim, close with links, check on a temp repo with a spaced path, autocrlf on and off, a reader holding a record), run it from a ci.yml step on Windows, document it in docs/architecture.md, changelog entry.
+
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 10:39-07:00: the GitHub Windows runner with PowerShell is the chosen environment (maintainer, 2026-11-08).
+- 2026-11-08 13:08-07:00: claimed (claude-sonnet-5-5-win).
