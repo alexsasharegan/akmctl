@@ -1,0 +1,32 @@
+{
+  "name": "a stale etag writes nothing",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "item": 1,
+    "reason": "no longer needed",
+    "confirm": true,
+    "if_match": "0000000000000000",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "remove",
+    "request": {
+      "as_of": "2026-10-28",
+      "confirm": true,
+      "id": "261022-e5f6",
+      "if_match": "0000000000000000",
+      "item": 1,
+      "reason": "no longer needed"
+    },
+    "ok": false,
+    "error": {
+      "code": "stale",
+      "message": "the record changed since it was read",
+      "details": {
+        "etag": "1e3e49990ff5d8ed"
+      }
+    }
+  }
+}

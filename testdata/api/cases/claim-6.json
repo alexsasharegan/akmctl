@@ -1,0 +1,196 @@
+{
+  "name": "dry_run claims nothing",
+  "repo": "claims",
+  "request": {
+    "id": "261022-e5f6",
+    "as": "agent-1",
+    "dry_run": true,
+    "as_of": "2026-10-28T09:30"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "claim",
+    "request": {
+      "as": "agent-1",
+      "as_of": "2026-10-28T09:30",
+      "dry_run": true,
+      "id": "261022-e5f6"
+    },
+    "ok": true,
+    "record": {
+      "id": "261022-e5f6",
+      "type": "work",
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "id_date": "2026-10-22",
+      "etag": "6095f4c7f9a042cf",
+      "fields": {
+        "id": "261022-e5f6",
+        "title": "Document the exit codes",
+        "summary": null,
+        "status": "active",
+        "kind": null,
+        "parent": "261015-c4d5",
+        "blocked_by": null,
+        "priority": null,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-22",
+        "updated": "2026-10-28",
+        "closed": null,
+        "authored_by": null,
+        "decisions": null,
+        "claimed_by": "agent-1",
+        "claimed_at": "2026-10-28T09:30"
+      }
+    },
+    "previous_holder": null,
+    "commit": {
+      "step": "claim",
+      "item": "261022-e5f6",
+      "detail": "claimed by agent-1",
+      "paths": [
+        "docs/work/261022-e5f6-document-the-exit-codes.md"
+      ],
+      "message": "261022-e5f6(claim): claimed by agent-1\n\nAKM-Step: claim\nAKM-Item: 261022-e5f6"
+    },
+    "diff": {
+      "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "new_path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+      "hunks": [
+        {
+          "header": "@@ -1,10 +1,12 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "---",
+              "old": 1,
+              "new": 1
+            },
+            {
+              "op": "ctx",
+              "text": "id: 261022-e5f6",
+              "old": 2,
+              "new": 2
+            },
+            {
+              "op": "ctx",
+              "text": "title: Document the exit codes",
+              "old": 3,
+              "new": 3
+            },
+            {
+              "op": "rem",
+              "text": "status: ready",
+              "old": 4,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "status: active",
+              "old": null,
+              "new": 4
+            },
+            {
+              "op": "ctx",
+              "text": "parent: 261015-c4d5",
+              "old": 5,
+              "new": 5
+            },
+            {
+              "op": "ctx",
+              "text": "created: 2026-10-22",
+              "old": 6,
+              "new": 6
+            },
+            {
+              "op": "rem",
+              "text": "updated: 2026-10-22",
+              "old": 7,
+              "new": null
+            },
+            {
+              "op": "add",
+              "text": "updated: 2026-10-28",
+              "old": null,
+              "new": 7
+            },
+            {
+              "op": "add",
+              "text": "claimed_by: agent-1",
+              "old": null,
+              "new": 8
+            },
+            {
+              "op": "add",
+              "text": "claimed_at: 2026-10-28T09:30",
+              "old": null,
+              "new": 9
+            },
+            {
+              "op": "ctx",
+              "text": "---",
+              "old": 8,
+              "new": 10
+            },
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 9,
+              "new": 11
+            },
+            {
+              "op": "ctx",
+              "text": "# Document the exit codes",
+              "old": 10,
+              "new": 12
+            }
+          ]
+        },
+        {
+          "header": "@@ -16,3 +18,6 @@",
+          "lines": [
+            {
+              "op": "ctx",
+              "text": "",
+              "old": 16,
+              "new": 18
+            },
+            {
+              "op": "ctx",
+              "text": "## Next",
+              "old": 17,
+              "new": 19
+            },
+            {
+              "op": "ctx",
+              "text": "Write the exit-code table.",
+              "old": 18,
+              "new": 20
+            },
+            {
+              "op": "add",
+              "text": "",
+              "old": null,
+              "new": 21
+            },
+            {
+              "op": "add",
+              "text": "## Log",
+              "old": null,
+              "new": 22
+            },
+            {
+              "op": "add",
+              "text": "- 2026-10-28 09:30+00:00: claimed (agent-1).",
+              "old": null,
+              "new": 23
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "would_be": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: active\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Next\nWrite the exit-code table.\n\n## Log\n- 2026-10-28 09:30+00:00: claimed (agent-1).\n"
+  }
+}

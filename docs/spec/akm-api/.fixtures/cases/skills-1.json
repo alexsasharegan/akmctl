@@ -1,0 +1,22 @@
+{
+  "name": "install without a manifest is refused",
+  "repo": "nomanifest",
+  "request": {
+    "mode": "install"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "skills",
+    "request": {
+      "mode": "install"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "there is no docs/.layout: run akmctl init or akmctl migrate first",
+      "details": {
+        "reason": "no_manifest"
+      }
+    }
+  }
+}
