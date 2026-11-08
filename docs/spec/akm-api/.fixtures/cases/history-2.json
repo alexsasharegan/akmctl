@@ -1,0 +1,16 @@
+{
+  "name": "history outside a git work tree is an answer, not an error",
+  "repo": "commitson",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "history",
+    "request": {},
+    "ok": true,
+    "available": false,
+    "reason": "not_git",
+    "head": "",
+    "moves": [],
+    "truncated": false
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "install with confirm writes the managed skills",
+  "repo": "basic",
+  "request": {
+    "mode": "install",
+    "confirm": true
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "skills",
+    "request": {
+      "confirm": true,
+      "mode": "install"
+    },
+    "ok": true,
+    "mode": "install",
+    "clean": false,
+    "skills": [
+      {
+        "name": "akm",
+        "path": ".agents/skills/akm",
+        "state": "missing",
+        "marker": false,
+        "files": "$any"
+      },
+      {
+        "name": "akm-record-decision",
+        "path": ".agents/skills/akm-record-decision",
+        "state": "missing",
+        "marker": false,
+        "files": "$any"
+      },
+      {
+        "name": "akm-track-work",
+        "path": ".agents/skills/akm-track-work",
+        "state": "missing",
+        "marker": false,
+        "files": "$any"
+      }
+    ],
+    "plan": "$any",
+    "applied": true,
+    "needs_confirmation": false,
+    "written": "$any",
+    "replaced": [],
+    "removed": [],
+    "skipped": [],
+    "notes": [
+      "the optional skill akm-commit is not installed (git_commits is off): it tells an agent to commit one step at a time; akmctl config git-commits on installs it"
+    ]
+  },
+  "after_paths": [
+    ".agents/skills/akm/SKILL.md",
+    ".agents/skills/akm/.akm-skill.json",
+    ".agents/skills/akm/",
+    ".agents/skills/akm-record-decision/",
+    ".agents/skills/akm-track-work/"
+  ]
+}

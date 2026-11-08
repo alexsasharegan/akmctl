@@ -129,6 +129,9 @@
             "required": ["available"]
           },
           "then": {
+            "properties": {
+              "reason": {}
+            },
             "required": ["reason"]
           },
           "else": {

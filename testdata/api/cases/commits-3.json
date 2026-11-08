@@ -1,0 +1,49 @@
+{
+  "name": "a step subject without trailers breaks CM2",
+  "repo": "commitson",
+  "git": [
+    {
+      "message": "Add the exit-codes item",
+      "date": "2026-10-22T10:00:00+00:00",
+      "files": {
+        "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+      }
+    },
+    {
+      "message": "261022-e5f6(claim): claimed by agent-1",
+      "date": "2026-10-28T09:30:00+00:00",
+      "files": {
+        "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: active\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+      }
+    }
+  ],
+  "request": {
+    "limit": 5
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "commits",
+    "request": {
+      "limit": 5
+    },
+    "ok": true,
+    "checked": 1,
+    "skipped": 1,
+    "clean": false,
+    "commits": [
+      {
+        "sha": "$hash",
+        "subject": "261022-e5f6(claim): claimed by agent-1",
+        "step": "claim",
+        "item": "261022-e5f6",
+        "ok": false,
+        "problems": [
+          {
+            "rule": "CM2",
+            "message": "a step commit has exactly one AKM-Step and one AKM-Item trailer (found 0 and 0)"
+          }
+        ]
+      }
+    ]
+  }
+}

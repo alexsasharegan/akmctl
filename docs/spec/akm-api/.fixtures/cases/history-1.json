@@ -1,0 +1,44 @@
+{
+  "name": "the moves of a replayed history, oldest first",
+  "repo": "commitson",
+  "git": [
+    {
+      "message": "Add the exit-codes item",
+      "date": "2026-10-22T10:00:00+00:00",
+      "files": {
+        "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: ready\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-22\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+      }
+    },
+    {
+      "message": "261022-e5f6(claim): claimed by agent-1\n\nAKM-Step: claim\nAKM-Item: 261022-e5f6\nAssisted-by: Claude Code",
+      "date": "2026-10-28T09:30:00+00:00",
+      "files": {
+        "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: active\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n\n# Document the exit codes\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n"
+      }
+    }
+  ],
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "history",
+    "request": {},
+    "ok": true,
+    "available": true,
+    "head": "$hash",
+    "moves": [
+      {
+        "sha": "$hash",
+        "time": "2026-10-28T09:30:00Z",
+        "author": "Fixture Author",
+        "item": "261022-e5f6",
+        "step": "claim",
+        "from": "ready",
+        "to": "active",
+        "trailers": [
+          "Assisted-by: Claude Code"
+        ]
+      }
+    ],
+    "truncated": false
+  }
+}
