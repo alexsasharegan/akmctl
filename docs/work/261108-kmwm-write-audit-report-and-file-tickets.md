@@ -8,7 +8,7 @@ priority: 3
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Last part of the test audit: number the findings, group them, file one work item per group, list the ADR drafts and order the roadmap"
-blocked_by: [261108-dzh4, 261108-x2c4, 261108-arn2]
+blocked_by: [261108-x2c4, 261108-arn2]
 ---
 
 # write audit report and file tickets
@@ -21,7 +21,7 @@ Done when:
 
 - [ ] The report ends with a numbered list of findings `F1`, `F2` and so on; each has an area, a severity (gap, risk or nuisance), the evidence and a recommended fix.
 - [ ] The findings are grouped, and each group has a work item filed from it that names the findings it addresses; the report links the items, and each item links the finding ids.
-- [ ] The seed-list check from [the strategy child](261108-dzh4-audit-test-strategy.md) is collected in the report, one row per entry.
+- [ ] The seed-list check from [the strategy child](done/261108-dzh4-audit-test-strategy.md) is collected in the report, one row per entry.
 - [ ] The ADR drafts the findings call for are listed in the report, not decided here.
 - [ ] The roadmap lists the filed items in the order the report recommends.
 

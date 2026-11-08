@@ -34,7 +34,7 @@ Scope of the audit, in three parts:
 
 Children, in dependency order (the first three can be taken in any order; the last needs them):
 
-- [Audit the test strategy](261108-dzh4-audit-test-strategy.md): the layers, their overlaps, and the seed-list check.
+- [Audit the test strategy](done/261108-dzh4-audit-test-strategy.md): the layers, their overlaps, and the seed-list check.
 - [Audit test maintainability](261108-x2c4-audit-test-maintainability.md): how hard each suite is to change, and run times.
 - [Measure test coverage](261108-arn2-measure-test-coverage.md): per-package figures and the operation and rule-id matrices.
 - [Write the audit report and file tickets](261108-kmwm-write-audit-report-and-file-tickets.md): numbered findings, groups, filed items, ADR draft list and roadmap order; waits for the other three.
