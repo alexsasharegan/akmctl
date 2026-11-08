@@ -173,18 +173,24 @@ Open questions to answer first:
 
 Done when:
 
-- [ ] the open questions are answered in this item's Log
-- [ ] the operation is in the API spec with a schema and fixtures, and the CLI command writes the file and refuses to overwrite an existing one
-- [ ] the generated file parses as YAML, every filter and property names an AKM field, and the folder filters use the manifest's directories
+- [x] the open questions are answered in this item's Log
+- [x] the operation is in the API spec with a schema and fixtures, and the CLI command writes the file and refuses to overwrite an existing one
+- [x] the generated file parses as YAML, every filter and property names an AKM field, and the folder filters use the manifest's directories
 - [ ] Alexander opens it in Obsidian and each view renders (manual check; the tool cannot test this)
-- [ ] the README and docs/glossary.md name it as Obsidian Bases
+- [x] the README and docs/glossary.md name it as Obsidian Bases
 
 ## Next
 
-Ready. Start by answering the open questions, because they decide the file's shape.
+Alexander opens `docs/akm.base` in Obsidian (this repository opened as a vault) and says whether each view renders: the open, ready and active, blocked, stale and recently closed tables, the three cards views, the Kanban view and the ADR table. Fix what does not, then close. If `file.name != "README.md"` or the `closed` date arithmetic is wrong in Obsidian, those are the likeliest.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-29: refined with Alexander.
 - 2026-11-07 21:06-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-07 21:13-07:00: Open questions answered. Kanban is a core Bases layout (Obsidian 1.14; list 1.10, table and cards 1.9), so the board is a real Kanban view with a fixed group order. The file is YAML with filters, formulas, properties and views, and the subset used is the one the Obsidian help documents, written for 1.14; akmctl cannot open Obsidian, so the render check is Alexander's. The vault root is the nearest .obsidian folder above the repository (the repository root when there is none), and folder filters are relative to it. No ADR: the file is written once, never overwritten and easy to delete, so the choice is not hard to reverse.
+- 2026-11-07 21:13-07:00: Built the bases operation: API spec section 4.25, schema, four fixture cases and the obsidian fixture repository, the CLI and POST /bases, skill reference, README and glossary. Chose the name bases and the default docs/akm.base with Alexander. Wrote docs/akm.base in this repository for the manual check.
+- 2026-11-07 21:13-07:00: ticked "the open questions are answered in this item's Log": answers are in the Log
+- 2026-11-07 21:13-07:00: ticked "the operation is in the API spec with a schema and fixtures, and the CLI command writes the file and refuses to overwrite an existing one": spec 4.25, schemas/bases.json, cases bases-1 to 4, CLI and POST /bases; go test and npm run schemas pass
+- 2026-11-07 21:13-07:00: ticked "the generated file parses as YAML, every filter and property names an AKM field, and the folder filters use the manifest's directories": TestBasesFileParsesAndNamesOnlyAKMFields parses the file and checks every property; TestBasesFileUsesTheManifestsFoldersAndStaleDays checks the folders
+- 2026-11-07 21:13-07:00: ticked "the README and docs/glossary.md name it as Obsidian Bases": README section Obsidian Bases and the glossary row bases

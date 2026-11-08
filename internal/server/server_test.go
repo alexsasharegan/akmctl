@@ -266,6 +266,15 @@ func TestWriteRoutes(t *testing.T) {
 	if r := do(t, ts, "POST", "/api/v1/index", `{"dry_run":true}`, nil); r.status != 200 {
 		t.Fatalf("index: %d %v", r.status, r.body)
 	}
+	if r := do(t, ts, "POST", "/api/v1/bases", `{"dry_run":true}`, nil); r.status != 200 || r.body["written"] != false {
+		t.Fatalf("bases dry run: %d %v", r.status, r.body)
+	}
+	if r := do(t, ts, "POST", "/api/v1/bases", `{}`, nil); r.status != 200 || r.body["written"] != true {
+		t.Fatalf("bases: %d %v", r.status, r.body)
+	}
+	if r := do(t, ts, "POST", "/api/v1/bases", `{}`, nil); r.status != 409 || reason(r) != "exists" {
+		t.Fatalf("bases again must be refused: %d %v", r.status, r.body)
+	}
 }
 
 func TestBadWrites(t *testing.T) {

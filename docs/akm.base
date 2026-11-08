@@ -1,0 +1,163 @@
+# Obsidian Bases file written by `akmctl bases` for this repository. It mirrors the
+# akmctl workbench. akmctl wrote it once and never overwrites it: edit it freely.
+# Written for Obsidian 1.14 (the Kanban view needs 1.14; table and cards 1.9). akmctl cannot open Obsidian to test it.
+formulas:
+  age_days: if(updated, (today() - updated).days, "")
+  stale: if(updated, (today() - updated).days > 30, true)
+properties:
+  formula.age_days:
+    displayName: days since update
+  formula.stale:
+    displayName: stale
+views:
+  - type: table
+    name: Open by parent
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status != "done"
+        - status != "dropped"
+    order:
+      - parent
+      - file.name
+      - status
+      - formula.age_days
+    sort:
+      - property: parent
+        direction: ASC
+      - property: status
+        direction: ASC
+  - type: table
+    name: Ready and active
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status == "ready" || status == "active"
+    order:
+      - file.name
+      - status
+      - parent
+      - updated
+  - type: table
+    name: Blocked
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status == "blocked"
+    order:
+      - file.name
+      - blocked_by
+      - parent
+      - updated
+  - type: table
+    name: Stale
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status != "done"
+        - status != "dropped"
+        - formula.stale
+    order:
+      - file.name
+      - status
+      - parent
+      - formula.age_days
+  - type: table
+    name: Recently closed
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status == "done" || status == "dropped"
+        - closed
+        - (today() - closed).days <= 14
+    order:
+      - file.name
+      - status
+      - parent
+      - decisions
+      - closed
+  - type: cards
+    name: Cards by status
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status != "done"
+        - status != "dropped"
+    groupBy:
+      property: status
+      direction: ASC
+    order:
+      - file.name
+      - parent
+      - formula.age_days
+    sort:
+      - property: updated
+        direction: DESC
+  - type: cards
+    name: Cards by parent
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status != "done"
+        - status != "dropped"
+    groupBy:
+      property: parent
+      direction: ASC
+    order:
+      - file.name
+      - status
+      - formula.age_days
+    sort:
+      - property: status
+        direction: ASC
+  - type: cards
+    name: Cards by cycle
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status != "done"
+        - status != "dropped"
+    groupBy:
+      property: cycle
+      direction: ASC
+    order:
+      - file.name
+      - status
+      - parent
+      - priority
+    sort:
+      - property: priority
+        direction: DESC
+  - type: kanban
+    name: Kanban by status
+    filters:
+      and:
+        - 'file.inFolder("docs/work")'
+        - status != "done"
+        - status != "dropped"
+    groupBy:
+      property: status
+      direction: ASC
+    groupOrder:
+      - raw
+      - ready
+      - active
+      - blocked
+    order:
+      - file.name
+      - parent
+      - formula.age_days
+  - type: table
+    name: ADRs
+    filters:
+      and:
+        - 'file.inFolder("docs/adr")'
+        - file.name != "README.md"
+    order:
+      - file.name
+      - status
+      - date
+      - scope
+    sort:
+      - property: date
+        direction: DESC

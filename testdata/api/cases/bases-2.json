@@ -1,0 +1,20 @@
+{
+  "name": "the file is written next to the manifest",
+  "repo": "obsidian",
+  "request": {},
+  "expected": {
+    "api_version": "1.0",
+    "operation": "bases",
+    "request": {},
+    "ok": true,
+    "path": "docs/akm.base",
+    "written": true,
+    "vault_root": ".",
+    "vault_found": true,
+    "work_folder": "docs/work",
+    "adr_folder": "docs/adr"
+  },
+  "after_paths": [
+    "docs/akm.base"
+  ]
+}

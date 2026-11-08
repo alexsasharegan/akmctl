@@ -597,6 +597,17 @@ func text(w io.Writer, op string, resp api.Obj) {
 		ch, _ := resp.Get("changed")
 		wr, _ := resp.Get("written")
 		fmt.Fprintf(w, "%v: changed=%v written=%v\n", p, ch, wr)
+	case "bases":
+		if c, ok := resp.Get("content"); ok {
+			fmt.Fprint(w, c)
+			break
+		}
+		p, _ := resp.Get("path")
+		wr, _ := resp.Get("written")
+		fmt.Fprintf(w, "%v: written=%v\n", p, wr)
+		if vf, _ := resp.Get("vault_found"); vf != true {
+			fmt.Fprintln(w, "no .obsidian folder found above this repository: the folder filters are relative to the repository root")
+		}
 	case "new", "set", "section", "tick", "remove", "log", "close", "claim", "release":
 		v, _ := resp.Get("record")
 		r := v.(api.Obj)

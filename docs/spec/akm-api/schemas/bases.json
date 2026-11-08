@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/bases.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "include_content": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "bases"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "path": {
+              "$ref": "common.json#/$defs/path"
+            },
+            "written": {
+              "type": "boolean"
+            },
+            "content": {
+              "type": "string"
+            },
+            "vault_root": {
+              "type": "string"
+            },
+            "vault_found": {
+              "type": "boolean"
+            },
+            "work_folder": {
+              "type": "string"
+            },
+            "adr_folder": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_version",
+            "operation",
+            "request",
+            "ok",
+            "path",
+            "written",
+            "vault_root",
+            "vault_found",
+            "work_folder",
+            "adr_folder"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

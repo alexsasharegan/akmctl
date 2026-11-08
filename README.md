@@ -130,6 +130,10 @@ akmctl config git-commits off      # remove it again; it shows what it will remo
 
 With `git-commits` on, agents commit after each logical step (a status change, or a "next step" checkpoint). The tool itself never stages or commits anything; only the skill tells the agent to.
 
+## Obsidian Bases
+
+In an Obsidian vault, `akmctl bases` writes `docs/akm.base`: an Obsidian Bases file with table, cards and Kanban views of your work items and a table of the ADRs, like the board in `akmctl ui`. It writes the file once and never overwrites it, so you can edit it freely in Obsidian; `--path` picks another file and `--dry-run --include-content` prints it. The Kanban view needs Obsidian 1.14 or later.
+
 ## A task from start to finish
 
 This is a real run in a fresh `code` project. The tool prints one line per change; nothing is staged or committed for you.
