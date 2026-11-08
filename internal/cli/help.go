@@ -101,7 +101,7 @@ func commandUsage(w io.Writer, op string) {
 	if op == "new" {
 		fmt.Fprintf(w, "  --parent <id>  --kind <kind>  --priority <n>  (a work item's fields; any other field: --field key=value)\n")
 	}
-	fmt.Fprintf(w, "  --repo <dir>  --format json|table|ids  (every command)\n")
+	fmt.Fprintf(w, "  --repo <dir>  --format json|table|ids  (every command; ids prints the id of each record a command lists, creates or changes)\n")
 	fmt.Fprintf(w, "\nexample:\n  %s\n", examples[op])
 }
 
