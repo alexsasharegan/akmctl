@@ -15,6 +15,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -111,6 +112,12 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request) {
 		case "/app.css":
 			s.asset(w, "web/app.css", "text/css; charset=utf-8")
 			return
+		case "/themes.css":
+			s.themesCSS(w)
+			return
+		case "/themes/themes.json":
+			s.asset(w, "web/themes/themes.json", "application/json; charset=utf-8")
+			return
 		case "/favicon.svg":
 			s.asset(w, "web/favicon.svg", "image/svg+xml")
 			return
@@ -168,6 +175,33 @@ func (s *Server) tokenOK(auth string) bool {
 		return false
 	}
 	return subtle.ConstantTimeCompare([]byte(auth[len(p):]), []byte(s.Token)) == 1
+}
+
+// themesCSS serves every colour theme as one stylesheet: the files in
+// web/themes/*.css joined in name order, so a new theme is one new file and
+// no change to the page (ADR 261108-w3xf).
+func (s *Server) themesCSS(w http.ResponseWriter) {
+	entries, err := web.ReadDir("web/themes")
+	if err != nil {
+		http.NotFound(w, nil)
+		return
+	}
+	var out []byte
+	for _, e := range entries {
+		if e.IsDir() || path.Ext(e.Name()) != ".css" {
+			continue
+		}
+		b, err := web.ReadFile("web/themes/" + e.Name())
+		if err != nil {
+			continue
+		}
+		out = append(out, b...)
+		out = append(out, '\n')
+	}
+	h := w.Header()
+	h.Set("Content-Type", "text/css; charset=utf-8")
+	h.Set("Content-Security-Policy", contentSecurityPolicy)
+	w.Write(out)
 }
 
 func (s *Server) asset(w http.ResponseWriter, name, ctype string) {

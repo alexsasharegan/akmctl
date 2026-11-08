@@ -9,7 +9,7 @@ import { mergeWithHistory, moveToEvent, mountAway, AWAY_MAX } from "./js/replay.
 import { parseRoute, routeHref, indexById, TABLES, pageTitle, repoLabel, filterByProject, projectFromHash, withProject } from "./js/logic.js";
 import { mountProjectFilter, recall } from "./js/project.js";
 import { el, isoDate } from "./js/util.js";
-import { initUI, setPage, toast, toggleTheme, openHelp, overlayOpen, typing } from "./js/ui.js";
+import { initUI, setPage, toast, toggleTheme, themeActions, openHelp, overlayOpen, typing } from "./js/ui.js";
 import { mountBoard } from "./js/board.js";
 import { mountTables } from "./js/tables.js";
 import { mountAdrs } from "./js/adrs.js";
@@ -339,6 +339,7 @@ const actions = () => [
   { label: "Show all projects", keys: [], run: () => project !== null && chooseProject(null) },
   { label: "Reload the records", keys: ["r"], run: () => reload(true) },
   { label: "Switch light and dark", keys: ["t"], run: toggleTheme },
+  ...themeActions(),
   ...animationActions(),
   { label: "Show keyboard shortcuts", keys: ["?"], run: openHelp },
 ];

@@ -2,8 +2,9 @@
 // (Cmd/Ctrl+K and /) and the help overlay (?). All text goes in as text nodes.
 import { el, clear, debounce, text } from "./util.js";
 import { score, searchRecords, field } from "./logic.js";
-import { searchBody, describeError } from "./store.js";
+import { searchBody, describeError, fetchThemes } from "./store.js";
 import { createToastQueue, toastSpec, roleFor } from "./toasts.js";
+import { DEFAULT_THEME, KEYS, MODES, resolvePrefs, checkPrefs, variantsOf, attrsOf } from "./theme.js";
 
 export const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || "");
 export const MOD = isMac ? "⌘" : "Ctrl";
@@ -31,22 +32,113 @@ export function kbd(keys) {
 export const typing = (t) => !!t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable || (t.tagName === "INPUT" && !["checkbox", "radio", "button"].includes(t.type)));
 
 // ---- theme ----
+// Which colour theme, mode and variant show is decided by theme.js; this part
+// reads and writes the stored choice, sets <html data-theme data-mode data-variant>
+// and offers the choices in the command palette. boot.js did the first paint.
 
-export function currentTheme() {
-  return root.dataset.theme === "dark" ? "dark" : "light";
+const T = { registry: null, prefs: null };
+
+function readStored() {
+  const out = {};
+  for (const k of Object.keys(KEYS)) {
+    try {
+      out[k] = localStorage.getItem(KEYS[k]);
+    } catch (e) {
+      out[k] = null;
+    }
+  }
+  return out;
 }
 
-export function setTheme(theme) {
-  root.dataset.theme = theme;
+function store(name, value) {
   try {
-    localStorage.setItem("akm-theme", theme);
+    if (value) localStorage.setItem(KEYS[name], value);
+    else localStorage.removeItem(KEYS[name]);
   } catch (e) {
     /* the choice lasts until the page is closed */
   }
+}
+
+const systemDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
+
+/** akm-theme once held "light" or "dark": move that to the mode key before a theme id replaces it. */
+function migrateStored() {
+  const s = readStored();
+  if (s.theme === "light" || s.theme === "dark") {
+    if (!s.mode) store("mode", s.theme);
+    store("theme", "");
+  }
+}
+
+/** Work out the choice (checked against the registry once it is loaded) and show it. */
+function applyTheme() {
+  let p = resolvePrefs(readStored(), systemDark());
+  if (T.registry) p = checkPrefs(p, T.registry);
+  T.prefs = p;
+  const a = attrsOf(p);
+  root.dataset.theme = a.theme;
+  root.dataset.mode = a.mode;
+  if (a.variant) root.dataset.variant = a.variant;
+  else delete root.dataset.variant;
   renderChrome();
 }
 
-export const toggleTheme = () => setTheme(currentTheme() === "dark" ? "light" : "dark");
+/** "dark" or "light": the mode on screen now. */
+export function currentTheme() {
+  return root.dataset.mode === "dark" ? "dark" : "light";
+}
+
+export function setMode(mode) {
+  migrateStored();
+  store("mode", mode === "system" ? "" : mode);
+  applyTheme();
+}
+
+export function setThemeId(id) {
+  migrateStored();
+  store("theme", id === ((T.registry && T.registry.default) || DEFAULT_THEME) ? "" : id);
+  store("light", ""); // variants belong to one theme
+  store("dark", "");
+  applyTheme();
+}
+
+export function setVariant(variantId) {
+  migrateStored();
+  store(T.prefs.resolved, variantId);
+  applyTheme();
+}
+
+export const toggleTheme = () => setMode(currentTheme() === "dark" ? "light" : "dark");
+
+/** Load the list of themes (the page works without it: boot.js already chose from the store). */
+async function loadThemes() {
+  const reg = await fetchThemes();
+  if (!reg) return;
+  T.registry = reg;
+  applyTheme();
+}
+
+/** The command-palette entries for the colour theme, mode and variant. */
+export function themeActions() {
+  const reg = T.registry;
+  if (!reg || !T.prefs) return [];
+  const p = T.prefs;
+  const out = [];
+  for (const t of reg.themes) {
+    out.push({ label: "Colour theme: " + t.name + (t.id === p.theme ? " (current)" : ""), keys: [], run: () => t.id !== p.theme && setThemeId(t.id) });
+  }
+  for (const m of MODES) {
+    out.push({ label: "Colour mode: " + m + (m === p.mode ? " (current)" : ""), keys: [], run: () => m !== p.mode && setMode(m) });
+  }
+  const here = variantsOf(reg, p.theme, p.resolved);
+  if (here.length > 1) {
+    here.forEach((v, i) => {
+      const on = i === 0 ? !p.variant : v.id === p.variant;
+      out.push({ label: "Colour variant (" + p.resolved + "): " + v.name + (on ? " (current)" : ""), keys: [], run: () => !on && setVariant(i === 0 ? "" : v.id) });
+    });
+  }
+  return out;
+}
 
 function renderChrome() {
   const dark = currentTheme() === "dark";
@@ -471,18 +563,9 @@ export function initUI(hooks) {
   $("#palette-btn").addEventListener("click", () => {
     if (!S.overlay) openPalette();
   });
-  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-    let saved = "";
-    try {
-      saved = localStorage.getItem("akm-theme") || "";
-    } catch (err) {
-      saved = "";
-    }
-    if (!saved) {
-      root.dataset.theme = e.matches ? "dark" : "light";
-      renderChrome();
-    }
-  });
-  renderChrome();
+  migrateStored();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => resolvePrefs(readStored(), false).mode === "system" && applyTheme());
+  applyTheme();
+  loadThemes();
   renderHints();
 }

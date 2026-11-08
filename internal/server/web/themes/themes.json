@@ -1,0 +1,13 @@
+{
+  "default": "quiet-paper",
+  "themes": [
+    {
+      "id": "quiet-paper",
+      "name": "Quiet paper",
+      "variants": [
+        { "id": "light", "name": "Light", "mode": "light" },
+        { "id": "dark", "name": "Dark", "mode": "dark" }
+      ]
+    }
+  ]
+}
