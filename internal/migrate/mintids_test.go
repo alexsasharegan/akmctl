@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 const mintFixture = "../../testdata/migrate/mint_ids"
@@ -23,50 +24,15 @@ func groupReader(groups ...byte) *bytes.Reader {
 	return bytes.NewReader(b)
 }
 
-func copyTree(t *testing.T, src, dst string) {
-	t.Helper()
-	err := filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, err := os.ReadFile(p)
-		if err != nil {
-			return err
-		}
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func mintRepo(t *testing.T) *record.Repo {
 	t.Helper()
 	root := t.TempDir()
-	copyTree(t, mintFixture, root)
+	testutil.CopyTree(t, mintFixture, root)
 	repo, err := record.Load(root)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return repo
-}
-
-func snapshotTree(t *testing.T, root string) map[string]string {
-	t.Helper()
-	m := map[string]string{}
-	filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
-		if err == nil && !d.IsDir() {
-			b, _ := os.ReadFile(p)
-			rel, _ := filepath.Rel(root, p)
-			m[filepath.ToSlash(rel)] = string(b)
-		}
-		return nil
-	})
-	return m
 }
 
 var mintStep = Step{ID: "mint-notes", Kind: "mint_ids", Class: "auto", Dir: "docs/notes"}
@@ -80,7 +46,7 @@ var mintEnv = func() Env {
 func TestMintIDsApply(t *testing.T) {
 	repo := mintRepo(t)
 	root := repo.Root
-	before := snapshotTree(t, root)
+	before := testutil.Snapshot(t, root)
 	res, err := ApplyEnv(repo, []Step{mintStep}, mintEnv())
 	if err != nil {
 		t.Fatal(err)
@@ -99,7 +65,7 @@ func TestMintIDsApply(t *testing.T) {
 	if strings.Join(res[0].Files, "\n") != strings.Join(wantFiles, "\n") {
 		t.Fatalf("files:\n%s", strings.Join(res[0].Files, "\n"))
 	}
-	after := snapshotTree(t, root)
+	after := testutil.Snapshot(t, root)
 	// the old names are gone by rename, never by deletion: the text moved
 	for old, id := range map[string]string{
 		"docs/notes/alpha-note.md":                      "docs/notes/261022-2222-alpha-note.md",
@@ -191,7 +157,7 @@ func TestMintIDsApply(t *testing.T) {
 	}
 
 	// a second run changes nothing
-	snap := snapshotTree(t, root)
+	snap := testutil.Snapshot(t, root)
 	res2, err := ApplyEnv(re, []Step{mintStep}, Env{Rand: groupReader(9, 9, 9, 9, 9, 9, 9, 9)})
 	if err != nil {
 		t.Fatal(err)
@@ -199,7 +165,7 @@ func TestMintIDsApply(t *testing.T) {
 	if res2[0].Status != "skipped" || len(res2[0].Files) != 0 {
 		t.Fatalf("second run: %s %v", res2[0].Status, res2[0].Files)
 	}
-	if !equalMaps(snap, snapshotTree(t, root)) {
+	if !equalMaps(snap, testutil.Snapshot(t, root)) {
 		t.Fatal("the second run changed files")
 	}
 }
@@ -218,12 +184,12 @@ func equalMaps(a, b map[string]string) bool {
 
 func TestMintIDsPlanWritesNothing(t *testing.T) {
 	repo := mintRepo(t)
-	before := snapshotTree(t, repo.Root)
+	before := testutil.Snapshot(t, repo.Root)
 	res := PlanEnv(repo, []Step{mintStep}, mintEnv())
 	if len(res[0].Files) != 6 || res[0].Status != "pending" {
 		t.Fatalf("plan %v %s", res[0].Files, res[0].Status)
 	}
-	if !equalMaps(before, snapshotTree(t, repo.Root)) {
+	if !equalMaps(before, testutil.Snapshot(t, repo.Root)) {
 		t.Fatal("plan wrote")
 	}
 	// the plan and the run agree when the source agrees

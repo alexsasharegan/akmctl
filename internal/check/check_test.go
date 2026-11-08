@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // repoWith copies the clean fixture repository to a temp dir and applies edits
@@ -16,14 +17,7 @@ func repoWith(t *testing.T, edits map[string]func(string) string) *record.Repo {
 	t.Helper()
 	src := "../../testdata/api/repos/basic"
 	dst := t.TempDir()
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
+	testutil.CopyTree(t, src, dst)
 	for p, f := range edits {
 		full := filepath.Join(dst, p)
 		if f == nil {
@@ -223,14 +217,7 @@ func vaultRepo(t *testing.T, edits map[string]func(string) string) *record.Repo 
 	t.Helper()
 	src := "../../testdata/api/repos/vault"
 	dst := t.TempDir()
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
+	testutil.CopyTree(t, src, dst)
 	for p, f := range edits {
 		full := filepath.Join(dst, filepath.FromSlash(p))
 		b, _ := os.ReadFile(full)

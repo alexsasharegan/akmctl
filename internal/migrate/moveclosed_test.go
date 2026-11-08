@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // vaultCopy loads a copy of the vault fixture with the named task files given
@@ -18,13 +19,17 @@ func vaultCopy(t *testing.T, closed map[string]string) *record.Repo {
 	t.Helper()
 	src := "../../testdata/api/repos/vault"
 	dst := t.TempDir()
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		if st, ok := closed[filepath.Base(p)]; ok {
+	testutil.CopyTree(t, src, dst)
+	for name, st := range closed {
+		var found bool
+		filepath.WalkDir(dst, func(p string, d os.DirEntry, err error) error {
+			if err != nil || d.IsDir() || filepath.Base(p) != name {
+				return err
+			}
+			b, rerr := os.ReadFile(p)
+			if rerr != nil {
+				t.Fatal(rerr)
+			}
 			lines := strings.Split(string(b), "\n")
 			for i, l := range lines {
 				if strings.HasPrefix(l, "status: ") {
@@ -32,10 +37,16 @@ func vaultCopy(t *testing.T, closed map[string]string) *record.Repo {
 					break
 				}
 			}
-			b = []byte(strings.Join(lines, "\n"))
+			if werr := os.WriteFile(p, []byte(strings.Join(lines, "\n")), 0o644); werr != nil {
+				t.Fatal(werr)
+			}
+			found = true
+			return nil
+		})
+		if !found {
+			t.Fatalf("no file %s in the vault fixture", name)
 		}
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
+	}
 	r, err := record.Load(dst)
 	if err != nil {
 		t.Fatal(err)

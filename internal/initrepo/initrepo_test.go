@@ -13,24 +13,8 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/check"
 	"github.com/alexsasharegan/akmctl/internal/initrepo"
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
-
-func snapshot(t *testing.T, root string) map[string]string {
-	t.Helper()
-	m := map[string]string{}
-	err := filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
-		if err == nil && !d.IsDir() {
-			rel, _ := filepath.Rel(root, p)
-			b, _ := os.ReadFile(p)
-			m[filepath.ToSlash(rel)] = string(b)
-		}
-		return err
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return m
-}
 
 // variants are the option sets the tests walk through: the defaults and a
 // custom folder with wikilinks.
@@ -87,7 +71,7 @@ func TestOptionsCheckClean(t *testing.T) {
 			if wiki := repo.Layout["reference_style"].Str == "wikilink"; wiki != v.opt.WikiLinks {
 				t.Errorf("reference_style wikilink = %v", wiki)
 			}
-			files := snapshot(t, dir)
+			files := testutil.Snapshot(t, dir)
 			if files["CLAUDE.md"] != "@AGENTS.md\n" {
 				t.Errorf("CLAUDE.md = %q", files["CLAUDE.md"])
 			}
@@ -129,7 +113,7 @@ func TestGitignoreOnlyWhenAsked(t *testing.T) {
 	if _, err := initrepo.InitWith(dir, initrepo.Options{}); err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := snapshot(t, dir)[".gitignore"]; ok {
+	if _, ok := testutil.Snapshot(t, dir)[".gitignore"]; ok {
 		t.Error(".gitignore written without a work tree")
 	}
 }
@@ -162,7 +146,7 @@ func TestNoOverwriteAndIdempotent(t *testing.T) {
 			if !reflect.DeepEqual(res.Skipped, []string{"AGENTS.md"}) {
 				t.Errorf("skipped %v", res.Skipped)
 			}
-			after := snapshot(t, dir)
+			after := testutil.Snapshot(t, dir)
 			if after["AGENTS.md"] != mine {
 				t.Error("AGENTS.md was overwritten")
 			}
@@ -173,7 +157,7 @@ func TestNoOverwriteAndIdempotent(t *testing.T) {
 			if len(res2.Written) != 0 || len(res2.Skipped) != len(res.Written)+1 {
 				t.Errorf("second run: written %v, skipped %d", res2.Written, len(res2.Skipped))
 			}
-			if !reflect.DeepEqual(snapshot(t, dir), after) {
+			if !reflect.DeepEqual(testutil.Snapshot(t, dir), after) {
 				t.Error("a second run changed files")
 			}
 		})
@@ -213,7 +197,7 @@ func TestVersionsFromConstants(t *testing.T) {
 
 // The embedded skills are a copy of this repository's own.
 func TestSkillsMatchRepository(t *testing.T) {
-	src := snapshot(t, "../../.agents/skills")
+	src := testutil.Snapshot(t, "../../.agents/skills")
 	// This repository has the optional skill on (git_commits); it must match its shipped copy.
 	opt := map[string]string{}
 	for k, v := range src {
@@ -222,10 +206,10 @@ func TestSkillsMatchRepository(t *testing.T) {
 			delete(src, k)
 		}
 	}
-	if len(opt) > 0 && !reflect.DeepEqual(opt, snapshot(t, "templates/optional-skills/akm-commit")) {
+	if len(opt) > 0 && !reflect.DeepEqual(opt, testutil.Snapshot(t, "templates/optional-skills/akm-commit")) {
 		t.Error("internal/initrepo/templates/optional-skills/akm-commit differs from .agents/skills/akm-commit: copy it over")
 	}
-	got := snapshot(t, "templates/skills")
+	got := testutil.Snapshot(t, "templates/skills")
 	if !reflect.DeepEqual(src, got) {
 		t.Error("internal/initrepo/templates/skills differs from .agents/skills: copy the skills over")
 	}

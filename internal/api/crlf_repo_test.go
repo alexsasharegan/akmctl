@@ -56,6 +56,7 @@ func mixedEndings(t *testing.T, root string) []string {
 // scripts/windows-smoke.ps1): every write keeps the file's CRLF and the links a
 // move rewrites use forward slashes.
 func TestWritesOnACRLFCheckout(t *testing.T) {
+	t.Parallel()
 	root := crlfRepo(t)
 	item := "docs/work/261020-a2b3-add-json-output-to-ls.md"
 

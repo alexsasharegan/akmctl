@@ -33,6 +33,7 @@ func historyMoves(t *testing.T, root string, req Request) (resp Obj, got []move)
 }
 
 func TestHistoryListsStepCommitsOldestFirstWithStatuses(t *testing.T) {
+	t.Parallel()
 	root := historyRepo(t, "claims")
 	commitWith(t, root, mustOK(t, root, "claim", Request{"id": "261022-e5f6", "as": "agent-1", "as_of": "2026-10-28T09:30"}), nil)
 	commitWith(t, root, mustOK(t, root, "release", Request{"id": "261022-e5f6", "as_of": "2026-10-28"}), nil)
@@ -70,6 +71,7 @@ func TestHistoryListsStepCommitsOldestFirstWithStatuses(t *testing.T) {
 }
 
 func TestHistoryShowsThePathOfOneItem(t *testing.T) {
+	t.Parallel()
 	root := historyRepo(t, "claims")
 	id := "261022-e5f6"
 	commitWith(t, root, mustOK(t, root, "claim", Request{"id": id, "as": "a", "as_of": "2026-10-28T09:30"}), nil)
@@ -88,6 +90,7 @@ func TestHistoryShowsThePathOfOneItem(t *testing.T) {
 }
 
 func TestHistoryReportsOnlyTheItemOfTheSubject(t *testing.T) {
+	t.Parallel()
 	root := historyRepo(t, "claims")
 	// the commit also changes another item, but it only claims e5f6
 	mustOK(t, root, "set", Request{"id": "261024-g7h8", "changes": map[string]any{"priority": 4}, "as_of": "2026-10-28"})
@@ -99,6 +102,7 @@ func TestHistoryReportsOnlyTheItemOfTheSubject(t *testing.T) {
 }
 
 func TestHistoryRangeLimitAndHead(t *testing.T) {
+	t.Parallel()
 	root := historyRepo(t, "claims")
 	commitWith(t, root, mustOK(t, root, "claim", Request{"id": "261022-e5f6", "as": "a", "as_of": "2026-10-28T09:30"}), nil)
 	resp, _ := historyMoves(t, root, Request{})
@@ -122,6 +126,7 @@ func TestHistoryRangeLimitAndHead(t *testing.T) {
 }
 
 func TestHistoryIgnoresCommitsThatAreNotSteps(t *testing.T) {
+	t.Parallel()
 	root := historyRepo(t, "claims")
 	mustOK(t, root, "set", Request{"id": "261022-e5f6", "changes": map[string]any{"priority": 4}, "as_of": "2026-10-28"})
 	gitIn(t, root, "add", "-A")
@@ -133,6 +138,7 @@ func TestHistoryIgnoresCommitsThatAreNotSteps(t *testing.T) {
 }
 
 func TestHistoryWithoutGitOrWithTheSettingOff(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name, reason string
 		repo         func(t *testing.T) string
@@ -157,6 +163,7 @@ func TestHistoryWithoutGitOrWithTheSettingOff(t *testing.T) {
 }
 
 func TestHistoryRejectsABadRangeAndItem(t *testing.T) {
+	t.Parallel()
 	root := historyRepo(t, "claims")
 	wantCode(t, root, "history", Request{"range": "--output=x"}, "invalid_request", "")
 	wantCode(t, root, "history", Request{"range": "nosuchrev..HEAD"}, "invalid_request", "")

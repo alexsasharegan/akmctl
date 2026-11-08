@@ -11,6 +11,7 @@ const e5f6ID = "261022-e5f6"
 const e5f6Path = "docs/work/261022-e5f6-document-the-exit-codes.md"
 
 func TestCloseWritesClosedForDoneAndDropped(t *testing.T) {
+	t.Parallel()
 	for _, status := range []string{"done", "dropped"} {
 		root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
 		mustOK(t, root, "claim", Request{"id": a2b3, "as": "agent-1", "as_of": "2026-10-28T09:30"})
@@ -30,6 +31,7 @@ func TestCloseWritesClosedForDoneAndDropped(t *testing.T) {
 }
 
 func TestClosedIsOnlyWrittenByClose(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	_, err := call(t, root, "set", Request{"id": e5f6ID, "changes": map[string]any{"closed": "2026-10-28"}})
 	if err == nil || err.Code != "invalid_request" || !strings.Contains(err.Message, "closed") || !strings.Contains(err.Message, "managed by the tool") {
@@ -49,6 +51,7 @@ func TestClosedIsOnlyWrittenByClose(t *testing.T) {
 }
 
 func TestSetCycleAndKeep(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "set", Request{"id": e5f6ID, "changes": map[string]any{"cycle": "2026-PI3-S4", "keep": true}, "as_of": "2026-10-28"})
 	if ch, _ := resp.Get("changed"); strings.Join(ch.([]string), ",") != "cycle,keep" {
@@ -80,6 +83,7 @@ func TestSetCycleAndKeep(t *testing.T) {
 }
 
 func TestSetCycleKeepRejects(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	for _, ch := range []map[string]any{
 		{"cycle": "has space"}, {"cycle": ""}, {"cycle": "-lead"}, {"cycle": strings.Repeat("a", 65)}, {"cycle": 5},
@@ -93,6 +97,7 @@ func TestSetCycleKeepRejects(t *testing.T) {
 }
 
 func TestLsFiltersByCycle(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "set", Request{"id": e5f6ID, "changes": map[string]any{"cycle": "2026-Q4"}})
 	resp := mustOK(t, root, "ls", Request{"cycle": "2026-Q4", "fields": []any{"cycle", "keep"}})

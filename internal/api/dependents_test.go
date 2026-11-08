@@ -3,6 +3,7 @@ package api
 import "testing"
 
 func TestCloseReportsDependents(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "closable", "")
 	// 261024-g7h8 is blocked_by 261020-a2b3
 	resp := mustOK(t, root, "close", Request{"id": "261020-a2b3", "status": "dropped", "as_of": "2026-10-28"})
@@ -23,6 +24,7 @@ func TestCloseReportsDependents(t *testing.T) {
 }
 
 func TestCloseWithNoDependentsHasNoMember(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "closable", "")
 	resp := mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "dropped", "outcome": "Not needed.", "as_of": "2026-10-28"})
 	if _, ok := resp.Get("dependents"); ok {
@@ -31,6 +33,7 @@ func TestCloseWithNoDependentsHasNoMember(t *testing.T) {
 }
 
 func TestCloseIgnoresClosedDependents(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "closable", "")
 	mustOK(t, root, "section", Request{"id": "261024-g7h8", "name": "outcome", "text": "Moot."})
 	mustOK(t, root, "close", Request{"id": "261024-g7h8", "status": "dropped", "as_of": "2026-10-28"})

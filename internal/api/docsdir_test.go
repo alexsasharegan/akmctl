@@ -11,19 +11,6 @@ import (
 )
 
 // call loads the repository at root and runs one operation against it.
-func callOK(t *testing.T, root, op string, req Request) Obj {
-	t.Helper()
-	repo, err := record.Load(root)
-	if err != nil {
-		t.Fatalf("%s: load: %v", op, err)
-	}
-	resp, aerr := Run(repo, Info{"akmctl", "test"}, op, req)
-	if aerr != nil {
-		t.Fatalf("%s %v: %v", op, req, aerr)
-	}
-	return resp
-}
-
 func findingPaths(resp Obj) []string {
 	var out []string
 	f, _ := resp.Get("findings")
@@ -55,30 +42,30 @@ func TestCustomDocsDirEndToEnd(t *testing.T) {
 		t.Errorf(".gitignore %q", b)
 	}
 
-	c := callOK(t, base, "check", Request{})
+	c := mustOK(t, base, "check", Request{})
 	if e, _ := c.Get("errors"); e != 0 {
 		t.Fatalf("check after init: %v", c)
 	}
 	if w, _ := c.Get("warnings"); w != 0 {
 		t.Fatalf("check after init: %v", c)
 	}
-	v := callOK(t, base, "version", Request{})
+	v := mustOK(t, base, "version", Request{})
 	repo, _ := v.Get("repository")
 	if wd, _ := repo.(Obj).Get("work_dir"); wd != "knowledge/work" {
 		t.Errorf("version work_dir %v", wd)
 	}
 
 	// new, set, claim, section, close, index
-	resp := callOK(t, base, "new", Request{"kind": "work", "slug": "first", "title": "First"})
+	resp := mustOK(t, base, "new", Request{"kind": "work", "slug": "first", "title": "First"})
 	rec, _ := resp.Get("record")
 	id, _ := rec.(Obj).Get("id")
 	if p, _ := rec.(Obj).Get("path"); !strings.HasPrefix(p.(string), "knowledge/work/") {
 		t.Errorf("path %v", p)
 	}
-	callOK(t, base, "section", Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [x] it works"})
-	callOK(t, base, "set", Request{"id": id, "changes": map[string]any{"status": "ready"}})
-	callOK(t, base, "section", Request{"id": id, "name": "Next", "text": "Close it."})
-	callOK(t, base, "claim", Request{"id": id, "as": "agent"})
+	mustOK(t, base, "section", Request{"id": id, "name": "Goal", "text": "Try it.\n\n- [x] it works"})
+	mustOK(t, base, "set", Request{"id": id, "changes": map[string]any{"status": "ready"}})
+	mustOK(t, base, "section", Request{"id": id, "name": "Next", "text": "Close it."})
+	mustOK(t, base, "claim", Request{"id": id, "as": "agent"})
 	// The lock file stays on disk after the write only where it is an advisory
 	// flock; on Windows it is created exclusively and removed on release.
 	if runtime.GOOS != "windows" && !exists(base, "knowledge/.akm.lock") {
@@ -87,18 +74,18 @@ func TestCustomDocsDirEndToEnd(t *testing.T) {
 	if exists(base, "docs") {
 		t.Error("a write created docs/")
 	}
-	callOK(t, base, "section", Request{"id": id, "name": "Next", "text": "Close it."})
-	callOK(t, base, "section", Request{"id": id, "name": "Outcome", "text": "It works."})
-	callOK(t, base, "close", Request{"id": id, "status": "done"})
+	mustOK(t, base, "section", Request{"id": id, "name": "Next", "text": "Close it."})
+	mustOK(t, base, "section", Request{"id": id, "name": "Outcome", "text": "It works."})
+	mustOK(t, base, "close", Request{"id": id, "status": "done"})
 	if !exists(base, "knowledge/work/done") {
 		t.Error("closed item not under knowledge/work/done")
 	}
-	callOK(t, base, "new", Request{"kind": "adr", "slug": "use-it"})
-	callOK(t, base, "index", Request{})
+	mustOK(t, base, "new", Request{"kind": "adr", "slug": "use-it"})
+	mustOK(t, base, "index", Request{})
 	if !exists(base, "knowledge/adr/README.md") {
 		t.Error("no index")
 	}
-	mr := callOK(t, base, "migrate", Request{"mode": "report"})
+	mr := mustOK(t, base, "migrate", Request{"mode": "report"})
 	if st, _ := mr.Get("state"); st != "current" {
 		t.Errorf("migrate state %v", st)
 	}
@@ -107,19 +94,19 @@ func TestCustomDocsDirEndToEnd(t *testing.T) {
 	}
 
 	// config on and off
-	callOK(t, base, "config", Request{"key": "git_commits", "value": true})
+	mustOK(t, base, "config", Request{"key": "git_commits", "value": true})
 	if b, _ := os.ReadFile(filepath.Join(base, "knowledge", ".layout")); !strings.Contains(string(b), "git_commits: true\n") {
 		t.Errorf("manifest after config on: %q", b)
 	}
 	if !exists(base, ".agents/skills/akm-commit/SKILL.md") {
 		t.Error("skill not installed")
 	}
-	if c := callOK(t, base, "check", Request{}); true {
+	if c := mustOK(t, base, "check", Request{}); true {
 		if e, _ := c.Get("errors"); e != 0 {
 			t.Errorf("check after config on: %v", c)
 		}
 	}
-	callOK(t, base, "config", Request{"key": "git_commits", "value": false, "confirm": true})
+	mustOK(t, base, "config", Request{"key": "git_commits", "value": false, "confirm": true})
 	if b, _ := os.ReadFile(filepath.Join(base, "knowledge", ".layout")); !strings.Contains(string(b), "git_commits: false\n") {
 		t.Errorf("manifest after config off: %q", b)
 	}
@@ -160,7 +147,7 @@ func TestCustomDocsDirFindingPaths(t *testing.T) {
 	os.WriteFile(filepath.Join(base, "knowledge", ".akm-deny"), []byte("forbidden phrase\nre:(\n"), 0o644)
 	a, _ := os.ReadFile(filepath.Join(base, "AGENTS.md"))
 	os.WriteFile(filepath.Join(base, "AGENTS.md"), append(a, "\nthe forbidden phrase\n"...), 0o644)
-	c := callOK(t, base, "check", Request{})
+	c := mustOK(t, base, "check", Request{})
 	paths := strings.Join(findingPaths(c), " ")
 	if !strings.Contains(paths, "knowledge/.layout") || !strings.Contains(paths, "knowledge/.akm-deny") {
 		t.Errorf("finding paths %q in %v", paths, c)

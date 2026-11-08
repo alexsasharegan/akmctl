@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/api"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // script makes the CLI think it runs on a terminal that types answers.
@@ -23,14 +24,7 @@ func script(t *testing.T, tty bool, answers string) {
 func tree(t *testing.T) string {
 	t.Helper()
 	root := filepath.Join(t.TempDir(), "basic")
-	filepath.WalkDir(repo, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(repo, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(root, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(root, rel), b, 0o644)
-	})
+	testutil.CopyTree(t, repo, root)
 	os.MkdirAll(filepath.Join(root, ".git"), 0o755)
 	return root
 }

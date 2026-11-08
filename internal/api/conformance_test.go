@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 type conformanceCase struct {
@@ -200,13 +201,13 @@ func TestConformance(t *testing.T) {
 			// every case runs on a copy, so write cases cannot touch the fixtures
 			// the directory is named like the fixture repository: version reports it
 			root := filepath.Join(t.TempDir(), c.Repo)
-			copyTree(t, filepath.Join("../../testdata/api/repos", c.Repo), root)
+			testutil.CopyTree(t, filepath.Join("../../testdata/api/repos", c.Repo), root)
 			if c.GitWorkTree {
 				if err := os.MkdirAll(filepath.Join(root, ".git"), 0o755); err != nil {
 					t.Fatal(err)
 				}
 			}
-			before := snapshot(t, root)
+			before := testutil.Snapshot(t, root)
 			repo, err := record.Load(root)
 			if err != nil {
 				t.Fatal(err)
@@ -229,7 +230,7 @@ func TestConformance(t *testing.T) {
 					// rewrite the would-be text from the applied diff
 					wd, _ := wm["diff"].(map[string]any)
 					np, _ := gd["new_path"].(string)
-					applied, aerr := applyDiff(snapshot(t, root)[gd["path"].(string)], gd)
+					applied, aerr := applyDiff(testutil.Snapshot(t, root)[gd["path"].(string)], gd)
 					if aerr != nil {
 						t.Fatalf("the diff does not apply (%v)", aerr)
 					}
@@ -271,7 +272,7 @@ func TestConformance(t *testing.T) {
 				}
 				if want, ok := c.WouldBe[gdm["new_path"].(string)]; !ok {
 					t.Fatal("the case has a diff but no would_be text")
-				} else if got, err := applyDiff(snapshot(t, root)[gdm["path"].(string)], gdm); err != nil || got != want {
+				} else if got, err := applyDiff(testutil.Snapshot(t, root)[gdm["path"].(string)], gdm); err != nil || got != want {
 					t.Fatalf("the diff does not produce the would-be file (%v):\n%s\nwant:\n%s", err, got, want)
 				}
 			}
@@ -280,7 +281,7 @@ func TestConformance(t *testing.T) {
 				gbi, _ := json.MarshalIndent(g, "", " ")
 				t.Fatalf("%s\ngot:\n%s\nwant:\n%s", c.Name, gbi, wb)
 			}
-			now := snapshot(t, root)
+			now := testutil.Snapshot(t, root)
 			delete(now, "docs/.akm.lock")
 			delete(before, "docs/.akm.lock")
 			if *update {
@@ -333,33 +334,6 @@ func TestConformance(t *testing.T) {
 		ran++
 	}
 	t.Logf("ran %d of %d cases", ran, len(files))
-}
-
-func copyTree(t *testing.T, src, dst string) {
-	t.Helper()
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
-}
-
-// snapshot maps every file under root to its text.
-func snapshot(t *testing.T, root string) map[string]string {
-	t.Helper()
-	m := map[string]string{}
-	filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
-		if err == nil && !d.IsDir() {
-			rel, _ := filepath.Rel(root, p)
-			b, _ := os.ReadFile(p)
-			m[filepath.ToSlash(rel)] = string(b)
-		}
-		return nil
-	})
-	return m
 }
 
 // applyDiff applies the hunks of a diff member to the old file text, checking

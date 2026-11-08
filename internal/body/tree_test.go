@@ -245,9 +245,11 @@ func TestSplitJoinRecords(t *testing.T) {
 // sections found are the level-2 headings the oracle finds, and each typed edit
 // changes nothing outside the span it means to change.
 func TestTreeAgainstOracle(t *testing.T) {
+	t.Parallel()
 	r := rand.New(rand.NewSource(7))
 	checked, edited, refused := 0, 0, 0
-	for i := 0; i < 20000; i++ {
+	n := iterations(20000)
+	for i := 0; i < n; i++ {
 		src := generate(r)
 		tr, err := Split(src)
 		if err != nil {
@@ -313,10 +315,10 @@ func TestTreeAgainstOracle(t *testing.T) {
 		}
 	}
 	t.Logf("%d documents split, %d edits checked, %d refused for a local construct in their section", checked, edited, refused)
-	if refused < 100 {
+	if refused < n/200 {
 		t.Errorf("only %d edits were refused; the local-construct path is barely exercised", refused)
 	}
-	if checked < 2000 || edited < 2000 {
+	if checked < n/10 || edited < n/10 {
 		t.Errorf("too few documents or edits (%d, %d)", checked, edited)
 	}
 }
