@@ -2,22 +2,20 @@
 id: "261030-456q"
 title: Test strategy and coverage audit
 summary: Audit how akmctl is tested (strategy, maintainability, coverage), list the gaps as numbered findings, and file linked tickets for each group.
-status: active
+status: ready
 kind: spike
 priority: 3
 created: 2026-10-30
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-08T07:57
 ---
 
 # Test strategy and coverage audit
 
 ## Goal
 
-We have let gaps in the tests slide, and the fixtures are the clearest case: `new` is tested for shape only, `commits` has no conformance fixtures, and the spec lists more write fixtures as "not in 1.0". Nobody has looked at the whole. This item looks at it once and produces a report with a hard list of findings, then tickets that address them in groups.
+We have let gaps in the tests slide, and the fixtures are the clearest case: `new` is tested for shape only, `commits` has no conformance fixtures, and the spec lists more write fixtures as "not in 1.0". Nobody has looked at the whole. This project looks at it once and produces a report with a hard list of findings, then tickets that address them in groups.
 
-It is an audit, not a fix: no test is written under this item except to measure something.
+It is an audit, not a fix: no test is written under it except to measure something.
 
 Seed list (known from earlier work; the audit finds the rest, and corrects any entry that is wrong):
 
@@ -34,20 +32,32 @@ Scope of the audit, in three parts:
 2. **Maintainability.** How hard each suite is to change: the generator and the hand-synced copy, helper duplication across test files, tests that depend on real time, git or Node, fixtures that break when a template changes (the `init` written-files lists), and how long a full run takes locally and in CI.
 3. **Coverage.** Measured, not guessed: `go test -cover` per package; a matrix of operations by parameter and error code against the fixtures; a matrix of `check` rule ids against tests; the spec's own "not tested" admissions.
 
+Children, in dependency order (the first three can be taken in any order; the last needs them):
+
+- [Audit the test strategy](261108-dzh4-audit-test-strategy.md): the layers, their overlaps, and the seed-list check.
+- [Audit test maintainability](261108-x2c4-audit-test-maintainability.md): how hard each suite is to change, and run times.
+- [Measure test coverage](261108-arn2-measure-test-coverage.md): per-package figures and the operation and rule-id matrices.
+- [Write the audit report and file tickets](261108-kmwm-write-audit-report-and-file-tickets.md): numbered findings, groups, filed items, ADR draft list and roadmap order; waits for the other three.
+
+All four write to one report, `docs/design/test-strategy-audit.md`; whichever child comes first creates it, and each adds its own section.
+
 Done when:
 
-- [ ] A report in `docs/design/test-strategy-audit.md` covers the three parts and ends with a numbered list of findings `F1`, `F2`, and so on. Each finding has an area, a severity (gap, risk or nuisance), the evidence (a command, a path or a number), and a recommended fix.
-- [ ] The coverage figures in the report come from commands recorded in the Log, run on the audit's date.
-- [ ] The findings are grouped (for example conformance fixtures, tooling and maintainability, platform, workbench, skills), and each group has a work item filed from it that names the findings it addresses. The report links the items, and each item links the finding ids.
-- [ ] The seed list above is checked entry by entry in the report: confirmed, corrected or dropped.
-- [ ] The ADR drafts that the findings call for (a decision on how to fixture non-deterministic or git-dependent operations, for instance) are listed in the report, not decided here.
-- [ ] The roadmap lists the filed items in an order the report recommends.
+- [ ] Every child is `done` or `dropped`.
+- [ ] The report in `docs/design/test-strategy-audit.md` covers the three parts and ends with a numbered list of findings `F1`, `F2` and so on, each with an area, a severity (gap, risk or nuisance), the evidence and a recommended fix (child 261108-kmwm).
+- [ ] The coverage figures come from commands recorded in the Log, run on the audit's date (child 261108-arn2).
+- [ ] The findings are grouped and each group has a work item filed from it, linked both ways (child 261108-kmwm).
+- [ ] The seed list is checked entry by entry in the report (child 261108-dzh4, collected by 261108-kmwm).
+- [ ] The ADR drafts the findings call for are listed in the report, not decided here (child 261108-kmwm).
+- [ ] The roadmap lists the filed items in the order the report recommends (child 261108-kmwm).
 
 ## Next
 
-Split into four spike children (strategy, maintainability, coverage, report), then work them in order; the parent closes after the report child.
+Take 261108-dzh4 (strategy), 261108-x2c4 (maintainability) and 261108-arn2 (coverage) in any order; 261108-kmwm (report and tickets) comes last. Close this item after kmwm.
 
 ## Log
 
 - 2026-10-30: filed, from the maintainer's request after `commits` shipped without fixtures; output is an audit report and linked tickets.
 - 2026-11-08 00:57-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-08 00:57-07:00: Split into four children. The old boxes moved: the report-with-findings box to 261108-kmwm; the coverage-commands box to 261108-arn2; the grouped-items box, the ADR-drafts box and the roadmap box to 261108-kmwm; the seed-list box to 261108-dzh4 (collected by 261108-kmwm). One new box: every child done or dropped.
+- 2026-11-08 00:57-07:00: released (claude-sonnet-5-5).
