@@ -2,11 +2,12 @@
 id: "261030-456q"
 title: Test strategy and coverage audit
 summary: Audit how akmctl is tested (strategy, maintainability, coverage), list the gaps as numbered findings, and file linked tickets for each group.
-status: ready
+status: done
 kind: spike
 priority: 3
 created: 2026-10-30
 updated: 2026-11-08
+closed: 2026-11-08
 ---
 
 # Test strategy and coverage audit
@@ -34,26 +35,28 @@ Scope of the audit, in three parts:
 
 Children, in dependency order (the first three can be taken in any order; the last needs them):
 
-- [Audit the test strategy](done/261108-dzh4-audit-test-strategy.md): the layers, their overlaps, and the seed-list check.
-- [Audit test maintainability](done/261108-x2c4-audit-test-maintainability.md): how hard each suite is to change, and run times.
-- [Measure test coverage](done/261108-arn2-measure-test-coverage.md): per-package figures and the operation and rule-id matrices.
+- [Audit the test strategy](261108-dzh4-audit-test-strategy.md): the layers, their overlaps, and the seed-list check.
+- [Audit test maintainability](261108-x2c4-audit-test-maintainability.md): how hard each suite is to change, and run times.
+- [Measure test coverage](261108-arn2-measure-test-coverage.md): per-package figures and the operation and rule-id matrices.
 - [Write the audit report and file tickets](261108-kmwm-write-audit-report-and-file-tickets.md): numbered findings, groups, filed items, ADR draft list and roadmap order; waits for the other three.
 
 All four write to one report, `docs/design/test-strategy-audit.md`; whichever child comes first creates it, and each adds its own section.
 
 Done when:
 
-- [ ] Every child is `done` or `dropped`.
-- [ ] The report in `docs/design/test-strategy-audit.md` covers the three parts and ends with a numbered list of findings `F1`, `F2` and so on, each with an area, a severity (gap, risk or nuisance), the evidence and a recommended fix (child 261108-kmwm).
-- [ ] The coverage figures come from commands recorded in the Log, run on the audit's date (child 261108-arn2).
-- [ ] The findings are grouped and each group has a work item filed from it, linked both ways (child 261108-kmwm).
-- [ ] The seed list is checked entry by entry in the report (child 261108-dzh4, collected by 261108-kmwm).
-- [ ] The ADR drafts the findings call for are listed in the report, not decided here (child 261108-kmwm).
-- [ ] The roadmap lists the filed items in the order the report recommends (child 261108-kmwm).
+- [x] Every child is `done` or `dropped`.
+- [x] The report in `docs/design/test-strategy-audit.md` covers the three parts and ends with a numbered list of findings `F1`, `F2` and so on, each with an area, a severity (gap, risk or nuisance), the evidence and a recommended fix (child 261108-kmwm).
+- [x] The coverage figures come from commands recorded in the Log, run on the audit's date (child 261108-arn2).
+- [x] The findings are grouped and each group has a work item filed from it, linked both ways (child 261108-kmwm).
+- [x] The seed list is checked entry by entry in the report (child 261108-dzh4, collected by 261108-kmwm).
+- [x] The ADR drafts the findings call for are listed in the report, not decided here (child 261108-kmwm).
+- [x] The roadmap lists the filed items in the order the report recommends (child 261108-kmwm).
 
 ## Next
 
-Take 261108-dzh4 (strategy), 261108-x2c4 (maintainability) and 261108-arn2 (coverage) in any order; 261108-kmwm (report and tickets) comes last. Close this item after kmwm.
+## Outcome
+
+The audit is in docs/design/test-strategy-audit.md: 19 findings (F1 to F19) grouped into seven work items (z9n8, 3kse, qv1w, rwqj, f1tv, 79t5, xajw), four ADR drafts listed, the seed list checked, and the items on the roadmap in the recommended order.
 
 ## Log
 
