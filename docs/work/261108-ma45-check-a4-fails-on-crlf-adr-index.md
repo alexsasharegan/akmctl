@@ -32,3 +32,4 @@ Find rule A4 in internal/check, compare after normalizing CRLF, add the test; re
 
 - 2026-11-08: filed.
 - 2026-11-08 13:16-07:00: filed by the Windows smoke harness run (PR 51)
+- 2026-11-08 13:52-07:00: the CRLF audit (261108-kbve) found the same cause in index: it rewrites a CRLF docs/adr/README.md to LF, so the fix should keep the file's endings
