@@ -2,11 +2,13 @@
 id: "261029-aezq"
 title: "Capture modal: header, width, a cycle field and the submit button"
 summary: Rework the capture modal's header and width, add a Cycle field, and restyle the submit button; select, summary and parent controls come from separate items
-status: ready
+status: active
 kind: feature
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-07
 priority: 1
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T05:34
 ---
 
 # Capture modal: header, width, a cycle field and the submit button
@@ -64,3 +66,4 @@ Ready. Do 261029-kb33 first if the select and summary should look right inside t
 
 - 2026-10-29: filed.
 - 2026-10-29: refined with Alexander; the summary, kind and parent parts moved to separate items.
+- 2026-11-07 22:34-07:00: claimed (claude-sonnet-5-5).
