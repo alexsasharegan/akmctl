@@ -1,11 +1,13 @@
 ---
 id: "261108-8m4a"
 title: global akmctl follows green main
-status: raw
+status: active
 kind: feature
 priority: 2
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T19:45
 ---
 
 # global akmctl follows green main
@@ -23,6 +25,11 @@ Done when:
 - [ ] The maintainer has a schedule for it (launchd or another), documented in `docs/` and set up by the maintainer, not by an agent.
 - [ ] The `.obsidian/` folder is excluded locally (`.git/info/exclude`) so local builds are not marked dirty, or the decision not to is recorded.
 
+## Next
+
+Write scripts/install-latest.sh (newest green main commit, skip if installed, go install by sha), a test with a fake gh and go, docs and the AGENTS rule.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 12:45-07:00: claimed (claude-sonnet-5-5).
