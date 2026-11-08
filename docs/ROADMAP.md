@@ -52,7 +52,6 @@ Workbench and polish:
 Hardening and small rules:
 
 - [261108-2ncf] Basic Windows support
-- [261108-z9n8] CI hardening for skipped tests and scripts
 - [261108-3kse] Fixture update mode and gap cases
 - [261108-qv1w] CLI and check test gaps
 - [261108-rwqj] Shared test helpers and run time
