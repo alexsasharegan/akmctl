@@ -1,13 +1,15 @@
 ---
 id: "261108-arn2"
 title: measure test coverage
-status: ready
+status: active
 kind: spike
 parent: 261030-456q
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Part 3 of the test audit: measured coverage per package, an operation by parameter and error code matrix, and a check rule id matrix"
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T08:28
 ---
 
 # measure test coverage
@@ -25,6 +27,11 @@ Done when:
 - [ ] The spec's "not tested" admissions are listed with where each is stated.
 - [ ] Findings are written as candidates in that section, unnumbered, each with an area, a severity (gap, risk or nuisance), the evidence and a recommended fix.
 
+## Next
+
+Run go test -cover per package, build the operation and rule-id matrices, list the spec's not-tested admissions, write the Coverage section.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 01:28-07:00: claimed (claude-sonnet-5-5).
