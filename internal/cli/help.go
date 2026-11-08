@@ -35,6 +35,7 @@ var examples = map[string]string{
 	"show":    "akmctl show 261101-m3pv",
 	"agents":  "akmctl agents > /tmp/AGENTS.shipped.md",
 	"skills":  "akmctl skills status",
+	"split":   "akmctl split 261101-m3pv parse-flags write-docs --kind chore",
 	"tick":    `akmctl tick 261101-m3pv 1 --evidence "go test passes"`,
 	"ui":      "akmctl ui --open",
 	"version": "akmctl version",
@@ -43,7 +44,7 @@ var examples = map[string]string{
 
 // commandNames lists every command help covers: the operations and ui.
 func commandNames() []string {
-	names := append(api.Operations(), "ui", "agents")
+	names := append(api.Operations(), "ui", "agents", "split")
 	sort.Strings(names)
 	return names
 }
@@ -52,6 +53,10 @@ func commandNames() []string {
 func commandUsage(w io.Writer, op string) {
 	if op == "ui" {
 		fmt.Fprintf(w, "usage: akmctl ui [flags]\n\nflags:\n  --port <n>  port to listen on (default: any free port)\n  --open      open the workbench in the browser\n\nexample:\n  %s\n", examples[op])
+		return
+	}
+	if op == "split" {
+		fmt.Fprintf(w, "usage: akmctl split [id] [slug...] [flags]\n\nflags:\n  --kind <kind>      the kind of every child\n  --priority <n>     the priority of every child (default: the parent's)\n  --as-of <text>\n  --repo <dir>  --format json|table|ids\n\nFiles one raw work item per slug under <id> (each is a `new`), prints each one's commit message, then what the parent still needs: its Goal and Next, its claim and its status. It edits none of that.\n\nexample:\n  %s\n", examples[op])
 		return
 	}
 	if op == "agents" {
