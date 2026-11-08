@@ -2,13 +2,12 @@
 id: "261029-aezq"
 title: "Capture modal: header, width, a cycle field and the submit button"
 summary: Rework the capture modal's header and width, add a Cycle field, and restyle the submit button; select, summary and parent controls come from separate items
-status: active
+status: done
 kind: feature
 created: 2026-10-29
 updated: 2026-11-07
+closed: 2026-11-07
 priority: 1
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-08T05:34
 ---
 
 # Capture modal: header, width, a cycle field and the submit button
@@ -60,7 +59,9 @@ Done when:
 
 ## Next
 
-All boxes are ticked: close it once the pull request is merged or the maintainer is happy with the look. The dark-mode focus ring on the submit button was not checked by eye (it uses the `--focus` token).
+## Outcome
+
+The capture modal now reads heading first (Raw in Monaspace Radon, a muted New work item line below), is 720px wide with the parent search on its own row, has an optional Cycle field beside Priority, and a submit button with its own style and a 3px focus ring. new accepts fields.cycle for a work item so the field files the item into a cycle. Checked in the browser in dark, light and at 375px. Not checked: the dark-mode focus ring by eye (it uses the --focus token), and screen readers.
 
 ## Log
 
