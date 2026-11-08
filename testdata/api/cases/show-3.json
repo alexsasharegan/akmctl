@@ -1,0 +1,58 @@
+{
+  "name": "a parent shows its progress counts",
+  "repo": "basic",
+  "request": {
+    "id": "261015-c4d5",
+    "section": "goal"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "show",
+    "request": {
+      "id": "261015-c4d5",
+      "section": "goal"
+    },
+    "ok": true,
+    "record": {
+      "id": "261015-c4d5",
+      "type": "work",
+      "path": "docs/work/261015-c4d5-machine-readable-listings.md",
+      "id_date": "2026-10-15",
+      "etag": "acae08a2f3cf6b27",
+      "fields": {
+        "id": "261015-c4d5",
+        "title": "Machine-readable listings",
+        "summary": "Make listings available as JSON for tools.",
+        "status": "active",
+        "kind": "feature",
+        "parent": null,
+        "blocked_by": null,
+        "priority": 3,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-15",
+        "updated": "2026-10-26",
+        "closed": null,
+        "authored_by": null,
+        "decisions": null
+      },
+      "progress": {
+        "children_done": 0,
+        "children_dropped": 0,
+        "children_total": 2,
+        "descendants_done": 0,
+        "descendants_dropped": 0,
+        "descendants_total": 2
+      }
+    },
+    "sections": [
+      "goal",
+      "next",
+      "log"
+    ],
+    "section": {
+      "name": "goal",
+      "text": "Do the thing.\n\n- [ ] It is done."
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "name": "tree lists children under their parent with depth and progress",
+  "repo": "basic",
+  "request": {
+    "type": "work",
+    "tree": true,
+    "fields": [
+      "title",
+      "status"
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "ls",
+    "request": {
+      "fields": [
+        "title",
+        "status"
+      ],
+      "tree": true,
+      "type": "work"
+    },
+    "ok": true,
+    "total": 6,
+    "count": 6,
+    "records": [
+      {
+        "id": "261010-j9k0",
+        "type": "work",
+        "path": "docs/work/done/261010-j9k0-choose-a-licence.md",
+        "id_date": "2026-10-10",
+        "etag": "29721853e3d6b9c4",
+        "fields": {
+          "title": "Choose a licence",
+          "status": "done"
+        },
+        "depth": 0
+      },
+      {
+        "id": "261015-c4d5",
+        "type": "work",
+        "path": "docs/work/261015-c4d5-machine-readable-listings.md",
+        "id_date": "2026-10-15",
+        "etag": "acae08a2f3cf6b27",
+        "fields": {
+          "title": "Machine-readable listings",
+          "status": "active"
+        },
+        "depth": 0,
+        "progress": {
+          "children_done": 0,
+          "children_dropped": 0,
+          "children_total": 2,
+          "descendants_done": 0,
+          "descendants_dropped": 0,
+          "descendants_total": 2
+        }
+      },
+      {
+        "id": "261020-a2b3",
+        "type": "work",
+        "path": "docs/work/261020-a2b3-add-json-output-to-ls.md",
+        "id_date": "2026-10-20",
+        "etag": "16e7c0aededa652c",
+        "fields": {
+          "title": "Add JSON output to ls",
+          "status": "active"
+        },
+        "depth": 1
+      },
+      {
+        "id": "261022-e5f6",
+        "type": "work",
+        "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+        "id_date": "2026-10-22",
+        "etag": "1e3e49990ff5d8ed",
+        "fields": {
+          "title": "Document the exit codes",
+          "status": "ready"
+        },
+        "depth": 1
+      },
+      {
+        "id": "261024-g7h8",
+        "type": "work",
+        "path": "docs/work/261024-g7h8-publish-the-first-release.md",
+        "id_date": "2026-10-24",
+        "etag": "3a839cf44a210de1",
+        "fields": {
+          "title": "Publish the first release",
+          "status": "blocked"
+        },
+        "depth": 0
+      },
+      {
+        "id": "261026-m1n2",
+        "type": "work",
+        "path": "docs/work/261026-m1n2-explore-a-plugin-system.md",
+        "id_date": "2026-10-26",
+        "etag": "c04c7e0e447bc6e9",
+        "fields": {
+          "title": "Explore a plugin system",
+          "status": "raw"
+        },
+        "depth": 0
+      }
+    ]
+  }
+}

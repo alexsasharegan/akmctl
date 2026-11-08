@@ -96,6 +96,30 @@
         "next_line": {
           "type": ["string", "null"]
         },
+        "depth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "progress": {
+          "type": "object",
+          "properties": {
+            "children_done": { "type": "integer", "minimum": 0 },
+            "children_dropped": { "type": "integer", "minimum": 0 },
+            "children_total": { "type": "integer", "minimum": 1 },
+            "descendants_done": { "type": "integer", "minimum": 0 },
+            "descendants_dropped": { "type": "integer", "minimum": 0 },
+            "descendants_total": { "type": "integer", "minimum": 1 }
+          },
+          "required": [
+            "children_done",
+            "children_dropped",
+            "children_total",
+            "descendants_done",
+            "descendants_dropped",
+            "descendants_total"
+          ],
+          "additionalProperties": false
+        },
         "matches": {
           "type": "array",
           "items": {

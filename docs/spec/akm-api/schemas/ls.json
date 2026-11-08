@@ -54,6 +54,9 @@
         },
         "next": {
           "type": "boolean"
+        },
+        "tree": {
+          "type": "boolean"
         }
       },
       "required": [],

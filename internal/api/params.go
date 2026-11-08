@@ -82,7 +82,7 @@ var specs = map[string]map[string]param{
 		"type": {kind: kString, enum: []string{"work", "adr"}}, "status": {kind: kStrings, enum: anyStatus},
 		"parent": s(pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "blocked": {kind: kBool}, "scope": s(), "since": s(pat(reDate, "YYYY-MM-DD")), "cycle": s(pat(reCycle, "letters, digits, dot, dash or underscore, starting with a letter or digit, at most 64 characters")),
 		"sort": {kind: kStrings}, "fields": {kind: kStrings}, "limit": {kind: kInt, min: 1}, "offset": {kind: kInt, min: 0},
-		"count_only": {kind: kBool}, "next": {kind: kBool},
+		"count_only": {kind: kBool}, "next": {kind: kBool}, "tree": {kind: kBool},
 	},
 	"search": {
 		"text": s(req), "body": {kind: kBool}, "type": {kind: kString, enum: []string{"work", "adr"}}, "status": {kind: kStrings, enum: anyStatus},

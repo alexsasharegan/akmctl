@@ -222,6 +222,12 @@ func opLs(repo *record.Repo, q Request) (Obj, *Error) {
 		return nil, err
 	}
 	sortRecords(repo, recs, sortKeys)
+	var depth map[string]int
+	var idx map[string][]*record.Record
+	if q.boolean("tree") {
+		recs, depth = treeOrder(recs)
+		idx = childIndex(repo)
+	}
 	total := len(recs)
 	page := paginate(recs, q.integer("offset", 0), q.integer("limit", -1))
 	if q.boolean("count_only") {
@@ -231,6 +237,12 @@ func opLs(repo *record.Repo, q Request) (Obj, *Error) {
 	out := make([]Obj, 0, len(page))
 	for _, r := range page {
 		o := recordObj(repo, r, names, false)
+		if depth != nil {
+			o = append(o, KV{"depth", depth[r.ID]})
+			if ro := progressOf(idx, r.ID); ro != nil && r.Type == record.Work {
+				o = append(o, KV{"progress", ro})
+			}
+		}
 		if q.boolean("next") && r.Type == record.Work {
 			if l, ok := r.NextLine(); ok && l != "" {
 				o = append(o, KV{"next_line", l})
@@ -508,7 +520,13 @@ func opShow(repo *record.Repo, q Request) (Obj, *Error) {
 	if names == nil {
 		names = []string{}
 	}
-	out := O("record", recordObj(repo, r, nil, true), "sections", names)
+	ro := recordObj(repo, r, nil, true)
+	if r.Type == record.Work {
+		if x := progressOf(childIndex(repo), r.ID); x != nil {
+			ro = append(ro, KV{"progress", x})
+		}
+	}
+	out := O("record", ro, "sections", names)
 	if sec, ok := q["section"]; ok {
 		name := strings.ToLower(strings.TrimSpace(sec.(string)))
 		t, found := text[name]
