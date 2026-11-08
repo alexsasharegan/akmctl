@@ -12,7 +12,7 @@ updated: 2026-11-08
 
 ## Goal
 
-A project that carries the skills of a newer `akmctl` while the global binary is older finds commands missing (2026-11-08). Make the mismatch visible instead of a surprise: `akmctl skills status`, or `check`, should say when a repository's skill files name a command or version the running binary does not have, and which `akmctl version` to install. Options to weigh: a `min_version` in each skill's frontmatter checked against `Version`; a list of operations each skill references checked against the binary's operations (the skill tests already map operations to references); or both. Related: [261108-8m4a](261108-8m4a-global-akmctl-follows-green-main.md).
+A project that carries the skills of a newer `akmctl` while the global binary is older finds commands missing (2026-11-08). Make the mismatch visible instead of a surprise: `akmctl skills status`, or `check`, should say when a repository's skill files name a command or version the running binary does not have, and which `akmctl version` to install. Options to weigh: a `min_version` in each skill's frontmatter checked against `Version`; a list of operations each skill references checked against the binary's operations (the skill tests already map operations to references); or both. Related: [261108-8m4a](done/261108-8m4a-global-akmctl-follows-green-main.md).
 
 Done when:
 
