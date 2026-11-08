@@ -41,4 +41,4 @@ jobs:
       - name: stress compare-and-swap (temporary, 261029-q8z3)
         if: runner.os == 'Windows'
         continue-on-error: true
-        run: go test ./internal/api -run 'TestCompareAndSwapRace' -count=300 -v
+        run: go test ./internal/api ./internal/server -run 'Race' -count=100 -cpu 1,2,8
