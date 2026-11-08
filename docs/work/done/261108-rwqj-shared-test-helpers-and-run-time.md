@@ -1,20 +1,19 @@
 ---
 id: "261108-rwqj"
 title: shared test helpers and run time
-status: active
+status: done
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5-rest
-claimed_at: 2026-11-08T21:05
+closed: 2026-11-08
 ---
 
 # shared test helpers and run time
 
 ## Goal
 
-Findings F11, F12 and F13 of [the audit](../design/test-strategy-audit.md), from [261030-456q](done/261030-456q-test-strategy-and-coverage-audit.md): seven copies of a repository-copy helper that ignore their errors, three of a snapshot helper, a serial `internal/api` run bound by file copies, and a race run dominated by `internal/body`. Add one `internal/testutil`, use it everywhere, run independent tests in parallel and lower the battery iterations under `-race`.
+Findings F11, F12 and F13 of [the audit](../../design/test-strategy-audit.md), from [261030-456q](261030-456q-test-strategy-and-coverage-audit.md): seven copies of a repository-copy helper that ignore their errors, three of a snapshot helper, a serial `internal/api` run bound by file copies, and a race run dominated by `internal/body`. Add one `internal/testutil`, use it everywhere, run independent tests in parallel and lower the battery iterations under `-race`.
 
 Done when:
 
@@ -24,7 +23,9 @@ Done when:
 
 ## Next
 
-Close after review. Tell the Windows thread to merge main before it adds tests (helpers moved to internal/testutil).
+## Outcome
+
+internal/testutil has CopyTree, Snapshot and RequireTool; the ten private copies are gone (MustOK stays in internal/api, since testutil cannot import api). 102 internal/api tests run in parallel (17.8 s to 11.7 s; 24.7 s to 15.3 s with -race). internal/body under -race went from 33.5 s to 7.2 s: parallel batteries, an eighth of the documents under the race detector, thresholds scaled. go test -race ./... went from 33.8 s to 18.2 s.
 
 ## Log
 
