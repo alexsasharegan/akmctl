@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/frontmatter"
 )
 
 var reCommitMessage = regexp.MustCompile(`^(\d{6}-[0-9a-hjkmnp-tv-z]{4})\(([a-z]+)\): (.+)\n\nAKM-Step: ([a-z]+)\nAKM-Item: (\d{6}-[0-9a-hjkmnp-tv-z]{4})$`)
@@ -58,6 +60,32 @@ func TestSetStatusChangeReturnsCommit(t *testing.T) {
 	checkCommit(t, mustOK(t, root, "set", Request{"id": "261026-m1n2", "changes": map[string]any{"status": "ready"}}), "unblock")
 }
 
+func TestBlockCommitNamesBlockers(t *testing.T) {
+	long := "261101-aaaa-a-very-long-slug-that-goes-on"
+	cases := []struct {
+		name string
+		by   []string
+		want string
+	}{
+		{"one", []string{"legal review"}, "legal review"},
+		{"several", []string{"a", "b", "c"}, "a, b, c"},
+		{"bounded", []string{"261101-aaaa", "261101-bbbb", long, "261101-cccc"}, "261101-aaaa, 261101-bbbb and 2 more"},
+		{"first is long", []string{long + long, "x"}, long + long + " and 1 more"},
+	}
+	for _, c := range cases {
+		root := copyRepo(t, "basic", "")
+		var by []any
+		for _, b := range c.by {
+			by = append(by, b)
+		}
+		r := mustOK(t, root, "set", Request{"id": "261026-m1n2", "changes": map[string]any{"status": "blocked", "blocked_by": by}})
+		d, _ := checkCommit(t, r, "block").Get("detail")
+		if d != "blocked on "+c.want {
+			t.Errorf("%s: detail = %v, want blocked on %s", c.name, d, c.want)
+		}
+	}
+}
+
 func TestSetWithoutStatusChangeReturnsNoCommit(t *testing.T) {
 	root := copyRepo(t, "basic", "")
 	for _, ch := range []map[string]any{{"priority": 3}, {"status": "ready"}} {
@@ -76,4 +104,14 @@ func TestCloseAndDropReturnCommit(t *testing.T) {
 		t.Errorf("paths = %v", ps)
 	}
 	checkCommit(t, mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "dropped", "outcome": "No.", "as_of": "2026-10-28"}), "drop")
+}
+
+func TestBlockerListWithoutBlocker(t *testing.T) {
+	doc, err := frontmatter.Parse([]byte("---\nid: 261026-m1n2\n---\nbody\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := blockerList(doc); got != "its blocker" {
+		t.Errorf("got %q", got)
+	}
 }
