@@ -1,0 +1,26 @@
+{
+  "name": "a write without If-Match is refused with 428 (HTTP only)",
+  "repo": "basic",
+  "bindings": [
+    "http"
+  ],
+  "request": {
+    "id": "261022-e5f6",
+    "changes": {
+      "priority": "high"
+    }
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "http",
+    "request": {},
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "a write needs If-Match with the record's etag (read the record first)",
+      "details": {
+        "reason": "if_match_required"
+      }
+    }
+  }
+}
