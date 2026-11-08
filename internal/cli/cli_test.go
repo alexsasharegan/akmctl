@@ -301,3 +301,21 @@ func TestHelpForAnUnknownCommandFails(t *testing.T) {
 		t.Fatalf("code %d, stderr %q", code, errb.String())
 	}
 }
+
+func TestNewTakesParentKindAndPriorityFlags(t *testing.T) {
+	root := t.TempDir()
+	copyDir(t, "../../testdata/api/repos/basic", root)
+	do := func(args ...string) (int, string) {
+		var out, errb bytes.Buffer
+		code := Run(append(args, "--repo", root, "--format", "json"), &out, &errb, ".")
+		return code, out.String() + errb.String()
+	}
+	code, out := do("new", "work", "flag-child", "--parent", "261015-c4d5", "--kind", "feature", "--priority", "3")
+	if code != 0 || !strings.Contains(out, `"parent":"261015-c4d5"`) || !strings.Contains(out, `"kind":"feature"`) || !strings.Contains(out, `"priority":3`) {
+		t.Fatalf("new with flags: %d %s", code, out)
+	}
+	code, out = do("new", "work", "lost-child", "--parent", "261015-zzzz")
+	if code != 2 || !strings.Contains(out, `"code":"not_found"`) {
+		t.Fatalf("unknown parent: %d %s", code, out)
+	}
+}

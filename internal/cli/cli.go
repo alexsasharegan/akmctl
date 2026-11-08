@@ -97,6 +97,22 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			m[k] = parseFieldValue(k, raw)
 			req["fields"] = m
 			continue
+		case "parent", "kind", "priority":
+			if op != "new" && op != "split" {
+				break // not a flag of this command: the generic code below reports it
+			}
+			v, ok := value()
+			if !ok {
+				fmt.Fprintf(stderr, "akmctl: --%s needs a value\n", name)
+				return 2
+			}
+			m, _ := req["fields"].(map[string]any)
+			if m == nil {
+				m = map[string]any{}
+			}
+			m[name] = parseFieldValue(name, v)
+			req["fields"] = m
+			continue
 		case "undo":
 			if op != "tick" {
 				fmt.Fprintf(stderr, "akmctl: --undo does not belong to %s\n", op)

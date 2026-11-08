@@ -16,7 +16,7 @@ claimed_at: 2026-11-08T06:52
 
 From spike 261031-078w, amended by spike 261101-baze. The API `new` takes `fields` (parent, kind, ...) but the CLI `new work` takes none, so a split needs N `new` plus N `set` plus N `section` (the cold-agent trial of 261101-baze: three commands per child). Add `--parent` and `--kind` to `new`, and `akmctl split <id> <slug>...` creating one child per slug. Done when:
 
-- [ ] `new work x --parent <id> --kind feature` sets both; an unknown parent is `not_found`.
+- [x] `new work x --parent <id> --kind feature` sets both; an unknown parent is `not_found`.
 - [ ] `split` creates the children as `raw` items under the parent and prints one `file` commit message per child, in order, as the `akm-commit` skill expects.
 - [ ] Children take the parent's `priority` unless one is given (the trial found they inherit nothing, so they sort below unrelated work).
 - [ ] After a split, `split` prints what is left for the parent, as `close` prints dependents: write a `## Next`, release the claim, set it `ready`, move its old Goal boxes. It edits none of that.
@@ -32,3 +32,5 @@ Commit 1: new --parent/--kind/--priority flags. Commit 2: akmctl split. Then the
 - 2026-10-31: filed from spike 261031-078w.
 - 2026-11-01 10:22-07:00: Amended from spike 261101-baze (box 4): added the priority, per-child commit messages and parent-reminder boxes, and the skill update.
 - 2026-11-07 23:52-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-07 23:52-07:00: ticked "`new work x --parent <id> --kind feature` sets both; an unknown parent is `not_found`.": TestNewTakesParentKindAndPriorityFlags: --parent/--kind/--priority set the fields; an unknown parent is not_found
+- 2026-11-07 23:52-07:00: Commit 1: new takes --parent, --kind and --priority (the API already took them as fields). --kind is also the record type's parameter name, so the CLI reads it as a field for new and split.

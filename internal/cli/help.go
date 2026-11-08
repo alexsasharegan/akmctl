@@ -26,7 +26,7 @@ var examples = map[string]string{
 	"log":     `akmctl log 261101-m3pv "Found the flag parser in cli.go."`,
 	"ls":      "akmctl ls --status ready,active --fields title",
 	"migrate": "akmctl migrate --mode report",
-	"new":     "akmctl new work fix-the-parser",
+	"new":     "akmctl new work fix-the-parser --parent 261101-m3pv --kind bug",
 	"release": "akmctl release 261101-m3pv",
 	"remove":  "akmctl remove 261101-m3pv 2",
 	"search":  "akmctl search toast duration",
@@ -87,6 +87,9 @@ func commandUsage(w io.Writer, op string) {
 		default:
 			fmt.Fprintf(w, "  %s <text>\n", flag)
 		}
+	}
+	if op == "new" {
+		fmt.Fprintf(w, "  --parent <id>  --kind <kind>  --priority <n>  (a work item's fields; any other field: --field key=value)\n")
 	}
 	fmt.Fprintf(w, "  --repo <dir>  --format json|table|ids  (every command)\n")
 	fmt.Fprintf(w, "\nexample:\n  %s\n", examples[op])
