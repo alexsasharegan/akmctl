@@ -17,7 +17,7 @@ const skillFile = ".agents/skills/akm-commit/SKILL.md"
 func cfgRepo(t *testing.T, tree bool) string {
 	t.Helper()
 	root := filepath.Join(t.TempDir(), "basic")
-	copyTree(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	if tree {
 		if err := os.MkdirAll(filepath.Join(root, ".git"), 0o755); err != nil {
 			t.Fatal(err)

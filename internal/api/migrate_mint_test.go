@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/migrate"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 // mintRegistry is a migration from layout 0.1.0 whose only step mints ids for
@@ -37,17 +38,7 @@ func mintFixtureRepo(t *testing.T) string {
 	t.Helper()
 	src := "../../testdata/migrate/mint_ids"
 	dst := t.TempDir()
-	err := filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	testutil.CopyTree(t, src, dst)
 	return dst
 }
 

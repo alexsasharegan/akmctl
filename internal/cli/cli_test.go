@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 const repo = "../../testdata/api/repos/basic"
@@ -90,7 +92,7 @@ func TestNoRepository(t *testing.T) {
 
 func TestWriteCommands(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/claims", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/claims", root)
 	do := func(args ...string) (int, string) {
 		var out, errb bytes.Buffer
 		code := Run(append(args, "--repo", root, "--format", "json"), &out, &errb, ".")
@@ -122,21 +124,9 @@ func TestWriteCommands(t *testing.T) {
 	}
 }
 
-func copyDir(t *testing.T, src, dst string) {
-	t.Helper()
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
-}
-
 func TestMigrateFlags(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	var out, errb bytes.Buffer
 	code := Run([]string{"migrate", "--mode", "handoff", "--target", "0.3.0", "--out", filepath.Join(root, "handoff.md"), "--repo", root, "--format", "json"}, &out, &errb, ".")
 	if code != 0 || !strings.Contains(out.String(), `"state":"current"`) {
@@ -225,7 +215,7 @@ func TestMigrationFileFlag(t *testing.T) {
 
 func TestNewPrintsSimilarItems(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	var out, errb bytes.Buffer
 	code := Run([]string{"new", "work", "json-output-for-board", "--repo", root, "--format", "table"}, &out, &errb, ".")
 	if code != 0 || !strings.Contains(out.String(), "similar open items") || !strings.Contains(out.String(), "Add JSON output to ls") {
@@ -240,7 +230,7 @@ func TestNewPrintsSimilarItems(t *testing.T) {
 
 func TestClosePrintsDependents(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/closable", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/closable", root)
 	var out, errb bytes.Buffer
 	code := Run([]string{"close", "261020-a2b3", "dropped", "--outcome", "Not needed.", "--repo", root, "--format", "table"}, &out, &errb, ".")
 	if code != 0 || !strings.Contains(out.String(), "waiting on this one") || !strings.Contains(out.String(), "261024-g7h8") {
@@ -250,7 +240,7 @@ func TestClosePrintsDependents(t *testing.T) {
 
 func TestRepoInsideARepositoryIsRefused(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	inner := filepath.Join(root, "notes", "deeper")
 	os.MkdirAll(inner, 0o755)
 	var out, errb bytes.Buffer
@@ -305,7 +295,7 @@ func TestHelpForAnUnknownCommandFails(t *testing.T) {
 
 func TestNewTakesParentKindAndPriorityFlags(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	do := func(args ...string) (int, string) {
 		var out, errb bytes.Buffer
 		code := Run(append(args, "--repo", root, "--format", "json"), &out, &errb, ".")
@@ -323,7 +313,7 @@ func TestNewTakesParentKindAndPriorityFlags(t *testing.T) {
 
 func TestSplitFilesChildrenUnderTheParent(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	run := func(args ...string) (int, string, string) {
 		var out, errb bytes.Buffer
 		code := Run(append(args, "--repo", root), &out, &errb, ".")
@@ -400,7 +390,7 @@ func TestListFieldValueForms(t *testing.T) {
 
 func TestSetBlockedByStoresACleanList(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	for _, v := range []string{"261015-c4d5,261020-a2b3", "[261015-c4d5,261020-a2b3]", `["261015-c4d5","261020-a2b3"]`} {
 		var out, errb bytes.Buffer
 		code := Run([]string{"set", "261026-m1n2", "blocked_by=" + v, "--repo", root, "--format", "json"}, &out, &errb, ".")
@@ -419,7 +409,7 @@ func TestSetBlockedByStoresACleanList(t *testing.T) {
 // --changes, and a JSON object for either was refused as "must be an object".
 func TestJSONObjectFlags(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	run := func(args ...string) (int, string, string) {
 		var out, errb bytes.Buffer
 		code := Run(append(args, "--repo", root), &out, &errb, ".")
@@ -455,7 +445,7 @@ func TestJSONObjectFlags(t *testing.T) {
 // string and an agent retried and filed a duplicate.
 func TestFormatIDsPrintsTheRecordOfAWrite(t *testing.T) {
 	root := t.TempDir()
-	copyDir(t, "../../testdata/api/repos/basic", root)
+	testutil.CopyTree(t, "../../testdata/api/repos/basic", root)
 	run := func(args ...string) (int, string) {
 		var out, errb bytes.Buffer
 		code := Run(append(args, "--repo", root, "--format", "ids"), &out, &errb, ".")

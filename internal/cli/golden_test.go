@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 var updateGolden = flag.Bool("update", false, "rewrite the golden files of the text view from the tool's output")
@@ -49,7 +51,7 @@ func TestTextView(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			dir := filepath.Join(t.TempDir(), c.repo)
-			copyDir(t, filepath.Join("../../testdata/api/repos", c.repo), dir)
+			testutil.CopyTree(t, filepath.Join("../../testdata/api/repos", c.repo), dir)
 			var out, errb bytes.Buffer
 			code := Run(append(append([]string(nil), c.args...), "--repo", dir), &out, &errb, ".")
 			got := "exit " + string(rune('0'+code)) + "\n" + out.String()

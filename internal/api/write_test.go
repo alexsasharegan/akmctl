@@ -10,20 +10,14 @@ import (
 
 	"github.com/alexsasharegan/akmctl/internal/check"
 	"github.com/alexsasharegan/akmctl/internal/record"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 func copyRepo(t *testing.T, name string, extraLayout string) string {
 	t.Helper()
 	src := filepath.Join("../../testdata/api/repos", name)
 	dst := t.TempDir()
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(dst, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(dst, rel), b, 0o644)
-	})
+	testutil.CopyTree(t, src, dst)
 	if extraLayout != "" {
 		f, _ := os.OpenFile(filepath.Join(dst, "docs/.layout"), os.O_APPEND|os.O_WRONLY, 0o644)
 		f.WriteString(extraLayout)

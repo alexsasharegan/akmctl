@@ -18,7 +18,7 @@ Findings F11, F12 and F13 of [the audit](../design/test-strategy-audit.md), from
 
 Done when:
 
-- [ ] One `internal/testutil` package (`CopyTree` that fails the test on error, `Snapshot`, `MustOK`) replaces the copies.
+- [x] One `internal/testutil` package (`CopyTree` that fails the test on error, `Snapshot`, `MustOK`) replaces the copies.
 - [ ] `t.Parallel` is on the `internal/api` tests that copy their own repository; the run time before and after is in the Log.
 - [ ] The `internal/body` race run takes under 10 s, and the Log says how.
 
@@ -30,3 +30,4 @@ Write `internal/testutil` and move one package onto it (F11).
 
 - 2026-11-08: filed.
 - 2026-11-08 14:05-07:00: claimed (claude-sonnet-5-5-rest).
+- 2026-11-08 14:06-07:00: internal/testutil now has CopyTree, Snapshot (both fail the test on error) next to RequireTool; the copies in api, cli, server, migrate, check and initrepo use it (14 files, -109 lines); callOK folded into mustOK. MustOK stays in internal/api: it needs the api types, and testutil importing api would be a cycle with api's own tests.
