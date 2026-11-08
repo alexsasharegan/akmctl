@@ -13,7 +13,7 @@ updated: 2026-11-08
 
 ## Goal
 
-A Homebrew tap. Part of [261108-2ncf](261108-2ncf-basic-windows-support.md). Generate `Formula/akmctl.rb` for a future `homebrew-tap` repository (a separate repository under the maintainer's account, which the maintainer creates later) with a script (`scripts/homebrew-formula.sh`) that installs the release archives for macOS and Linux (arm64 and amd64) with their SHA256. Publishing the tap waits for the same confidence items as the WinGet package ([261108-fabf](261108-fabf-winget-package.md)); the maintainer decides when. The update on each tag needs a token with write access to the tap: the maintainer sets that secret; no credential goes in a file.
+A Homebrew tap. Part of [261108-2ncf](261108-2ncf-basic-windows-support.md). Generate `Formula/akmctl.rb` for a future `homebrew-tap` repository (a separate repository under the maintainer's account, which the maintainer creates later) with a script (`scripts/homebrew-formula.sh`) that installs the release archives for macOS and Linux (arm64 and amd64) with their SHA256. Publishing the tap waits for the same confidence items as the WinGet package ([261108-fabf](done/261108-fabf-winget-package.md)); the maintainer decides when. The update on each tag needs a token with write access to the tap: the maintainer sets that secret; no credential goes in a file.
 
 Done when:
 
