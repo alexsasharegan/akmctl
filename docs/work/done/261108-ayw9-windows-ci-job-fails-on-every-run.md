@@ -13,7 +13,7 @@ closed: 2026-11-08
 
 ## Goal
 
-The `test (windows-latest)` job of CI fails on every run (it is `continue-on-error`, so the run still shows success), which hides a new Windows regression among the known failures (audit finding F7, [261108-z9n8](../261108-z9n8-ci-hardening-for-skipped-tests-and-scripts.md)). The hold on Windows work was lifted on 2026-11-08. The latest `main` run (16:08 UTC) shows two failing tests:
+The `test (windows-latest)` job of CI fails on every run (it is `continue-on-error`, so the run still shows success), which hides a new Windows regression among the known failures (audit finding F7, [261108-z9n8](261108-z9n8-ci-hardening-for-skipped-tests-and-scripts.md)). The hold on Windows work was lifted on 2026-11-08. The latest `main` run (16:08 UTC) shows two failing tests:
 
 - `TestCustomDocsDirEndToEnd` (`internal/api/docsdir_test.go`): "the lock is not in the docs dir". On Windows the lock is created exclusively and removed on release (`internal/fsx/lock_other.go`), so the file is not there after the write; the test assumes the Unix advisory lock that stays on disk.
 - `TestRepoInsideARepositoryIsRefused` (`internal/cli/cli_test.go`): compares the JSON output with an unescaped Windows path; JSON writes `\` for each backslash.

@@ -1,20 +1,19 @@
 ---
 id: "261108-z9n8"
 title: ci hardening for skipped tests and scripts
-status: active
+status: done
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5-rest
-claimed_at: 2026-11-08T20:17
+closed: 2026-11-08
 ---
 
 # ci hardening for skipped tests and scripts
 
 ## Goal
 
-Findings F3, F5, F7 and F8 of [the audit](../design/test-strategy-audit.md), from [261030-456q](done/261030-456q-test-strategy-and-coverage-audit.md): a runner can pass with tests skipped for want of `node` or `git`, the release and install scripts run only on a tag or in a user's shell, `-race` does not run on macOS, and fuzz targets only run their seeds. Make CI fail when a required tool is missing, test `scripts/release.sh` and `scripts/install.sh` against a dummy version, add `-race` on macOS, and add a scheduled or manual `-fuzz` job.
+Findings F3, F5, F7 and F8 of [the audit](../../design/test-strategy-audit.md), from [261030-456q](261030-456q-test-strategy-and-coverage-audit.md): a runner can pass with tests skipped for want of `node` or `git`, the release and install scripts run only on a tag or in a user's shell, `-race` does not run on macOS, and fuzz targets only run their seeds. Make CI fail when a required tool is missing, test `scripts/release.sh` and `scripts/install.sh` against a dummy version, add `-race` on macOS, and add a scheduled or manual `-fuzz` job.
 
 Done when:
 
@@ -25,7 +24,9 @@ Done when:
 
 ## Next
 
-Close after CI runs the new jobs. Follow-up: fix 261108-xkck so the weekly fuzz job is green; rwqj will grow internal/testutil.
+## Outcome
+
+CI sets AKM_REQUIRE_TOOLS=1 so missing git, node or sh fails instead of skipping (AKM_CORPUS stays a skip: a manual measurement). A packaging job runs release.sh for 0.0.0-ci and install.sh from the local archive (AKMCTL_BASE_URL). -race runs on macOS. fuzz.yml runs each fuzz target weekly and on demand. The first fuzz run found 261108-xkck, so the fuzz job will fail until that is fixed.
 
 ## Log
 
