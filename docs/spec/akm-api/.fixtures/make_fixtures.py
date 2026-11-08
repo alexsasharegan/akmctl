@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Regenerate the fixture repositories and the expected responses (API spec section 9).
+"""A frozen reference for how the sample fixture repositories were built (API spec section 9).
 
-A throwaway reference, not an implementation of the tool: it knows only the two sample
-repositories below. Run it, review the diff, commit. Python 3 standard library only.
+NOT a generator to run any more: it has not kept up with the cases (bases, show-3, ls-7, the
+newer close and init cases), and running it rewrites cases that are kept by hand. Edit the
+case files directly, then run scripts/sync-fixtures.sh (work item 261029-x4ws).
+Not an implementation of the tool. Python 3 standard library only.
 """
 import datetime as dt, hashlib, json, os, re, shutil
 
