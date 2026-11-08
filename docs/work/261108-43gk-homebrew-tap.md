@@ -1,12 +1,14 @@
 ---
 id: "261108-43gk"
 title: homebrew tap
-status: ready
+status: active
 kind: chore
 parent: 261108-2ncf
 priority: 2
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T17:54
 ---
 
 # homebrew tap
@@ -29,3 +31,4 @@ Write Formula/akmctl.rb for the four release archives, test it on macOS, then wr
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 10:54-07:00: claimed (claude-sonnet-5-5).
