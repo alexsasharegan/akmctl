@@ -1,14 +1,12 @@
 ---
 id: "261108-7avk"
 title: windows first run checklist
-status: active
+status: ready
 kind: chore
 parent: 261108-2ncf
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
-claimed_by: claude-sonnet-5-5-win
-claimed_at: 2026-11-08T21:32
 ---
 
 # windows first run checklist
@@ -31,3 +29,4 @@ Waiting for the first Windows user to run docs/windows-first-run.md (maintainer 
 - 2026-11-08: filed.
 - 2026-11-08 14:32-07:00: claimed (claude-sonnet-5-5-win).
 - 2026-11-08 14:38-07:00: docs/windows-first-run.md written and linked from the README; CI runs its command block on windows-latest (green, no failures found). Open: a person runs it by hand
+- 2026-11-08 14:50-07:00: released (claude-sonnet-5-5-win).
