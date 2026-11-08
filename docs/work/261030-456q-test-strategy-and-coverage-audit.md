@@ -36,7 +36,7 @@ Children, in dependency order (the first three can be taken in any order; the la
 
 - [Audit the test strategy](done/261108-dzh4-audit-test-strategy.md): the layers, their overlaps, and the seed-list check.
 - [Audit test maintainability](done/261108-x2c4-audit-test-maintainability.md): how hard each suite is to change, and run times.
-- [Measure test coverage](261108-arn2-measure-test-coverage.md): per-package figures and the operation and rule-id matrices.
+- [Measure test coverage](done/261108-arn2-measure-test-coverage.md): per-package figures and the operation and rule-id matrices.
 - [Write the audit report and file tickets](261108-kmwm-write-audit-report-and-file-tickets.md): numbered findings, groups, filed items, ADR draft list and roadmap order; waits for the other three.
 
 All four write to one report, `docs/design/test-strategy-audit.md`; whichever child comes first creates it, and each adds its own section.
