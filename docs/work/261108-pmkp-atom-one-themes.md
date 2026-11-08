@@ -1,13 +1,12 @@
 ---
 id: "261108-pmkp"
 title: atom one themes
-status: blocked
+status: ready
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
 summary: Add Atom One to the workbench in its light and dark variants
-blocked_by: [261108-hp9k]
 ---
 
 # atom one themes
@@ -26,7 +25,7 @@ Done when:
 
 ## Next
 
-Wait for 261108-hp9k (theme factorization), then read the theme how-to it leaves and map the palette.
+Read docs/theming.md, then this item's Discovery. Read the upstream palette named there, and write themes/<id>.css and the themes.json entry; run go test ./internal/server and look at it in the workbench.
 
 ## Discovery
 
