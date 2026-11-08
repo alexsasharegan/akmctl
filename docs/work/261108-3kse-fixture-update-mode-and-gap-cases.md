@@ -1,11 +1,13 @@
 ---
 id: "261108-3kse"
 title: fixture update mode and gap cases
-status: ready
+status: active
 kind: chore
 priority: 3
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T20:30
 ---
 
 # fixture update mode and gap cases
@@ -28,3 +30,4 @@ Write the update flag on `TestConformance` (F9), then add the cases.
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 13:30-07:00: claimed (claude-sonnet-5-5-rest).
