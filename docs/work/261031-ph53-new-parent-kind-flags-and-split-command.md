@@ -1,11 +1,13 @@
 ---
 id: "261031-ph53"
 title: new parent kind flags and split command
-status: ready
+status: active
 created: 2026-10-31
-updated: 2026-11-01
+updated: 2026-11-07
 summary: CLI new takes --parent and --kind; split creates several children of an item
 parent: 261101-t8h8
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T06:52
 ---
 
 # new parent kind flags and split command
@@ -20,8 +22,13 @@ From spike 261031-078w, amended by spike 261101-baze. The API `new` takes `field
 - [ ] After a split, `split` prints what is left for the parent, as `close` prints dependents: write a `## Next`, release the claim, set it `ready`, move its old Goal boxes. It edits none of that.
 - [ ] The `Item too big` section of `akm-track-work` (step 2) is shortened to use `split`, in both skill copies, and "split" is registered in `docs/glossary.md` with the word "umbrella" for a parent whose Goal only lists its children.
 
+## Next
+
+Commit 1: new --parent/--kind/--priority flags. Commit 2: akmctl split. Then the skill step 2 in both copies, glossary, changelog.
+
 ## Log
 
 - 2026-10-31: filed.
 - 2026-10-31: filed from spike 261031-078w.
 - 2026-11-01 10:22-07:00: Amended from spike 261101-baze (box 4): added the priority, per-child commit messages and parent-reminder boxes, and the skill update.
+- 2026-11-07 23:52-07:00: claimed (claude-sonnet-5-5).
