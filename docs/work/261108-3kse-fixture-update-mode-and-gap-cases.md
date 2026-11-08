@@ -18,16 +18,17 @@ Findings F9, F10, F14, F16 and F17 of [the audit](../design/test-strategy-audit.
 
 Done when:
 
-- [ ] `go test` has an update flag that rewrites `expected` from the tool's own output, with the etag handled, and the diff is the review.
-- [ ] Fixture cases cover the `ls` filters `blocked`, `scope` and `since`.
-- [ ] Every write has a stale (`If-Match`) case, and the six refusal reasons named in F17 each have a case.
-- [ ] `npm run schemas` and `TestFixtureCopiesAgree` pass.
+- [x] `go test` has an update flag that rewrites `expected` from the tool's own output, with the etag handled, and the diff is the review.
+- [x] Fixture cases cover the `ls` filters `blocked`, `scope` and `since`.
+- [x] Every write has a stale (`If-Match`) case, and the six refusal reasons named in F17 each have a case.
+- [x] `npm run schemas` and `TestFixtureCopiesAgree` pass.
 
 ## Next
 
-Write the update flag on `TestConformance` (F9), then add the cases.
+Close after review. Left for later: the other parameters F16 counts as unnamed, and if_match_required (261108-f1tv, both bindings).
 
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 13:30-07:00: claimed (claude-sonnet-5-5-rest).
+- 2026-11-08 13:35-07:00: TestConformance -update rewrites expected (and after, would_be for a diff) in the source fixtures and the copy; checked by breaking an etag and an after text and getting the files back byte for byte. 20 new cases: ls blocked/scope/since (ls-8 to ls-12), stale for section, tick, remove, log, close, claim, release, dry_run for claim, log, release, and the refusals extension_off, needs_confirmation, no_manifest, not_git, ticked_box (new fixture repos commitson and nomanifest). if_match_required is HTTP-only and waits for f1tv (both bindings); scopeMatch has a unit test. Not done: F16's remaining unnamed parameters beyond these.

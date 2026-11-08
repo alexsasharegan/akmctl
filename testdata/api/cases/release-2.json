@@ -1,0 +1,26 @@
+{
+  "name": "a stale etag writes nothing",
+  "repo": "claims",
+  "request": {
+    "id": "261020-a2b3",
+    "if_match": "0000000000000000",
+    "as_of": "2026-10-28"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "release",
+    "request": {
+      "as_of": "2026-10-28",
+      "id": "261020-a2b3",
+      "if_match": "0000000000000000"
+    },
+    "ok": false,
+    "error": {
+      "code": "stale",
+      "message": "the record changed since it was read",
+      "details": {
+        "etag": "affde9e3aa551c14"
+      }
+    }
+  }
+}

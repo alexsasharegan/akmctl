@@ -1,0 +1,26 @@
+{
+  "name": "claim is refused while the claims extension is off",
+  "repo": "basic",
+  "request": {
+    "id": "261022-e5f6",
+    "as": "agent-1",
+    "as_of": "2026-10-28T09:30"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "claim",
+    "request": {
+      "as": "agent-1",
+      "as_of": "2026-10-28T09:30",
+      "id": "261022-e5f6"
+    },
+    "ok": false,
+    "error": {
+      "code": "refused",
+      "message": "the claims extension is not enabled in docs/.layout",
+      "details": {
+        "reason": "extension_off"
+      }
+    }
+  }
+}
