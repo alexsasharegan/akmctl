@@ -22,7 +22,7 @@ Done when:
 
 - [x] Both tests pass on Windows CI (a run of the branch shows them passing).
 - [x] The whole `go test ./...` step of the `test (windows-latest)` job is green, or each remaining failure is filed.
-- [x] [261029-q8z3](../261029-q8z3-cas-race-windows.md) (flaky `TestCompareAndSwapRace`) is checked on the green runs and noted.
+- [x] [261029-q8z3](261029-q8z3-cas-race-windows.md) (flaky `TestCompareAndSwapRace`) is checked on the green runs and noted.
 - [x] Whether the job can stop being `continue-on-error` is recorded in the Log (the decision is the maintainer's).
 
 ## Next
