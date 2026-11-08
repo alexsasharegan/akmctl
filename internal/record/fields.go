@@ -99,6 +99,27 @@ func FirstHeading(body string) string {
 	return ""
 }
 
+// RetitleHeading rewrites the first "# " heading of a body outside fenced code
+// blocks from old to new, and reports whether it did. A body whose first heading
+// is not old is left alone: its author made it differ, and the tool does not
+// choose between them (rule WK12 warns).
+func RetitleHeading(body, old, new string) (string, bool) {
+	var fence mdbody.FenceTracker
+	lines := strings.Split(body, "\n")
+	for i, l := range lines {
+		t := strings.TrimRight(l, "\r")
+		if fence.In(t) || !strings.HasPrefix(t, "# ") {
+			continue
+		}
+		if strings.TrimSpace(t[2:]) != old {
+			return body, false
+		}
+		lines[i] = "# " + new + l[len(t):]
+		return strings.Join(lines, "\n"), true
+	}
+	return body, false
+}
+
 // NextLine is the first line of the Next section, or "".
 func (r *Record) NextLine() (string, bool) {
 	_, text := Sections(r.Body)

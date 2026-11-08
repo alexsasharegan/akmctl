@@ -712,6 +712,15 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	if len(changed) == 0 {
 		return e.finish(O("record", recordObj(repo, e.rec, nil, true), "changed", []string{})), nil
 	}
+	// A new title also renames the first heading when it matched the old title,
+	// so WK12 stays quiet (work item 261108-kdz1).
+	if typ == record.Work && contains(changed, "title") {
+		if nv, ok := e.doc.Get("title"); ok && nv.Kind == frontmatter.String {
+			if nb, did := record.RetitleHeading(e.text, e.rec.Str("title"), nv.Str); did {
+				e.text = nb
+			}
+		}
+	}
 	// status rules
 	newStatus := oldStatus
 	if v, ok := e.doc.Get("status"); ok {
