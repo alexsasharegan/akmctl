@@ -765,7 +765,7 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 		if step := statusStep(oldStatus, newStatus); step != "" {
 			detail := map[string]string{"ready": "ready", "start": "started", "unblock": "unblocked"}[step]
 			if step == "block" {
-				detail = "blocked on " + firstBlocker(e.doc)
+				detail = "blocked on " + blockerList(e.doc)
 			}
 			out = append(out, KV{"commit", commitObj(step, rec.ID, detail, rec.Path)})
 		}
@@ -773,12 +773,29 @@ func opSet(repo *record.Repo, q Request) (Obj, *Error) {
 	return e.finish(out), nil
 }
 
-// firstBlocker is the first blocked_by entry of the document, as written.
-func firstBlocker(doc *frontmatter.Doc) string {
-	if v, ok := doc.Get("blocked_by"); ok && len(v.Items) > 0 {
-		return record.RefID(v.Items[0].Str)
+// blockerMax bounds the blocker names in a block commit message.
+const blockerMax = 60
+
+// blockerList names every blocked_by entry of the document, as ids, joined by ", ". It stops
+// before the names pass blockerMax characters and says how many it left out ("a, b and 2 more").
+// The first blocker is always named, however long.
+func blockerList(doc *frontmatter.Doc) string {
+	v, ok := doc.Get("blocked_by")
+	if !ok || len(v.Items) == 0 {
+		return "its blocker"
 	}
-	return "its blocker"
+	var names []string
+	for _, it := range v.Items {
+		names = append(names, record.RefID(it.Str))
+	}
+	out := names[0]
+	for i := 1; i < len(names); i++ {
+		if len(out)+2+len(names[i]) > blockerMax {
+			return fmt.Sprintf("%s and %d more", out, len(names)-i)
+		}
+		out += ", " + names[i]
+	}
+	return out
 }
 
 // sameValue compares a stored value with a new one, reading references as ids.
