@@ -83,6 +83,7 @@ func TestBasesFileUsesTheManifestsFoldersAndStaleDays(t *testing.T) {
 }
 
 func TestBasesWritesOnceAndNeverOverwrites(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "bases", Request{})
 	if p, _ := resp.Get("path"); p != "docs/akm.base" {
@@ -107,6 +108,7 @@ func TestBasesWritesOnceAndNeverOverwrites(t *testing.T) {
 }
 
 func TestBasesDryRunAndContentWriteNothing(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "bases", Request{"dry_run": true, "include_content": true})
 	if w, _ := resp.Get("written"); w != false {
@@ -120,6 +122,7 @@ func TestBasesDryRunAndContentWriteNothing(t *testing.T) {
 }
 
 func TestBasesFindsTheVaultRoot(t *testing.T) {
+	t.Parallel()
 	// the repository is a folder inside a vault: folder filters start at the vault
 	vault := t.TempDir()
 	os.MkdirAll(filepath.Join(vault, ".obsidian"), 0o755)
@@ -148,6 +151,7 @@ func TestBasesFindsTheVaultRoot(t *testing.T) {
 }
 
 func TestBasesRefusesBadPaths(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	for _, p := range []string{"/abs/x.base", "../x.base", "docs/../x.base", "docs/x.md", ".base", `docs\x.base`, "docs//x.base"} {
 		wantCode(t, root, "bases", Request{"path": p}, "invalid_request", "")

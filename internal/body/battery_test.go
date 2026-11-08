@@ -136,8 +136,9 @@ func generate(r *rand.Rand) []byte {
 // battery. It fails on any case where the Scanner is confidently wrong, and on a
 // run so cautious that it proves nothing.
 func TestGenerated(t *testing.T) {
+	t.Parallel()
 	r := rand.New(rand.NewSource(1))
-	const n = 30000
+	n := iterations(30000)
 	refused, wrong := 0, 0
 	for i := 0; i < n; i++ {
 		src := generate(r)
@@ -179,8 +180,9 @@ func FuzzAgainstOracle(f *testing.F) {
 // one the oracle finds too. What it stepped over may differ; that is what makes
 // those lines refusals.
 func TestTolerantAgainstOracle(t *testing.T) {
+	t.Parallel()
 	r := rand.New(rand.NewSource(11))
-	const n = 30000
+	n := iterations(30000)
 	scanned, stepped, wrong := 0, 0, 0
 	for i := 0; i < n; i++ {
 		src := generate(r)
@@ -200,7 +202,7 @@ func TestTolerantAgainstOracle(t *testing.T) {
 		}
 	}
 	t.Logf("tolerant scan: %d documents scanned, %d with a stepped-over construct, %d wrong", scanned, stepped, wrong)
-	if stepped < 500 {
+	if stepped < n/60 {
 		t.Errorf("only %d documents had a local construct; the generator is too tame", stepped)
 	}
 }

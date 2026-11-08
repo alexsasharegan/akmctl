@@ -18,6 +18,7 @@ func progressOfResp(t *testing.T, resp Obj) Obj {
 func num(o Obj, k string) int { v, _ := o.Get(k); return v.(int) }
 
 func TestShowProgressCountsChildren(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "closable", "")
 	// 261015-c4d5 has two open children; drop one and finish the other
 	mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "dropped", "outcome": "No.", "as_of": "2026-10-28"})
@@ -41,6 +42,7 @@ func TestShowProgressCountsChildren(t *testing.T) {
 }
 
 func TestProgressDescendantsCountGrandchildren(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	// make 261026-m1n2 a child of 261020-a2b3, which is a child of 261015-c4d5
 	mustOK(t, root, "set", Request{"id": "261026-m1n2", "changes": map[string]any{"parent": "261020-a2b3"}})
@@ -51,6 +53,7 @@ func TestProgressDescendantsCountGrandchildren(t *testing.T) {
 }
 
 func TestLsTreeOrdersChildrenUnderParent(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "ls", Request{"type": "work", "tree": true})
 	v, _ := resp.Get("records")
@@ -94,6 +97,7 @@ func TestLsTreeOrdersChildrenUnderParent(t *testing.T) {
 }
 
 func TestCloseNamesParentAndOpenSiblings(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "closable", "")
 	r := mustOK(t, root, "close", Request{"id": "261020-a2b3", "status": "done", "outcome": "Done.", "as_of": "2026-10-28"})
 	if p, _ := r.Get("parent"); p != "261015-c4d5" {

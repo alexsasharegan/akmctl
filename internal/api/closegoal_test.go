@@ -50,6 +50,7 @@ func TestCloseRefusesUncheckedGoal(t *testing.T) {
 // A box outside the first run is named without a position, because tick cannot
 // address it; a Goal with no boxes closes.
 func TestCloseGoalEdges(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	p := filepath.Join(root, e5f6Path)
 	b, _ := os.ReadFile(p)

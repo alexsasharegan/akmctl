@@ -64,6 +64,7 @@ func commitsReport(t *testing.T, root string) (clean bool, problems []string, ch
 }
 
 func TestCommitsAcceptsTheToolsOwnMessages(t *testing.T) {
+	t.Parallel()
 	root := commitsRepo(t, "claims")
 	commitWith(t, root, mustOK(t, root, "claim", Request{"id": "261022-e5f6", "as": "agent-1", "as_of": "2026-10-28T09:30"}), nil)
 	commitWith(t, root, mustOK(t, root, "release", Request{"id": "261022-e5f6", "as_of": "2026-10-28"}), nil)
@@ -78,6 +79,7 @@ func TestCommitsAcceptsTheToolsOwnMessages(t *testing.T) {
 }
 
 func TestCommitsAcceptsDrop(t *testing.T) {
+	t.Parallel()
 	root := commitsRepo(t, "closable")
 	commitWith(t, root, mustOK(t, root, "close", Request{"id": "261022-e5f6", "status": "dropped", "outcome": "No.", "as_of": "2026-10-28"}), nil)
 	if clean, problems, checked, _ := commitsReport(t, root); !clean || checked != 1 {
@@ -86,6 +88,7 @@ func TestCommitsAcceptsDrop(t *testing.T) {
 }
 
 func TestCommitsFlagsWhatDoesNotAgree(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name string
 		edit func(string) string
@@ -111,6 +114,7 @@ func TestCommitsFlagsWhatDoesNotAgree(t *testing.T) {
 }
 
 func TestCommitsTrailersMustBeInTheFinalBlock(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name string
 		edit func(string) string
@@ -135,6 +139,7 @@ func TestCommitsTrailersMustBeInTheFinalBlock(t *testing.T) {
 }
 
 func TestCommitsFlagsAStepThatDidNotHappen(t *testing.T) {
+	t.Parallel()
 	root := commitsRepo(t, "closable")
 	// a close subject on a commit that only edits the item
 	resp := mustOK(t, root, "set", Request{"id": "261022-e5f6", "changes": map[string]any{"priority": 4}, "as_of": "2026-10-28"})
@@ -149,6 +154,7 @@ func TestCommitsFlagsAStepThatDidNotHappen(t *testing.T) {
 }
 
 func TestCommitsSkipsOrdinaryCommits(t *testing.T) {
+	t.Parallel()
 	root := commitsRepo(t, "basic")
 	if clean, _, checked, skipped := commitsReport(t, root); !clean || checked != 0 || skipped != 1 {
 		t.Errorf("clean=%v checked=%d skipped=%d", clean, checked, skipped)
@@ -158,6 +164,7 @@ func TestCommitsSkipsOrdinaryCommits(t *testing.T) {
 // A commit with no AKM step that changes an open item's status or claim is CM4;
 // one that edits only its prose is an ordinary commit.
 func TestCommitsFlagsAnUnlabelledStatusChange(t *testing.T) {
+	t.Parallel()
 	root := commitsRepo(t, "claims")
 	mustOK(t, root, "section", Request{"id": "261022-e5f6", "name": "Next", "text": "Write the table."})
 	gitIn(t, root, "add", "-A")
@@ -175,6 +182,7 @@ func TestCommitsFlagsAnUnlabelledStatusChange(t *testing.T) {
 }
 
 func TestCommitsRefusesWhatIsNotGitOrNotARange(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "commits", Request{}, "refused", "not_git")
 	g := commitsRepo(t, "basic")

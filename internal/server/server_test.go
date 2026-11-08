@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/alexsasharegan/akmctl/internal/api"
+	"github.com/alexsasharegan/akmctl/internal/testutil"
 )
 
 const token = "0123456789abcdef0123456789abcdef"
@@ -21,14 +22,7 @@ func setup(t *testing.T) (*httptest.Server, string) {
 	t.Helper()
 	root := t.TempDir()
 	src := "../../testdata/api/repos/claims"
-	filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error {
-		rel, _ := filepath.Rel(src, p)
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(root, rel), 0o755)
-		}
-		b, _ := os.ReadFile(p)
-		return os.WriteFile(filepath.Join(root, rel), b, 0o644)
-	})
+	testutil.CopyTree(t, src, root)
 	s := &Server{Root: root, Token: token, Info: api.Info{Name: "akmctl", Version: "test"}}
 	ts := httptest.NewServer(s.Handler())
 	s.Hosts = []string{strings.TrimPrefix(ts.URL, "http://")}

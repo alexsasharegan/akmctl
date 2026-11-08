@@ -26,6 +26,7 @@ func skillState(t *testing.T, resp Obj, name string) string {
 func skillPath(root, rel string) string { return filepath.Join(root, filepath.FromSlash(rel)) }
 
 func TestSkillsInstallStatusUpdate(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "skills", Request{})
 	if n, _ := resp.Get("notes"); n == nil || !strings.Contains(n.([]string)[0], "git-commits on") {
@@ -79,6 +80,7 @@ func TestSkillsInstallStatusUpdate(t *testing.T) {
 }
 
 func TestSkillsOutdatedUpdatesWithoutAsking(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "skills", Request{"mode": "install", "confirm": true})
 	// an older release: the file differs and the marker records the old hash
@@ -111,6 +113,7 @@ func TestSkillsOutdatedUpdatesWithoutAsking(t *testing.T) {
 }
 
 func TestSkillsRetiredNameIsRemoved(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "skills", Request{"mode": "install", "confirm": true})
 	// the old folder with no marker (0.3.x wrote none) counts as edited
@@ -141,6 +144,7 @@ func TestSkillsRetiredNameIsRemoved(t *testing.T) {
 }
 
 func TestSkillsRefusals(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "skills", Request{"confirm": true}, "invalid_request", "")
 	wantCode(t, root, "skills", Request{"mode": "remove"}, "invalid_request", "")
@@ -161,6 +165,7 @@ func TestSkillsRefusals(t *testing.T) {
 }
 
 func TestSkillsNewerThanTheBinary(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	mustOK(t, root, "skills", Request{"mode": "install", "confirm": true})
 	run := func(version string, req Request) Obj {

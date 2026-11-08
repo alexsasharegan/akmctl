@@ -17,6 +17,7 @@ const (
 )
 
 func TestVersionReportsFolders(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "vault", "")
 	resp := mustOK(t, root, "version", Request{})
 	repo, _ := resp.Get("repository")
@@ -30,6 +31,7 @@ func TestVersionReportsFolders(t *testing.T) {
 }
 
 func TestWritesFollowTheManifestFolders(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "vault", "")
 	clean(t, root)
 	// new work and new adr land in their folders
@@ -74,6 +76,7 @@ func TestWritesFollowTheManifestFolders(t *testing.T) {
 }
 
 func TestClaimsFollowTheManifestFolders(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "vault", "extension.claims: 0.3.0\n")
 	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	resp := mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
@@ -85,6 +88,7 @@ func TestClaimsFollowTheManifestFolders(t *testing.T) {
 }
 
 func TestBadManifestPathRefusesWrites(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "work_dir: ../outside\n")
 	for _, c := range []struct {
 		op  string
@@ -109,6 +113,7 @@ func TestBadManifestPathRefusesWrites(t *testing.T) {
 }
 
 func TestCloseCreatesOutcomeWithBlankLine(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "close", Request{"id": a2b3, "status": "done", "outcome": "Shipped.", "as_of": "2026-10-28"})
 	to, _ := resp.Get("moved_to")

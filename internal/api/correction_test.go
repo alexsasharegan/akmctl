@@ -10,6 +10,7 @@ const closedPath = "docs/work/done/261010-j9k0-choose-a-licence.md"
 // A closed work item is read-only except through a logged correction
 // (ADR 261101-dxcn, work item 261101-3vwz).
 func TestClosedItemCorrection(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	id := "261010-j9k0"
 	closedReason := func(op string, req Request) string {

@@ -40,6 +40,7 @@ func checkCommit(t *testing.T, resp Obj, step string) Obj {
 }
 
 func TestNewReturnsCommit(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	c := checkCommit(t, mustOK(t, root, "new", Request{"kind": "work", "slug": "frob", "title": "Frob the widget"}), "file")
 	if d, _ := c.Get("detail"); d != "Frob the widget" {
@@ -49,6 +50,7 @@ func TestNewReturnsCommit(t *testing.T) {
 }
 
 func TestSetStatusChangeReturnsCommit(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	// 261026-m1n2 is raw
 	checkCommit(t, mustOK(t, root, "set", Request{"id": "261026-m1n2", "changes": map[string]any{"status": "ready"}}), "ready")
@@ -61,6 +63,7 @@ func TestSetStatusChangeReturnsCommit(t *testing.T) {
 }
 
 func TestBlockCommitNamesBlockers(t *testing.T) {
+	t.Parallel()
 	long := "261101-aaaa-a-very-long-slug-that-goes-on"
 	cases := []struct {
 		name string
@@ -87,6 +90,7 @@ func TestBlockCommitNamesBlockers(t *testing.T) {
 }
 
 func TestSetWithoutStatusChangeReturnsNoCommit(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	for _, ch := range []map[string]any{{"priority": 3}, {"status": "ready"}} {
 		resp := mustOK(t, root, "set", Request{"id": "261022-e5f6", "changes": ch})
@@ -97,6 +101,7 @@ func TestSetWithoutStatusChangeReturnsNoCommit(t *testing.T) {
 }
 
 func TestCloseAndDropReturnCommit(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "closable", "")
 	c := checkCommit(t, mustOK(t, root, "close", Request{"id": "261020-a2b3", "status": "done", "outcome": "Done.", "as_of": "2026-10-28"}), "close")
 	ps, _ := c.Get("paths")

@@ -20,6 +20,7 @@ func similarIDs(t *testing.T, resp Obj) []string {
 }
 
 func TestNewWorkReportsSimilarOpenItems(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	// "Add JSON output to ls" is active; "Document the exit codes" is ready.
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "json-output-for-board"})
@@ -38,6 +39,7 @@ func TestNewWorkReportsSimilarOpenItems(t *testing.T) {
 }
 
 func TestNewWorkNoMatchHasNoSimilar(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "rotate-the-signing-keys"})
 	if _, ok := resp.Get("similar"); ok {
@@ -46,6 +48,7 @@ func TestNewWorkNoMatchHasNoSimilar(t *testing.T) {
 }
 
 func TestNewSimilarOneWordIsNotEnough(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	// shares only "output" with the active item
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "colour-output"})
@@ -55,6 +58,7 @@ func TestNewSimilarOneWordIsNotEnough(t *testing.T) {
 }
 
 func TestNewSimilarSingleWordItemNeedsThatWord(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	// fewer than two words: every word must be shared ("a" is a stop word)
 	resp := mustOK(t, root, "new", Request{"kind": "work", "slug": "a-plugin"})
@@ -64,6 +68,7 @@ func TestNewSimilarSingleWordItemNeedsThatWord(t *testing.T) {
 }
 
 func TestNewSimilarSkipsClosedAndAdr(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	first := mustOK(t, root, "new", Request{"kind": "work", "slug": "audit-the-flux-capacitor"})
 	id, _ := first.Get("record")
@@ -81,6 +86,7 @@ func TestNewSimilarSkipsClosedAndAdr(t *testing.T) {
 }
 
 func TestNewSimilarIsCappedAndOrdered(t *testing.T) {
+	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	for i := 0; i < 7; i++ {
 		mustOK(t, root, "new", Request{"kind": "work", "slug": "frobnicate-widget", "title": "Frobnicate widget"})
