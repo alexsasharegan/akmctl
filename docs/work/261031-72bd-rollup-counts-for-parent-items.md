@@ -1,11 +1,13 @@
 ---
 id: "261031-72bd"
 title: rollup counts for parent items
-status: ready
+status: active
 created: 2026-10-31
-updated: 2026-11-01
+updated: 2026-11-07
 summary: Children done / total, direct and transitive, in show, ls --tree and the API
 parent: 261101-t8h8
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-08T06:46
 ---
 
 # rollup counts for parent items
@@ -18,9 +20,14 @@ From spike 261031-078w. A parent shows no progress. Add counts (`children_done`,
 - [ ] Dropped children are counted in a separate figure, not as done.
 - [ ] `close` of a child names its parent and the open siblings left (`parent`, `open_siblings` in JSON), and says when the parent is now closable (from spike 261101-baze, which found `close` is silent about the parent, so a closer does not learn that a split is finished).
 
+## Next
+
+Progress counts in show and ls --tree, close names parent and open siblings; then close and open the PR.
+
 ## Log
 
 - 2026-10-31: filed.
 - 2026-10-31: filed from spike 261031-078w.
 - 2026-11-01 10:14-07:00: Added a box for close reporting the parent and open siblings, from spike 261101-baze.
 - 2026-11-01: 261101-a86m (workbench close prompt) is blocked by this item's close reporting.
+- 2026-11-07 23:46-07:00: claimed (claude-sonnet-5-5).
