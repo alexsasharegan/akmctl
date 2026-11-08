@@ -32,7 +32,7 @@ Done when:
 - `internal/fsx/write_test.go`: the order (file sync with no target yet, then the rename, then the folder sync), a file-sync failure that leaves the old content and no `.akm-*.tmp`, and a folder-sync failure that is not an error. `go test -race ./internal/fsx ./internal/api` passes.
 - Other writers: `migrate`'s scratch copy (`internal/migrate/migrate.go`) is a throw-away copy removed after planning, and the `--out` handoff file (`internal/cli/cli.go`) is a user-chosen report; neither is a record, so both stay as they are.
 - API spec section 7 (Atomicity) and the changelog are updated.
-- Not measured: the cost of the extra syncs (a write is rare and a few milliseconds), and behaviour under a real power loss, which a test cannot show.
+- Not measured: the cost of the extra syncs (a write is rare and a few milliseconds), and behavior under a real power loss, which a test cannot show.
 
 Decision: none. The sync is the existing promise made true, not a new choice.
 

@@ -19,7 +19,7 @@ Alexander's feedback after using the workbench on the vault: the detail view is 
 Done when:
 
 - [ ] The drawer shows the frontmatter as a table with one row per field.
-- [ ] Each value is styled by its type, with a legend or label that does not rely on colour alone.
+- [ ] Each value is styled by its type, with a legend or label that does not rely on color alone.
 - [ ] Lists render one item per line, wikilinks as links (see the wikilink item).
 - [ ] Unit tests cover the value typing; checked in the browser on the vault in light and dark.
 

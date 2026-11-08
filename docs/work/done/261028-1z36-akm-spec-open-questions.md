@@ -19,7 +19,7 @@ Small decisions left open when [261026-m74k-agent-ready-repo-layout-spike](26102
 
 - **Formatter:** require Prettier for style (a pinned version and shipped config) with the tool validating structure and no `fmt` command? Settle: the generated ADR index must survive Prettier; Prettier's handling of long frontmatter values must be tested against the simple-subset parser; Node is needed only for formatting.
 - **`renumber`:** in the first version of the tool, or a manual repair?
-- **`summary` on work items:** required, optional (as now) or dropped in favour of the title?
+- **`summary` on work items:** required, optional (as now) or dropped in favor of the title?
 - **UI name:** `akmctl ui` or a separate AKM Workbench (one binary or two).
 - **Name:** AKM and `akmctl` are a working title; the overlap with `itlackey/akm` and the AgenticAKM paper is accepted knowingly ([261027-ensf-akm-an-agent-knowledge-management](../../adr/261027-ensf-akm-an-agent-knowledge-management.md)).
 - **Concurrency and claiming:** the spec does not say which agent or person holds an `active` item (a `claimed_by` field?).

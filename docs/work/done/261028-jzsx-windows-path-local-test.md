@@ -1,7 +1,7 @@
 ---
 id: "261028-jzsx"
 title: Cover the Windows path beyond CI
-summary: Windows behaviour (paths, line endings, locks, atomic rename) is tested only by the CI runner; add a way to run or simulate it locally.
+summary: Windows behavior (paths, line endings, locks, atomic rename) is tested only by the CI runner; add a way to run or simulate it locally.
 status: done
 kind: chore
 priority: 1
@@ -15,7 +15,7 @@ parent: 261108-2ncf
 
 ## Goal
 
-The Windows behaviour (path separators, CRLF, file locks, rename over an existing file) is exercised only by the Windows job in CI. A change cannot be tried on Windows before it is pushed.
+The Windows behavior (path separators, CRLF, file locks, rename over an existing file) is exercised only by the Windows job in CI. A change cannot be tried on Windows before it is pushed.
 
 Done when:
 

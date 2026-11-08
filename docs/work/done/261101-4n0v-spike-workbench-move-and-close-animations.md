@@ -21,7 +21,7 @@ Two groups to try:
 1. Moving a record from one lane to another: themed movement (a rocket that becomes a car, a Mario-style figure along the lane, Frogger hops, Pac-Man, a Tetris drop, a train or marble run).
 2. Clearing a task by completing it: a **confetti cannon** on `done` (the standard name for the effect Alexander wants), the "Vegas / power mode" extras (dimmed lights, sweeping spotlights, small explosions), a quiet fizzle for `dropped`, and streaks or combos for several closes in a row.
 
-Constraints from the brainstorm: animation is presentation only (the server emits a move event, a theme draws it); the queue plays one event at a time; a speed control and an off switch; quiet by default, `prefers-reduced-motion` honoured, power themes opt-in, sound off by default; no new dependency.
+Constraints from the brainstorm: animation is presentation only (the server emits a move event, a theme draws it); the queue plays one event at a time; a speed control and an off switch; quiet by default, `prefers-reduced-motion` honored, power themes opt-in, sound off by default; no new dependency.
 
 Done when:
 

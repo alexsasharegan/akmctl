@@ -20,7 +20,7 @@ A spike: prototype two ways to show a status move as a graphic in the workbench'
 1. **Inline transition:** one row under the sentence with the two statuses as the existing `.stat` markers, `[◌ raw] → [◐ ready]`.
 2. **Lifecycle strip:** a row of raw, ready, active, blocked and done markers with the from and to markers highlighted and an arc between them. A skipped stage shows as skipped, and a close ends at done or dropped.
 
-Both reuse the status shapes and `--st-*` colours in `app.css`. Optional on either: the marker fills in over about 300 ms (a half-filled marker becomes full for ready to active), off under `prefers-reduced-motion`; a backward move (active to ready) uses a reversed or muted arrow.
+Both reuse the status shapes and `--st-*` colors in `app.css`. Optional on either: the marker fills in over about 300 ms (a half-filled marker becomes full for ready to active), off under `prefers-reduced-motion`; a backward move (active to ready) uses a reversed or muted arrow.
 
 ### Reach
 
@@ -32,7 +32,7 @@ The graphic appears wherever a toast reports a status move, through one helper, 
 
 ### Constraints
 
-- The toast keeps its full sentence (it has `role=status`); the graphic is `aria-hidden` and carries no meaning that the sentence lacks. The marker shapes already differ without colour.
+- The toast keeps its full sentence (it has `role=status`); the graphic is `aria-hidden` and carries no meaning that the sentence lacks. The marker shapes already differ without color.
 - A pure function in `js/logic.js` (for example `transition(from, to)`) builds the graphic spec, so it is unit tested; `toastSpec` in `js/toasts.js` accepts the extra content.
 - The Undo button keeps working in the same toast.
 
