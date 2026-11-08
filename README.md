@@ -83,6 +83,8 @@ Open a new terminal for other programs to see the new `PATH`. To update, run the
 
 The binary is not code-signed. A file saved by `Invoke-WebRequest` carries no download mark, so Windows SmartScreen usually stays quiet; one saved by a browser may show "Windows protected your PC". Choose "More info", then "Run anyway", or run `Unblock-File "$dir\akmctl.exe"`. Only do this for a file whose checksum matches. A checksum mismatch means the download is damaged or changed: do not run it.
 
+Then work through the [Windows first-run checklist](docs/windows-first-run.md): five minutes in a throwaway folder, and what to send back if a step fails.
+
 WinGet manifests exist (`scripts/winget-manifests.sh`) but are not submitted to `winget-pkgs` yet, so `winget install akmctl` does not work today.
 
 ### Build from source
