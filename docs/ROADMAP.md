@@ -8,8 +8,6 @@ Nothing in flight. Agent rails hardening (261101-vs5c) is done; the rerun on oth
 
 Workbench polish, in order (the styling freeze is lifted for these):
 
-- [261101-4n0v] Spike workbench move and close animations
-
 Then make work decomposition discoverable (the children in order: 3erc, ph53, 72bd):
 
 - [261101-t8h8] Make work decomposition discoverable
@@ -57,10 +55,14 @@ Workbench and polish:
 - [261026-np3c] pkm-workbench: delete a task, with its backlinks listed
 - [261026-zg0g] pkm-workbench: filters
 - [261029-mj49] After a capture, offer to open the new record
+- [261107-49ta] Animation settings in the workbench
+- [261107-qsd4] More lane-move themes
+- [261107-7v9y] Dropped fizzle and close streaks
 
 Hardening and small rules:
 
 - [261030-456q] Test strategy and coverage audit
+- [261107-1gha] help lists --fields and --changes flags that refuse a JSON object
 - [261029-q8z3] TestCompareAndSwapRace is flaky on Windows CI
 - [261028-jzsx] Cover the Windows path beyond CI
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
