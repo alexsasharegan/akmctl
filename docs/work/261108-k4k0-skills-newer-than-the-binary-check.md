@@ -1,11 +1,13 @@
 ---
 id: "261108-k4k0"
 title: skills newer than the binary check
-status: raw
+status: active
 kind: feature
 priority: 2
 created: 2026-11-08
 updated: 2026-11-08
+claimed_by: claude-sonnet-5-5-rest
+claimed_at: 2026-11-08T20:08
 ---
 
 # skills newer than the binary check
@@ -20,6 +22,11 @@ Done when:
 - [ ] A test covers it with a skill that needs a version above the binary's.
 - [ ] The `akm` skill tells an agent what to do on that line.
 
+## Next
+
+Design: the marker (.akm-skill.json) records the tool version that wrote each skill. `skills status` compares it with the running binary; when it is newer it adds a note naming the version to install and a `requires_tool` field, and `update` skips that skill. Then the `akm` skill (both copies) says what to do on the line.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-08 13:08-07:00: claimed (claude-sonnet-5-5-rest).
