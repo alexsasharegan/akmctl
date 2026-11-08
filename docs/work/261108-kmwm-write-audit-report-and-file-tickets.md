@@ -8,7 +8,7 @@ priority: 3
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Last part of the test audit: number the findings, group them, file one work item per group, list the ADR drafts and order the roadmap"
-blocked_by: [261108-x2c4, 261108-arn2]
+blocked_by: [261108-arn2]
 ---
 
 # write audit report and file tickets
