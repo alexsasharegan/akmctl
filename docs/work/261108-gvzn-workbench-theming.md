@@ -1,11 +1,13 @@
 ---
 id: "261108-gvzn"
 title: Workbench theming
-status: ready
+status: active
 kind: feature
 created: 2026-11-08
 updated: 2026-11-08
 summary: Make the workbench's look themeable so a new color theme is a small, plug-in addition, then ship the classic themes in light and dark
+claimed_by: claude-sonnet-5-5-theming
+claimed_at: 2026-11-09T02:42
 ---
 
 # Workbench theming
@@ -43,3 +45,4 @@ Palette discovery was done on 2026-11-08 from Ghostty's bundled themes, with the
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
 - 2026-11-08 11:21-07:00: Ayu second source found in Zed's bundled theme (see 261108-zg9m).
+- 2026-11-08 19:42-07:00: claimed (claude-sonnet-5-5-theming).
