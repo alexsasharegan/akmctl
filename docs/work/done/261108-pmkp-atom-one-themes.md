@@ -1,14 +1,13 @@
 ---
 id: "261108-pmkp"
 title: atom one themes
-status: active
+status: done
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
+closed: 2026-11-08
 summary: Add Atom One to the workbench in its light and dark variants
-claimed_by: claude-sonnet-5-5-atom-one
-claimed_at: 2026-11-09T02:04
 ---
 
 # atom one themes
@@ -26,8 +25,6 @@ Done when:
 - [x] the upstream palette's license is noted if it needs attribution
 
 ## Next
-
-Read docs/theming.md, then this item's Discovery. Read the upstream palette named there, and write themes/<id>.css and the themes.json entry; run go test ./internal/server and look at it in the workbench.
 
 ## Discovery
 
@@ -68,6 +65,17 @@ Two things to check against upstream before trusting these. Ghostty's Light flav
 | button                   | #5871EF   | #4D78CC  |
 
 Light page differs slightly from Ghostty (#fafafa against #f9f9f9) and the text differs (#383a42 against #2a2c33); prefer the extension, which is derived from Atom's own variables (`mono-1` #383a42 and `syntax-bg` #fafafa for Light). These extensions define no border, muted-text, error or warning colors (they are unset), so take those from Atom's `one-*-syntax` hues (`hue-5` red, `hue-6` and `hue-6-2` orange, `hue-4` green, `mono-3` muted) and `base-border-color`.
+
+## Outcome
+
+- `internal/server/web/themes/atom-one.css` has two blocks (One Light, One Dark) and passes `TestThemeRegistryAndTokens`. Values: the HSL variables of Atom's `one-dark-syntax` and `one-light-syntax` packages (`atom/atom` at commit 1c3bd35ce238, MIT) for text, muted text and hues; the page, sidebar, input, active-row and accent tones from the installed VS Code ports `akamud.vscode-theme-onedark` and `-onelight` 2.3.0. Ghostty's Atom One was not used for tiers: its dark background is the sidebar tone.
+- `themes.json` lists the theme with One Light as the default light and One Dark as the default dark.
+- Contrast (WCAG, computed by the generator over the resolved values): the lowest pair is 4.52 for One Light and 4.51 for One Dark, over text and muted text on the page, surface and active row, the accent and its text, warning, error, added and removed diff text on their tints, key caps, toasts, a search match and the four status colors. Colors that are too light or dark to read as text are mixed toward the text color with `color-mix`; those mixes are the only colors outside the sources, and the file header says so.
+- Looked at in the browser: the board in One Light and One Dark, and the record drawer in One Dark. Not looked at: the palette, the review diff, the Check view, and the drawer in One Light.
+- Choices made: the accent is the One blue (#526fff light, #528bff dark); ready and added are blue, active is green, blocked is red, removed is orange, the same convention as the other themes. Light-mode orange and yellow come from Atom's `hue-6` values, which are dark ochre.
+- Unverified: whether the mixes look right to the maintainer's eye; the contrast numbers are arithmetic, not a visual test.
+
+Decision: none (the format is ADR 261108-w3xf).
 
 ## Log
 
