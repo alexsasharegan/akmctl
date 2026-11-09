@@ -1,12 +1,14 @@
 ---
 id: "261108-zg9m"
 title: ayu themes
-status: ready
+status: active
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Add Ayu to the workbench: Light, Mirage and Dark"
+claimed_by: claude-sonnet-5-5-ayu
+claimed_at: 2026-11-09T01:44
 ---
 
 # ayu themes
@@ -78,3 +80,4 @@ Text colors agree with Ghostty for Light, Mirage and Dark (#5c6166, #cccac2, #bf
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
 - 2026-11-08 11:21-07:00: Found Ayu in Zed (embedded in the binary, compressed); read the same file from zed-industries/zed main. Added its tiers to Discovery; the page color disagrees with Ghostty, so the build reads ayu-colors.
+- 2026-11-08 18:44-07:00: claimed (claude-sonnet-5-5-ayu).
