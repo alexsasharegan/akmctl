@@ -1,20 +1,11 @@
-/* akmctl workbench: "Quiet paper" (ported from the pkm-workbench theme). Tokens first; a theme is another token block.
-   Monaspace is SIL OFL; the licences are served from /fonts/. local() is tried before the embedded file. */
+/* akmctl workbench: structure and the non-color tokens. Every color comes from a color theme (themes/*.css, joined
+   into /themes.css; docs/theming.md). Monaspace is SIL OFL; the licences are served from /fonts/. local() is tried before the embedded file. */
 @font-face{font-family:"Monaspace Argon";src:local("Monaspace Argon Var"),url("/fonts/monaspace-argon-var.woff2") format("woff2");font-weight:200 800;font-stretch:100% 125%;font-style:oblique 0deg 11deg;font-display:swap}
 @font-face{font-family:"Monaspace Neon";src:local("Monaspace Neon Var"),url("/fonts/monaspace-neon-var.woff2") format("woff2");font-weight:200 800;font-stretch:100% 125%;font-style:oblique 0deg 11deg;font-display:swap}
 @font-face{font-family:"Monaspace Krypton";src:local("Monaspace Krypton Var"),url("/fonts/monaspace-krypton-var.woff2") format("woff2");font-weight:200 800;font-stretch:100% 125%;font-style:oblique 0deg 11deg;font-display:swap}
 @font-face{font-family:"Monaspace Radon";src:local("Monaspace Radon Var"),url("/fonts/monaspace-radon-var.woff2") format("woff2");font-weight:200 800;font-stretch:100% 125%;font-style:oblique 0deg 11deg;font-display:swap}
 
 :root{
-  color-scheme:light;
-  --bg:#FBF8F2; --surface:#FFFDF8; --surface-2:#F2EDE2; --input-bg:#FFFFFF; --tray:#F1EBDE;
-  --text:#26231F; --text-2:#5C554A; --line:#E3DCCD; --line-strong:#8C8170;
-  --accent:#0B5570; --accent-fg:#FFFFFF; --accent-soft:#E1EEF2; --focus:#0B5570;
-  --scrim:rgba(38,35,31,.38);
-  --warn-fg:#7A4B00; --warn-bg:#FBF1D6; --err-fg:#9C2A18; --err-bg:#FBE6E1;
-  --kbd-bg:#FFFFFF; --kbd-fg:#3A352D; --pal-sel:#E1EEF2; --mark-bg:#F4DE9A; --toast-bg:#26231F; --toast-fg:#FBF8F2;
-  --tl-success:#86CF93; --tl-info:#86CCE0; --tl-warning:#F0C25E; --tl-error:#FF9C88;
-  --st-raw:#6F675B; --st-ready:#0B5570; --st-active:#2F6B3A; --st-blocked:#A3341F;
   --font:"Monaspace Argon",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --font-head:"Monaspace Neon",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --mono:"Monaspace Krypton",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -24,41 +15,8 @@
   --top-pad:18px 40px 10px; --view-pad:24px 40px 12px; --hint-pad:10px 40px; --dlg-pad:24px;
   --col-min:240px; --col-gap:12px; --cell-y:11px; --cell-x:14px;
   --r-sm:4px; --r-md:6px; --r-lg:10px; --focus-w:3px;
-  --sh-ink:38,35,31;
-  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
-  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
-  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
-  --card-hi:none;
   --dur-fast:80ms; --dur:160ms; --ease:cubic-bezier(.2,.7,.2,1);
 }
-:root[data-theme=dark]{
-  color-scheme:dark;
-  --bg:#1B1916; --surface:#25221E; --surface-2:#2D2924; --input-bg:#1B1916; --tray:#211E1A;
-  --text:#ECE6DA; --text-2:#B5AC9C; --line:#39342C; --line-strong:#80766A;
-  --accent:#86CCE0; --accent-fg:#0E2630; --accent-soft:#1E3239; --focus:#9ADAEC;
-  --scrim:rgba(0,0,0,.6);
-  --warn-fg:#F0C25E; --warn-bg:#35290F; --err-fg:#FF9C88; --err-bg:#3D1D17;
-  --kbd-bg:#1B1916; --kbd-fg:#D9D2C4; --pal-sel:#1E3239; --mark-bg:#6B5A1C; --toast-bg:#ECE6DA; --toast-fg:#1B1916;
-  --tl-success:#2F6B3A; --tl-info:#0B5570; --tl-warning:#7A4B00; --tl-error:#9C2A18;
-  --st-raw:#A89F90; --st-ready:#86CCE0; --st-active:#86CF93; --st-blocked:#F08C78;
-  --sh-ink:0,0,0; --sh-sm:0 1px 2px 0 rgba(0,0,0,.35); --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5); --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5); --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
-}
-/* no script (or boot.js blocked): follow the system */
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme]){
-    color-scheme:dark;
-  --bg:#1B1916; --surface:#25221E; --surface-2:#2D2924; --input-bg:#1B1916; --tray:#211E1A;
-  --text:#ECE6DA; --text-2:#B5AC9C; --line:#39342C; --line-strong:#80766A;
-  --accent:#86CCE0; --accent-fg:#0E2630; --accent-soft:#1E3239; --focus:#9ADAEC;
-  --scrim:rgba(0,0,0,.6);
-  --warn-fg:#F0C25E; --warn-bg:#35290F; --err-fg:#FF9C88; --err-bg:#3D1D17;
-  --kbd-bg:#1B1916; --kbd-fg:#D9D2C4; --pal-sel:#1E3239; --mark-bg:#6B5A1C; --toast-bg:#ECE6DA; --toast-fg:#1B1916;
-  --tl-success:#2F6B3A; --tl-info:#0B5570; --tl-warning:#7A4B00; --tl-error:#9C2A18;
-  --st-raw:#A89F90; --st-ready:#86CCE0; --st-active:#86CF93; --st-blocked:#F08C78;
-  --sh-ink:0,0,0; --sh-sm:0 1px 2px 0 rgba(0,0,0,.35); --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5); --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5); --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
-  }
-}
-
 /* ===== structure ===== */
 *{box-sizing:border-box}
 [hidden]{display:none !important}
@@ -275,9 +233,6 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 @media (max-width:900px){.top{flex-wrap:wrap;gap:var(--s-2) var(--s-4)}.pb-label,.col-desc,.repo{display:none}.hints li:nth-child(n+5){display:none}}
 
 /* ===== moves: wizard, review, capture, drag (js/flow.js, wizard.js, review.js, capture.js) ===== */
-:root{--add-fg:#0B5570;--add-bg:#DCEBF5;--rem-fg:#8A4B00;--rem-bg:#FBE9D2;--hunk-bg:#EFE9DB}
-:root[data-theme=dark]{--add-fg:#86CCE0;--add-bg:#1E3239;--rem-fg:#F0B070;--rem-bg:#3A2A14;--hunk-bg:#2D2924}
-@media (prefers-color-scheme:dark){:root:not([data-theme]){--add-fg:#86CCE0;--add-bg:#1E3239;--rem-fg:#F0B070;--rem-bg:#3A2A14;--hunk-bg:#2D2924}}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .btn.primary:hover{background:var(--accent);filter:brightness(1.1)}
@@ -288,7 +243,7 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .dialog.capture{--dlg-w:720px}
 .dlg-head h2 .raw-word{font-family:var(--font-note);font-weight:700;font-style:italic;color:var(--accent);margin-right:.2em}
 .cap-sub{margin-top:var(--s-1)}
-.cap-go{padding:var(--s-2) var(--s-5);font-size:var(--fs-base);letter-spacing:.02em;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.cap-go{padding:var(--s-2) var(--s-5);font-size:var(--fs-base);letter-spacing:.02em;box-shadow:0 1px 0 rgba(var(--sh-ink),.25)}
 .cap-go:focus-visible{outline:var(--focus-w) solid var(--focus);outline-offset:3px}
 .cap-go[disabled]{box-shadow:none}
 .dialog form{display:flex;flex-direction:column;min-height:0;flex:1}

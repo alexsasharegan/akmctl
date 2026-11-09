@@ -188,6 +188,16 @@ export const searchBody = (text, limit = 10) => api("GET", "search", { query: { 
 
 export const check = () => api("GET", "check");
 
+/** The color themes the page can show (web/themes/themes.json; it holds no data, so no token); null when it cannot be read. */
+export async function fetchThemes() {
+  try {
+    const res = await fetch("/themes/themes.json");
+    return res.ok ? await res.json() : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 /** The step commits of a range as moves (the `history` operation); { available, head, moves, truncated }. */
 export const fetchHistory = ({ range, limit } = {}) => api("GET", "history", { query: { range, limit }, timeout: 8000 });
 
