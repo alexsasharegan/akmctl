@@ -24,15 +24,22 @@ const key = (k, target) => ({ key: k, shiftKey: k.length === 1 && k !== k.toLowe
 
 // boot.js: the theme before first paint
 {
-  const boot = (await import("./js/boot.js"), doc.documentElement.dataset.theme);
-  assert.equal(boot, "light", "no saved choice and no dark preference gives light");
-  localStorage.setItem("akm-theme", "dark");
+  await import("./js/boot.js");
+  const root = doc.documentElement.dataset;
+  assert.equal(root.theme, "quiet-paper", "no saved choice gives the default theme");
+  assert.equal(root.mode, "light", "no saved choice and no dark preference gives light");
+  localStorage.setItem("akm-mode", "dark");
   await import("./js/boot.js?again");
-  assert.equal(doc.documentElement.dataset.theme, "dark", "a saved choice wins");
+  assert.equal(doc.documentElement.dataset.mode, "dark", "a saved mode wins");
+  localStorage.removeItem("akm-mode");
+  localStorage.setItem("akm-theme", "dark");
+  await import("./js/boot.js?old");
+  assert.equal(doc.documentElement.dataset.mode, "dark", "the old two-value akm-theme key still sets the mode");
+  assert.equal(doc.documentElement.dataset.theme, "quiet-paper");
   localStorage.removeItem("akm-theme");
   globalThis.matchMedia = () => mql(true);
   await import("./js/boot.js?dark");
-  assert.equal(doc.documentElement.dataset.theme, "dark", "the system preference decides without a saved choice");
+  assert.equal(doc.documentElement.dataset.mode, "dark", "the system preference decides without a saved choice");
   globalThis.matchMedia = () => mql(false);
 }
 

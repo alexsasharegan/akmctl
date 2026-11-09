@@ -27,11 +27,12 @@ assert.match(overlay.text, /keyboard/i, "? opens the shortcut help");
 press("Escape");
 assert.equal(overlay.kids.length, 0, "Esc closes it");
 
-// theme
-const before = doc.documentElement.dataset.theme;
+// light and dark mode (the color theme stays)
+const before = doc.documentElement.dataset.mode;
 press("t");
-assert.notEqual(doc.documentElement.dataset.theme, before, "t switches the theme");
-assert.equal(localStorage.getItem("akm-theme"), doc.documentElement.dataset.theme);
+assert.notEqual(doc.documentElement.dataset.mode, before, "t switches between light and dark");
+assert.equal(localStorage.getItem("akm-mode"), doc.documentElement.dataset.mode);
+assert.equal(doc.documentElement.dataset.theme, "quiet-paper", "t keeps the color theme");
 
 // palette
 press("/");
