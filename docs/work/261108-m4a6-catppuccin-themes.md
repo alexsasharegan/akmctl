@@ -1,12 +1,14 @@
 ---
 id: "261108-m4a6"
 title: catppuccin themes
-status: ready
+status: active
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Add Catppuccin to the workbench: Latte (light) and Frappé, Macchiato, Mocha (dark)"
+claimed_by: claude-sonnet-5-5-catppuccin
+claimed_at: 2026-11-09T01:31
 ---
 
 # catppuccin themes
@@ -75,3 +77,4 @@ So the tiers map as `bg`=base, `surface`/`tray`=mantle, `input-bg`=surface0, `li
 - 2026-11-08: filed.
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
+- 2026-11-08 18:31-07:00: claimed (claude-sonnet-5-5-catppuccin).
