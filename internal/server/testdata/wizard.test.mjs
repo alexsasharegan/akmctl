@@ -11,6 +11,12 @@ const app = await startApp({
   bodyOf: (r) => "# " + r.fields.title + "\n",
   onWrite: (u, init, records) => {
     const body = init.body ? JSON.parse(init.body) : {};
+    if (u.endsWith("/preview")) {
+      // one answer for the whole list: each write's diff
+      const rec = records.find((x) => x.id === body.writes.find((w) => w.id).id);
+      const diff = { path: rec.path, new_path: rec.path, hunks: [{ old_start: 1, old_lines: 1, new_start: 1, new_lines: 2, lines: [{ op: " ", text: "# t" }, { op: "+", text: "## Goal" }] }] };
+      return json(200, { ok: true, writes: body.writes.map((w) => ({ ok: true, operation: w.op, record: rec, diff })) });
+    }
     const id = decodeURIComponent((u.match(/records\/([^/]+)/) || [])[1] || "");
     const r = records.find((x) => x.id === id);
     if (failNext && !body.dry_run) {
@@ -48,10 +54,13 @@ press("Enter", { metaKey: true, target: overlay.querySelector("textarea") });
 await settle(10);
 assert.match(overlay.text, /Review/);
 assert.ok(overlay.querySelector(".diff") || /Goal/.test(overlay.text), "the review shows the diff of the write");
-const dry = app.calls.filter((c) => c.body && c.body.dry_run);
-assert.ok(dry.length >= 1, "the review is made of dry runs");
-assert.equal(dry[0].method, "PUT");
-assert.match(dry[0].url, /sections\/Goal$/);
+const previews = app.calls.filter((c) => /\/preview$/.test(c.url));
+assert.equal(previews.length, 1, "the review is one preview of every write");
+assert.equal(previews[0].method, "POST");
+assert.equal(previews[0].body.writes[0].op, "section");
+assert.equal(previews[0].body.writes[0].name, "Goal");
+assert.ok(previews[0].body.writes[0].if_match, "the first write carries the etag");
+assert.equal(app.calls.filter((c) => c.body && c.body.dry_run).length, 0, "no write is dry-run on its own any more");
 
 // Esc goes back a step, not out
 press("Escape", { target: overlay.querySelector(".diff") || overlay });

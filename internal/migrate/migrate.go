@@ -165,7 +165,7 @@ type Result struct {
 // against the working tree.
 func PlanEnv(repo *record.Repo, steps []Step, env Env) []Result {
 	out := make([]Result, 0, len(steps))
-	sc, cleanup := scratchRepo(repo)
+	sc, cleanup := ScratchRepo(repo)
 	if cleanup != nil {
 		defer cleanup()
 	}
@@ -214,9 +214,10 @@ func mirrorFile(repo, sc *record.Repo, rel string) {
 	}
 }
 
-// scratchRepo copies the manifest and every Markdown file of the repository to a
-// temporary directory and loads it. It returns nil, nil when that fails.
-func scratchRepo(repo *record.Repo) (*record.Repo, func()) {
+// ScratchRepo copies the manifest and every Markdown file of the repository to a
+// temporary directory and loads it. It returns nil, nil when that fails. The
+// cleanup function removes the directory.
+func ScratchRepo(repo *record.Repo) (*record.Repo, func()) {
 	dir, err := os.MkdirTemp("", "akmctl-plan-")
 	if err != nil {
 		return nil, nil
