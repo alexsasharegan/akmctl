@@ -1,12 +1,14 @@
 ---
 id: "261108-pmkp"
 title: atom one themes
-status: ready
+status: active
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
 summary: Add Atom One to the workbench in its light and dark variants
+claimed_by: claude-sonnet-5-5-atom-one
+claimed_at: 2026-11-09T02:04
 ---
 
 # atom one themes
@@ -72,3 +74,4 @@ Light page differs slightly from Ghostty (#fafafa against #f9f9f9) and the text 
 - 2026-11-08: filed.
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
+- 2026-11-08 19:04-07:00: claimed (claude-sonnet-5-5-atom-one).
