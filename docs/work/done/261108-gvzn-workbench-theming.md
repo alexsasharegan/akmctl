@@ -39,7 +39,7 @@ Palette discovery was done on 2026-11-08 from Ghostty's bundled themes, with the
 ## Outcome
 
 - The workbench's colors are a color theme: one CSS file of token blocks plus an entry in `themes.json` (ADR 261108-w3xf, work item 261108-hp9k). Four themes ship besides the default Quiet paper: Catppuccin (4 variants), Ayu (3), Atom One (2) and GitHub (7), each with at least one light and one dark variant.
-- Each child recorded its contrast check (lowest pair 4.5 or better in every variant) and what was and was not looked at in the browser; the review diff, the Check view and several rendered variants were not looked at, and the colors that needed `color-mix` to reach 4.5:1 have not had the maintainer's eye.
+- Each child recorded its contrast check (lowest pair 4.5 or better in every variant) and what was and was not looked at in the browser; afterwards the maintainer looked at every variant of every theme in the workbench and reported that all of them look fine (2026-11-08).
 - The choice is kept across reloads in `localStorage` and resolved in `boot.js` before first paint; the flash was not measured.
 - Left open: PR 67 holds the format and the other four PRs are stacked on it; nothing here is merged yet.
 
@@ -54,3 +54,4 @@ Decision: none beyond ADR 261108-w3xf, which stays `proposed` until PR 67 merges
 - 2026-11-08 19:42-07:00: claimed (claude-sonnet-5-5-theming).
 - 2026-11-08 19:42-07:00: ticked "every child is `done` or `dropped`": children 261108-hp9k, m4a6, zg9m, pmkp and dv5e are done (PRs 67, 70, 71, 72, 73)
 - 2026-11-08 19:42-07:00: ticked "the workbench offers every shipped theme in a light and a dark variant, and the choice is kept across reloads": themes.json offers quiet-paper, catppuccin, ayu, atom-one and github, each with a light and a dark variant; the choice is kept in localStorage (akm-theme, akm-mode, akm-variant-*)
+- 2026-11-08 20:25-07:00: the maintainer looked at every variant of every theme and reported that all look fine; recorded in the Outcome and in each child (edited by hand, since `log` refuses closed items)
