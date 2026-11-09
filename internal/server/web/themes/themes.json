@@ -63,6 +63,22 @@
           "mode": "dark"
         }
       ]
+    },
+    {
+      "id": "atom-one",
+      "name": "Atom One",
+      "variants": [
+        {
+          "id": "light",
+          "name": "One Light",
+          "mode": "light"
+        },
+        {
+          "id": "dark",
+          "name": "One Dark",
+          "mode": "dark"
+        }
+      ]
     }
   ]
 }

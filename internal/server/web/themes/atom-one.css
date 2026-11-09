@@ -1,0 +1,45 @@
+/* Atom One (github.com/atom/atom, packages one-dark-syntax, one-light-syntax and the one-*-ui packages at
+   1c3bd35ce238, MIT): One Light and One Dark. Values: the syntax packages' HSL variables (mono-1 to mono-3
+   for text and muted text, hue-1 to hue-6 for the hues, converted to sRGB here); page, sidebar, input, active
+   row and accent tiers from the VS Code ports akamud.vscode-theme-onedark and -onelight 2.3.0, which match
+   Atom's own backgrounds. A color that is too light or too dark to read as text on its surface is mixed
+   toward the text color (color-mix) until it reaches 4.5:1; the mixes are the only colors that are not in
+   those sources. Mapping: bg = the sidebar tone, surface = the editor tone, surface-2 = the active row,
+   tray = the input tone, accent = the One blue, ready and added = blue, active = green, blocked = red,
+   removed = orange. */
+
+/* One Light (the default light variant) */
+:root[data-theme="atom-one"][data-mode="light"] {
+  color-scheme:light;
+  --bg:#eaeaeb; --surface:#fafafa; --surface-2:#dbdbdc; --input-bg:#ffffff; --tray:#dbdbdc;
+  --text:#383a42; --text-2:color-mix(in srgb, #696c77 75%, #383a42); --line:#d4d4d6; --line-strong:#a0a1a7;
+  --accent:color-mix(in srgb, #526fff 55%, #383a42); --accent-fg:#ffffff; --accent-soft:color-mix(in srgb, #526fff 18%, #fafafa); --focus:#526fff; --scrim:rgba(56,58,66,.38);
+  --warn-fg:color-mix(in srgb, #b76b01 65%, #383a42); --warn-bg:color-mix(in srgb, #b76b01 18%, #fafafa); --err-fg:color-mix(in srgb, #e45649 60%, #383a42); --err-bg:color-mix(in srgb, #e45649 14%, #fafafa);
+  --kbd-bg:#fafafa; --kbd-fg:#383a42; --pal-sel:#dbdbdc; --mark-bg:color-mix(in srgb, #cb7701 35%, #fafafa); --toast-bg:#383a42; --toast-fg:#fafafa;
+  --tl-success:color-mix(in srgb, #50a14f 55%, #fafafa); --tl-info:color-mix(in srgb, #4078f2 60%, #fafafa); --tl-warning:color-mix(in srgb, #cb7701 50%, #fafafa); --tl-error:color-mix(in srgb, #e45649 60%, #fafafa);
+  --st-raw:color-mix(in srgb, #696c77 75%, #383a42); --st-ready:color-mix(in srgb, #4078f2 55%, #383a42); --st-active:color-mix(in srgb, #50a14f 45%, #383a42); --st-blocked:color-mix(in srgb, #e45649 55%, #383a42);
+  --add-fg:color-mix(in srgb, #4078f2 65%, #383a42); --add-bg:color-mix(in srgb, #4078f2 16%, #fafafa); --rem-fg:color-mix(in srgb, #b76b01 65%, #383a42); --rem-bg:color-mix(in srgb, #b76b01 18%, #fafafa); --hunk-bg:#dbdbdc;
+  --sh-ink:56,58,66;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* One Dark (the default dark variant) */
+:root[data-theme="atom-one"][data-mode="dark"] {
+  color-scheme:dark;
+  --bg:#21252b; --surface:#282c34; --surface-2:#2c313a; --input-bg:#1b1d23; --tray:#1b1d23;
+  --text:#abb2bf; --text-2:color-mix(in srgb, #828997 30%, #abb2bf); --line:#3e4451; --line-strong:#5c6370;
+  --accent:color-mix(in srgb, #528bff 30%, #abb2bf); --accent-fg:#1b1d23; --accent-soft:color-mix(in srgb, #528bff 16%, #282c34); --focus:#528bff; --scrim:rgba(27,29,35,.6);
+  --warn-fg:color-mix(in srgb, #d19a66 35%, #abb2bf); --warn-bg:color-mix(in srgb, #d19a66 18%, #282c34); --err-fg:color-mix(in srgb, #e06c75 35%, #abb2bf); --err-bg:color-mix(in srgb, #e06c75 14%, #282c34);
+  --kbd-bg:#1b1d23; --kbd-fg:#abb2bf; --pal-sel:#2c313a; --mark-bg:color-mix(in srgb, #e5c07b 15%, #282c34); --toast-bg:#abb2bf; --toast-fg:#282c34;
+  --tl-success:color-mix(in srgb, #98c379 55%, #1b1d23); --tl-info:color-mix(in srgb, #61afef 60%, #1b1d23); --tl-warning:color-mix(in srgb, #e5c07b 50%, #1b1d23); --tl-error:color-mix(in srgb, #e06c75 60%, #1b1d23);
+  --st-raw:color-mix(in srgb, #828997 30%, #abb2bf); --st-ready:#61afef; --st-active:#98c379; --st-blocked:color-mix(in srgb, #e06c75 65%, #abb2bf);
+  --add-fg:color-mix(in srgb, #61afef 75%, #abb2bf); --add-bg:color-mix(in srgb, #61afef 16%, #282c34); --rem-fg:color-mix(in srgb, #d19a66 35%, #abb2bf); --rem-bg:color-mix(in srgb, #d19a66 18%, #282c34); --hunk-bg:#2c313a;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
