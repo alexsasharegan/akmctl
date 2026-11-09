@@ -274,7 +274,7 @@ func TestDOMModulesUnderNode(t *testing.T) {
 	}
 	put("app.js", readWeb(t, "app.js"))
 	put("package.json", `{"type":"module"}`)
-	for _, n := range []string{"fakedom.mjs", "dom.test.mjs", "app.test.mjs"} {
+	for _, n := range []string{"fakedom.mjs", "apphelper.mjs", "dom.test.mjs", "app.test.mjs", "keys.test.mjs", "drawer.test.mjs", "wizard.test.mjs", "project.test.mjs"} {
 		b, err := os.ReadFile(filepath.Join("testdata", n))
 		if err != nil {
 			t.Fatal(err)
@@ -282,8 +282,9 @@ func TestDOMModulesUnderNode(t *testing.T) {
 		put(n, string(b))
 	}
 	// one process per file: app.js keeps module state
-	for _, n := range []string{"dom.test.mjs", "app.test.mjs"} {
+	for _, n := range []string{"dom.test.mjs", "app.test.mjs", "keys.test.mjs", "drawer.test.mjs", "wizard.test.mjs", "project.test.mjs"} {
 		t.Run(n, func(t *testing.T) {
+			t.Parallel()
 			cmd := exec.Command(node, n)
 			cmd.Dir = dir
 			if out, err := cmd.CombinedOutput(); err != nil {

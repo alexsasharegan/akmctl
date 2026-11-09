@@ -174,4 +174,48 @@ const key = (k, target) => ({ key: k, shiftKey: k.length === 1 && k !== k.toLowe
   assert.match(failed.querySelector(".err").text, /offline/);
 }
 
+// the animator: events become sentences, then the views are drawn again
+{
+  const { createAnimator, keepSteady } = await import("./js/anim.js");
+  const run = async (reduced, events) => {
+    globalThis.matchMedia = () => mql(reduced);
+    const said = [];
+    const drawn = [];
+    const a = createAnimator({ toast: (m) => said.push(m), titleOf: (id) => "Title of " + id, records: () => records, rerender: (ids) => drawn.push(ids), busy: () => false });
+    a.push(events);
+    for (let i = 0; i < 40 && !drawn.length; i++) await new Promise((r) => setTimeout(r, 25));
+    return { said, drawn };
+  };
+  const moved = (id, from, to) => ({ type: "moved", id, from, to, closed: false, source: "outside" });
+  let r = await run(true, [moved("261101-aaaa", "raw", "ready")]);
+  assert.equal(r.said.length, 1);
+  assert.match(r.said[0], /261101-aaaa Title of 261101-aaaa.*raw to ready/);
+  assert.deepEqual(r.drawn, [["261101-aaaa"]], "the views are drawn again for the touched record");
+
+  r = await run(true, [moved("261101-aaaa", "raw", "ready"), moved("261101-bbbb", "ready", "active")]);
+  assert.equal(r.said.length, 1, "a burst is one sentence");
+  assert.match(r.said[0], /2 changes outside \(2 moved\)/);
+
+  // with motion on, a card that is not on the page is not a reason to fail
+  const board = mountPoint("anim");
+  const { mountBoard } = await import("./js/board.js");
+  mountBoard(board, ctx);
+  r = await run(false, [moved("261101-aaaa", "raw", "ready")]);
+  assert.match(r.said[0], /raw to ready/);
+  assert.equal(r.drawn.length, 1, "the animation ends in a redraw");
+  globalThis.matchMedia = () => mql(false);
+
+  // keepSteady puts focus back on the card that had it
+  const h = mountPoint("steady");
+  mountBoard(h, ctx);
+  h.querySelector('.card[data-id="261101-bbbb"]').focus();
+  let fell = false;
+  keepSteady(h, () => mountBoard(h, ctx), () => (fell = true));
+  assert.equal(document.activeElement.dataset.id, "261101-bbbb");
+  assert.equal(fell, false);
+  h.querySelector('.card[data-id="261101-bbbb"]').focus();
+  keepSteady(h, () => mountBoard(h, { ...ctx, records: () => records.filter((x) => x.id !== "261101-bbbb") }), () => (fell = true));
+  assert.equal(fell, true, "the fallback runs when the card is gone");
+}
+
 console.log("dom ok");

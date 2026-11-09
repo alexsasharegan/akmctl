@@ -2,6 +2,12 @@
 // TestDOMModulesUnderNode). It implements only what those modules call; a
 // missing member throws, so a new DOM call in a module shows up as a test
 // failure that says which member to add.
+/** A removed element that had focus loses it, as in a browser. */
+const dropFocus = (n) => {
+  const a = globalThis.document && document.activeElement;
+  for (let x = a; x; x = x.parent) if (x === n) return void (document.activeElement = null);
+};
+
 class FNode {
   constructor() {
     this.parent = null;
@@ -9,6 +15,9 @@ class FNode {
   }
   get childNodes() {
     return this.kids;
+  }
+  get children() {
+    return this.kids.filter((k) => k instanceof FElement);
   }
   _adopt(k) {
     if (k.parent) k.parent.kids.splice(k.parent.kids.indexOf(k), 1);
@@ -37,11 +46,15 @@ class FNode {
     for (const n of ns) this.parent.insertBefore(typeof n === "string" ? new FText(n) : n, next);
   }
   remove() {
+    dropFocus(this);
     if (this.parent) this.parent.kids.splice(this.parent.kids.indexOf(this), 1);
     this.parent = null;
   }
   replaceChildren(...ns) {
-    for (const k of this.kids) k.parent = null;
+    for (const k of this.kids) {
+      dropFocus(k);
+      k.parent = null;
+    }
     this.kids = [];
     this.append(...ns);
   }
@@ -58,15 +71,17 @@ class FText extends FNode {
 }
 
 const parseSimple = (sel) => {
-  const out = { tag: null, id: null, classes: [], attrs: [] };
-  const re = /^([a-zA-Z][\w-]*)|#([\w-]+)|\.([\w-]+)|\[([\w-]+)(?:=["']?([^\]"']*)["']?)?\]/y;
+  const out = { tag: null, id: null, classes: [], attrs: [], notAttrs: [], checked: false };
+  const re = /^([a-zA-Z][\w-]*)|#([\w-]+)|\.([\w-]+)|\[([\w-]+)(?:=["']?([^\]"']*)["']?)?\]|:not\(\[([\w-]+)\]\)|:(checked)/y;
   let m;
   let i = 0;
   while (i < sel.length && (re.lastIndex = i, (m = re.exec(sel)))) {
     if (m[1]) out.tag = m[1].toLowerCase();
     else if (m[2]) out.id = m[2];
     else if (m[3]) out.classes.push(m[3]);
-    else out.attrs.push([m[4], m[5]]);
+    else if (m[4]) out.attrs.push([m[4], m[5]]);
+    else if (m[6]) out.notAttrs.push(m[6]);
+    else out.checked = true;
     i = re.lastIndex;
   }
   if (i !== sel.length) throw new Error("fakedom: selector not supported: " + sel);
@@ -93,16 +108,24 @@ export class FElement extends FNode {
   get classList() {
     const self = this;
     const list = () => self.className.split(/\s+/).filter(Boolean);
-    return {
+    const api = {
       contains: (c) => list().includes(c),
       add: (...cs) => (self.className = [...new Set([...list(), ...cs])].join(" ")),
       remove: (...cs) => (self.className = list().filter((c) => !cs.includes(c)).join(" ")),
       toggle: (c, force) => {
         const on = force === undefined ? !list().includes(c) : force;
-        on ? this.add(c) : this.remove(c);
+        on ? api.add(c) : api.remove(c);
         return on;
       },
     };
+    return api;
+  }
+  get value() {
+    if (this._value !== undefined) return this._value;
+    return this.tagName === "TEXTAREA" ? this.textContent : this.attrs.get("value") || "";
+  }
+  set value(v) {
+    this._value = String(v);
   }
   get id() {
     return this.attrs.get("id") || "";
@@ -146,6 +169,10 @@ export class FElement extends FNode {
     for (let n = this; n; n = n.parent) for (const fn of (n.listeners && n.listeners.get(type)) || []) fn(e);
     return e;
   }
+  contains(n) {
+    for (let x = n; x; x = x.parent) if (x === this) return true;
+    return false;
+  }
   focus() {
     this.focused = true;
     if (globalThis.document) document.activeElement = this;
@@ -154,11 +181,16 @@ export class FElement extends FNode {
     this.focused = false;
   }
   scrollIntoView() {}
+  getBoundingClientRect() {
+    return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+  }
   _matches(sel) {
     const s = parseSimple(sel.trim());
     if (s.tag && this.tagName.toLowerCase() !== s.tag) return false;
     if (s.id && this.id !== s.id) return false;
     if (!s.classes.every((c) => this.classList.contains(c))) return false;
+    if (s.checked && !this.checked) return false;
+    if (s.notAttrs.some((k) => this.attrs.has(k))) return false;
     return s.attrs.every(([k, v]) => this.attrs.has(k) && (v === undefined || this.attrs.get(k) === v));
   }
   /** Comma lists and descendant selectors ("#nav [data-nav]"); no child or sibling combinators. */
@@ -220,14 +252,30 @@ export function installDOM() {
     getElementById: (id) => html.querySelector("#" + id),
     querySelector: (s) => html.querySelector(s),
     querySelectorAll: (s) => html.querySelectorAll(s),
-    addEventListener() {},
-    removeEventListener() {},
+    listeners: new Map(),
+    addEventListener(t, fn) {
+      if (!this.listeners.has(t)) this.listeners.set(t, []);
+      this.listeners.get(t).push(fn);
+    },
+    removeEventListener(t, fn) {
+      const l = this.listeners.get(t) || [];
+      if (l.includes(fn)) l.splice(l.indexOf(fn), 1);
+    },
+    /** Fire a document-level event (a key press). */
+    dispatch(type, props = {}) {
+      const e = { type, key: "", target: body, metaKey: false, ctrlKey: false, altKey: false, shiftKey: false, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, stopPropagation() {}, ...props };
+      for (const fn of [...(this.listeners.get(type) || [])]) fn(e);
+      return e;
+    },
   };
   const store = () => {
     const m = new Map();
     return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
   };
   globalThis.window = globalThis;
+  globalThis.innerWidth = 1280;
+  globalThis.innerHeight = 800;
+  globalThis.CSS = { escape: (s) => String(s).replace(/[^\w-]/g, (c) => "\\" + c) };
   globalThis.document = doc;
   globalThis.localStorage = store();
   globalThis.sessionStorage = store();
