@@ -42,6 +42,27 @@
           "mode": "dark"
         }
       ]
+    },
+    {
+      "id": "ayu",
+      "name": "Ayu",
+      "variants": [
+        {
+          "id": "light",
+          "name": "Light",
+          "mode": "light"
+        },
+        {
+          "id": "dark",
+          "name": "Dark",
+          "mode": "dark"
+        },
+        {
+          "id": "mirage",
+          "name": "Mirage",
+          "mode": "dark"
+        }
+      ]
     }
   ]
 }
