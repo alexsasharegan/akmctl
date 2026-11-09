@@ -5,8 +5,42 @@
       "id": "quiet-paper",
       "name": "Quiet paper",
       "variants": [
-        { "id": "light", "name": "Light", "mode": "light" },
-        { "id": "dark", "name": "Dark", "mode": "dark" }
+        {
+          "id": "light",
+          "name": "Light",
+          "mode": "light"
+        },
+        {
+          "id": "dark",
+          "name": "Dark",
+          "mode": "dark"
+        }
+      ]
+    },
+    {
+      "id": "catppuccin",
+      "name": "Catppuccin",
+      "variants": [
+        {
+          "id": "latte",
+          "name": "Latte",
+          "mode": "light"
+        },
+        {
+          "id": "mocha",
+          "name": "Mocha",
+          "mode": "dark"
+        },
+        {
+          "id": "frappe",
+          "name": "Frappé",
+          "mode": "dark"
+        },
+        {
+          "id": "macchiato",
+          "name": "Macchiato",
+          "mode": "dark"
+        }
       ]
     }
   ]
