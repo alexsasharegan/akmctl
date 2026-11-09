@@ -43,7 +43,7 @@ Facts as of 2026-10-28, from the GitHub API (`gh api repos/...`), the Go module 
 |                                                    | Hand-written                           | `go.yaml.in/yaml/v3`                                                                                 | `go.yaml.in/yaml/v4`                | `goccy/go-yaml`                                                      | `gopkg.in/yaml.v3`                                             |
 | -------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
 | Version / last release                             | n/a                                    | v3.0.5, 2026-07-26                                                                                   | v4.0.0-rc.6, 2026-06-17 (no GA yet) | v1.19.2, 2026-01-08                                                  | v3.0.1, 2022-05-27                                             |
-| Licence                                            | n/a                                    | Apache-2.0 (repo licence; not checked for per-file notices)                                          | Apache-2.0                          | MIT                                                                  | Apache-2.0 (as the original; not re-checked)                   |
+| License                                            | n/a                                    | Apache-2.0 (repo license; not checked for per-file notices)                                          | Apache-2.0                          | MIT                                                                  | Apache-2.0 (as the original; not re-checked)                   |
 | Maintainers                                        | n/a                                    | `yaml` GitHub org; top contributors ingydotnet, niemeyer, ccoVeille                                  | same repository                     | one dominant author (goccy: 605 commits; next contributor 22)        | archived 2025-04-01; original author states it is unmaintained |
 | Activity                                           | n/a                                    | repo pushed 2026-10-27 (v3 branch: security fixes only)                                              | active development on `main`        | last push 2026-04-11                                                 | none                                                           |
 | Open issues                                        | n/a                                    | 80 (whole repo)                                                                                      | 80 (whole repo)                     | 260                                                                  | 422 (frozen)                                                   |
@@ -57,15 +57,15 @@ Facts as of 2026-10-28, from the GitHub API (`gh api repos/...`), the Go module 
 
 Sources:
 
-- Repository state: `gh api repos/{yaml/go-yaml, go-yaml/yaml, goccy/go-yaml}` (archived flag, pushed_at, stars, issues, licence), contributors endpoint, `yaml/go-yaml` README (version table, v4 release plan).
+- Repository state: `gh api repos/{yaml/go-yaml, go-yaml/yaml, goccy/go-yaml}` (archived flag, pushed_at, stars, issues, license), contributors endpoint, `yaml/go-yaml` README (version table, v4 release plan).
 - Versions and dates: `https://proxy.golang.org/<module>/@latest` and `@v/list`. Note `yaml/go-yaml` publishes tags, not GitHub releases.
 - Importers: pkg.go.dev "Imported by" count for each module path.
 - Vulnerabilities: `https://api.osv.dev/v1/query` for each module path, and the GitHub advisory database. Only `gopkg.in/yaml.v3` returned entries.
 - Dependencies: `go list -m all` and `go list -deps` in the test module (no third-party modules besides the candidates).
 
-go-yaml status in one line: the original `go-yaml/yaml` is archived (its README: "THIS PROJECT IS UNMAINTAINED"). The YAML organisation maintains the fork at `yaml/go-yaml`, published as `go.yaml.in/yaml/v2`, `/v3` and `/v4`. v2 and v3 are frozen and receive security fixes only; new work goes into v4.
+go-yaml status in one line: the original `go-yaml/yaml` is archived (its README: "THIS PROJECT IS UNMAINTAINED"). The YAML organization maintains the fork at `yaml/go-yaml`, published as `go.yaml.in/yaml/v2`, `/v3` and `/v4`. v2 and v3 are frozen and receive security fixes only; new work goes into v4.
 
-## Behaviour results
+## Behavior results
 
 Method: one program per candidate (appendix) reads each fixture's frontmatter block and normalizes it to fields (key, kind, tag, quoting style, values, line). Libraries are used in their node/AST mode so that ordering, quoting style and comments are visible. Line numbers below are file lines (block line plus 1 for the opening fence). Raw output is in the appendix.
 
@@ -90,7 +90,7 @@ Fixtures with a known bad line. "OK" means the reported line is the offending li
 | Tab indent (file line 4)           | OK         | OK                                        | OK                        | OK                                           |
 | Stray indented line (file line 3)  | OK         | OK                                        | OK                        | `[1:8]` + 1 = 2: points at the previous line |
 
-All four libraries report the line relative to the block they were given, so the tool must add the offset itself, same as it must for a hand parser fed only the block. `goccy/go-yaml` and the v3 family sometimes name a neighbouring line. v4 changed the error format (`L2.C10`, "go-yaml load error in scanner ...") and has an open issue titled "BC break: odd line/column notation in errors".
+All four libraries report the line relative to the block they were given, so the tool must add the offset itself, same as it must for a hand parser fed only the block. `goccy/go-yaml` and the v3 family sometimes name a neighboring line. v4 changed the error format (`L2.C10`, "go-yaml load error in scanner ...") and has an open issue titled "BC break: odd line/column notation in errors".
 
 ### Edit round trip
 
@@ -153,7 +153,7 @@ History: `gopkg.in/yaml.v3` CVE-2022-28948 (panic on malformed input) was fixed 
 - **Dialect drift.** The hand parser defines a dialect. If it accepts something YAML does not, or rejects valid YAML in the subset (an escape such as `\/`, a plain scalar with `: ` inside quotes, a key with spaces), files will behave differently in other tools (GitHub rendering, Obsidian properties). Mitigation: the differential test against `go.yaml.in/yaml/v3` described above, plus a fuzz target; neither is written yet.
 - **Subset not fully pinned.** Decisions the spec should state before the parser is built: allowed key characters (mine: letters, digits, `_`, `-`), whether `[a,b]` needs a space, escapes allowed in double quotes (I used Go's `strconv.Unquote`, which is close to but not the same as YAML), BOM handling (not handled), whether `---` inside a value is an issue, line ending preservation when adding a field (not handled).
 - **Obsidian interplay.** Obsidian's Properties UI rewrites frontmatter in its own style (it quotes, reorders and reindents). Byte-for-byte edits by `akmctl` do not stop Obsidian from changing a block when someone edits properties there. Not tested.
-- **The evidence is small.** One machine, one generated corpus, 15-line blocks. Hostile cases are my choices, not a catalogue. The libraries were used at one version each.
+- **The evidence is small.** One machine, one generated corpus, 15-line blocks. Hostile cases are my choices, not a catalog. The libraries were used at one version each.
 - **If H5 widens** (nested maps, multi-line values), the hand parser stops being cheap and the recommendation flips to `go.yaml.in/yaml/v3` for reading, with the edit problem unsolved by any library; edits would still be splices guided by node line and column positions.
 
 ## What I could not verify
@@ -163,7 +163,7 @@ History: `gopkg.in/yaml.v3` CVE-2022-28948 (panic on malformed input) was fixed 
 - Maintainer counts beyond the contributors endpoint (commit counts, not people with merge rights), and open-issue lists beyond keyword scans of titles.
 - Whether any private or unpublished advisories exist; only osv.dev and the public GitHub advisory database were checked.
 - The hand parser against a fuzzer, or a full YAML 1.2 test suite; only the fixtures here.
-- Behaviour on Windows or Linux; only macOS arm64 was run.
+- Behavior on Windows or Linux; only macOS arm64 was run.
 
 ## Appendix A: how it was run
 
@@ -1328,7 +1328,7 @@ github.com/goccy/go-yaml     list-1M-items              decode 923 MB         89
 
 The first hostile run accepted `k: - - - x` as a plain scalar in the hand parser (a bug, fixed by rejecting an indicator at the start of a plain value); the hand rows above are from the rerun.
 
-### Behaviour (`behave.txt`)
+### Behavior (`behave.txt`)
 
 ```
 === fixture basic (subset in one file)

@@ -14,7 +14,7 @@ summary: The workbench has no favicon, so the browser tab shows a blank icon.
 
 ## Goal
 
-Add a favicon as an SVG served from the embedded assets (the asset server serves only listed prefixes and extensions, so add a path such as /icons/favicon.svg, or allow .svg under an existing prefix, with the right content type) and link it from index.html. Design: a simple mark that fits the Quiet paper style and reads at 16 px; it should work in light and dark (use prefers-color-scheme inside the SVG, or a colour that works on both). Optional, noted for later: a per-repository colour accent so two tabs differ at a glance, derived from a hash of the repository name.
+Add a favicon as an SVG served from the embedded assets (the asset server serves only listed prefixes and extensions, so add a path such as /icons/favicon.svg, or allow .svg under an existing prefix, with the right content type) and link it from index.html. Design: a simple mark that fits the Quiet paper style and reads at 16 px; it should work in light and dark (use prefers-color-scheme inside the SVG, or a color that works on both). Optional, noted for later: a per-repository color accent so two tabs differ at a glance, derived from a hash of the repository name.
 
 Done when:
 
@@ -26,7 +26,7 @@ Done when:
 ## Next
 
 - Coordinator: look at the tab icon at 16 px in light and dark browser chrome (not done here; no browser was run). Then tick the last Done item.
-- The per-repository colour accent (optional, in the Goal) is not done.
+- The per-repository color accent (optional, in the Goal) is not done.
 
 ## Outcome
 
@@ -36,5 +36,5 @@ Done when:
 
 - 2026-10-29: filed.
 - 2026-10-30: claimed (ui-agent).
-- 2026-10-30: web/favicon.svg is a rounded tile with three bars, no text. Its colours switch with prefers-color-scheme inside the SVG. Served at `/favicon.svg` by an explicit case in server.go (image/svg+xml, same CSP, no token) and linked from index.html. TestFaviconIsServed covers the route, the type and the link.
+- 2026-10-30: web/favicon.svg is a rounded tile with three bars, no text. Its colors switch with prefers-color-scheme inside the SVG. Served at `/favicon.svg` by an explicit case in server.go (image/svg+xml, same CSP, no token) and linked from index.html. TestFaviconIsServed covers the route, the type and the link.
 - 2026-10-30: released (ui-agent).

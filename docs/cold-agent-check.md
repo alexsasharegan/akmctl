@@ -21,7 +21,7 @@ The agent knows only what a new user's agent knows: the repository's `AGENTS.md`
 6. **Sort what you found.** Each is one of:
    - a **tool snag** (a wrong result, a silent success that stored something odd, an error that does not say what to do): file a `raw` work item with the command, the actual and the expected behavior;
    - a **text snag** (the skill is missing a step or names a flag that does not exist): fix the skill in both copies;
-   - a **judgement call the rule leaves to the agent**: note it in the Log and leave it.
+   - a **judgment call the rule leaves to the agent**: note it in the Log and leave it.
 7. **Pin every snag with a test** before closing the item that fixes it: a Go test for a tool snag, a line in the skill checks for a text snag. A snag without a test will come back.
 8. **Record the run** in the Log of the item that asked for it: the date, the model, the task sentence, and the list from step 6. If nothing needed a guess, say so; that is the result a release wants.
 

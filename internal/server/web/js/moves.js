@@ -10,7 +10,7 @@ export const NEEDS_GOAL = ["ready", "active", "blocked", "done"];
 export const NEEDS_NEXT = ["active", "blocked"];
 
 /** The lane next to `status` ("left" or "right"), or null at an end. */
-export function neighbour(status, dir) {
+export function neighbor(status, dir) {
   const i = LANES.indexOf(status);
   if (i < 0) return null;
   return LANES[i + (dir === "left" ? -1 : 1)] || null;

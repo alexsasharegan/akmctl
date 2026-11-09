@@ -18,7 +18,7 @@ The generated ADR index pads its table cells to display width, as Prettier does 
 
 1. **Baseline:** output matches Prettier 3.x (the tested 3.9.10 or the then-current pin) for a fixture of cells: ASCII, accented Latin, CJK, fullwidth forms, emoji (single, with variation selectors, ZWJ sequences, flags), combining marks. The test is the index table of [akm-spec-review](../../design/akm-spec-review.md) (appendix) run through `prettier --check`.
 2. **Performance:** time per cell on a few thousand rows.
-3. **Security and supply chain:** maintenance record, advisories, number of dependencies, behaviour on hostile input (very long strings, invalid UTF-8).
+3. **Security and supply chain:** maintenance record, advisories, number of dependencies, behavior on hostile input (very long strings, invalid UTF-8).
 4. **Tiebreaker:** popularity and support.
 
 Candidates to start from, to be verified today: `golang.org/x/text/width`, `github.com/mattn/go-runewidth`, `github.com/rivo/uniseg`; also the no-dependency alternative of an embedded width table, and padding by rune count with the file in `.prettierignore`, as a baseline.

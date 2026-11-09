@@ -24,7 +24,7 @@ func TestEditSection(t *testing.T) {
 		{"append to another section is verbatim", "goal", "more", true, "\n", "\n# T\n\n## Goal\nOld goal.\nmore\n\n## Log\n- one\n"},
 		{"append nothing changes nothing", "log", "\n", true, "\n", body},
 		{"create before Log", "Notes", "n", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Notes\n\nn\n\n## Log\n- one\n"},
-		{"lowercase name is capitalised", "outcome", "done", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Outcome\n\ndone\n\n## Log\n- one\n"},
+		{"lowercase name is capitalized", "outcome", "done", false, "\n", "\n# T\n\n## Goal\nOld goal.\n\n## Outcome\n\ndone\n\n## Log\n- one\n"},
 		{"crlf", "goal", "a\nb", false, "\r\n", "\r\n# T\r\n\r\n## Goal\r\na\r\nb\r\n\r\n## Log\r\n- one\r\n"},
 	}
 	for _, c := range cases {
@@ -104,7 +104,7 @@ func TestEditSectionEdges(t *testing.T) {
 	eq("create with no Log", set(t, "# T\n\ntext", "Notes", "n", false, "\n"), "# T\n\ntext\n\n## Notes\n\nn\n")
 	eq("create, no text", set(t, "# T\n", "Notes", "", false, "\n"), "# T\n\n## Notes\n")
 	eq("append creates", set(t, "## Goal\nx\n", "log", "- a", true, "\n"), "## Goal\nx\n\n## Log\n\n- a\n")
-	// a heading is capitalised only when the name is all lowercase
+	// a heading is capitalized only when the name is all lowercase
 	eq("mixed case kept", set(t, "## A\n", "ToDo", "t", false, "\n"), "## A\n\n## ToDo\n\nt\n")
 
 	// refusals: structural anywhere, local only in the edited section

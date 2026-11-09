@@ -235,6 +235,6 @@ npm ci && npm run format:check && npm run schemas   # Prettier and the API schem
 
 The tool uses only the standard library (the YAML library in tests is an oracle for the parser). The packages and invariants are in [`docs/architecture.md`](docs/architecture.md).
 
-## Licence
+## License
 
-MIT; see `LICENSE`. The Unicode data files in `internal/width/data` are under the Unicode licence.
+MIT; see `LICENSE`. The Unicode data files in `internal/width/data` are under the Unicode license.

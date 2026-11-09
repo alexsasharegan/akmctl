@@ -119,11 +119,11 @@ assert.equal(L.isId("261020-a2b3"), true);
 assert.equal(L.isId("261020-A2B3"), false);
 
 // ---- moves ----
-assert.equal(M.neighbour("raw", "right"), "ready");
-assert.equal(M.neighbour("blocked", "right"), null);
-assert.equal(M.neighbour("raw", "left"), null);
-assert.equal(M.neighbour("active", "left"), "ready");
-assert.equal(M.neighbour("done", "left"), null);
+assert.equal(M.neighbor("raw", "right"), "ready");
+assert.equal(M.neighbor("blocked", "right"), null);
+assert.equal(M.neighbor("raw", "left"), null);
+assert.equal(M.neighbor("active", "left"), "ready");
+assert.equal(M.neighbor("done", "left"), null);
 
 const body = "\n# T\n\n## Goal\nDo it.\n\n```\n## Not a heading\n```\n\n### Sub\nstill goal\n\n## Next\n\n## Log\n- 2026-10-28: x\n";
 const secs = M.sectionsOf(body);

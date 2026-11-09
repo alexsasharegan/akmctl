@@ -37,7 +37,7 @@ Done when:
 
 ## Outcome
 
-The capture modal now uses two shared controls from `js/controls.js`. `createSelect` is a listbox-pattern select: it has the same height as its neighbours, opens with Enter, Space or the arrows, Home and End move, a typed letter jumps to a match, Escape closes the list without closing the dialog, and Tab closes it. It announces the selected option and opens upward when there is no room below. `createSummary` is a wrapping text area for one line of text (Enter captures, a pasted line break becomes a space) with a counter that warns from 144 of 160 characters and says "limit reached" at 160. The key handling and the counter are pure functions with node tests in `testdata/logic.test.mjs`. Not done: the controls are used only by capture; the drawer editor (261028-esyt) and the capture polish (261029-aezq) adopt them next, and priority could take the select too.
+The capture modal now uses two shared controls from `js/controls.js`. `createSelect` is a listbox-pattern select: it has the same height as its neighbors, opens with Enter, Space or the arrows, Home and End move, a typed letter jumps to a match, Escape closes the list without closing the dialog, and Tab closes it. It announces the selected option and opens upward when there is no room below. `createSummary` is a wrapping text area for one line of text (Enter captures, a pasted line break becomes a space) with a counter that warns from 144 of 160 characters and says "limit reached" at 160. The key handling and the counter are pure functions with node tests in `testdata/logic.test.mjs`. Not done: the controls are used only by capture; the drawer editor (261028-esyt) and the capture polish (261029-aezq) adopt them next, and priority could take the select too.
 
 ## Log
 

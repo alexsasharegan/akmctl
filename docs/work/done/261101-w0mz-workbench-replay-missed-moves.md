@@ -30,7 +30,7 @@ Scope since 2026-11-06 (ADR 261106-60xv): the order, author and path of moves co
 Done when:
 
 - [x] a gap list says what a returning user sees now, driven in the browser: one move, three, twelve, a multi-step path, after a hidden tab
-- [x] the moves made while away play one at a time in order on return, each labelled by who made it
+- [x] the moves made while away play one at a time in order on return, each labeled by who made it
 - [x] reduced motion and a very long batch degrade to a clear summary
 - [x] unit tests cover the event ordering and the batching rule
 
@@ -48,7 +48,7 @@ Driven on 2026-11-06 in the built-in browser against a scratch repository (14 `r
 | Reduced motion                                                    | By code, not driven: `push` skips animation and shows the summary, or the single sentence                          | A reduced-motion user gets no way to review the moves either.                                                                                  |
 | A move out of a filtered view                                     | Not driven: the filters (261026-zg0g) do not exist yet                                                             | `cardOf` returns null when the card is not drawn, so the toast shows and nothing animates; settle once filters land.                           |
 
-What exists to build on: `claimed_by` and `claimed_at` (UTC, to the minute) are in the polled listing, so a move of a claimed item can be labelled with the agent that holds it; the etag is the only per-item change marker; nothing in the API says when a status changed.
+What exists to build on: `claimed_by` and `claimed_at` (UTC, to the minute) are in the polled listing, so a move of a claimed item can be labeled with the agent that holds it; the etag is the only per-item change marker; nothing in the API says when a status changed.
 
 ## Next
 
@@ -63,4 +63,4 @@ Moves made while away are read from history, replayed one at a time in commit or
 - 2026-11-06 12:11-07:00: Drove the board in the browser and wrote the gap list: id order not move order, bursts over 10 are summarized and lost, a path shows as its net move, 'Outside' never names an agent; claimed_by is available to label agents.
 - 2026-11-06 12:22-07:00: released (claude-sonnet-5-5).
 - 2026-11-06 12:37-07:00: claimed (claude-sonnet-5-5).
-- 2026-11-06 12:42-07:00: Built the replay: replay.js (merge history moves into the poll's events, who, the away panel), history fetch, who-aware sentences, panel CSS; verified in the browser on a scratch repo: five committed moves with a three-step path played in commit order, labelled Claude Code and Codex; twelve moves gave a summary toast and a listed panel; a reload listed what was committed since the last visit; a hidden tab returned and replayed. Limits noted in the CHANGELOG.
+- 2026-11-06 12:42-07:00: Built the replay: replay.js (merge history moves into the poll's events, who, the away panel), history fetch, who-aware sentences, panel CSS; verified in the browser on a scratch repo: five committed moves with a three-step path played in commit order, labeled Claude Code and Codex; twelve moves gave a summary toast and a listed panel; a reload listed what was committed since the last visit; a hidden tab returned and replayed. Limits noted in the CHANGELOG.

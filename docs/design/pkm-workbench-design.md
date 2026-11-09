@@ -27,7 +27,7 @@ Direction, Alexander 2026-10-25, after the Kanban test: the Tasks hub dashboard 
 - On 2026-10-25 three native views were added to `Tasks.base` (Obsidian 1.14.4): Cards by status, Cards by project, List next and active. Obsidian parses them. The checkpoint before the change is commit `3008564`.
 - Alexander's verdict: useful, possibly better as a mobile view. The look is a no-go and does not scale; he wants a UI with more control.
 - Not verified: dragging a card to another group to change its status. Check it before saying Bases has no board.
-- Correction, same day: a subagent read the changelog and Bases docs. Bases has had a **Kanban layout since Obsidian 1.14.0**, so this spike's assumption of no board was wrong. The docs say dragging a card between columns writes the grouped property (for example `status`) to the note's frontmatter. Not documented: order within a column, WIP limits, drag on mobile, per-column colours. The 1.14.5 release (22 Oct) is only an Electron update per the changelog. All of this is from documentation, not tested. Tested the same evening on Alexander's phone: he dragged `2026-10-20 appendix-b-skills` from inbox to next in the Kanban view; the note's `status` changed in the frontmatter (a one-line diff, verified with git), and `updated_at` did not change. So drag-to-change-status works natively on mobile, but it does not set `updated_at`. It is Alexander's call whether it changes the build recommendation; it may, since drag-to-change-status was one of the two gaps (the other is styling and control).
+- Correction, same day: a subagent read the changelog and Bases docs. Bases has had a **Kanban layout since Obsidian 1.14.0**, so this spike's assumption of no board was wrong. The docs say dragging a card between columns writes the grouped property (for example `status`) to the note's frontmatter. Not documented: order within a column, WIP limits, drag on mobile, per-column colors. The 1.14.5 release (22 Oct) is only an Electron update per the changelog. All of this is from documentation, not tested. Tested the same evening on Alexander's phone: he dragged `2026-10-20 appendix-b-skills` from inbox to next in the Kanban view; the note's `status` changed in the frontmatter (a one-line diff, verified with git), and `updated_at` did not change. So drag-to-change-status works natively on mobile, but it does not set `updated_at`. It is Alexander's call whether it changes the build recommendation; it may, since drag-to-change-status was one of the two gaps (the other is styling and control).
 - The three views stay in `Tasks.base` for now.
 
 ## Decisions ledger
@@ -105,7 +105,7 @@ A move between columns is a transaction, not an edit. Dragging a card opens it; 
 
 1. **Check.** The rules table (below) says what the target status requires. If the task already meets it, the move commits with no modal.
 2. **Wizard for what is missing.** Only unmet requirements become steps: one question per step, "2 of 3" progress, Enter to advance, Back keeps answers. The server fills in everything mechanical (`updated_at`, the "claimed" and "closed" log lines, deleting `## Next`); the user supplies judgment only.
-3. **Review.** The last step shows the exact change to the note as a standard diff view of the raw Markdown (unified diff, added and removed lines coloured). The user accepts or cancels. Cancel snaps the card back.
+3. **Review.** The last step shows the exact change to the note as a standard diff view of the raw Markdown (unified diff, added and removed lines colored). The user accepts or cancels. Cancel snaps the card back.
 4. **Commit, then animate.** The write goes through the usual hash check and atomic rename; then the move animates. A move the user just committed takes priority over any queued background animation.
 
 Rules table (gated moves approved by Alexander; this is part of the view spec):
@@ -147,12 +147,12 @@ Not in the MVP, but expected to be high value: the page you leave open and watch
 
 - **What a theme receives.** Animation is presentation only. The server emits a move event (task, from column, to column, kind: agent or user, time) and the active theme draws it. The queue plays events one at a time (see above). A theme is a self-contained CSS and JS bundle embedded in the binary, so adding one never touches the server logic.
 - **Ideas from Alexander:**
-  - Vegas or "power mode": the lights dim, coloured spotlights sweep, confetti or small explosions on a close.
+  - Vegas or "power mode": the lights dim, colored spotlights sweep, confetti or small explosions on a close.
   - A rocket ship that turns into a car and drives to the next column.
   - Super Mario World: a little figure scoots along the lane from one column to the next.
   - Frogger: the card hops across lanes, dodging traffic.
 - **More to consider:** Pac-Man eating the card and spitting it out in the new column; a Tetris-style drop; a train carrying cards between stations; a marble run; confetti only for `done`; a quiet "fizzle" for `dropped`; streaks (several moves in a row build a combo).
-- **Controls.** A theme picker; a speed control (a slow "popcorn" watch speed); an off switch. Quiet by default, with `prefers-reduced-motion` honoured. A busy page can be hard on a sensory-sensitive user, so power themes are opt-in. Sound, if ever, is off by default.
+- **Controls.** A theme picker; a speed control (a slow "popcorn" watch speed); an off switch. Quiet by default, with `prefers-reduced-motion` honored. A busy page can be hard on a sensory-sensitive user, so power themes are opt-in. Sound, if ever, is off by default.
 - **Plain default.** Without a theme the card slides to its new column and briefly highlights, which costs almost nothing and is enough to follow what happened.
 
 ## Later (pinned)

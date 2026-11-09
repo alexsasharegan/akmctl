@@ -9,7 +9,7 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/record"
 )
 
-// Hidden files follow ADR 261030-1wj5: .layout is the one recognisable
+// Hidden files follow ADR 261030-1wj5: .layout is the one recognizable
 // configuration file, and every other file the tool keeps for itself is .akm*.
 // The rest are files other tools define (git, Prettier) that init writes.
 func TestHiddenFilesFollowTheNamespaceRule(t *testing.T) {

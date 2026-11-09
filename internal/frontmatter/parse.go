@@ -383,7 +383,7 @@ func typePlain(s string) (Value, string) {
 	case "false":
 		return NewBool(false), ""
 	case "True", "TRUE", "False", "FALSE", "Null", "NULL":
-		return Value{}, "capitalised " + s + " is not supported (write it lower case or quote it)"
+		return Value{}, "capitalized " + s + " is not supported (write it lower case or quote it)"
 	}
 	if isCanonicalInt(s) {
 		n, err := strconv.ParseInt(s, 10, 64)

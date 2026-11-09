@@ -18,7 +18,7 @@ title: Make the akmctl repository a dogfood candidate of the AKM repo kit
 
 Not yet. It waits for the template repository (the clone template of the layout spec, section 7), which waits for the v1.0 spec cleanup ([261028-j3m9-akm-spec-v1-cleanup](261028-j3m9-akm-spec-v1-cleanup.md)). When the template exists, this task stamps it onto `akmctl` the same way any new repository would get it, and records what had to be fixed in the template.
 
-Done when: `akmctl check` passes on the `akmctl` repository itself with the layout in place; its decisions so far (Y1 to Y37 as they apply to the tool, the licence, the release process) are ADRs there or are linked from them; its remaining work (the gaps listed in [261027-r3hh-repo-records-go-tool](261027-r3hh-repo-records-go-tool.md)) is work items under `docs/work/`; and a note says what the exercise showed about the template.
+Done when: `akmctl check` passes on the `akmctl` repository itself with the layout in place; its decisions so far (Y1 to Y37 as they apply to the tool, the license, the release process) are ADRs there or are linked from them; its remaining work (the gaps listed in [261027-r3hh-repo-records-go-tool](261027-r3hh-repo-records-go-tool.md)) is work items under `docs/work/`; and a note says what the exercise showed about the template.
 
 Open questions for when it starts:
 
