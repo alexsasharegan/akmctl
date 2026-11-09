@@ -23,7 +23,6 @@ Exit criteria (draft, for Alexander to edit). The layout, the API and the spec a
 Items:
 
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest
-- [261029-47m0] migrate plan: simulate move_file steps
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback
 - [261029-shz5] Undo covers only the last safe move or capture
 - [261028-a2wd] Let check --target accept layouts other than the tool's own
