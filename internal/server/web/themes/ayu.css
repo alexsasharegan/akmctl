@@ -1,0 +1,62 @@
+/* Ayu (https://github.com/ayu-theme/ayu-colors, MIT): Light, Dark and Mirage. Values: ayu-colors at
+   c6e86054896e (themes/light.yaml, dark.yaml, mirage.yaml: surfaces, accent, error, palette hues, VCS colors);
+   text, muted text and borders follow the editor foreground and the softer borders that Zed's bundled Ayu
+   (zed-industries/zed, assets/themes/ayu/ayu.json) and Ghostty's Ayu themes agree on. A palette color that is
+   too light or too dark to read as text on its surface is mixed toward the text color (color-mix) until it
+   reaches 4.5:1; the mixes are the only colors that are not in those sources. Mapping: bg = surface.base,
+   surface = surface.lift, surface-2 = the panel or sunk tone, tray = the darkest tone, accent = the Ayu gold
+   (common.accent.tint), ready and added = blue, active = green, blocked = red, removed = orange. */
+
+/* Light (the default light variant) */
+:root[data-theme="ayu"][data-mode="light"] {
+  color-scheme:light;
+  --bg:#f8f9fa; --surface:#fcfcfc; --surface-2:#ebeef0; --input-bg:#ffffff; --tray:#ebeef0;
+  --text:#5c6166; --text-2:color-mix(in srgb, #8b8e92 65%, #1f2329); --line:#dfe0e1; --line-strong:#adaeb1;
+  --accent:color-mix(in srgb, #f29718 50%, #1f2329); --accent-fg:#ffffff; --accent-soft:color-mix(in srgb, #f29718 18%, #fcfcfc); --focus:#f29718; --scrim:rgba(2,10,18,.38);
+  --warn-fg:color-mix(in srgb, #fa8532 55%, #1f2329); --warn-bg:color-mix(in srgb, #fa8532 18%, #fcfcfc); --err-fg:color-mix(in srgb, #f07171 60%, #1f2329); --err-bg:color-mix(in srgb, #f07171 14%, #fcfcfc);
+  --kbd-bg:#fcfcfc; --kbd-fg:#5c6166; --pal-sel:#ebeef0; --mark-bg:color-mix(in srgb, #eba400 35%, #fcfcfc); --toast-bg:#5c6166; --toast-fg:#fcfcfc;
+  --tl-success:color-mix(in srgb, #86b300 55%, #fcfcfc); --tl-info:color-mix(in srgb, #22a4e6 60%, #fcfcfc); --tl-warning:color-mix(in srgb, #eba400 50%, #fcfcfc); --tl-error:color-mix(in srgb, #f07171 60%, #fcfcfc);
+  --st-raw:color-mix(in srgb, #8b8e92 65%, #1f2329); --st-ready:color-mix(in srgb, #22a4e6 60%, #1f2329); --st-active:color-mix(in srgb, #86b300 55%, #1f2329); --st-blocked:color-mix(in srgb, #f07171 60%, #1f2329);
+  --add-fg:color-mix(in srgb, #22a4e6 60%, #1f2329); --add-bg:color-mix(in srgb, #22a4e6 16%, #fcfcfc); --rem-fg:color-mix(in srgb, #fa8532 55%, #1f2329); --rem-bg:color-mix(in srgb, #fa8532 18%, #fcfcfc); --hunk-bg:#ebeef0;
+  --sh-ink:2,10,18;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* Dark (the default dark variant) */
+:root[data-theme="ayu"][data-mode="dark"] {
+  color-scheme:dark;
+  --bg:#0d1017; --surface:#10141c; --surface-2:#141821; --input-bg:#0f131a; --tray:#090c11;
+  --text:#bfbdb6; --text-2:color-mix(in srgb, #8a8986 75%, #bfbdb6); --line:#2d2f34; --line-strong:#5a6673;
+  --accent:#e6b450; --accent-fg:#090c11; --accent-soft:color-mix(in srgb, #e6b450 16%, #10141c); --focus:#e6b450; --scrim:rgba(5,7,10,.6);
+  --warn-fg:#ff8f40; --warn-bg:color-mix(in srgb, #ff8f40 18%, #10141c); --err-fg:#f07178; --err-bg:color-mix(in srgb, #f07178 14%, #10141c);
+  --kbd-bg:#0f131a; --kbd-fg:#bfbdb6; --pal-sel:#141821; --mark-bg:color-mix(in srgb, #ffb454 22%, #10141c); --toast-bg:#bfbdb6; --toast-fg:#10141c;
+  --tl-success:color-mix(in srgb, #aad94c 55%, #090c11); --tl-info:color-mix(in srgb, #59c2ff 60%, #090c11); --tl-warning:color-mix(in srgb, #ffb454 50%, #090c11); --tl-error:color-mix(in srgb, #f07178 60%, #090c11);
+  --st-raw:color-mix(in srgb, #8a8986 75%, #bfbdb6); --st-ready:#59c2ff; --st-active:#aad94c; --st-blocked:#f07178;
+  --add-fg:#73b8ff; --add-bg:color-mix(in srgb, #73b8ff 16%, #10141c); --rem-fg:#ff8f40; --rem-bg:color-mix(in srgb, #ff8f40 18%, #10141c); --hunk-bg:#141821;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Mirage */
+:root[data-theme="ayu"][data-mode="dark"][data-variant="mirage"] {
+  color-scheme:dark;
+  --bg:#1f2430; --surface:#242936; --surface-2:#282e3b; --input-bg:#1c212c; --tray:#181c26;
+  --text:#cccac2; --text-2:color-mix(in srgb, #9a9a98 55%, #cccac2); --line:#43464f; --line-strong:#6e7c8f;
+  --accent:#ffcc66; --accent-fg:#181c26; --accent-soft:color-mix(in srgb, #ffcc66 16%, #242936); --focus:#ffcc66; --scrim:rgba(10,12,18,.6);
+  --warn-fg:#ffa659; --warn-bg:color-mix(in srgb, #ffa659 18%, #242936); --err-fg:#f28779; --err-bg:color-mix(in srgb, #f28779 14%, #242936);
+  --kbd-bg:#1c212c; --kbd-fg:#cccac2; --pal-sel:#282e3b; --mark-bg:color-mix(in srgb, #ffcd66 22%, #242936); --toast-bg:#cccac2; --toast-fg:#242936;
+  --tl-success:color-mix(in srgb, #d5ff80 55%, #181c26); --tl-info:color-mix(in srgb, #73d0ff 60%, #181c26); --tl-warning:color-mix(in srgb, #ffcd66 50%, #181c26); --tl-error:color-mix(in srgb, #f28779 60%, #181c26);
+  --st-raw:color-mix(in srgb, #9a9a98 55%, #cccac2); --st-ready:#73d0ff; --st-active:#d5ff80; --st-blocked:#f28779;
+  --add-fg:#80bfff; --add-bg:color-mix(in srgb, #80bfff 16%, #242936); --rem-fg:#ffa659; --rem-bg:color-mix(in srgb, #ffa659 18%, #242936); --hunk-bg:#282e3b;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}

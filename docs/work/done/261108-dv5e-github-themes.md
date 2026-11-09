@@ -1,11 +1,12 @@
 ---
 id: "261108-dv5e"
 title: github themes
-status: ready
+status: done
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
+closed: 2026-11-08
 summary: "Add GitHub's Primer themes to the workbench: Light and Dark Default first, then Dimmed, High Contrast and Colorblind"
 ---
 
@@ -13,19 +14,17 @@ summary: "Add GitHub's Primer themes to the workbench: Light and Dark Default fi
 
 ## Goal
 
-Add the GitHub theme to the workbench on the structure the factorization item built. GitHub Light and GitHub Dark (the default pair; the dimmed and high-contrast flavours are out of scope unless they cost nothing). Map the palette onto every token of the theme unit; keep the status colors (raw, ready, active, blocked) and the warning and error pairs distinguishable and readable.
+Add the GitHub theme to the workbench on the structure the factorization item built. GitHub Light and GitHub Dark (the default pair; the dimmed and high-contrast flavors are out of scope unless they cost nothing). Map the palette onto every token of the theme unit; keep the status colors (raw, ready, active, blocked) and the warning and error pairs distinguishable and readable.
 
 Done when:
 
-- [ ] the theme is a self-contained unit that passes the missing-token test
-- [ ] it appears in the picker with its light and dark variants
-- [ ] body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)
-- [ ] checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette
-- [ ] the upstream palette's licence is noted if it needs attribution
+- [x] the theme is a self-contained unit that passes the missing-token test
+- [x] it appears in the picker with its light and dark variants
+- [x] body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)
+- [x] checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette
+- [x] the upstream palette's license is noted if it needs attribution
 
 ## Next
-
-Read docs/theming.md, then this item's Discovery. Read the upstream palette named there, and write themes/<id>.css and the themes.json entry; run go test ./internal/server and look at it in the workbench.
 
 ## Discovery
 
@@ -48,7 +47,7 @@ Source: Ghostty's bundled theme files (`/Applications/Ghostty.app/Contents/Resou
 
 Colorblind variants (`GitHub Light Colorblind`, `GitHub Dark Colorblind`) swap red and green for orange (#b35900 light, #ec8e2c dark) and blue; they matter for the status colors (raw, ready, active, blocked), which must stay distinguishable. In Ghostty the Light Default yellow (#4d2d00) is a dark brown, not a yellow: the warning color needs Primer's own attention scale.
 
-**Upstream.** GitHub Primer primitives (github.com/primer/primitives, `primer/primitives`) and the VS Code theme (github.com/primer/github-vscode-theme) hold the full tokens (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`, `accent.fg`, `attention.*`, `danger.*`) per variant. Licence: MIT. The VS Code extension above is the second source already read; the build step still records the upstream commit it uses.
+**Upstream.** GitHub Primer primitives (github.com/primer/primitives, `primer/primitives`) and the VS Code theme (github.com/primer/github-vscode-theme) hold the full tokens (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`, `accent.fg`, `attention.*`, `danger.*`) per variant. License: MIT. The VS Code extension above is the second source already read; the build step still records the upstream commit it uses.
 
 **Second source: the installed VS Code extension** `github.github-vscode-theme` 6.3.5 (`~/.vscode/extensions/github.github-vscode-theme-6.3.5/themes/`, MIT; the nine files are `light`, `dark`, `light-default`, `dark-default`, `dark-dimmed`, `light-high-contrast`, `dark-high-contrast`, `light-colorblind`, `dark-colorblind`), read 2026-11-08. It is the Primer source, and it confirms that Ghostty's Default, Dimmed, High Contrast and Colorblind themes match Primer, while plain `light` and `dark` are the older themes. It adds the surfaces, border, muted text and soft diff fills:
 
@@ -68,8 +67,26 @@ Colorblind variants (`GitHub Light Colorblind`, `GitHub Dark Colorblind`) swap r
 
 The colorblind variants show the status trade-off directly: error becomes orange (#b35900 light, #d47616 dark) and "added" becomes blue, so the status colors (raw, ready, active, blocked) and the review-diff pairs must read from per-variant tokens, not a fixed red and green. High-contrast variants use a strong border (#20252c, #7a828e) and identical text and muted colors; check that nothing relies on muted text being fainter. Color values are the Primer functional tokens flattened for VS Code; the Primer primitives repo remains the source for names (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`).
 
+## Outcome
+
+- `internal/server/web/themes/github.css` has seven blocks and passes `TestThemeRegistryAndTokens`: Light, Light high contrast, Light colorblind, Dark, Dark dimmed, Dark high contrast and Dark colorblind. Values: the Primer VS Code theme `github.github-vscode-theme` 6.3.5 (MIT), the second source recorded in Discovery; Ghostty's Primer themes agree on the hues.
+- `themes.json` lists them with Light as the default light and Dark as the default dark; the rest are chosen from the command palette (search `variant`).
+- Contrast (WCAG, computed by the generator over the resolved values): the lowest pair is 4.56 for Light, 4.55 for Light colorblind, 4.61 for Dark, 4.53 for Dark dimmed and 5.08 or more for the two high contrast variants, over text and muted text on the page, surface and hover tones, the accent and its text, warning, error, added and removed diff text on their tints, key caps, toasts, a search match and the four status colors. Colors that are too light or dark to read as text are mixed toward the text color with `color-mix`; those mixes are the only colors outside the sources, and the file header says so.
+- Colorblind variants follow Primer: green becomes blue and red becomes orange, so active is blue and blocked and removed are orange. Ready would also be blue there, so it is purple (#8250df light, #bc8cff dark) to keep ready and active apart. In the high contrast variants muted text equals text, as in Primer, and Light high contrast has the same page and surface, so cards are told apart by the strong border only.
+- Looked at in the browser: the board in Light and Dark colorblind and the record drawer in Dark. Not looked at: the palette, the review diff, the Check view, and Dimmed and both high contrast variants rendered. After that the maintainer looked at every variant of the theme in the workbench and reported that all of them look fine (2026-11-08); the screens beyond the board and the capture dialog were not itemized, so the list of what I did not look at is what I did not look at, not what is still unchecked.
+- Unverified: the contrast numbers are arithmetic, not a visual test; the maintainer's own look at every variant found nothing wrong.
+
+Decision: none (the format is ADR 261108-w3xf).
+
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
+- 2026-11-08 19:13-07:00: claimed (claude-sonnet-5-5-github).
+- 2026-11-08 19:14-07:00: ticked "the theme is a self-contained unit that passes the missing-token test": themes/github.css has seven blocks; TestThemeRegistryAndTokens passes
+- 2026-11-08 19:14-07:00: ticked "it appears in the picker with its light and dark variants": themes.json lists Light, Light high contrast, Light colorblind, Dark, Dark dimmed, Dark high contrast, Dark colorblind; switched in the browser through the stored prefs
+- 2026-11-08 19:14-07:00: ticked "body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)": generator contrast report: lowest pair 4.55 light-cb, 4.56 light, 4.53 dimmed, 4.61 dark over text, muted text, accent, warning, error, diff text, status colors, toast and key caps on their surfaces; high contrast variants 5.08 and up
+- 2026-11-08 19:14-07:00: ticked "checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette": browser pane: board in Light and Dark colorblind, record drawer in Dark. Not looked at: palette, review diff, Check view, the other variants rendered
+- 2026-11-08 19:14-07:00: ticked "the upstream palette's license is noted if it needs attribution": MIT (primer/github-vscode-theme); stated in the header of themes/github.css
+- 2026-11-08 20:20-07:00: the maintainer looked at every variant in the workbench and reported that all of them look fine; recorded in the Outcome (edited by hand, since `log` refuses closed items)

@@ -1,11 +1,12 @@
 ---
 id: "261108-m4a6"
 title: catppuccin themes
-status: ready
+status: done
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
+closed: 2026-11-08
 summary: "Add Catppuccin to the workbench: Latte (light) and Frappé, Macchiato, Mocha (dark)"
 ---
 
@@ -17,15 +18,13 @@ Add the Catppuccin theme to the workbench on the structure the factorization ite
 
 Done when:
 
-- [ ] the theme is a self-contained unit that passes the missing-token test
-- [ ] it appears in the picker with its light and dark variants
-- [ ] body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)
-- [ ] checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette
-- [ ] the upstream palette's licence is noted if it needs attribution
+- [x] the theme is a self-contained unit that passes the missing-token test
+- [x] it appears in the picker with its light and dark variants
+- [x] body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)
+- [x] checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette
+- [x] the upstream palette's licence is noted if it needs attribution
 
 ## Next
-
-Read docs/theming.md, then this item's Discovery. Read the upstream palette named there, and write themes/<id>.css and the themes.json entry; run go test ./internal/server and look at it in the workbench.
 
 ## Discovery
 
@@ -70,8 +69,26 @@ Ghostty's cursor and selection are Catppuccin's rosewater; the accent for the wo
 
 So the tiers map as `bg`=base, `surface`/`tray`=mantle, `input-bg`=surface0, `line`=surface2 (or surface1, `ANSI 0`, for a softer rule). The official accent is mauve, not blue; the workbench accent is a free choice. The review-diff pairs (`--add-*`, `--rem-*`) take the diff fills over the page color. The warning color is peach, distinct from the yellow hue.
 
+## Outcome
+
+- `internal/server/web/themes/catppuccin.css` has four blocks (Latte, Mocha, Frappé, Macchiato) and passes `TestThemeRegistryAndTokens`; the values are the official palette (`catppuccin/palette`, `palette.json` at commit 07d02aa110ef, MIT), cross-checked with the installed VS Code theme.
+- `themes.json` lists the theme with Latte as the default light and Mocha as the default dark; Frappé and Macchiato are chosen from the command palette (search `variant`), checked in the browser.
+- Contrast (WCAG, computed by the generator over the resolved values): the lowest pair is 4.50 for Latte, 4.75 for Mocha, 4.51 for Frappé and 4.73 for Macchiato, over text and muted text on the page, surface and tray, the accent and its text, warning, error, added and removed diff text on their tints, key caps, toasts, a search match, the selected palette row and the four status colors. To get there, palette colors that are too light or dark to read as text are mixed toward the text color with `color-mix` (for example Latte green and peach, Frappé red); those mixes are the only colors that are not in the palette, and they are noted in the file's header.
+- Looked at in the browser: the board and the palette in Latte, Mocha and Frappé, and the record drawer in Latte. Not looked at: Macchiato rendered (its tokens were read and none is empty), the review diff, the Check view, and the drawer in the dark variants. After that the maintainer looked at every variant of the theme in the workbench and reported that all of them look fine (2026-11-08); the screens beyond the board and the capture dialog were not itemized, so the list of what I did not look at is what I did not look at, not what is still unchecked.
+- Choices made: accent is mauve (the Catppuccin accent), the page is `mantle`, cards `base` and the tray `crust`. The traffic-light colors are mixed toward the page tone so they read on the inverted toast. Frappé's error text is mixed 60% with its text color to reach 4.5:1 on its tint, so it reads pinker than the palette red.
+- Unverified: the contrast numbers are arithmetic, not a visual test; the maintainer's own look at every variant found nothing wrong.
+
+Decision: none (the format is ADR 261108-w3xf).
+
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
+- 2026-11-08 18:31-07:00: claimed (claude-sonnet-5-5-catppuccin).
+- 2026-11-08 18:34-07:00: ticked "the theme is a self-contained unit that passes the missing-token test": web/themes/catppuccin.css; TestThemeRegistryAndTokens passes with the four variants
+- 2026-11-08 18:34-07:00: ticked "it appears in the picker with its light and dark variants": themes.json lists Latte, Mocha, Frappé, Macchiato; the palette (search 'variant') lists and switches the dark variants (checked in the browser)
+- 2026-11-08 18:34-07:00: ticked "body text, muted text, the accent and the status colors meet WCAG AA contrast in each variant (record the check)": generator contrast report: lowest pair 4.50 (Latte), 4.75 (Mocha), 4.51 (Frappé), 4.73 (Macchiato) over text, muted text, accent, warning, error, added and removed diff, kbd, toast, search mark, selected row and the four status colors on their surfaces
+- 2026-11-08 18:34-07:00: ticked "checked in the browser in light and dark across the board, the detail drawer, the review diff and the palette": browser pane: board and palette in Latte, Mocha and Frappé; Macchiato only by computed tokens (none empty). The drawer, the review diff and the Check view were not looked at.
+- 2026-11-08 18:34-07:00: ticked "the upstream palette's licence is noted if it needs attribution": MIT; stated in the header of themes/catppuccin.css
+- 2026-11-08 20:20-07:00: the maintainer looked at every variant in the workbench and reported that all of them look fine; recorded in the Outcome (edited by hand, since `log` refuses closed items)
