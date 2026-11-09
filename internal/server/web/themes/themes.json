@@ -79,6 +79,47 @@
           "mode": "dark"
         }
       ]
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "variants": [
+        {
+          "id": "light",
+          "name": "Light",
+          "mode": "light"
+        },
+        {
+          "id": "light-hc",
+          "name": "Light high contrast",
+          "mode": "light"
+        },
+        {
+          "id": "light-cb",
+          "name": "Light colorblind",
+          "mode": "light"
+        },
+        {
+          "id": "dark",
+          "name": "Dark",
+          "mode": "dark"
+        },
+        {
+          "id": "dimmed",
+          "name": "Dark dimmed",
+          "mode": "dark"
+        },
+        {
+          "id": "dark-hc",
+          "name": "Dark high contrast",
+          "mode": "dark"
+        },
+        {
+          "id": "dark-cb",
+          "name": "Dark colorblind",
+          "mode": "dark"
+        }
+      ]
     }
   ]
 }
