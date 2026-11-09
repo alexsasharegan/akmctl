@@ -17,7 +17,7 @@ The workbench look is fixed to one palette ("Quiet paper", light and dark) whose
 Children, in dependency order:
 
 - [Theme factorization](done/261108-hp9k-theme-factorization.md): the refactor that makes a theme one self-contained unit; the rest wait for it
-- [Catppuccin themes](261108-m4a6-catppuccin-themes.md): Latte and the dark flavours
+- [Catppuccin themes](done/261108-m4a6-catppuccin-themes.md): Latte and the dark flavours
 - [Ayu themes](261108-zg9m-ayu-themes.md): light, mirage and dark
 - [Atom One themes](261108-pmkp-atom-one-themes.md): light and dark
 - [GitHub themes](261108-dv5e-github-themes.md): light and dark
