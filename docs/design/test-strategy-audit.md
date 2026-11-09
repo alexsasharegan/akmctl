@@ -182,7 +182,7 @@ The 19 findings above are numbered `F1` to `F19`: F1 to F8 from the strategy sec
 | 4     | [261108-rwqj](../work/done/261108-rwqj-shared-test-helpers-and-run-time.md) Shared test helpers and run time                     | F11, F12, F13          | Nuisances; pay off before the suite grows more                                          |
 | 5     | [261108-f1tv](../work/done/261108-f1tv-run-fixtures-through-both-bindings.md) Run fixtures through both bindings                 | F1, F2                 | Larger and needs an ADR first; benefits from 2                                          |
 | 6     | [261108-79t5](../work/done/261108-79t5-skill-text-checks.md) Skill text checks                                                   | F6                     | Needs a decision on where the cold-agent procedure lives                                |
-| 7     | [261108-xajw](../work/261108-xajw-workbench-page-tests.md) Workbench page tests                                                  | F4                     | Largest effort; the workbench is not promised for 1.0.0                                 |
+| 7     | [261108-xajw](../work/done/261108-xajw-workbench-page-tests.md) Workbench page tests                                             | F4                     | Largest effort; the workbench is not promised for 1.0.0                                 |
 
 ### ADR drafts the findings call for
 

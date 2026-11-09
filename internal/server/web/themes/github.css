@@ -1,0 +1,137 @@
+/* GitHub (github.com/primer/github-vscode-theme, MIT; Primer): Light, Light high contrast, Light colorblind,
+   Dark, Dark dimmed, Dark high contrast and Dark colorblind. Values: the Primer VS Code theme
+   github.github-vscode-theme 6.3.5 (page, sidebar, widget, border, text, muted text, link, diff and Git
+   colors per variant); Ghostty's GitHub Primer themes agree on the hues. A color that is too light or too
+   dark to read as text on its surface is mixed toward the text color (color-mix) until it reaches 4.5:1; the
+   mixes are the only colors that are not in those sources. Mapping: bg = the sidebar tone, surface = the
+   editor tone, surface-2 = the hover tone, tray = the sidebar tone (dark) or hover tone (light), accent =
+   the link blue, ready = blue, active = green, blocked = red, added = green, removed = red. In the
+   colorblind variants Primer swaps green for blue and red for orange: active is blue, blocked and removed
+   are orange, and ready is purple so that ready and active stay apart. In the high contrast variants muted
+   text equals text, as in Primer. */
+
+/* Light (the default light variant) */
+:root[data-theme="github"][data-mode="light"] {
+  color-scheme:light;
+  --bg:#f6f8fa; --surface:#ffffff; --surface-2:#eaeef2; --input-bg:#ffffff; --tray:#eaeef2;
+  --text:#1f2328; --text-2:color-mix(in srgb, #656d76 90%, #1f2328); --line:#d0d7de; --line-strong:#8c959f;
+  --accent:color-mix(in srgb, #0969da 90%, #1f2328); --accent-fg:#ffffff; --accent-soft:color-mix(in srgb, #0969da 18%, #ffffff); --focus:#0969da; --scrim:rgba(31,35,40,.4);
+  --warn-fg:color-mix(in srgb, #9a6700 85%, #1f2328); --warn-bg:color-mix(in srgb, #9a6700 18%, #ffffff); --err-fg:color-mix(in srgb, #cf222e 95%, #1f2328); --err-bg:color-mix(in srgb, #cf222e 14%, #ffffff);
+  --kbd-bg:#ffffff; --kbd-fg:#1f2328; --pal-sel:#eaeef2; --mark-bg:color-mix(in srgb, #9a6700 35%, #ffffff); --toast-bg:#1f2328; --toast-fg:#ffffff;
+  --tl-success:color-mix(in srgb, #1a7f37 55%, #ffffff); --tl-info:color-mix(in srgb, #0969da 60%, #ffffff); --tl-warning:color-mix(in srgb, #9a6700 50%, #ffffff); --tl-error:color-mix(in srgb, #cf222e 60%, #ffffff);
+  --st-raw:color-mix(in srgb, #656d76 90%, #1f2328); --st-ready:color-mix(in srgb, #0969da 95%, #1f2328); --st-active:color-mix(in srgb, #1a7f37 95%, #1f2328); --st-blocked:#cf222e;
+  --add-fg:color-mix(in srgb, #1a7f37 90%, #1f2328); --add-bg:color-mix(in srgb, #1a7f37 16%, #ffffff); --rem-fg:color-mix(in srgb, #cf222e 90%, #1f2328); --rem-bg:color-mix(in srgb, #cf222e 18%, #ffffff); --hunk-bg:#eaeef2;
+  --sh-ink:31,35,40;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* Light high contrast */
+:root[data-theme="github"][data-mode="light"][data-variant="light-hc"] {
+  color-scheme:light;
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#e7ecf0; --input-bg:#ffffff; --tray:#e7ecf0;
+  --text:#0e1116; --text-2:#0e1116; --line:#20252c; --line-strong:#4b535d;
+  --accent:#0349b4; --accent-fg:#ffffff; --accent-soft:color-mix(in srgb, #0349b4 18%, #ffffff); --focus:#0349b4; --scrim:rgba(14,17,22,.45);
+  --warn-fg:#744500; --warn-bg:color-mix(in srgb, #744500 18%, #ffffff); --err-fg:#a0111f; --err-bg:color-mix(in srgb, #a0111f 14%, #ffffff);
+  --kbd-bg:#ffffff; --kbd-fg:#0e1116; --pal-sel:#e7ecf0; --mark-bg:color-mix(in srgb, #744500 35%, #ffffff); --toast-bg:#0e1116; --toast-fg:#ffffff;
+  --tl-success:color-mix(in srgb, #055d20 55%, #ffffff); --tl-info:color-mix(in srgb, #0349b4 60%, #ffffff); --tl-warning:color-mix(in srgb, #744500 50%, #ffffff); --tl-error:color-mix(in srgb, #a0111f 60%, #ffffff);
+  --st-raw:#0e1116; --st-ready:#0349b4; --st-active:#055d20; --st-blocked:#a0111f;
+  --add-fg:#055d20; --add-bg:color-mix(in srgb, #055d20 16%, #ffffff); --rem-fg:#a0111f; --rem-bg:color-mix(in srgb, #a0111f 18%, #ffffff); --hunk-bg:#e7ecf0;
+  --sh-ink:14,17,22;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* Light colorblind */
+:root[data-theme="github"][data-mode="light"][data-variant="light-cb"] {
+  color-scheme:light;
+  --bg:#f6f8fa; --surface:#ffffff; --surface-2:#eaeef2; --input-bg:#ffffff; --tray:#eaeef2;
+  --text:#24292f; --text-2:#57606a; --line:#d0d7de; --line-strong:#8c959f;
+  --accent:color-mix(in srgb, #0969da 85%, #24292f); --accent-fg:#ffffff; --accent-soft:color-mix(in srgb, #0969da 18%, #ffffff); --focus:#0969da; --scrim:rgba(36,41,47,.4);
+  --warn-fg:color-mix(in srgb, #9a6700 85%, #24292f); --warn-bg:color-mix(in srgb, #9a6700 18%, #ffffff); --err-fg:color-mix(in srgb, #b35900 85%, #24292f); --err-bg:color-mix(in srgb, #b35900 14%, #ffffff);
+  --kbd-bg:#ffffff; --kbd-fg:#24292f; --pal-sel:#eaeef2; --mark-bg:color-mix(in srgb, #9a6700 35%, #ffffff); --toast-bg:#24292f; --toast-fg:#ffffff;
+  --tl-success:color-mix(in srgb, #0969da 55%, #ffffff); --tl-info:color-mix(in srgb, #0969da 60%, #ffffff); --tl-warning:color-mix(in srgb, #9a6700 50%, #ffffff); --tl-error:color-mix(in srgb, #b35900 60%, #ffffff);
+  --st-raw:#57606a; --st-ready:color-mix(in srgb, #8250df 95%, #24292f); --st-active:color-mix(in srgb, #0969da 95%, #24292f); --st-blocked:color-mix(in srgb, #b35900 90%, #24292f);
+  --add-fg:color-mix(in srgb, #0969da 90%, #24292f); --add-bg:color-mix(in srgb, #0969da 16%, #ffffff); --rem-fg:color-mix(in srgb, #b35900 80%, #24292f); --rem-bg:color-mix(in srgb, #b35900 18%, #ffffff); --hunk-bg:#eaeef2;
+  --sh-ink:36,41,47;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* Dark (the default dark variant) */
+:root[data-theme="github"][data-mode="dark"] {
+  color-scheme:dark;
+  --bg:#010409; --surface:#0d1117; --surface-2:#161b22; --input-bg:#0d1117; --tray:#010409;
+  --text:#e6edf3; --text-2:color-mix(in srgb, #7d8590 95%, #e6edf3); --line:#30363d; --line-strong:#6e7681;
+  --accent:color-mix(in srgb, #2f81f7 90%, #e6edf3); --accent-fg:#010409; --accent-soft:color-mix(in srgb, #2f81f7 16%, #0d1117); --focus:#2f81f7; --scrim:rgba(1,4,9,.6);
+  --warn-fg:#d29922; --warn-bg:color-mix(in srgb, #d29922 18%, #0d1117); --err-fg:#f85149; --err-bg:color-mix(in srgb, #f85149 14%, #0d1117);
+  --kbd-bg:#0d1117; --kbd-fg:#e6edf3; --pal-sel:#161b22; --mark-bg:color-mix(in srgb, #d29922 15%, #0d1117); --toast-bg:#e6edf3; --toast-fg:#0d1117;
+  --tl-success:color-mix(in srgb, #3fb950 55%, #010409); --tl-info:color-mix(in srgb, #58a6ff 60%, #010409); --tl-warning:color-mix(in srgb, #d29922 50%, #010409); --tl-error:color-mix(in srgb, #f85149 60%, #010409);
+  --st-raw:color-mix(in srgb, #7d8590 95%, #e6edf3); --st-ready:#58a6ff; --st-active:#3fb950; --st-blocked:#f85149;
+  --add-fg:#3fb950; --add-bg:color-mix(in srgb, #3fb950 16%, #0d1117); --rem-fg:#f85149; --rem-bg:color-mix(in srgb, #f85149 18%, #0d1117); --hunk-bg:#161b22;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Dark dimmed */
+:root[data-theme="github"][data-mode="dark"][data-variant="dimmed"] {
+  color-scheme:dark;
+  --bg:#1c2128; --surface:#22272e; --surface-2:#2d333b; --input-bg:#22272e; --tray:#1c2128;
+  --text:#adbac7; --text-2:color-mix(in srgb, #768390 40%, #adbac7); --line:#444c56; --line-strong:#636e7b;
+  --accent:color-mix(in srgb, #539bf5 65%, #adbac7); --accent-fg:#1c2128; --accent-soft:color-mix(in srgb, #539bf5 16%, #22272e); --focus:#539bf5; --scrim:rgba(28,33,40,.6);
+  --warn-fg:color-mix(in srgb, #c69026 60%, #adbac7); --warn-bg:color-mix(in srgb, #c69026 18%, #22272e); --err-fg:color-mix(in srgb, #e5534b 45%, #adbac7); --err-bg:color-mix(in srgb, #e5534b 14%, #22272e);
+  --kbd-bg:#22272e; --kbd-fg:#adbac7; --pal-sel:#2d333b; --mark-bg:color-mix(in srgb, #c69026 15%, #22272e); --toast-bg:#adbac7; --toast-fg:#22272e;
+  --tl-success:color-mix(in srgb, #57ab5a 55%, #1c2128); --tl-info:color-mix(in srgb, #539bf5 60%, #1c2128); --tl-warning:color-mix(in srgb, #c69026 50%, #1c2128); --tl-error:color-mix(in srgb, #e5534b 60%, #1c2128);
+  --st-raw:color-mix(in srgb, #768390 40%, #adbac7); --st-ready:color-mix(in srgb, #539bf5 95%, #adbac7); --st-active:color-mix(in srgb, #57ab5a 95%, #adbac7); --st-blocked:color-mix(in srgb, #e5534b 45%, #adbac7);
+  --add-fg:color-mix(in srgb, #57ab5a 70%, #adbac7); --add-bg:color-mix(in srgb, #57ab5a 16%, #22272e); --rem-fg:color-mix(in srgb, #e5534b 40%, #adbac7); --rem-bg:color-mix(in srgb, #e5534b 18%, #22272e); --hunk-bg:#2d333b;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Dark high contrast */
+:root[data-theme="github"][data-mode="dark"][data-variant="dark-hc"] {
+  color-scheme:dark;
+  --bg:#010409; --surface:#0a0c10; --surface-2:#272b33; --input-bg:#0a0c10; --tray:#010409;
+  --text:#f0f3f6; --text-2:#f0f3f6; --line:#7a828e; --line-strong:#9ea7b3;
+  --accent:#71b7ff; --accent-fg:#010409; --accent-soft:color-mix(in srgb, #71b7ff 16%, #0a0c10); --focus:#71b7ff; --scrim:rgba(1,4,9,.7);
+  --warn-fg:#f0b72f; --warn-bg:color-mix(in srgb, #f0b72f 18%, #0a0c10); --err-fg:#ff6a69; --err-bg:color-mix(in srgb, #ff6a69 14%, #0a0c10);
+  --kbd-bg:#0a0c10; --kbd-fg:#f0f3f6; --pal-sel:#272b33; --mark-bg:color-mix(in srgb, #f0b72f 15%, #0a0c10); --toast-bg:#f0f3f6; --toast-fg:#0a0c10;
+  --tl-success:color-mix(in srgb, #26cd4d 55%, #010409); --tl-info:color-mix(in srgb, #71b7ff 60%, #010409); --tl-warning:color-mix(in srgb, #f0b72f 50%, #010409); --tl-error:color-mix(in srgb, #ff6a69 60%, #010409);
+  --st-raw:#f0f3f6; --st-ready:#71b7ff; --st-active:#26cd4d; --st-blocked:#ff6a69;
+  --add-fg:#26cd4d; --add-bg:color-mix(in srgb, #26cd4d 16%, #0a0c10); --rem-fg:#ff6a69; --rem-bg:color-mix(in srgb, #ff6a69 18%, #0a0c10); --hunk-bg:#272b33;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Dark colorblind */
+:root[data-theme="github"][data-mode="dark"][data-variant="dark-cb"] {
+  color-scheme:dark;
+  --bg:#010409; --surface:#0d1117; --surface-2:#161b22; --input-bg:#0d1117; --tray:#010409;
+  --text:#c9d1d9; --text-2:#8b949e; --line:#30363d; --line-strong:#6e7681;
+  --accent:#58a6ff; --accent-fg:#010409; --accent-soft:color-mix(in srgb, #58a6ff 16%, #0d1117); --focus:#58a6ff; --scrim:rgba(1,4,9,.6);
+  --warn-fg:#d29922; --warn-bg:color-mix(in srgb, #d29922 18%, #0d1117); --err-fg:#ec8e2c; --err-bg:color-mix(in srgb, #ec8e2c 14%, #0d1117);
+  --kbd-bg:#0d1117; --kbd-fg:#c9d1d9; --pal-sel:#161b22; --mark-bg:color-mix(in srgb, #d29922 15%, #0d1117); --toast-bg:#c9d1d9; --toast-fg:#0d1117;
+  --tl-success:color-mix(in srgb, #58a6ff 55%, #010409); --tl-info:color-mix(in srgb, #58a6ff 60%, #010409); --tl-warning:color-mix(in srgb, #d29922 50%, #010409); --tl-error:color-mix(in srgb, #ec8e2c 60%, #010409);
+  --st-raw:#8b949e; --st-ready:#bc8cff; --st-active:#58a6ff; --st-blocked:#ec8e2c;
+  --add-fg:#58a6ff; --add-bg:color-mix(in srgb, #58a6ff 16%, #0d1117); --rem-fg:#ec8e2c; --rem-bg:color-mix(in srgb, #ec8e2c 18%, #0d1117); --hunk-bg:#161b22;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}

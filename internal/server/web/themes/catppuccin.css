@@ -1,0 +1,79 @@
+/* Catppuccin (https://catppuccin.com, MIT): Latte (light) and Mocha, Frappé and Macchiato (dark).
+   Values: the official palette (github.com/catppuccin/palette, palette.json at 07d02aa110ef), mapped to the
+   workbench tokens as docs/theming.md describes; the VS Code theme catppuccin.catppuccin-vsc 3.19.0 agrees on
+   page, sidebar, input, border and diff tints. Where a palette color is too light or too dark to read as text
+   on its surface, it is mixed toward the text color (color-mix) until it reaches 4.5:1; the mixes are the
+   only colors that are not in the palette. Mapping: bg = mantle, surface = base, surface-2 = surface0,
+   tray = crust, line = surface1, line-strong = overlay1, accent = mauve. */
+
+/* Latte (the default light variant) */
+:root[data-theme="catppuccin"][data-mode="light"] {
+  color-scheme:light;
+  --bg:#e6e9ef; --surface:#eff1f5; --surface-2:#ccd0da; --input-bg:#eff1f5; --tray:#dce0e8;
+  --text:#4c4f69; --text-2:color-mix(in srgb, #6c6f85 25%, #4c4f69); --line:#bcc0cc; --line-strong:#8c8fa1;
+  --accent:color-mix(in srgb, #8839ef 80%, #4c4f69); --accent-fg:#eff1f5; --accent-soft:#ccd0da; --focus:#8839ef; --scrim:rgba(76,79,105,.38);
+  --warn-fg:color-mix(in srgb, #fe640b 30%, #4c4f69); --warn-bg:color-mix(in srgb, #fe640b 18%, #eff1f5); --err-fg:color-mix(in srgb, #d20f39 80%, #4c4f69); --err-bg:color-mix(in srgb, #d20f39 14%, #eff1f5);
+  --kbd-bg:#eff1f5; --kbd-fg:#4c4f69; --pal-sel:#ccd0da; --mark-bg:color-mix(in srgb, #df8e1d 35%, #eff1f5); --toast-bg:#4c4f69; --toast-fg:#eff1f5;
+  --tl-success:color-mix(in srgb, #40a02b 75%, #eff1f5); --tl-info:color-mix(in srgb, #1e66f5 60%, #eff1f5); --tl-warning:#df8e1d; --tl-error:color-mix(in srgb, #d20f39 45%, #eff1f5);
+  --st-raw:color-mix(in srgb, #6c6f85 60%, #4c4f69); --st-ready:color-mix(in srgb, #1e66f5 65%, #4c4f69); --st-active:color-mix(in srgb, #40a02b 35%, #4c4f69); --st-blocked:color-mix(in srgb, #d20f39 85%, #4c4f69);
+  --add-fg:color-mix(in srgb, #1e66f5 55%, #4c4f69); --add-bg:color-mix(in srgb, #1e66f5 16%, #eff1f5); --rem-fg:color-mix(in srgb, #fe640b 30%, #4c4f69); --rem-bg:color-mix(in srgb, #fe640b 18%, #eff1f5); --hunk-bg:#ccd0da;
+  --sh-ink:76,79,105;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* Mocha (the default dark variant) */
+:root[data-theme="catppuccin"][data-mode="dark"] {
+  color-scheme:dark;
+  --bg:#181825; --surface:#1e1e2e; --surface-2:#313244; --input-bg:#11111b; --tray:#11111b;
+  --text:#cdd6f4; --text-2:#a6adc8; --line:#45475a; --line-strong:#7f849c;
+  --accent:#cba6f7; --accent-fg:#11111b; --accent-soft:#313244; --focus:#cba6f7; --scrim:rgba(17,17,27,.6);
+  --warn-fg:#fab387; --warn-bg:color-mix(in srgb, #fab387 18%, #1e1e2e); --err-fg:#f38ba8; --err-bg:color-mix(in srgb, #f38ba8 14%, #1e1e2e);
+  --kbd-bg:#11111b; --kbd-fg:#cdd6f4; --pal-sel:#313244; --mark-bg:color-mix(in srgb, #f9e2af 30%, #1e1e2e); --toast-bg:#cdd6f4; --toast-fg:#1e1e2e;
+  --tl-success:color-mix(in srgb, #a6e3a1 50%, #11111b); --tl-info:color-mix(in srgb, #89b4fa 60%, #11111b); --tl-warning:color-mix(in srgb, #f9e2af 45%, #11111b); --tl-error:color-mix(in srgb, #f38ba8 65%, #11111b);
+  --st-raw:#a6adc8; --st-ready:#89b4fa; --st-active:#a6e3a1; --st-blocked:#f38ba8;
+  --add-fg:#89b4fa; --add-bg:color-mix(in srgb, #89b4fa 16%, #1e1e2e); --rem-fg:#fab387; --rem-bg:color-mix(in srgb, #fab387 18%, #1e1e2e); --hunk-bg:#313244;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Frappé */
+:root[data-theme="catppuccin"][data-mode="dark"][data-variant="frappe"] {
+  color-scheme:dark;
+  --bg:#292c3c; --surface:#303446; --surface-2:#414559; --input-bg:#232634; --tray:#232634;
+  --text:#c6d0f5; --text-2:color-mix(in srgb, #a5adce 85%, #c6d0f5); --line:#51576d; --line-strong:#838ba7;
+  --accent:#ca9ee6; --accent-fg:#232634; --accent-soft:#414559; --focus:#ca9ee6; --scrim:rgba(35,38,52,.6);
+  --warn-fg:color-mix(in srgb, #ef9f76 70%, #c6d0f5); --warn-bg:color-mix(in srgb, #ef9f76 18%, #303446); --err-fg:color-mix(in srgb, #e78284 60%, #c6d0f5); --err-bg:color-mix(in srgb, #e78284 14%, #303446);
+  --kbd-bg:#232634; --kbd-fg:#c6d0f5; --pal-sel:#414559; --mark-bg:color-mix(in srgb, #e5c890 25%, #303446); --toast-bg:#c6d0f5; --toast-fg:#303446;
+  --tl-success:color-mix(in srgb, #a6d189 45%, #232634); --tl-info:color-mix(in srgb, #8caaee 55%, #232634); --tl-warning:color-mix(in srgb, #e5c890 45%, #232634); --tl-error:color-mix(in srgb, #e78284 65%, #232634);
+  --st-raw:#a5adce; --st-ready:#8caaee; --st-active:#a6d189; --st-blocked:#e78284;
+  --add-fg:color-mix(in srgb, #8caaee 70%, #c6d0f5); --add-bg:color-mix(in srgb, #8caaee 16%, #303446); --rem-fg:color-mix(in srgb, #ef9f76 70%, #c6d0f5); --rem-bg:color-mix(in srgb, #ef9f76 18%, #303446); --hunk-bg:#414559;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Macchiato */
+:root[data-theme="catppuccin"][data-mode="dark"][data-variant="macchiato"] {
+  color-scheme:dark;
+  --bg:#1e2030; --surface:#24273a; --surface-2:#363a4f; --input-bg:#181926; --tray:#181926;
+  --text:#cad3f5; --text-2:#a5adcb; --line:#494d64; --line-strong:#8087a2;
+  --accent:#c6a0f6; --accent-fg:#181926; --accent-soft:#363a4f; --focus:#c6a0f6; --scrim:rgba(24,25,38,.6);
+  --warn-fg:#f5a97f; --warn-bg:color-mix(in srgb, #f5a97f 18%, #24273a); --err-fg:#ed8796; --err-bg:color-mix(in srgb, #ed8796 14%, #24273a);
+  --kbd-bg:#181926; --kbd-fg:#cad3f5; --pal-sel:#363a4f; --mark-bg:color-mix(in srgb, #eed49f 25%, #24273a); --toast-bg:#cad3f5; --toast-fg:#24273a;
+  --tl-success:color-mix(in srgb, #a6da95 50%, #181926); --tl-info:color-mix(in srgb, #8aadf4 60%, #181926); --tl-warning:color-mix(in srgb, #eed49f 45%, #181926); --tl-error:color-mix(in srgb, #ed8796 65%, #181926);
+  --st-raw:#a5adcb; --st-ready:#8aadf4; --st-active:#a6da95; --st-blocked:#ed8796;
+  --add-fg:#8aadf4; --add-bg:color-mix(in srgb, #8aadf4 16%, #24273a); --rem-fg:#f5a97f; --rem-bg:color-mix(in srgb, #f5a97f 18%, #24273a); --hunk-bg:#363a4f;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}

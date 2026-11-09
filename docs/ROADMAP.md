@@ -46,13 +46,11 @@ Workbench and polish:
 - [261029-mj49] After a capture, offer to open the new record
 - [261107-49ta] Animation settings in the workbench
 - [261107-qsd4] More lane-move themes
-- [261108-gvzn] Workbench theming
 - [261107-7v9y] Dropped fizzle and close streaks
 
 Hardening and small rules:
 
 - [261108-2ncf] Basic Windows support
-- [261108-xajw] Workbench page tests
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs

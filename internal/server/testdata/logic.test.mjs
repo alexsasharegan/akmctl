@@ -13,6 +13,9 @@ import * as K from "./controls.js";
 import * as P from "./picker.js";
 import * as F from "./fields.js";
 import * as X from "./effects.js";
+import * as TH from "./theme.js";
+import vm from "node:vm";
+import { readFileSync } from "node:fs";
 
 const work = (id, f) => ({ id, type: "work", path: "docs/work/" + id + ".md", etag: "x", fields: { id, title: "T " + id, status: "ready", parent: null, priority: null, blocked_by: null, updated: "2026-10-20", summary: null, kind: null, ...f } });
 const adr = (id, f) => ({ id, type: "adr", path: "docs/adr/" + id + ".md", etag: "x", fields: { id, title: "A " + id, status: "accepted", ...f } });
@@ -753,4 +756,63 @@ assert.equal(X.confettiPieces(70, 1).length, 70);
 for (const p of X.confettiPieces(70, 3)) {
   assert.ok(X.CONFETTI_COLORS.includes(p.color));
   assert.ok(p.rise > -1 && p.fall > 0 && p.dur >= 1100 && p.delay >= 0);
+}
+
+// color themes (theme.js; boot.js repeats resolvePrefs for the first paint)
+const reg = JSON.parse(readFileSync(new URL("./themes.json", import.meta.url), "utf8"));
+assert.equal(reg.default, TH.DEFAULT_THEME);
+assert.deepEqual(TH.resolvePrefs({}, false), { theme: "quiet-paper", mode: "system", resolved: "light", variant: "" });
+assert.deepEqual(TH.resolvePrefs({}, true), { theme: "quiet-paper", mode: "system", resolved: "dark", variant: "" });
+// the old key held "light" or "dark"
+assert.deepEqual(TH.resolvePrefs({ theme: "dark" }, false), { theme: "quiet-paper", mode: "dark", resolved: "dark", variant: "" });
+assert.equal(TH.resolvePrefs({ theme: "light" }, true).resolved, "light");
+// a mode key beats the old key; a theme id keeps system mode unless a mode is saved
+assert.equal(TH.resolvePrefs({ theme: "dark", mode: "light" }, true).resolved, "light");
+assert.deepEqual(TH.resolvePrefs({ theme: "ayu", mode: "dark", dark: "mirage", light: "light" }, false), { theme: "ayu", mode: "dark", resolved: "dark", variant: "mirage" });
+assert.equal(TH.resolvePrefs({ theme: "ayu", dark: "mirage" }, false).variant, ""); // the variant of the other mode is not used
+// odd values never get through (they end up in a CSS selector and an attribute)
+assert.deepEqual(TH.resolvePrefs({ theme: '"]{}', mode: "sepia", light: "a b" }, false), { theme: "quiet-paper", mode: "system", resolved: "light", variant: "" });
+assert.equal(TH.resolvePrefs({ theme: "Ayu" }, false).theme, "quiet-paper");
+// checked against the registry
+const multi = { default: "quiet-paper", themes: [...reg.themes, { id: "demo", name: "Demo", variants: [{ id: "day", name: "Day", mode: "light" }, { id: "dusk", name: "Dusk", mode: "dark" }, { id: "night", name: "Night", mode: "dark" }] }] };
+assert.equal(TH.checkPrefs(TH.resolvePrefs({ theme: "gone" }, false), multi).theme, "quiet-paper");
+assert.equal(TH.checkPrefs(TH.resolvePrefs({ theme: "demo", mode: "dark", dark: "night" }, false), multi).variant, "night");
+assert.equal(TH.checkPrefs(TH.resolvePrefs({ theme: "demo", mode: "dark", dark: "dusk" }, false), multi).variant, ""); // the default needs no name
+assert.equal(TH.checkPrefs(TH.resolvePrefs({ theme: "demo", mode: "dark", dark: "gone" }, false), multi).variant, "");
+assert.equal(TH.checkPrefs(TH.resolvePrefs({ theme: "gone", mode: "dark", dark: "night" }, false), multi).variant, ""); // a new theme drops the old variant
+assert.deepEqual(TH.variantsOf(multi, "demo", "dark").map((v) => v.id), ["dusk", "night"]);
+assert.deepEqual(TH.variantsOf(multi, "none", "dark"), []);
+assert.deepEqual(TH.attrsOf(TH.resolvePrefs({ theme: "demo", mode: "dark", dark: "night" }, false)), { theme: "demo", mode: "dark", variant: "night" });
+
+// boot.js (a classic script) must choose what resolvePrefs chooses
+const bootSrc = readFileSync(new URL("./boot.js", import.meta.url), "utf8");
+function boot(store, systemDark) {
+  const dataset = {};
+  const sandbox = {
+    localStorage: { getItem: (k) => (k in store ? store[k] : null) },
+    matchMedia: () => ({ matches: systemDark }),
+    document: { documentElement: { dataset } },
+  };
+  sandbox.window = sandbox;
+  vm.runInNewContext(bootSrc, sandbox);
+  return dataset;
+}
+for (const sys of [false, true]) {
+  for (const stored of [
+    {},
+    { "akm-theme": "dark" },
+    { "akm-theme": "light" },
+    { "akm-theme": "dark", "akm-mode": "light" },
+    { "akm-mode": "dark" },
+    { "akm-mode": "system", "akm-variant-light": "x1", "akm-variant-dark": "x2" },
+    { "akm-theme": "ayu", "akm-mode": "dark", "akm-variant-dark": "mirage" },
+    { "akm-theme": "ayu", "akm-variant-light": "light" },
+    { "akm-theme": '"]{}', "akm-mode": "sepia", "akm-variant-dark": "a b" },
+  ]) {
+    const want = TH.attrsOf(TH.resolvePrefs({ theme: stored["akm-theme"], mode: stored["akm-mode"], light: stored["akm-variant-light"], dark: stored["akm-variant-dark"] }, sys));
+    const got = boot(stored, sys);
+    assert.equal(got.theme, want.theme, JSON.stringify([stored, sys]));
+    assert.equal(got.mode, want.mode, JSON.stringify([stored, sys]));
+    assert.equal(got.variant || "", want.variant, JSON.stringify([stored, sys]));
+  }
 }

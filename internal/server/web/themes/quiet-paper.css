@@ -1,0 +1,40 @@
+/* Quiet paper: the workbench's own color theme (the pkm-workbench palette). A color theme is one file
+   in this folder plus an entry in themes.json; docs/theming.md says how. The server joins every *.css here
+   into /themes.css. Each variant block must define exactly the tokens below (TestThemeTokens). */
+
+/* light (the default light variant; also the page's colors before any theme is chosen) */
+:root,
+:root[data-theme="quiet-paper"][data-mode="light"] {
+  color-scheme:light;
+  --bg:#FBF8F2; --surface:#FFFDF8; --surface-2:#F2EDE2; --input-bg:#FFFFFF; --tray:#F1EBDE;
+  --text:#26231F; --text-2:#5C554A; --line:#E3DCCD; --line-strong:#8C8170;
+  --accent:#0B5570; --accent-fg:#FFFFFF; --accent-soft:#E1EEF2; --focus:#0B5570; --scrim:rgba(38,35,31,.38);
+  --warn-fg:#7A4B00; --warn-bg:#FBF1D6; --err-fg:#9C2A18; --err-bg:#FBE6E1;
+  --kbd-bg:#FFFFFF; --kbd-fg:#3A352D; --pal-sel:#E1EEF2; --mark-bg:#F4DE9A; --toast-bg:#26231F; --toast-fg:#FBF8F2;
+  --tl-success:#86CF93; --tl-info:#86CCE0; --tl-warning:#F0C25E; --tl-error:#FF9C88;
+  --st-raw:#6F675B; --st-ready:#0B5570; --st-active:#2F6B3A; --st-blocked:#A3341F;
+  --add-fg:#0B5570; --add-bg:#DCEBF5; --rem-fg:#8A4B00; --rem-bg:#FBE9D2; --hunk-bg:#EFE9DB;
+  --sh-ink:38,35,31;
+  --sh-sm:0 1px 2px 0 rgba(var(--sh-ink),.06);
+  --sh-lg:0 10px 15px -3px rgba(var(--sh-ink),.14),0 4px 6px -4px rgba(var(--sh-ink),.12);
+  --sh-2:0 20px 25px -5px rgba(var(--sh-ink),.16),0 8px 10px -6px rgba(var(--sh-ink),.12);
+  --card-hi:none;
+}
+
+/* dark (the default dark variant) */
+:root[data-theme="quiet-paper"][data-mode="dark"] {
+  color-scheme:dark;
+  --bg:#1B1916; --surface:#25221E; --surface-2:#2D2924; --input-bg:#1B1916; --tray:#211E1A;
+  --text:#ECE6DA; --text-2:#B5AC9C; --line:#39342C; --line-strong:#80766A;
+  --accent:#86CCE0; --accent-fg:#0E2630; --accent-soft:#1E3239; --focus:#9ADAEC; --scrim:rgba(0,0,0,.6);
+  --warn-fg:#F0C25E; --warn-bg:#35290F; --err-fg:#FF9C88; --err-bg:#3D1D17;
+  --kbd-bg:#1B1916; --kbd-fg:#D9D2C4; --pal-sel:#1E3239; --mark-bg:#6B5A1C; --toast-bg:#ECE6DA; --toast-fg:#1B1916;
+  --tl-success:#2F6B3A; --tl-info:#0B5570; --tl-warning:#7A4B00; --tl-error:#9C2A18;
+  --st-raw:#A89F90; --st-ready:#86CCE0; --st-active:#86CF93; --st-blocked:#F08C78;
+  --add-fg:#86CCE0; --add-bg:#1E3239; --rem-fg:#F0B070; --rem-bg:#3A2A14; --hunk-bg:#2D2924;
+  --sh-ink:0,0,0;
+  --sh-sm:0 1px 2px 0 rgba(0,0,0,.35);
+  --sh-lg:0 10px 15px -3px rgba(0,0,0,.55),0 4px 6px -4px rgba(0,0,0,.5);
+  --sh-2:0 20px 25px -5px rgba(0,0,0,.6),0 8px 10px -6px rgba(0,0,0,.5);
+  --card-hi:inset 0 1px 0 rgba(255,255,255,.05);
+}
