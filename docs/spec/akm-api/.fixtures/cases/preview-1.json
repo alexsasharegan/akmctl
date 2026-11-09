@@ -1,0 +1,496 @@
+{
+  "name": "a sequence of writes: each diff is after the earlier ones",
+  "repo": "claims",
+  "bindings": [
+    "api",
+    "http"
+  ],
+  "request": {
+    "as_of": "2026-10-28T09:30",
+    "writes": [
+      {
+        "op": "section",
+        "id": "261022-e5f6",
+        "name": "Goal",
+        "text": "First."
+      },
+      {
+        "op": "section",
+        "id": "261022-e5f6",
+        "name": "Goal",
+        "text": "Second."
+      },
+      {
+        "op": "claim",
+        "id": "261022-e5f6",
+        "as": "agent-1"
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "preview",
+    "request": {
+      "as_of": "2026-10-28T09:30",
+      "writes": [
+        {
+          "id": "261022-e5f6",
+          "name": "Goal",
+          "op": "section",
+          "text": "First."
+        },
+        {
+          "id": "261022-e5f6",
+          "name": "Goal",
+          "op": "section",
+          "text": "Second."
+        },
+        {
+          "as": "agent-1",
+          "id": "261022-e5f6",
+          "op": "claim"
+        }
+      ]
+    },
+    "ok": true,
+    "writes": [
+      {
+        "api_version": "1.0",
+        "operation": "section",
+        "request": {
+          "as_of": "2026-10-28T09:30",
+          "dry_run": true,
+          "id": "261022-e5f6",
+          "name": "Goal",
+          "text": "First."
+        },
+        "ok": true,
+        "record": {
+          "id": "261022-e5f6",
+          "type": "work",
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "id_date": "2026-10-22",
+          "etag": "6095f4c7f9a042cf",
+          "fields": {
+            "id": "261022-e5f6",
+            "title": "Document the exit codes",
+            "summary": null,
+            "status": "ready",
+            "kind": null,
+            "parent": "261015-c4d5",
+            "blocked_by": null,
+            "priority": null,
+            "cycle": null,
+            "keep": null,
+            "created": "2026-10-22",
+            "updated": "2026-10-28",
+            "closed": null,
+            "authored_by": null,
+            "decisions": null,
+            "claimed_by": null,
+            "claimed_at": null
+          }
+        },
+        "section": {
+          "name": "goal",
+          "text": "First."
+        },
+        "changed": true,
+        "diff": {
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "new_path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "hunks": [
+            {
+              "header": "@@ -4,15 +4,13 @@",
+              "lines": [
+                {
+                  "op": "ctx",
+                  "text": "status: ready",
+                  "old": 4,
+                  "new": 4
+                },
+                {
+                  "op": "ctx",
+                  "text": "parent: 261015-c4d5",
+                  "old": 5,
+                  "new": 5
+                },
+                {
+                  "op": "ctx",
+                  "text": "created: 2026-10-22",
+                  "old": 6,
+                  "new": 6
+                },
+                {
+                  "op": "rem",
+                  "text": "updated: 2026-10-22",
+                  "old": 7,
+                  "new": null
+                },
+                {
+                  "op": "add",
+                  "text": "updated: 2026-10-28",
+                  "old": null,
+                  "new": 7
+                },
+                {
+                  "op": "ctx",
+                  "text": "---",
+                  "old": 8,
+                  "new": 8
+                },
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 9,
+                  "new": 9
+                },
+                {
+                  "op": "ctx",
+                  "text": "# Document the exit codes",
+                  "old": 10,
+                  "new": 10
+                },
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 11,
+                  "new": 11
+                },
+                {
+                  "op": "ctx",
+                  "text": "## Goal",
+                  "old": 12,
+                  "new": 12
+                },
+                {
+                  "op": "rem",
+                  "text": "Do the thing.",
+                  "old": 13,
+                  "new": null
+                },
+                {
+                  "op": "rem",
+                  "text": "",
+                  "old": 14,
+                  "new": null
+                },
+                {
+                  "op": "rem",
+                  "text": "- [ ] It is done.",
+                  "old": 15,
+                  "new": null
+                },
+                {
+                  "op": "add",
+                  "text": "First.",
+                  "old": null,
+                  "new": 13
+                },
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 16,
+                  "new": 14
+                },
+                {
+                  "op": "ctx",
+                  "text": "## Next",
+                  "old": 17,
+                  "new": 15
+                },
+                {
+                  "op": "ctx",
+                  "text": "Write the exit-code table.",
+                  "old": 18,
+                  "new": 16
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "api_version": "1.0",
+        "operation": "section",
+        "request": {
+          "as_of": "2026-10-28T09:30",
+          "dry_run": true,
+          "id": "261022-e5f6",
+          "if_match": "824daa7e1563d01e",
+          "name": "Goal",
+          "text": "Second."
+        },
+        "ok": true,
+        "record": {
+          "id": "261022-e5f6",
+          "type": "work",
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "id_date": "2026-10-22",
+          "etag": "824daa7e1563d01e",
+          "fields": {
+            "id": "261022-e5f6",
+            "title": "Document the exit codes",
+            "summary": null,
+            "status": "ready",
+            "kind": null,
+            "parent": "261015-c4d5",
+            "blocked_by": null,
+            "priority": null,
+            "cycle": null,
+            "keep": null,
+            "created": "2026-10-22",
+            "updated": "2026-10-28",
+            "closed": null,
+            "authored_by": null,
+            "decisions": null,
+            "claimed_by": null,
+            "claimed_at": null
+          }
+        },
+        "section": {
+          "name": "goal",
+          "text": "Second."
+        },
+        "changed": true,
+        "diff": {
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "new_path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "hunks": [
+            {
+              "header": "@@ -10,7 +10,7 @@",
+              "lines": [
+                {
+                  "op": "ctx",
+                  "text": "# Document the exit codes",
+                  "old": 10,
+                  "new": 10
+                },
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 11,
+                  "new": 11
+                },
+                {
+                  "op": "ctx",
+                  "text": "## Goal",
+                  "old": 12,
+                  "new": 12
+                },
+                {
+                  "op": "rem",
+                  "text": "First.",
+                  "old": 13,
+                  "new": null
+                },
+                {
+                  "op": "add",
+                  "text": "Second.",
+                  "old": null,
+                  "new": 13
+                },
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 14,
+                  "new": 14
+                },
+                {
+                  "op": "ctx",
+                  "text": "## Next",
+                  "old": 15,
+                  "new": 15
+                },
+                {
+                  "op": "ctx",
+                  "text": "Write the exit-code table.",
+                  "old": 16,
+                  "new": 16
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "api_version": "1.0",
+        "operation": "claim",
+        "request": {
+          "as": "agent-1",
+          "as_of": "2026-10-28T09:30",
+          "dry_run": true,
+          "id": "261022-e5f6",
+          "if_match": "acb728c462c8cfc5"
+        },
+        "ok": true,
+        "record": {
+          "id": "261022-e5f6",
+          "type": "work",
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "id_date": "2026-10-22",
+          "etag": "acb728c462c8cfc5",
+          "fields": {
+            "id": "261022-e5f6",
+            "title": "Document the exit codes",
+            "summary": null,
+            "status": "active",
+            "kind": null,
+            "parent": "261015-c4d5",
+            "blocked_by": null,
+            "priority": null,
+            "cycle": null,
+            "keep": null,
+            "created": "2026-10-22",
+            "updated": "2026-10-28",
+            "closed": null,
+            "authored_by": null,
+            "decisions": null,
+            "claimed_by": "agent-1",
+            "claimed_at": "2026-10-28T09:30"
+          }
+        },
+        "previous_holder": null,
+        "commit": {
+          "step": "claim",
+          "item": "261022-e5f6",
+          "detail": "claimed by agent-1",
+          "paths": [
+            "docs/work/261022-e5f6-document-the-exit-codes.md"
+          ],
+          "message": "261022-e5f6(claim): claimed by agent-1\n\nAKM-Step: claim\nAKM-Item: 261022-e5f6"
+        },
+        "diff": {
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "new_path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "hunks": [
+            {
+              "header": "@@ -1,10 +1,12 @@",
+              "lines": [
+                {
+                  "op": "ctx",
+                  "text": "---",
+                  "old": 1,
+                  "new": 1
+                },
+                {
+                  "op": "ctx",
+                  "text": "id: 261022-e5f6",
+                  "old": 2,
+                  "new": 2
+                },
+                {
+                  "op": "ctx",
+                  "text": "title: Document the exit codes",
+                  "old": 3,
+                  "new": 3
+                },
+                {
+                  "op": "rem",
+                  "text": "status: ready",
+                  "old": 4,
+                  "new": null
+                },
+                {
+                  "op": "add",
+                  "text": "status: active",
+                  "old": null,
+                  "new": 4
+                },
+                {
+                  "op": "ctx",
+                  "text": "parent: 261015-c4d5",
+                  "old": 5,
+                  "new": 5
+                },
+                {
+                  "op": "ctx",
+                  "text": "created: 2026-10-22",
+                  "old": 6,
+                  "new": 6
+                },
+                {
+                  "op": "ctx",
+                  "text": "updated: 2026-10-28",
+                  "old": 7,
+                  "new": 7
+                },
+                {
+                  "op": "add",
+                  "text": "claimed_by: agent-1",
+                  "old": null,
+                  "new": 8
+                },
+                {
+                  "op": "add",
+                  "text": "claimed_at: 2026-10-28T09:30",
+                  "old": null,
+                  "new": 9
+                },
+                {
+                  "op": "ctx",
+                  "text": "---",
+                  "old": 8,
+                  "new": 10
+                },
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 9,
+                  "new": 11
+                },
+                {
+                  "op": "ctx",
+                  "text": "# Document the exit codes",
+                  "old": 10,
+                  "new": 12
+                }
+              ]
+            },
+            {
+              "header": "@@ -14,3 +16,6 @@",
+              "lines": [
+                {
+                  "op": "ctx",
+                  "text": "",
+                  "old": 14,
+                  "new": 16
+                },
+                {
+                  "op": "ctx",
+                  "text": "## Next",
+                  "old": 15,
+                  "new": 17
+                },
+                {
+                  "op": "ctx",
+                  "text": "Write the exit-code table.",
+                  "old": 16,
+                  "new": 18
+                },
+                {
+                  "op": "add",
+                  "text": "",
+                  "old": null,
+                  "new": 19
+                },
+                {
+                  "op": "add",
+                  "text": "## Log",
+                  "old": null,
+                  "new": 20
+                },
+                {
+                  "op": "add",
+                  "text": "- 2026-10-28 09:30+00:00: claimed (agent-1).",
+                  "old": null,
+                  "new": 21
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

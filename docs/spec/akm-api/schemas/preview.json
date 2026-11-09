@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/preview.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "writes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "op": {
+                "enum": [
+                  "new",
+                  "set",
+                  "section",
+                  "tick",
+                  "remove",
+                  "log",
+                  "close",
+                  "claim",
+                  "release"
+                ]
+              }
+            },
+            "required": ["op"]
+          }
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        }
+      },
+      "required": ["writes"],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "preview"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "writes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "api_version": {
+                    "const": "1.0"
+                  },
+                  "operation": {
+                    "type": "string"
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "ok": {
+                    "const": true
+                  },
+                  "record": {
+                    "$ref": "common.json#/$defs/record"
+                  },
+                  "diff": {
+                    "$ref": "common.json#/$defs/diff"
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "api_version",
+                  "operation",
+                  "request",
+                  "ok",
+                  "record",
+                  "diff"
+                ]
+              }
+            }
+          },
+          "required": ["api_version", "operation", "request", "ok", "writes"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}

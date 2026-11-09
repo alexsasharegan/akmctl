@@ -62,6 +62,8 @@ func Run(repo *record.Repo, info Info, op string, req Request) (Obj, *Error) {
 		body, err = opBases(repo, req)
 	case "migrate":
 		body, err = opMigrate(repo, req)
+	case "preview":
+		body, err = opPreview(repo, info, req)
 	case "init":
 		body, err = opInit(repo, req, info)
 	case "config":
