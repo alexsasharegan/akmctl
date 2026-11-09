@@ -1,14 +1,13 @@
 ---
 id: "261108-zg9m"
 title: ayu themes
-status: active
+status: done
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
+closed: 2026-11-08
 summary: "Add Ayu to the workbench: Light, Mirage and Dark"
-claimed_by: claude-sonnet-5-5-ayu
-claimed_at: 2026-11-09T01:44
 ---
 
 # ayu themes
@@ -26,8 +25,6 @@ Done when:
 - [x] the upstream palette's license is noted if it needs attribution
 
 ## Next
-
-Read docs/theming.md, then this item's Discovery. Read the upstream palette named there, and write themes/<id>.css and the themes.json entry; run go test ./internal/server and look at it in the workbench.
 
 ## Discovery
 
@@ -73,6 +70,17 @@ Ghostty's selection color for all three is a saturated blue (#035bd6 on Light, #
 | selection fill (accent at 24%) | #3b9ee53d | #72cffe3d | #5ac1fe3d |
 
 Text colors agree with Ghostty for Light, Mirage and Dark (#5c6166, #cccac2, #bfbdb6). The page differs: Ghostty has #f8f9fa, #1f2430, #0b0e14; Zed has #fcfcfc, #242835, #0d1016, which are lighter than Ayu's published bases for the dark flavors. Zed also makes the text accent blue where Ghostty's cursor is the Ayu gold (#ffaa33, #ffcc66, #e6b450). Ayu's own VS Code theme was not installed, so the two disagree on the page color with no tie-breaker yet: the build step should read `ayu-colors` and pick the base from there (Ayu's published `ui.bg` values: check, do not trust memory), taking Zed's tier steps and Ghostty's hues as cross-checks.
+
+## Outcome
+
+- `internal/server/web/themes/ayu.css` has three blocks (Light, Dark, Mirage) and passes `TestThemeRegistryAndTokens`. Values: `ayu-colors` at commit c6e86054896e (MIT; `themes/*.yaml` for surfaces, accent, error, hues and VCS colors); text and borders follow what Zed's bundled Ayu and Ghostty's Ayu themes agree on (Ayu's own `ui.line` is nearly invisible on its page).
+- `themes.json` lists the theme with Light as the default light and Dark as the default dark; Mirage is chosen from the command palette (search `variant`).
+- Contrast (WCAG, computed by the generator over the resolved values): the lowest pair is 4.56 for Light, 4.67 for Mirage and 5.35 for Dark, over text and muted text on the page, surface and panel, the accent and its text, warning, error, added and removed diff text on their tints, key caps, toasts, a search match and the four status colors. Hues that are too light to read as text are mixed toward a dark ink (Light) or the text color (Dark, Mirage) with `color-mix`; those mixes are the only colors outside the sources, and the file header says so.
+- Looked at in the browser: the board in Light, Dark and Mirage, and the record drawer in Mirage. Not looked at: the palette, the review diff, the Check view, and the drawer in Light and Dark.
+- Choices made: the accent is Ayu's gold (`common.accent.tint`), ready and added are blue, active is green, blocked is red, removed is orange (the same convention as Catppuccin, which keeps added and removed apart for color-blind readers). Light's gold, orange and green text mixes lean toward brown and olive to reach 4.5:1.
+- Unverified: whether the mixes look right to the maintainer's eye; the contrast numbers are arithmetic, not a visual test.
+
+Decision: none (the format is ADR 261108-w3xf).
 
 ## Log
 
