@@ -36,7 +36,6 @@ Workbench and polish:
 - [261029-12sx] Push updates to the workbench with a watcher, keeping polling as the fallback
 
 - [261030-3vgb] status lifecycle graphics
-- [261029-g8x2] The review diff is against the current file, not after earlier writes
 - [261029-jm46] Restart of akmctl ui forces a new URL
 - [261026-mrdr] pkm-workbench: sort options
 - [261026-np3c] pkm-workbench: delete a task, with its backlinks listed

@@ -11,6 +11,10 @@ const wrote = (u, init, records) => {
   const body = init.body ? JSON.parse(init.body) : {};
   if (init.method === "POST" && u.endsWith("/records")) return { ok: true, status: 201, statusText: "Created", json: async () => ({ ok: true, record: { id: "261109-new1", type: "work", path: "docs/work/261109-new1.md", etag: "n0", fields: { title: body.title, status: "raw" } } }) };
   if (staleNext) { staleNext = false; return { ok: false, status: 412, statusText: "Precondition Failed", json: async () => ({ ok: false, error: { code: "stale", message: "changed" } }) }; }
+  if (u.endsWith("/preview")) {
+    const rec = records.find((x) => x.id === body.writes.find((w) => w.id).id);
+    return { ok: true, status: 200, statusText: "OK", json: async () => ({ ok: true, writes: body.writes.map((w) => ({ ok: true, operation: w.op, record: rec, diff: { path: rec.path, new_path: rec.path, hunks: [] } })) }) };
+  }
   const fields = { ...(r ? r.fields : {}), ...(body.changes || {}) };
   if (body.dry_run) return { ok: true, status: 200, statusText: "OK", json: async () => ({ ok: true, dry_run: true, record: r, diff: { path: r.path, new_path: r.path, hunks: [] } }) };
   if (u.endsWith("/close")) fields.status = body.status;
@@ -104,9 +108,10 @@ assert.match(overlay.text, /Decision|ADR/i, "next comes the decision step");
 press("Enter", { target: overlay.querySelector("input:checked") || overlay });
 await settle(10);
 assert.match(overlay.text, /Review/, "then the review");
-assert.equal(app.calls.length, before2 + 1, "one dry run so far");
-assert.equal(app.calls.at(-1).body.dry_run, true, "the review is a dry run");
-assert.equal(app.calls.at(-1).body.status, "done");
+assert.equal(app.calls.length, before2 + 1, "one preview so far");
+assert.match(app.calls.at(-1).url, /\/preview$/, "the review is a preview");
+assert.equal(app.calls.at(-1).body.writes.at(-1).op, "close");
+assert.equal(app.calls.at(-1).body.writes.at(-1).status, "done");
 press("Enter", { target: overlay.querySelector(".diff") || overlay });
 await settle(10);
 assert.equal(app.calls.length, before2 + 2, "and one real write");
