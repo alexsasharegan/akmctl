@@ -1,12 +1,14 @@
 ---
 id: "261108-dv5e"
 title: github themes
-status: ready
+status: active
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
 summary: "Add GitHub's Primer themes to the workbench: Light and Dark Default first, then Dimmed, High Contrast and Colorblind"
+claimed_by: claude-sonnet-5-5-github
+claimed_at: 2026-11-09T02:13
 ---
 
 # github themes
@@ -73,3 +75,4 @@ The colorblind variants show the status trade-off directly: error becomes orange
 - 2026-11-08: filed.
 - 2026-11-08 11:00-07:00: Palette discovery from Ghostty's bundled themes: variants, hex values and upstream sources recorded in Discovery.
 - 2026-11-08 11:05-07:00: Second discovery pass from the installed VS Code themes (Catppuccin, GitHub, One Dark/Light); Ayu has none installed. Tiers, borders, accents and diff fills added to Discovery.
+- 2026-11-08 19:13-07:00: claimed (claude-sonnet-5-5-github).
