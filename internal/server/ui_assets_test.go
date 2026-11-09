@@ -249,3 +249,48 @@ func TestPureModulesUnderNode(t *testing.T) {
 		t.Fatalf("node: %v\n%s", err, out)
 	}
 }
+
+// The DOM modules and the page run under Node against a small fake document
+// (testdata/fakedom.mjs), so a render function that throws or draws the wrong
+// thing fails here and not in someone's browser. The tree is copied with the
+// layout of web/ (app.js next to js/) and a package.json that marks it as ESM.
+func TestDOMModulesUnderNode(t *testing.T) {
+	node := testutil.RequireTool(t, "node")
+	dir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(dir, "js"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	put := func(name, content string) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	entries, err := web.ReadDir("web/js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range entries {
+		put("js/"+e.Name(), readWeb(t, "js/"+e.Name()))
+	}
+	put("app.js", readWeb(t, "app.js"))
+	put("package.json", `{"type":"module"}`)
+	for _, n := range []string{"fakedom.mjs", "apphelper.mjs", "dom.test.mjs", "app.test.mjs", "keys.test.mjs", "drawer.test.mjs", "wizard.test.mjs", "project.test.mjs"} {
+		b, err := os.ReadFile(filepath.Join("testdata", n))
+		if err != nil {
+			t.Fatal(err)
+		}
+		put(n, string(b))
+	}
+	// one process per file: app.js keeps module state
+	for _, n := range []string{"dom.test.mjs", "app.test.mjs", "keys.test.mjs", "drawer.test.mjs", "wizard.test.mjs", "project.test.mjs"} {
+		t.Run(n, func(t *testing.T) {
+			t.Parallel()
+			cmd := exec.Command(node, n)
+			cmd.Dir = dir
+			if out, err := cmd.CombinedOutput(); err != nil {
+				t.Fatalf("node %s: %v\n%s", n, err, out)
+			}
+		})
+	}
+}
