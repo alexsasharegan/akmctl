@@ -20,7 +20,7 @@ Children, in dependency order:
 - [Catppuccin themes](done/261108-m4a6-catppuccin-themes.md): Latte and the dark flavours
 - [Ayu themes](done/261108-zg9m-ayu-themes.md): light, mirage and dark
 - [Atom One themes](done/261108-pmkp-atom-one-themes.md): light and dark
-- [GitHub themes](261108-dv5e-github-themes.md): light and dark
+- [GitHub themes](done/261108-dv5e-github-themes.md): light and dark
 
 More themes can be added as children when wanted. A _color theme_ (this project) is not a _move theme_ (the lane-move animation in `js/anim.js`, see the glossary); the factorization item registers the distinction.
 

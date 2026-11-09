@@ -1,14 +1,13 @@
 ---
 id: "261108-dv5e"
 title: github themes
-status: active
+status: done
 kind: feature
 parent: 261108-gvzn
 created: 2026-11-08
 updated: 2026-11-08
+closed: 2026-11-08
 summary: "Add GitHub's Primer themes to the workbench: Light and Dark Default first, then Dimmed, High Contrast and Colorblind"
-claimed_by: claude-sonnet-5-5-github
-claimed_at: 2026-11-09T02:13
 ---
 
 # github themes
@@ -26,8 +25,6 @@ Done when:
 - [x] the upstream palette's license is noted if it needs attribution
 
 ## Next
-
-Read docs/theming.md, then this item's Discovery. Read the upstream palette named there, and write themes/<id>.css and the themes.json entry; run go test ./internal/server and look at it in the workbench.
 
 ## Discovery
 
@@ -69,6 +66,17 @@ Colorblind variants (`GitHub Light Colorblind`, `GitHub Dark Colorblind`) swap r
 | diff removed fill        | #ff818266     | #ff7b724d    | #f470674d   | #ee5a5d66 | #ff94924d | #f7993966 | #ec8e2c4d |
 
 The colorblind variants show the status trade-off directly: error becomes orange (#b35900 light, #d47616 dark) and "added" becomes blue, so the status colors (raw, ready, active, blocked) and the review-diff pairs must read from per-variant tokens, not a fixed red and green. High-contrast variants use a strong border (#20252c, #7a828e) and identical text and muted colors; check that nothing relies on muted text being fainter. Color values are the Primer functional tokens flattened for VS Code; the Primer primitives repo remains the source for names (`canvas.default`, `canvas.subtle`, `border.default`, `fg.muted`).
+
+## Outcome
+
+- `internal/server/web/themes/github.css` has seven blocks and passes `TestThemeRegistryAndTokens`: Light, Light high contrast, Light colorblind, Dark, Dark dimmed, Dark high contrast and Dark colorblind. Values: the Primer VS Code theme `github.github-vscode-theme` 6.3.5 (MIT), the second source recorded in Discovery; Ghostty's Primer themes agree on the hues.
+- `themes.json` lists them with Light as the default light and Dark as the default dark; the rest are chosen from the command palette (search `variant`).
+- Contrast (WCAG, computed by the generator over the resolved values): the lowest pair is 4.56 for Light, 4.55 for Light colorblind, 4.61 for Dark, 4.53 for Dark dimmed and 5.08 or more for the two high contrast variants, over text and muted text on the page, surface and hover tones, the accent and its text, warning, error, added and removed diff text on their tints, key caps, toasts, a search match and the four status colors. Colors that are too light or dark to read as text are mixed toward the text color with `color-mix`; those mixes are the only colors outside the sources, and the file header says so.
+- Colorblind variants follow Primer: green becomes blue and red becomes orange, so active is blue and blocked and removed are orange. Ready would also be blue there, so it is purple (#8250df light, #bc8cff dark) to keep ready and active apart. In the high contrast variants muted text equals text, as in Primer, and Light high contrast has the same page and surface, so cards are told apart by the strong border only.
+- Looked at in the browser: the board in Light and Dark colorblind and the record drawer in Dark. Not looked at: the palette, the review diff, the Check view, and Dimmed and both high contrast variants rendered.
+- Unverified: whether the mixes look right to the maintainer's eye; warning and error are both brown-orange in Light colorblind (Primer's own choice), so check that pair; the contrast numbers are arithmetic, not a visual test.
+
+Decision: none (the format is ADR 261108-w3xf).
 
 ## Log
 
