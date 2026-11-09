@@ -146,11 +146,13 @@ Response: `columns` (array of `{status, count, records}`, in the order requested
 
 Run the rules of section 6 of the specification.
 
-| Parameter | Type              | Default        | Meaning                                                                                             |
-| --------- | ----------------- | -------------- | --------------------------------------------------------------------------------------------------- |
-| `target`  | version string    | the tool's own | Run the rules of another layout version and classify each finding (section 7 of the specification). |
-| `rules`   | array of string   | all            | Rule ids (`WK4`) or prefixes (`WK`, `L`).                                                           |
-| `as_of`   | timestamp or date | now            | The clock for staleness rules (WK10, claims). Tests set it.                                         |
+| Parameter | Type              | Default        | Meaning                                                                                                                                                                                               |
+| --------- | ----------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`  | version string    | the tool's own | Classify each finding for another layout version (section 7 of the specification): the tool's own, the repository's own, or any version the embedded migrations reach from the repository's `layout`. |
+| `rules`   | array of string   | all            | Rule ids (`WK4`) or prefixes (`WK`, `L`).                                                                                                                                                             |
+| `as_of`   | timestamp or date | now            | The clock for staleness rules (WK10, claims). Tests set it.                                                                                                                                           |
+
+The findings are those of this release's one rule set; `target` only sets each finding's `class` from the steps of the migration chain from the repository's `layout` to the target. Any other `target` is refused with `invalid_request`, and the message names the versions that would be accepted.
 
 Response: `clean` (true when no finding has severity `E`), `errors`, `warnings` (counts), `count` (findings), `findings`, and `reconcile` (`state`: `current`, `behind`, `ahead`, `unsupported`, `conflict` or `absent`; and `steps`, an array of strings, when `behind`).
 

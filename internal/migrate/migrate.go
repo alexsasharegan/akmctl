@@ -116,6 +116,26 @@ func ChainIn(registry []Migration, from, to string) ([]Migration, bool) {
 	return nil, false
 }
 
+// Reachable lists the layout versions the embedded migrations lead to from a
+// version, nearest first, not including the version itself.
+func Reachable(from string) []string {
+	var out []string
+	seen := map[string]bool{from: true}
+	queue := []string{from}
+	for len(queue) > 0 {
+		v := queue[0]
+		queue = queue[1:]
+		for _, m := range Registry {
+			if m.From == v && !seen[m.To] {
+				seen[m.To] = true
+				out = append(out, m.To)
+				queue = append(queue, m.To)
+			}
+		}
+	}
+	return out
+}
+
 // Steps flattens a chain.
 func Steps(ms []Migration) []Step {
 	var out []Step
