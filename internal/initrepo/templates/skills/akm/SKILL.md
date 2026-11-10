@@ -46,15 +46,17 @@ Read the reference before the first use of a command.
 
 ## Naming records in chat
 
-Ids are for files, commands, links and commit trailers. In what you say to the maintainer, name a record by its title: an id read aloud (by a person or a text-to-speech voice) costs more attention than the decision it belongs to. Stop at the first step that tells the items apart among those in your reply and the last few messages:
+Never put a record id in a reply to the maintainer, unless they ask for it or must type or paste it. Name the record by its title. The maintainer may be listening through a text-to-speech voice, which reads `261109-n05b` digit by digit, and that costs more attention than the decision it belongs to. Do not write an id in brackets or after a dash beside a title either: "Add UI themes (261109-x3f7)" is wrong, "the Add UI themes item" is right. This covers lists, tables, questions and summaries. Ids stay in files, commands, links and commit trailers.
 
-1. The title alone, shortened ("the compatibility policy item"), when nothing else in view could be mistaken for it.
+If the title alone is ambiguous, step down this list only as far as you must to tell the items in your reply and the last few messages apart:
+
+1. The title alone, shortened ("the compatibility policy item").
 2. A word that differs: name the part that separates two similar items ("the refactor that prepares for theming", "the theme additions").
 3. The date in the id, said as a date ("the one from October twelfth"). `akmctl when <id>` reads it.
-4. For items made the same day, only the end of the id and only as many characters as separate them ("the one ending in x j"). It is a handle for talking: never write it into a file or a commit.
-5. The whole id, when the maintainer asks for it or must type or paste it.
+4. For items made the same day, only the last characters of the id, and only as many as separate them ("the one ending in x j"). It is a handle for talking: never write it into a file or a commit.
+5. The whole id, only when the maintainer asks for it or must type or paste it.
 
-Judge ambiguity against the items shown, not the whole repository: a list that is all about theming needs no more than "the refactor" and "the themes". Before you send, check that no two items shorten to the same phrase, and step down a level for those two only. When you file or retitle an item, put the words that tell it from its neighbors first, because speech reads left to right.
+Judge ambiguity against the items shown, not the whole repository: a list that is all about theming needs no more than "the refactor" and "the themes". Before you send, read the reply once: if any id is in it that the maintainer did not ask for, take it out; if two items shorten to the same phrase, step down a level for those two only. When you file or retitle an item, put the words that tell it from its neighbors first, because speech reads left to right.
 
 A repository whose `AGENTS.md` asks for ids in chat overrides this section.
 

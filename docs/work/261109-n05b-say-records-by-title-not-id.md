@@ -44,3 +44,4 @@ Rework the cold-agent check. Two runs with a small model (2026-11-09) did not sh
 - 2026-11-09: filed.
 - 2026-11-09 17:57-07:00: claimed (claude-sonnet-5-5-names).
 - 2026-11-09 18:01-07:00: Skill section, decision record, glossary term, changelog entry and AGENTS.md line written. Cold-agent check not passed: run one named items by title but never faced the similar or same-day items; run two quoted full ids beside titles. Goal box 3 stays open.
+- 2026-11-09 18:03-07:00: Tightened the skill section and the AGENTS.md line (a flat 'never put an id in a reply', with a right and a wrong example). Third cold run with a small model still wrote the full id before every title, so the rule does not hold yet. Goal box 3 stays open.
