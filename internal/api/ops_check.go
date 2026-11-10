@@ -3,6 +3,7 @@ package api
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/alexsasharegan/akmctl/internal/check"
@@ -14,7 +15,19 @@ import (
 
 func opCheck(repo *record.Repo, q Request) (Obj, *Error) {
 	if t := q.str("target"); t != "" && t != check.LayoutVersion {
-		return nil, invalid("target", "target: layout version %s is not supported (this tool checks %s)", t, check.LayoutVersion)
+		// any layout the embedded migrations reach from the repository's own, or the
+		// repository's own: the findings are the tool's, classified by the chain's steps
+		if from := repoLayout(repo); t != from {
+			if _, ok := migrate.Chain(from, t); !ok {
+				reach := []string{check.LayoutVersion}
+				for _, v := range migrate.Reachable(from) {
+					if v != check.LayoutVersion {
+						reach = append(reach, v)
+					}
+				}
+				return nil, invalid("target", "target: layout version %s is not reachable from this repository's layout %s; supported targets: %s", t, from, strings.Join(reach, ", "))
+			}
+		}
 	}
 	opt := check.Options{Rules: q.strs("rules")}
 	if s := q.str("as_of"); s != "" {

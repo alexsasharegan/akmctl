@@ -152,6 +152,19 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			prev, _ := req["migrations"].([]any)
 			req["migrations"] = append(prev, ms...)
 			continue
+		case "writes":
+			v, ok := value()
+			if !ok || op != "preview" {
+				fmt.Fprintln(stderr, "akmctl: --writes <file> belongs to preview")
+				return 2
+			}
+			ws, err := readWritesFile(v)
+			if err != nil {
+				fmt.Fprintln(stderr, "akmctl:", err)
+				return 2
+			}
+			req["writes"] = ws
+			continue
 		case "format":
 			v, ok := value()
 			if !ok || (v != "json" && v != "table" && v != "ids") {
@@ -386,6 +399,24 @@ func readMigrationFile(p string) ([]any, error) {
 	return nil, fmt.Errorf("%s: a migration file holds an object or a list of objects", p)
 }
 
+// readWritesFile reads the writes of a preview: a JSON list of objects, each
+// {"op": ..., ...parameters of that operation}.
+func readWritesFile(p string) ([]any, error) {
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+	var v any
+	if err := json.Unmarshal(b, &v); err != nil {
+		return nil, fmt.Errorf("%s: not JSON: %v", p, err)
+	}
+	l, ok := v.([]any)
+	if !ok {
+		return nil, fmt.Errorf("%s: a writes file holds a list of objects", p)
+	}
+	return l, nil
+}
+
 // relativeDir reports whether d stays inside the directory it is relative to.
 func relativeDir(d string) bool {
 	c := filepath.ToSlash(filepath.Clean(d))
@@ -551,6 +582,18 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if s, ok := resp.Get("section"); ok {
 			t, _ := s.(api.Obj).Get("text")
 			fmt.Fprintf(w, "\n%v\n", t)
+		}
+	case "preview":
+		ws, _ := resp.Get("writes")
+		for n, x := range ws.([]api.Obj) {
+			op, _ := x.Get("operation")
+			fmt.Fprintf(w, "write %d: %v\n", n+1, op)
+			if note, ok := x.Get("note"); ok {
+				fmt.Fprintln(w, note)
+			}
+			if d, ok := x.Get("diff"); ok {
+				writeDiff(w, d.(api.Obj))
+			}
 		}
 	case "migrate":
 		st, _ := resp.Get("state")

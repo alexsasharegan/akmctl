@@ -10,7 +10,7 @@ const NEAR = 0.9; // the counter warns from 90% of the limit
 /**
  * The counter for a text of `len` characters against `max`.
  * Returns { level: "ok" | "near" | "limit" | "over", text, left }. The words change
- * with the level, so colour is never the only signal.
+ * with the level, so color is never the only signal.
  */
 export function counterState(len, max = SUMMARY_MAX) {
   const left = max - len;

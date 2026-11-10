@@ -1,0 +1,43 @@
+{
+  "name": "a stale first write is refused and named",
+  "repo": "claims",
+  "bindings": [
+    "api",
+    "http"
+  ],
+  "request": {
+    "writes": [
+      {
+        "op": "section",
+        "id": "261022-e5f6",
+        "name": "Goal",
+        "text": "x",
+        "if_match": "0000000000000000"
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "preview",
+    "request": {
+      "writes": [
+        {
+          "id": "261022-e5f6",
+          "if_match": "0000000000000000",
+          "name": "Goal",
+          "op": "section",
+          "text": "x"
+        }
+      ]
+    },
+    "ok": false,
+    "error": {
+      "code": "stale",
+      "message": "the record changed since it was read",
+      "details": {
+        "write": 0,
+        "etag": "6095f4c7f9a042cf"
+      }
+    }
+  }
+}

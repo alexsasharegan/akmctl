@@ -26,7 +26,7 @@ Done when:
 - [x] Each candidate is run over every item in `docs/work/` and `docs/work/done/`, and the span of every `##` section, checklist item and log line is compared with the file; mismatches are counted and shown.
 - [x] Each is run over a set of hostile cases: a `## ` inside a code fence, setext headings, HTML blocks, nested lists with task items, tables, CRLF files, a file with no trailing newline.
 - [x] A splice edit (tick one item, append one log line) is done through each candidate on a scratch copy, and the git diff shows only the intended lines.
-- [x] Each candidate is costed: lines of code to adopt, added binary size, licence, maintenance activity, release cadence, and how often the spec it follows changes.
+- [x] Each candidate is costed: lines of code to adopt, added binary size, license, maintenance activity, release cadence, and how often the spec it follows changes.
 - [x] Whether a parser plus our own printer could replace Prettier for records is noted as a finding only; replacing Prettier is a separate decision.
 - [x] A recommendation (adopt one, extend our scanner, or defer) is in `## Outcome`; the dependency or the decision not to take one has a `proposed` ADR (the dependency rule in AGENTS.md); `261031-gam0` and `261031-j4bc` are updated to match; follow-up items are filed.
 

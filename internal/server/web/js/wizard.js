@@ -3,7 +3,7 @@
 // A write that finds the record changed shows the conflict and writes nothing more.
 import { el } from "./util.js";
 import { api, ApiError, describeError, state } from "./store.js";
-import { buildOps, requestFor, resolveOp, previewable, opLabel, validateStep, wizardKey } from "./moves.js";
+import { buildOps, requestFor, resolveOp, previewRequest, opLabel, validateStep, wizardKey } from "./moves.js";
 import { slugify } from "./capture.js";
 import { renderDiff } from "./review.js";
 
@@ -183,11 +183,11 @@ export function openWizard(deps, spec) {
           W.written ? el("p", { class: "help", text: W.written + " of " + W.ops.length + " writes were made before this." }) : null,
         ];
     }
-    const parts = [el("p", { class: "muted", text: "This is exactly what each write will change. Nothing is written until you confirm." + (W.previews.length > 1 ? " Each diff is against the file as it is now; the writes are made in this order, so a later one builds on the earlier." : "") })];
+    const parts = [el("p", { class: "muted", text: "This is exactly what each write will change. Nothing is written until you confirm." + (W.previews.length > 1 ? " Each diff is as it will apply after the writes before it." : "") })];
     W.previews.forEach((p, n) => {
       parts.push(el("h3", { class: "sec-h" }, "Write " + (n + 1) + " of " + W.previews.length + ": " + opLabel(p.op, rec.id, state.folders)));
       if (p.diff) parts.push(renderDiff(p.diff));
-      else parts.push(el("p", { class: "note-card", text: p.note }));
+      if (p.note) parts.push(el("p", { class: "note-card", text: p.note }));
     });
     return parts;
   }
@@ -272,7 +272,7 @@ export function openWizard(deps, spec) {
     render();
   }
 
-  // ---- review (dry runs) ----
+  // ---- review (one preview of every write) ----
 
   async function loadReview() {
     const mine = ++W.seq;
@@ -282,20 +282,11 @@ export function openWizard(deps, spec) {
     W.canTakeover = false;
     W.ops = ops();
     render();
-    const previews = [];
     try {
-      for (const op of W.ops) {
-        if (!previewable(op, move)) {
-          previews.push({ op, note: op.kind === "new" ? "A new ADR file is created when you write. It has no diff to show: its status is proposed, and it is linked from this record's decisions." : op.kind === "claim" ? "The claim is written after the status change: it sets claimed_by and claimed_at and adds a log line." : "This write names the new ADR, which does not exist yet, so it is shown when written." });
-          continue;
-        }
-        const q = requestFor(op, rec.id, { dry_run: true, takeover: W.takeover });
-        const r = await api(q.method, q.path, { body: q.body, etag: rec.etag });
-        if (mine !== W.seq) return;
-        previews.push({ op, diff: r.diff });
-      }
+      const q = previewRequest(W.ops, rec.id, { takeover: W.takeover, etag: rec.etag });
+      const r = await api(q.method, q.path, { body: q.body });
       if (mine !== W.seq) return;
-      W.previews = previews;
+      W.previews = W.ops.map((op, n) => ({ op, diff: r.writes[n] && r.writes[n].diff, note: r.writes[n] && r.writes[n].note }));
       W.phase = "review";
     } catch (e) {
       if (mine !== W.seq) return;

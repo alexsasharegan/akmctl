@@ -32,7 +32,7 @@ func runeWidth(r rune) int {
 	return 1
 }
 
-// emojiCluster recognises an emoji sequence starting at rs[i]: the number of
+// emojiCluster recognizes an emoji sequence starting at rs[i]: the number of
 // runes it uses (0 when there is none) and its width.
 func emojiCluster(rs []rune, i int) (n, w int) {
 	r := rs[i]

@@ -25,7 +25,7 @@ Close this item.
 
 ## Outcome
 
-- API `close` refuses `dropped` with `open_children` (WK8): `TestCloseDroppedRefusesOpenChildren`, `TestCloseParentWithOpenChildren` (updated, it expected the old behaviour), fixture `close-7`.
+- API `close` refuses `dropped` with `open_children` (WK8): `TestCloseDroppedRefusesOpenChildren`, `TestCloseParentWithOpenChildren` (updated, it expected the old behavior), fixture `close-7`.
 - `check` WK8 covers `dropped` and open descendants below a settled child: `TestRules` (WK8 dropped parent with open child). No separate `check` fixture; the rule is in the spec table and the table test.
 - Spec rule table and parent bullet, API spec, guide and changelog updated. `go test -race ./...`, `gofmt`, `npm run schemas` (78 cases) pass.
 

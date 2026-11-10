@@ -26,7 +26,7 @@ Done when:
 
 ## Outcome
 
-docs/ROADMAP.md now matches the board: Now holds the Windows thread, Next is the unattended queue (eight items with no decision, four 1.0.0 items with a pick), Later holds the 1.0.0 criteria and what needs the maintainer. Criterion 5 got its item (261109-vxdr). Not covered: the raw items are untriaged, and 261101-12c0 still warns WK12 (title and heading differ).
+docs/ROADMAP.md now matches the board: Now holds the Windows thread, Next is the unattended queue (five items with no decision, four 1.0.0 items with a pick), Later holds the 1.0.0 criteria and what needs the maintainer. Criterion 5 got its item (261109-vxdr). Not covered: the raw items are untriaged, and 261101-12c0 still warns WK12 (title and heading differ).
 
 ## Log
 

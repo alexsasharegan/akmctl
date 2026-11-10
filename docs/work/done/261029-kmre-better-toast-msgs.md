@@ -1,7 +1,7 @@
 ---
 id: "261029-kmre"
 title: "Workbench toasts: placement, levels, persistence and a countdown border"
-summary: "Rework the workbench toasts: bottom right, four levels, ephemeral and persistent flavours, a countdown border, hover pause and a close button"
+summary: "Rework the workbench toasts: bottom right, four levels, ephemeral and persistent flavors, a countdown border, hover pause and a close button"
 status: done
 kind: feature
 priority: 1
@@ -36,7 +36,7 @@ Proposals to confirm when picked up:
 Done when:
 
 - [ ] toasts appear bottom right, above the hint bar
-- [ ] four levels (success, info, warning, error) look distinct without relying on colour alone
+- [ ] four levels (success, info, warning, error) look distinct without relying on color alone
 - [ ] ephemeral toasts clear after 8 seconds; persistent ones stay until dismissed by the close icon or the keyboard binding
 - [ ] the top border counts down, pauses on hover and focus, and respects reduced motion
 - [ ] every existing toast caller still shows its message at a sensible level
@@ -49,7 +49,7 @@ Implemented and checked in the browser (dark and light); waiting for Alexander's
 
 ## Outcome
 
-Toasts reworked: bottom right above the hint bar, four levels (success, info, warning, error) with a glyph and a word, ephemeral (8 s) and persistent flavours (errors persistent by default), a top border that counts down and pauses on hover and focus, a close icon, Escape for the newest persistent toast, roles alert and status, a pure queue in js/toasts.js with unit tests, all 26 call sites migrated, the Toast row in the glossary updated. Driven in the browser in both themes; reduced motion was not exercised. No action buttons yet: see 261029-mj49.
+Toasts reworked: bottom right above the hint bar, four levels (success, info, warning, error) with a glyph and a word, ephemeral (8 s) and persistent flavors (errors persistent by default), a top border that counts down and pauses on hover and focus, a close icon, Escape for the newest persistent toast, roles alert and status, a pure queue in js/toasts.js with unit tests, all 26 call sites migrated, the Toast row in the glossary updated. Driven in the browser in both themes; reduced motion was not exercised. No action buttons yet: see 261029-mj49.
 
 ## Log
 

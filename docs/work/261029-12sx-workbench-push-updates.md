@@ -16,7 +16,7 @@ summary: Server-sent events fed by a file watcher, with the 2 second poll kept a
 Alexander's wishes, for refinement and an ADR before any code:
 
 - Push changes to the workbench with server-sent events fed by a file watcher (`fsnotify`, a dependency that needs an ADR).
-- Keep the existing poll as a fallback: a manifest key picks the behaviour, and `akmctl ui --watch` overrides it.
+- Keep the existing poll as a fallback: a manifest key picks the behavior, and `akmctl ui --watch` overrides it.
 - Open questions: how an `EventSource` (no `Authorization` header) is authenticated; debouncing a branch switch that rewrites many files; the inotify and macOS descriptor limits; the Windows path (on hold).
 - Related: a conditional poll with a repository change token (`If-None-Match`, `304`) could be the same protocol the watcher feeds later. Not decided.
 

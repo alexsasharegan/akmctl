@@ -13,7 +13,7 @@ priority: -1
 
 ## Goal
 
-Make `priority` editable by dragging a card within a lane to raise or lower it. The drawer field edit for priority is in 261028-esyt; this is the board gesture and its keyboard equivalent, and how it renumbers neighbours.
+Make `priority` editable by dragging a card within a lane to raise or lower it. The drawer field edit for priority is in 261028-esyt; this is the board gesture and its keyboard equivalent, and how it renumbers neighbors.
 
 ## Log
 

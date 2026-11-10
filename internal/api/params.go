@@ -106,6 +106,7 @@ var specs = map[string]map[string]param{
 	"claim":   {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "as": s(req), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "takeover": {kind: kBool}, "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
 	"release": {"id": s(req, pat(reID, "YYMMDD-xxxx, six digits, a dash and four characters from 0-9a-hjkmnp-tv-z (for example 261101-y3ch)")), "if_match": s(pat(reEtag, "16 lowercase hex digits, as returned in the record's etag")), "dry_run": {kind: kBool}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
 	"migrate": {"mode": {kind: kString, enum: []string{"report", "plan", "apply_safe", "handoff"}}, "target": s(pat(reVersion, "MAJOR.MINOR.PATCH, for example 1.0.0")), "acknowledge_backup": {kind: kBool}, "migrations": {kind: kObjects}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
+	"preview": {"writes": {kind: kObjects, required: true}, "as_of": s(pat(reDateTS, "YYYY-MM-DD or YYYY-MM-DDTHH:MM"))},
 	"init":    {"docs_dir": s(), "wikilinks": {kind: kBool}, "dir": s(), "git_commits": {kind: kBool}, "git_init": {kind: kBool}},
 	"config":  {"key": {kind: kString, enum: []string{"git_commits"}}, "value": {kind: kBool}, "dry_run": {kind: kBool}, "confirm": {kind: kBool}, "confirm_edited": {kind: kBool}},
 	"index":   {"dry_run": {kind: kBool}, "include_content": {kind: kBool}},

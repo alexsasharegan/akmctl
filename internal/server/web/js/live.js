@@ -13,7 +13,7 @@ export const OFFLINE_AFTER = 3; // failed polls in a row before "offline" shows
 
 // ---- what this page wrote ----
 
-/** The etags that writes of this page produced, per record, so their effect is labelled "you". */
+/** The etags that writes of this page produced, per record, so their effect is labeled "you". */
 export function createOwn(keep = 8) {
   const byId = new Map();
   return {

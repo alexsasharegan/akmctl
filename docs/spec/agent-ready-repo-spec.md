@@ -33,7 +33,7 @@ Repository memory kept in files fails in a few predictable ways: two people clai
 | R6  | The id alone is the reference. The word "ADR" is prose, not part of the id.                                                                                                                                                                    | One form to type, parse and search.                                                                                                                                                                                                           |
 | R7  | Ids are minted by the tool or by the shell recipe in section 2, never typed by an agent or person.                                                                                                                                             | Agents are poor random-number generators and two will pick the same letters.                                                                                                                                                                  |
 | R8  | An id can be read aloud and typed without confusion: lowercase, and no character that looks like another (`i` and `l` with `1`, `o` with `0`). `u` is also left out, following Crockford's Base32, to avoid ids that accidentally spell words. | Humans and speech transcription both use ids.                                                                                                                                                                                                 |
-| R9  | An id is recognisable by pattern.                                                                                                                                                                                                              | `blocked_by` mixes ids with free text, so the check must tell them apart.                                                                                                                                                                     |
+| R9  | An id is recognizable by pattern.                                                                                                                                                                                                              | `blocked_by` mixes ids with free text, so the check must tell them apart.                                                                                                                                                                     |
 | R10 | Renaming a slug never breaks a reference.                                                                                                                                                                                                      | Titles and slugs get reworded; links must not depend on them.                                                                                                                                                                                 |
 
 ### Design principles
@@ -44,7 +44,7 @@ Repository memory kept in files fails in a few predictable ways: two people clai
 - **H4 One source of truth per fact.** For example, children are found by their `parent` field, not listed in the parent.
 - **H5 Frontmatter is YAML-lite, a simple subset of YAML 1.2 core.** Flat `key: value` lines, where a value is a scalar or a list of scalars (inline `[a, b]` or `- item` lines). No nesting, no anchors. An inline list stays on one line. It means the same as YAML 1.2 core, the schema Obsidian reads and writes, wherever it is accepted, and it is an error wherever YAML is richer (grammar below). A tool with no YAML library parses it with a small hand-written parser that edits by splicing bytes.
 - **H6 The tool is an accelerator, not a dependency.** Every read and every record creation is possible without it, through plain files, the fallbacks and the id recipe in section 2, so a cold agent without the tool still works (C12). Regenerating the index and running the full checks need the tool.
-- **H7 Obsidian-compatible.** Records are Markdown notes with frontmatter that Obsidian reads and edits without making them invalid. Where a design choice and Obsidian's behaviour conflict, Obsidian wins. The standard does not require Obsidian: a repository need not be a vault. Obsidian assigns property types by name for a whole vault, and the standard ships no type settings.
+- **H7 Obsidian-compatible.** Records are Markdown notes with frontmatter that Obsidian reads and edits without making them invalid. Where a design choice and Obsidian's behavior conflict, Obsidian wins. The standard does not require Obsidian: a repository need not be a vault. Obsidian assigns property types by name for a whole vault, and the standard ships no type settings.
 
 ### Frontmatter format: YAML-lite (H5)
 
@@ -62,7 +62,7 @@ _Not supported, an error:_
 - multi-line scalars of any style (plain, quoted, literal `|`, folded `>`)
 - anchors, aliases, tags and explicit types (`!!str`), directives, more than one document
 - every number except a canonical decimal integer (signs other than `-`, leading zeros, underscores, floats, hex, octal, exponents, `.inf`, `.nan`): write them quoted if you mean text
-- the capitalised spellings `True`, `TRUE`, `False`, `FALSE`, `Null`, `NULL` (YAML 1.2 core reads them as booleans and null, and the subset keeps one spelling): write `true`, `false`, `null`, or quote them
+- the capitalized spellings `True`, `TRUE`, `False`, `FALSE`, `Null`, `NULL` (YAML 1.2 core reads them as booleans and null, and the subset keeps one spelling): write `true`, `false`, `null`, or quote them
 - empty list items, duplicate keys, and keys spelled `true`, `false`, `null` or `~` in any case (these are not string keys in YAML 1.2 core)
 
 _Stricter than YAML (valid YAML that is rejected anyway):_ a tab anywhere in the block, a byte-order mark, any backslash escape other than `\"` and `\\`, and any value that does not fit on one line; any control character or non-character code point (YAML's printable set only); a key longer than 255 characters; in an inline list, a plain item that contains `?` or starts with `:`, or that is only `-`, `?` or `:`; and every spelling of a number that some YAML library reads as one: `0x`, `0o` and `0b` prefixes in any case, and a string that becomes such a number once underscores are removed. Libraries disagree on these corners, so the subset keeps clear of them.
@@ -85,7 +85,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 - A scalar is a double-quoted string, a single-quoted string or a plain scalar.
 - Double-quoted: the only escapes are `\"` and `\\`; any other backslash is an error. Single-quoted: `''` is one quote.
 - Plain: non-empty text that does not start with `,` `[` `]` `{` `}` `#` `&` `*` `!` `|` `>` `%` `@` or a backtick; does not start with `-`, `?` or `:` followed by a space or the end of the line; does not contain `: ` and does not end with `:`; and does not contain ` #` (a space then `#` starts a comment). Inside an inline list a plain scalar also cannot contain `,` `[` `]` `{` `}`.
-- Typing: `-?(0|[1-9][0-9]*)` is an integer; `true` and `false` are booleans; `null`, `~` and the empty value are null; any other unquoted text is a string, unless it is one of the number forms or capitalised spellings listed as errors above. A quoted value is always a string. Version strings such as `1.0.0` and ids such as `261027-m3qz` are ordinary strings; `1.2` is a float and needs quotes.
+- Typing: `-?(0|[1-9][0-9]*)` is an integer; `true` and `false` are booleans; `null`, `~` and the empty value are null; any other unquoted text is a string, unless it is one of the number forms or capitalized spellings listed as errors above. A quoted value is always a string. Version strings such as `1.0.0` and ids such as `261027-m3qz` are ordinary strings; `1.2` is a float and needs quotes.
 - Fields of type date hold `YYYY-MM-DD` as a plain string, the local calendar day of the machine that writes it, and timestamps hold `YYYY-MM-DDTHH:MM` in UTC. The tool writes them unquoted, as Obsidian does.
 - A list is an inline list on one line, `[` scalars separated by commas (no empty items, an optional trailing comma) `]`; or block form: the key with no value, followed by lines `- scalar`, all indented by the same number of spaces (zero or more).
 - An entry with no value and no list items is empty (null) and counts as absent.
@@ -108,9 +108,9 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 | `time: 12:30`                                      | accept: string (YAML 1.1 reads a base-60 integer)                                            |
 | `done: yes`                                        | accept: string (YAML 1.1 reads a boolean)                                                    |
 | `flag: true`                                       | accept: boolean                                                                              |
-| `flag: True`                                       | reject: capitalised boolean                                                                  |
+| `flag: True`                                       | reject: capitalized boolean                                                                  |
 | `gone: ~`                                          | accept: null                                                                                 |
-| `gone: Null`                                       | reject: capitalised null                                                                     |
+| `gone: Null`                                       | reject: capitalized null                                                                     |
 | `id: 261027-m3qz`                                  | accept: string                                                                               |
 | `summary: "Fix the \"x\" case"`                    | accept                                                                                       |
 | `summary: 'it''s fine'`                            | accept                                                                                       |
@@ -535,7 +535,7 @@ stale_days: 30
 
 **Migration (`akmctl migrate`).** A MAJOR step is data: an ordered list of steps in a file `migrations/<from>-to-<to>.json` (format in the API spec, section 4.15). Each tool release embeds the migrations it supports, so migrating needs no network and a newer migration needs a newer tool. Three parts, in this order:
 
-1. **Conformance report.** `akmctl check --target <version>` classifies each finding: `auto` (a step can fix it), `manual` (needs a judgement), `info`. Output is structured JSON. This is the static analysis, and it is useful by itself.
+1. **Conformance report.** `akmctl check --target <version>` classifies each finding: `auto` (a step can fix it), `manual` (needs a judgment), `info`. Output is structured JSON. This is the static analysis, and it is useful by itself.
 2. **Safe steps (codemod-style).** Steps from a small set of declarative primitives: rename, copy, remove or default a frontmatter field, set a title from the first heading, scaffold a `## Goal`, rename a section heading, move or rename a file (keeping history), add a file from a template, mint ids (the list is in the API spec, section 4.15). Properties: dry run by default, `--mode apply-safe` to write; idempotent; never deletes or overwrites; preserves unknown fields and prose bodies; writes by temp file and rename; each applied step recorded in an append-only log so the change is traceable. Steps that need real code are written in the tool, but the primitives cover the common cases and are auditable and testable on fixtures.
    A repository with no layout history (no manifest, or one without `layout`) can run a one-off migration file the maintainer supplies (`akmctl migrate --migration <file>`; API spec, section 4.15): the same steps and the same safeguards, read from the working tree instead of the binary.
 
@@ -546,7 +546,7 @@ stale_days: 30
 - Refuse unless the git tree is clean; create a backup tag (`pre-migrate-<from>-to-<to>`) and work on a new branch.
 - Require an explicit acknowledgement that a backup exists and the maintainer accepts the risk of data loss.
 - Stop and ask on any ambiguity; never delete a file; show the diff before any commit.
-- The acknowledgement is a safety step, not a legal waiver. Liability is handled by the tool's licence, and the wording of any disclaimer is the maintainer's call.
+- The acknowledgement is a safety step, not a legal waiver. Liability is handled by the tool's license, and the wording of any disclaimer is the maintainer's call.
 
 The manifest's `layout` is the version of this specification's layout. A repo records any deliberate deviation from the layout in its `AGENTS.md`; its `AGENTS.md` wins.
 

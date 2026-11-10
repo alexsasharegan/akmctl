@@ -146,11 +146,13 @@ Response: `columns` (array of `{status, count, records}`, in the order requested
 
 Run the rules of section 6 of the specification.
 
-| Parameter | Type              | Default        | Meaning                                                                                             |
-| --------- | ----------------- | -------------- | --------------------------------------------------------------------------------------------------- |
-| `target`  | version string    | the tool's own | Run the rules of another layout version and classify each finding (section 7 of the specification). |
-| `rules`   | array of string   | all            | Rule ids (`WK4`) or prefixes (`WK`, `L`).                                                           |
-| `as_of`   | timestamp or date | now            | The clock for staleness rules (WK10, claims). Tests set it.                                         |
+| Parameter | Type              | Default        | Meaning                                                                                                                                                                                               |
+| --------- | ----------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`  | version string    | the tool's own | Classify each finding for another layout version (section 7 of the specification): the tool's own, the repository's own, or any version the embedded migrations reach from the repository's `layout`. |
+| `rules`   | array of string   | all            | Rule ids (`WK4`) or prefixes (`WK`, `L`).                                                                                                                                                             |
+| `as_of`   | timestamp or date | now            | The clock for staleness rules (WK10, claims). Tests set it.                                                                                                                                           |
+
+The findings are those of this release's one rule set; `target` only sets each finding's `class` from the steps of the migration chain from the repository's `layout` to the target. Any other `target` is refused with `invalid_request`, and the message names the versions that would be accepted.
 
 Response: `clean` (true when no finding has severity `E`), `errors`, `warnings` (counts), `count` (findings), `findings`, and `reconcile` (`state`: `current`, `behind`, `ahead`, `unsupported`, `conflict` or `absent`; and `steps`, an array of strings, when `behind`).
 
@@ -462,13 +464,29 @@ The folder filters are `file.inFolder("<folder>")` with the manifest's `work_dir
 
 Response: `path`, `written`, `vault_root` (the vault root, relative to the repository root, `.` when it is the repository), `vault_found` (an `.obsidian` folder was found), `work_folder` and `adr_folder` (as the filters name them), and `content` when asked. Side effect: writes the file unless `dry_run`. A file that already exists at `path` is `refused` with `details.reason: "exists"`, also with `dry_run`; nothing is written.
 
+### 4.26 `preview`
+
+Shows what a sequence of writes would do, each as it would be after the earlier ones (ADR 261109-vgg7). A `dry_run` of one write reads the file as it is on disk, so it cannot show the second write of a move that makes several. `preview` copies the manifest and the Markdown files to a scratch directory, applies the writes there in order and returns each write's dry-run response. It never writes to the repository, takes no lock on it and needs no `if_match`.
+
+| Parameter | Type              | Default  | Meaning                                                                                                                                                                                                              |
+| --------- | ----------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `writes`  | array of objects  | required | The writes, in order. Each is `{"op": ..., ...}`: `op` is `new`, `set`, `section`, `tick`, `remove`, `log`, `close`, `claim` or `release`, and the other members are the parameters of that operation. At least one. |
+| `as_of`   | timestamp or date | now      | The clock for a write that has no `as_of` of its own.                                                                                                                                                                |
+
+A write's `if_match` is checked as given when it is the first write to its record. For a later write to the same record it is replaced by the etag the previous write produced on the scratch copy, so a client sends the etag it read once. In a string of a write, `"$new"` stands for the id of the record made by the most recent `new` before it; the id made in the preview is not the id the real write will mint.
+
+Response: `writes`, an array with one entry per write: the response object that operation gives for a `dry_run` after the earlier writes (`record`, `diff`, and what the operation adds). The entry of a `new` is the response of the write, with a `diff` from an empty file and a `note` that the id is only for the preview. A write that fails stops the preview: the response is that write's error (`stale` for a stale first write, `refused`, `invalid_request`, `not_found`) with `details.write` set to its zero-based position. A request that names an `op` outside the list above is `invalid_request`.
+
+The scratch copy holds the manifest and Markdown files only. CLI: `akmctl preview --writes <file>`, a JSON file holding the list.
+
 ## 5. CLI binding
 
-- The command is `akmctl <operation> [positional] [flags]`. Operation names are the subcommands of the specification (`bases`, `board`, `check`, `claim`, `close`, `commits`, `config`, `find`, `history`, `index`, `init`, `ls`, `migrate`, `new`, `release`, `remove`, `search`, `section`, `set`, `show`, `skills`, `tick`, `log`, `version`, `when`). `ui` is not an API operation.
+- The command is `akmctl <operation> [positional] [flags]`. Operation names are the subcommands of the specification (`bases`, `board`, `check`, `claim`, `close`, `commits`, `config`, `find`, `history`, `index`, `init`, `ls`, `migrate`, `new`, `preview`, `release`, `remove`, `search`, `section`, `set`, `show`, `skills`, `tick`, `log`, `version`, `when`). `ui` is not an API operation.
 - Parameter `foo_bar` is the flag `--foo-bar`. A boolean flag with no value means true; `--no-foo-bar` means false. A list is a comma-separated value (`--status ready,active`) or a repeated flag. The required parameter that is a single id or text is positional (`akmctl show <id>`, `akmctl search <text>`, `akmctl find <id>`, `akmctl when <id>`). `new` takes `kind` and `slug` positionally (`akmctl new work add-json-output`). `set` takes `<id> field=value ...` and `close` takes `<id> done|dropped`; `claim` takes `<id> --as <name>`, and `section` takes `<id> <name>` with the text in `--text`; `tick` takes `<id> <n>` (`--undo` clears the box) and `log` takes `<id> <text...>`.
 - `--format json` prints the response object as one JSON document, then a newline, on stdout. The default format is a human text table (a `dry_run` response prints its `diff` in unified form) and is not part of the contract; it does not change with whether stdout is a terminal, so a command prints the same thing in a pipe and by hand. `AGENTS.md` names `--format json` explicitly. `--format ids` prints one `id` per line (for `ls`, `search`, `board`).
 - With `--format json`, a failure also prints the response object (`ok: false`) on stdout, and nothing on stdout otherwise. Diagnostics and progress go to stderr and are never part of the contract.
 - `--repo <dir>` sets the repository root; the default is the nearest ancestor of the working directory that has a manifest (`docs/.layout`, or the one `<name>/.layout` among its immediate non-hidden subdirectories) or `AGENTS.md`. None found is `unreadable`, and so are two candidate manifests, which the message names. `--repo` is taken as given and never climbs. A folder with no manifest whose ancestor has one is `unreadable` for every command except `migrate` and `version` (the message names the ancestor), because the command would otherwise see an empty repository with default folders.
+- `preview` takes `--writes <file>`: a JSON file holding the list sent as the `writes` parameter. An unreadable or invalid file is exit 2.
 - `migrate` also takes `--migration <file>`: a JSON file holding one migration object or a list of them, sent as the `migrations` parameter (the flag can repeat). An unreadable or invalid file is exit 2.
 - Exit codes: section 2.
 
@@ -480,7 +498,7 @@ Response: `path`, `written`, `vault_root` (the vault root, relative to the repos
 
 - Bind to `127.0.0.1` or `::1` only; there is no option to bind elsewhere in 1.0.
 - Every request carries `Authorization: Bearer <token>`. The token is random (at least 128 bits), chosen at start and kept in memory only. `akmctl ui` prints it once on stderr inside the URL it opens, as a fragment (`http://127.0.0.1:PORT/#token=...`). A URL fragment is never sent to the server, so the page itself holds no token and no data: it is served without authentication, reads the token from the fragment, removes it from the address bar and sends it as the bearer header. A missing or wrong token is `unauthorized` (401), with no other detail.
-- The server checks `Host` against its own loopback address and port, and rejects any request with an `Origin` header that is not the same origin (a defence against DNS rebinding and cross-site requests).
+- The server checks `Host` against its own loopback address and port, and rejects any request with an `Origin` header that is not the same origin (a defense against DNS rebinding and cross-site requests).
 - No CORS headers are sent, and a preflight is not answered.
 - The page and its two assets (`/`, `/app.js`, `/app.css`) are the only routes served without the token. They are sent with a `Content-Security-Policy` of `default-src 'none'` plus `'self'` for script, style and fetch, so a record's text cannot run as script; the page shows record text with `textContent` only. Every response carries `Cache-Control: no-store` and `X-Content-Type-Options: nosniff`.
 - A request with a wrong `Host` or a foreign `Origin` is answered 403 with the error code `unauthorized`.
@@ -513,6 +531,7 @@ Response: `path`, `written`, `vault_root` (the vault root, relative to the repos
 | `DELETE /records/{id}/claim`                  | `release`          | `If-Match` header; optional JSON body: `dry_run`                                                                                |
 | `POST /index`                                 | `index`            | JSON body: `dry_run`, `include_content`                                                                                         |
 | `POST /bases`                                 | `bases`            | JSON body: `path`, `dry_run`, `include_content`                                                                                 |
+| `POST /preview`                               | `preview`          | JSON body: `writes`, `as_of`                                                                                                    |
 | `POST /migrate`                               | `migrate`          | JSON body: the request object                                                                                                   |
 | `POST /init`                                  | `init`             | JSON body: the request object                                                                                                   |
 | `GET /config`                                 | `config`           | query: `key`                                                                                                                    |
@@ -546,10 +565,10 @@ Response: `path`, `written`, `vault_root` (the vault root, relative to the repos
 
 ## 9. Conformance
 
-An implementation conforms to API 1.0 if, for every case in the fixtures it claims, its response equals the expected response (after the normalisation below), and every response it produces validates against the schemas.
+An implementation conforms to API 1.0 if, for every case in the fixtures it claims, its response equals the expected response (after the normalization below), and every response it produces validates against the schemas.
 
 - **Layout of the fixtures.** `akm-api/.fixtures/` holds `repos/<name>/` (`basic`, a clean repository; `broken`, the same with three errors; `claims`, with the claims extension on and one claimed item; `closable`, with an item that has an Outcome; `vault`, the clean repository with its folders moved by the manifest under a folder whose names have spaces; `legacy`, a repository with no layout history and notes without ids; `commits`, the clean repository with `git_commits: true` and no skill; `conflict`, the clean repository with a file where the skill directory would go; `obsidian`, the clean repository as an Obsidian vault, with an `.obsidian` folder at its root and a `views/mine.base` file), `cases/<operation>-<n>.json` (140 cases: reads, `check`, `index`, `migrate`, `version` and the writes, including dry runs) and `make_fixtures.py`, a frozen reference for how the sample repositories were built (it no longer regenerates every case; cases are edited by hand); it is not an implementation. Each case is `{name, repo, request, expected}`; a case with `git_work_tree: true` runs in a copy that is made a git work tree first (an empty `.git` directory). `repo` is the name of a directory in `repos/`; a runner that copies it to run a case names the copy the same, because `version` reports the name. `request` is the request object; the runner passes it through the binding under test. `expected` is the full response.
-- **Normalisation.** Compared as JSON values, so key order and whitespace do not matter. Arrays are compared in order. `api_version` is compared; `request` is the request as given.
+- **Normalization.** Compared as JSON values, so key order and whitespace do not matter. Arrays are compared in order. `api_version` is compared; `request` is the request as given.
 - **`version`.** Only the envelope and `repository` are compared. `tool`, `api_versions`, `layout_versions` and `extensions` describe the implementation, which the fixtures cannot know.
 - **Clock.** Cases that depend on time set `as_of`.
 - **Matchers.** A string in `expected`, or in the paths and texts of `after`, may hold a matcher for a value the request does not fix (ADR 261108-15dw). `$any`, as the whole string, matches any value of any type but `null`; it stands for shipped text and for what depends on the tool (a skill's file list, an etag that hashes a random id). `$id(YYMMDD)` matches an id of that date with four characters of the id alphabet, and `$id(YYMMDD,b)` is a second, distinct id of the same date. `$hash` matches a git object name of 7 to 40 hexadecimal digits. The first occurrence of a marker in a case binds the actual text, and every other occurrence of the same marker (in the response, in the paths and texts of `after`, in `would_be`) means that text.

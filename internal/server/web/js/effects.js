@@ -40,7 +40,7 @@ export function savePrefs(p) {
   }
 }
 
-// Mid-tone colours that read on both the light and the dark surface.
+// Mid-tone colors that read on both the light and the dark surface.
 export const CONFETTI_COLORS = ["#E4572E", "#F3A712", "#29A19C", "#5C7AEA", "#C04CFD", "#7BC043"];
 
 /** A small repeatable random generator (mulberry32): the same seed gives the same burst. */

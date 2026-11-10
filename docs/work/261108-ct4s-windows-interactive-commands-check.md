@@ -13,7 +13,7 @@ updated: 2026-11-08
 
 ## Goal
 
-A check of the interactive commands on Windows. Part of [261108-2ncf](261108-2ncf-basic-windows-support.md). `init`'s questionnaire (`internal/cli/prompt.go`), colours and `akmctl ui` (opens the browser with `rundll32`) were never run on a Windows terminal. Run them once in Windows Terminal and PowerShell, record what works, and file the faults. The workbench is lower value than the filesystem items.
+A check of the interactive commands on Windows. Part of [261108-2ncf](261108-2ncf-basic-windows-support.md). `init`'s questionnaire (`internal/cli/prompt.go`), colors and `akmctl ui` (opens the browser with `rundll32`) were never run on a Windows terminal. Run them once in Windows Terminal and PowerShell, record what works, and file the faults. The workbench is lower value than the filesystem items.
 
 Done when:
 

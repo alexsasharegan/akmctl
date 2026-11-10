@@ -10,7 +10,7 @@ export const NEEDS_GOAL = ["ready", "active", "blocked", "done"];
 export const NEEDS_NEXT = ["active", "blocked"];
 
 /** The lane next to `status` ("left" or "right"), or null at an end. */
-export function neighbour(status, dir) {
+export function neighbor(status, dir) {
   const i = LANES.indexOf(status);
   if (i < 0) return null;
   return LANES[i + (dir === "left" ? -1 : 1)] || null;
@@ -167,15 +167,36 @@ export function resolveOp(op, newId) {
 }
 
 /**
- * Whether a dry run can show this op against the file as it is now. Not the
- * creation of an ADR, not a set that names it, and not a claim that follows a
- * status change (claim refuses a record that is not yet ready or active).
+ * The preview call for a move's ops (work item 261029-g8x2, ADR 261109-vgg7):
+ * one POST that applies every write on a scratch copy and answers each write's
+ * diff as it is after the earlier ones. The first write to the record carries
+ * its etag as `if_match`; the server chains the etag for the rest, and reads
+ * "$new" as the id of the ADR made by the `new` before it.
  */
-export function previewable(op, i) {
-  if (op.kind === "new") return false;
-  if (op.kind === "set" && (op.changes.decisions || []).includes(NEW_ADR)) return false;
-  if (op.kind === "claim" && i.from !== "ready") return false;
-  return true;
+export function previewRequest(ops, id, o = {}) {
+  let first = true;
+  const writes = ops.map((op) => {
+    const w = { op: op.kind };
+    if (op.kind === "new") {
+      Object.assign(w, { kind: op.what, slug: op.slug, title: op.title });
+      if (op.fields) w.fields = op.fields;
+      return w;
+    }
+    w.id = id;
+    if (op.kind === "set") w.changes = op.changes;
+    else if (op.kind === "section") Object.assign(w, { name: op.name, text: op.text, mode: op.mode || "replace" });
+    else if (op.kind === "close") {
+      w.status = op.status;
+      if (op.outcome) w.outcome = op.outcome;
+    } else if (op.kind === "claim") {
+      w.as = op.as;
+      if (o.takeover) w.takeover = true;
+    }
+    if (first && o.etag) w.if_match = o.etag;
+    first = false;
+    return w;
+  });
+  return { method: "POST", path: "preview", body: { writes } };
 }
 
 /** A line for the review: what an op does. */

@@ -130,7 +130,7 @@ func TestRules(t *testing.T) {
 		{"RM1 unresolved", "RM1", "E", map[string]func(string) string{rm: sub("## Later\n", "## Later\n- [261099-bbbb] Ghost\n")}},
 		{"RM2 unknown section", "RM2", "E", map[string]func(string) string{rm: sub("## Later", "## Someday")}},
 		{"RM2 duplicate", "RM2", "E", map[string]func(string) string{rm: sub("## Later\n", "## Later\n- [261015-c4d5] Again\n")}},
-		{"RM3 done on the roadmap", "RM3", "E", map[string]func(string) string{rm: sub("## Later\n", "## Later\n- [261010-j9k0] Licence\n")}},
+		{"RM3 done on the roadmap", "RM3", "E", map[string]func(string) string{rm: sub("## Later\n", "## Later\n- [261010-j9k0] License\n")}},
 		{"RM4 top-level not on roadmap", "RM4", "W", map[string]func(string) string{rm: sub("- [261015-c4d5] Machine-readable listings\n", "")}},
 		{"G1 missing heading", "G1", "E", map[string]func(string) string{"AGENTS.md": sub("## Rules", "## Conduct")}},
 		{"G1 heading hidden in a longer fence", "G1", "E", map[string]func(string) string{"AGENTS.md": sub("## Rules", "````\n```\n## Rules\n````")}},

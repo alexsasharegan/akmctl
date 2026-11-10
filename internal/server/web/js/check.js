@@ -1,5 +1,5 @@
 // The check view: the findings of `check`, errors first. Severity is a word
-// and a symbol as well as a colour.
+// and a symbol as well as a color.
 import { el, text } from "./util.js";
 import { orderFindings, SEVERITY } from "./logic.js";
 import { describeError } from "./store.js";

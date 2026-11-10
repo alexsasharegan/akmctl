@@ -119,11 +119,11 @@ assert.equal(L.isId("261020-a2b3"), true);
 assert.equal(L.isId("261020-A2B3"), false);
 
 // ---- moves ----
-assert.equal(M.neighbour("raw", "right"), "ready");
-assert.equal(M.neighbour("blocked", "right"), null);
-assert.equal(M.neighbour("raw", "left"), null);
-assert.equal(M.neighbour("active", "left"), "ready");
-assert.equal(M.neighbour("done", "left"), null);
+assert.equal(M.neighbor("raw", "right"), "ready");
+assert.equal(M.neighbor("blocked", "right"), null);
+assert.equal(M.neighbor("raw", "left"), null);
+assert.equal(M.neighbor("active", "left"), "ready");
+assert.equal(M.neighbor("done", "left"), null);
 
 const body = "\n# T\n\n## Goal\nDo it.\n\n```\n## Not a heading\n```\n\n### Sub\nstill goal\n\n## Next\n\n## Log\n- 2026-10-28: x\n";
 const secs = M.sectionsOf(body);
@@ -179,11 +179,18 @@ const withNew = M.buildOps({ ...mv, to: "done" }, { outcome: "o", decision: { mo
 assert.deepEqual(withNew.map((o) => o.kind), ["new", "set", "close"]);
 assert.deepEqual(withNew[0], { kind: "new", what: "adr", slug: "pick-x", title: "Pick X" });
 assert.deepEqual(M.resolveOp(withNew[1], "261028-abcd").changes.decisions, ["261028-abcd"]);
-assert.equal(M.previewable(withNew[0], mv), false);
-assert.equal(M.previewable(withNew[1], mv), false);
-assert.equal(M.previewable(withNew[2], mv), true);
-assert.equal(M.previewable({ kind: "claim", as: "a" }, { from: "ready" }), true);
-assert.equal(M.previewable({ kind: "claim", as: "a" }, { from: "raw" }), false);
+// the preview: every write in one list, the first with the etag, "$new" left for the server
+const pv = M.previewRequest([{ kind: "section", name: "Goal", text: "g", mode: "replace" }, ...withNew, { kind: "claim", as: "a" }], "261022-e5f6", { etag: "e1", takeover: true });
+assert.equal(pv.method, "POST");
+assert.equal(pv.path, "preview");
+assert.deepEqual(pv.body.writes.map((w) => w.op), ["section", "new", "set", "close", "claim"]);
+assert.equal(pv.body.writes[0].if_match, "e1");
+assert.equal(pv.body.writes.filter((w) => w.if_match).length, 1, "only the first write to the record carries the etag");
+assert.deepEqual(pv.body.writes[1], { op: "new", kind: "adr", slug: "pick-x", title: "Pick X" });
+assert.deepEqual(pv.body.writes[2].changes.decisions, ["$new"]);
+assert.equal(pv.body.writes[2].id, "261022-e5f6");
+assert.equal(pv.body.writes[4].takeover, true);
+assert.equal(M.previewable, undefined, "no write is left out of the preview any more");
 
 assert.deepEqual(M.requestFor({ kind: "set", changes: { status: "ready" } }, "261022-e5f6"), { method: "PATCH", path: "records/261022-e5f6", body: { changes: { status: "ready" } } });
 assert.deepEqual(M.requestFor({ kind: "set", changes: { status: "ready" } }, "261022-e5f6", { dry_run: true }).body, { changes: { status: "ready" }, dry_run: true });

@@ -116,6 +116,26 @@ func ChainIn(registry []Migration, from, to string) ([]Migration, bool) {
 	return nil, false
 }
 
+// Reachable lists the layout versions the embedded migrations lead to from a
+// version, nearest first, not including the version itself.
+func Reachable(from string) []string {
+	var out []string
+	seen := map[string]bool{from: true}
+	queue := []string{from}
+	for len(queue) > 0 {
+		v := queue[0]
+		queue = queue[1:]
+		for _, m := range Registry {
+			if m.From == v && !seen[m.To] {
+				seen[m.To] = true
+				out = append(out, m.To)
+				queue = append(queue, m.To)
+			}
+		}
+	}
+	return out
+}
+
 // Steps flattens a chain.
 func Steps(ms []Migration) []Step {
 	var out []Step
@@ -136,7 +156,8 @@ type Result struct {
 
 // PlanEnv lists what each step would change, without writing, with the random
 // source and the clock given. The steps are
-// planned in order on a scratch copy of the repository's Markdown files, each
+// planned in order on a scratch copy of the repository's Markdown files (plus
+// any other file a move_file or add_file step names), each
 // applied there after it is planned, so a step that depends on an earlier one
 // (a date field renamed before ids are minted from it, a legacy id renamed
 // before ids are minted) is planned as it will run. Nothing in the repository
@@ -144,7 +165,7 @@ type Result struct {
 // against the working tree.
 func PlanEnv(repo *record.Repo, steps []Step, env Env) []Result {
 	out := make([]Result, 0, len(steps))
-	sc, cleanup := scratchRepo(repo)
+	sc, cleanup := ScratchRepo(repo)
 	if cleanup != nil {
 		defer cleanup()
 	}
@@ -152,9 +173,17 @@ func PlanEnv(repo *record.Repo, steps []Step, env Env) []Result {
 		files, notes, renames := []string{}, []string(nil), []Rename(nil)
 		if s.Class == "auto" {
 			switch {
-			case sc == nil || s.Kind == "move_file" || s.Kind == "add_file":
-				// these touch files that are not Markdown: planned against the real tree
+			case sc == nil:
 				files, notes, renames, _ = run(repo, s, true, env)
+			case s.Kind == "move_file" || s.Kind == "add_file":
+				// the scratch copy holds only Markdown: bring over the path the step
+				// reads so it sees the same files as the real tree, then apply it there
+				// so later steps see the move or the new file
+				for _, rel := range []string{s.From, s.To, s.Path} {
+					mirrorFile(repo, sc, rel)
+				}
+				files, notes, renames, _ = run(sc, s, false, env)
+				sc.Reload()
 			default:
 				files, notes, renames, _ = run(sc, s, false, env)
 				sc.Reload()
@@ -165,9 +194,30 @@ func PlanEnv(repo *record.Repo, steps []Step, env Env) []Result {
 	return out
 }
 
-// scratchRepo copies the manifest and every Markdown file of the repository to a
-// temporary directory and loads it. It returns nil, nil when that fails.
-func scratchRepo(repo *record.Repo) (*record.Repo, func()) {
+// mirrorFile copies a file of the real tree to the scratch copy when the scratch
+// copy lacks it (a file that is not Markdown). It does nothing for a path that
+// is empty, unsafe, missing from the real tree or already in the scratch copy.
+func mirrorFile(repo, sc *record.Repo, rel string) {
+	if rel == "" || !safeRel(rel) {
+		return
+	}
+	dst := filepath.Join(sc.Root, filepath.FromSlash(rel))
+	if _, err := os.Stat(dst); err == nil {
+		return
+	}
+	b, err := os.ReadFile(filepath.Join(repo.Root, filepath.FromSlash(rel)))
+	if err != nil {
+		return
+	}
+	if os.MkdirAll(filepath.Dir(dst), 0o755) == nil {
+		os.WriteFile(dst, b, 0o644)
+	}
+}
+
+// ScratchRepo copies the manifest and every Markdown file of the repository to a
+// temporary directory and loads it. It returns nil, nil when that fails. The
+// cleanup function removes the directory.
+func ScratchRepo(repo *record.Repo) (*record.Repo, func()) {
 	dir, err := os.MkdirTemp("", "akmctl-plan-")
 	if err != nil {
 		return nil, nil

@@ -1,4 +1,4 @@
-// The record drawer's field table: one row per frontmatter field, typed and labelled,
+// The record drawer's field table: one row per frontmatter field, typed and labeled,
 // with the editable fields of an open work item edited in place through `set`.
 // The typing, the edit rules and the request are pure (node tests); the table at the
 // bottom wires them to the DOM. The edit rules are a fixed copy of the matrix in the
@@ -9,7 +9,7 @@ import { createSelect, createSummary, SUMMARY_MAX } from "./controls.js";
 import { createPicker } from "./picker.js";
 import { KINDS } from "./capture.js";
 
-/** What each type is called and drawn with. The word is always shown, so colour is never the only signal. */
+/** What each type is called and drawn with. The word is always shown, so color is never the only signal. */
 export const TYPE_LEGEND = [
   { type: "text", word: "text", note: "plain text" },
   { type: "date", word: "date", note: "a day, in monospace" },

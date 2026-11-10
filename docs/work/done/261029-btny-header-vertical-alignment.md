@@ -18,7 +18,7 @@ Reported by Alexander with two screenshots (dark theme, the akmctl repo and the 
 
 Done when:
 
-- [ ] The title, the label, the repository name and the tabs share one vertical centre line (or one consistent baseline) in both themes.
+- [ ] The title, the label, the repository name and the tabs share one vertical center line (or one consistent baseline) in both themes.
 - [ ] Checked at desktop and tablet widths with a long repository name.
 - [ ] A short note in the Log says what the cause was.
 
@@ -28,11 +28,11 @@ Done when:
 
 ## Outcome
 
-Label, repository name and nav share one centre line (32px at 1200px wide, measured in the built-in browser). Fix in `internal/server/web/app.css`: `.brand` is an inline flex box and each part has line-height 1. The repository name is hidden under 900px by an existing rule, unchanged.
+Label, repository name and nav share one center line (32px at 1200px wide, measured in the built-in browser). Fix in `internal/server/web/app.css`: `.brand` is an inline flex box and each part has line-height 1. The repository name is hidden under 900px by an existing rule, unchanged.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-10-30: claimed (ui-agent).
-- 2026-10-30: cause: `.brand` was a block whose inline `<small>` label and the title shared one line box, so the label sat on the title's baseline, and the repository name (`.repo`) had its own font and line box; the flex row centred the boxes, not the glyphs. Fix in web/app.css: `.brand` is an inline flex row with `align-items:center`, and the label and `.repo` have `line-height:1`. The visual check is not done here.
+- 2026-10-30: cause: `.brand` was a block whose inline `<small>` label and the title shared one line box, so the label sat on the title's baseline, and the repository name (`.repo`) had its own font and line box; the flex row centered the boxes, not the glyphs. Fix in web/app.css: `.brand` is an inline flex row with `align-items:center`, and the label and `.repo` have `line-height:1`. The visual check is not done here.
 - 2026-10-30: released (ui-agent).

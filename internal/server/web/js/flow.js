@@ -4,7 +4,7 @@
 import { el, ageDays, ageText, text } from "./util.js";
 import { api, ApiError, state, show, describeError } from "./store.js";
 import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl } from "./logic.js";
-import { neighbour, sectionsOf, planMove, buildOps, requestFor, validateStep } from "./moves.js";
+import { neighbor, sectionsOf, planMove, buildOps, requestFor, validateStep } from "./moves.js";
 import { openWizard } from "./wizard.js";
 import { openCapture } from "./capture.js";
 import { openDialog, closeOverlay, setDialogHints, toast, dismissToast, MOD, overlayOpen } from "./ui.js";
@@ -239,7 +239,7 @@ export function flowKeys(e, id) {
       return openInObsidian(id);
     case "H":
     case "L": {
-      const to = rec && neighbour(field(rec, "status"), e.key === "H" ? "left" : "right");
+      const to = rec && neighbor(field(rec, "status"), e.key === "H" ? "left" : "right");
       if (!rec) return false;
       if (!to) toast("Already in the " + (e.key === "H" ? "first" : "last") + " lane.");
       else moveTo(id, to);

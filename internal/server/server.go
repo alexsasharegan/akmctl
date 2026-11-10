@@ -307,6 +307,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op = "skills"
 	case len(seg) == 1 && seg[0] == "migrate" && m == "POST":
 		op = "migrate"
+	case len(seg) == 1 && seg[0] == "preview" && m == "POST":
+		op = "preview"
 	case len(seg) == 2 && seg[0] == "records" && m == "GET":
 		op, id = "show", seg[1]
 	case len(seg) == 2 && seg[0] == "records" && m == "PATCH":

@@ -19,9 +19,6 @@ The queue for an agent working unattended. Take the top item that is `ready`; no
 
 Without a decision:
 
-- [261029-47m0] migrate plan: simulate move_file steps (1.0.0, criterion 1)
-- [261028-a2wd] Let check --target accept layouts other than the tool's own (1.0.0, criterion 3)
-- [261029-g8x2] The review diff is against the current file, not after earlier writes
 - [261101-3che] show reports edit states
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column (_pick_: separate columns or prefixed ids)
@@ -41,9 +38,9 @@ With a pick, for 1.0.0:
 
 Exit criteria (draft, for Alexander to edit). The layout, the API and the spec are declared stable at 1.0.0, and:
 
-1. **Adoption works.** An existing repository can be brought into AKM with `migrate`: discovery finds its records, the plan simulates every step, and apply reports what it leaves broken. Items: 261029-tgfe, 261029-47m0.
+1. **Adoption works.** An existing repository can be brought into AKM with `migrate`: discovery finds its records, the plan simulates every step, and apply reports what it leaves broken. Item: 261029-tgfe (the plan simulating every step, 261029-47m0, is done).
 2. **Writes are safe.** A write that changes several files cannot stop half-way, and the last operation can be undone. Items: 261029-xtqj, 261029-shz5. ADR 261106-60xv chose git as the move log and kept the journal as the spike 261106-wx2a; the design note on xtqj and shz5 about a journal is an alternative to that, not the plan.
-3. **Other layouts are first-class.** `check` can validate a repository against a layout other than the tool's own. Item: 261028-a2wd.
+3. **Other layouts are first-class.** `check` can validate a repository against a layout other than the tool's own. Done: `check --target` accepts any layout the migration chain reaches (261028-a2wd).
 4. **The standard has no known gaps.** One copy of the API fixtures (done, 261029-x4ws), and the known rule defects (L2 done, 261029-z4gk; S2, orphaned ADRs from the done wizard, 261029-nkqv) are closed.
 5. **Compatibility is stated.** The spec says what a MINOR and a MAJOR change to the layout, the API and the extensions mean. Item: 261109-vxdr, which needs the maintainer.
 

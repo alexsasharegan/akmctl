@@ -10,7 +10,7 @@ date: 2026-11-06
 
 ## Context
 
-The workbench should replay the moves made while the maintainer was away (work item 261101-w0mz). It polls the work listing and compares two snapshots, so it sees the net change only: ids come back in id order, a path through several statuses shows as one move, a burst of more than ten is summarised and lost, and "Outside" never says who. Nothing the API returns says when a status changed or who changed it. Replay, and later undo (261029-shz5), churn detection (261031-st7s) and counts (261031-72bd), need an ordered record of moves.
+The workbench should replay the moves made while the maintainer was away (work item 261101-w0mz). It polls the work listing and compares two snapshots, so it sees the net change only: ids come back in id order, a path through several statuses shows as one move, a burst of more than ten is summarized and lost, and "Outside" never says who. Nothing the API returns says when a status changed or who changed it. Replay, and later undo (261029-shz5), churn detection (261031-st7s) and counts (261031-72bd), need an ordered record of moves.
 
 The step commits already are that record when `git_commits` is on: each has a subject `<id>(<step>): <detail>`, the `AKM-Step` and `AKM-Item` trailers, an author, a time and an `Assisted-by` trailer, and `commits` already reads and checks them.
 

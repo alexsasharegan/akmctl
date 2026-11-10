@@ -17,7 +17,7 @@ Command: `akmctl new work <slug>`, `new adr <slug>` and `split <id> <slug>...` i
 
 Actual: the new file is written with LF, so the repository holds CRLF and LF records side by side. Every edit of an existing record keeps its CRLF; only new files differ.
 
-Expected: decide the rule. Either a new file follows the line ending of its neighbours (for example the first record in the folder), or LF is the documented rule because git normalizes on `add`. Whichever is chosen is written in the guide and tested.
+Expected: decide the rule. Either a new file follows the line ending of its neighbors (for example the first record in the folder), or LF is the documented rule because git normalizes on `add`. Whichever is chosen is written in the guide and tested.
 
 Done when:
 
@@ -26,7 +26,7 @@ Done when:
 
 ## Next
 
-Decide with the maintainer: follow the neighbours or stay LF. Low priority; git normalizes LF on add when autocrlf is on.
+Decide with the maintainer: follow the neighbors or stay LF. Low priority; git normalizes LF on add when autocrlf is on.
 
 ## Log
 

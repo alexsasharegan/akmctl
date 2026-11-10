@@ -36,6 +36,7 @@ Read the reference before the first use of a command.
 | Remove a Goal box that no longer applies | `akmctl remove <id> <n>`   | `references/remove.md`  |
 | Add a stamped Log line                   | `akmctl log <id> <text>`   | `references/log.md`     |
 | Take an item before working it           | `akmctl claim <id> --as n` | `references/claim.md`   |
+| See a list of writes before them         | `akmctl preview`           | `references/preview.md` |
 | Give up an item                          | `akmctl release <id>`      | `references/release.md` |
 | Finish an item                           | `akmctl close <id> done`   | `references/close.md`   |
 | Check or upgrade a repository's layout   | `akmctl migrate`           | `references/migrate.md` |
