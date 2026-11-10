@@ -41,6 +41,7 @@ The command-line tool and API of AKM (agent knowledge management), written in Go
 - Without the tool: decisions are in `docs/adr/README.md`; `grep -lE '^status: ?"?active"?$' docs/work/*.md` lists active work (same for `ready`, `blocked`); close an item by setting `status`, writing `## Outcome`, setting `updated` and `git mv` to `docs/work/done/`. Never hand-edit the ADR index.
 - The `akmctl` binary must work on macOS and Linux. Windows is best effort and not required below 1.0.0 (ADR 261029-eegx): CI runs it without blocking.
 
+- Never put a record id in a reply to the maintainer unless they ask for it or must type it: name records by title, and tell two similar ones apart by a differing word, the date or the last characters of the id (the `akm` skill's "Naming records in chat", ADR 261109-7c0s). Ids stay in files, commands and trailers. The maintainer listens to replies through text to speech.
 - Register every new term in `docs/glossary.md` in the same change: a feature, command, field, rule or workbench part. Write "Obsidian Bases" in full, never "base" alone.
 
 ## Do not, without asking

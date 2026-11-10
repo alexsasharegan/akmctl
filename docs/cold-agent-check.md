@@ -27,11 +27,12 @@ The agent knows only what a new user's agent knows: the repository's `AGENTS.md`
 
 ## What has been found
 
-| Run                                   | Snags                                                                                  | Pinned by                                                                                   |
-| ------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Split an oversized item (261101-t8h8) | `set blocked_by=[a,b]` stored a mangled list and `check` was silent (261108-h7ds)      | `TestListFieldValueForms`, `TestSetBlockedByStoresACleanList` in `internal/cli/cli_test.go` |
-| Split an oversized item (261101-t8h8) | `set title=` left the first heading behind, so `check` warned WK12 later (261108-kdz1) | `TestSetTitleRenamesTheHeading` in `internal/api/retitle_test.go`                           |
-| Split an oversized item (261101-t8h8) | `--changes` refuses an object (261107-1gha); `split` cannot give a child a title       | Open                                                                                        |
+| Run                                   | Snags                                                                                                                                                                                           | Pinned by                                                                                   |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Split an oversized item (261101-t8h8) | `set blocked_by=[a,b]` stored a mangled list and `check` was silent (261108-h7ds)                                                                                                               | `TestListFieldValueForms`, `TestSetBlockedByStoresACleanList` in `internal/cli/cli_test.go` |
+| Split an oversized item (261101-t8h8) | `set title=` left the first heading behind, so `check` warned WK12 later (261108-kdz1)                                                                                                          | `TestSetTitleRenamesTheHeading` in `internal/api/retitle_test.go`                           |
+| Split an oversized item (261101-t8h8) | `--changes` refuses an object (261107-1gha); `split` cannot give a child a title                                                                                                                | Open                                                                                        |
+| Name records in chat (261109-n05b)    | A small model (Haiku) wrote the full id before every title in three runs, with the rule in the skill and in `AGENTS.md`; a larger model (Sonnet) wrote none and told six records apart by title | Open for small models; the larger model's run is the result recorded in the item's Log      |
 
 Add a row for each run that finds something.
 
