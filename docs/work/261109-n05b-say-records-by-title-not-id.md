@@ -1,9 +1,11 @@
 ---
 id: "261109-n05b"
 title: Agents name records by title, not id, and resolve ambiguity in steps
-status: raw
+status: active
 created: 2026-11-09
 updated: 2026-11-09
+claimed_by: claude-sonnet-5-5-names
+claimed_at: 2026-11-10T00:57
 ---
 
 # Agents name records by title, not id, and resolve ambiguity in steps
@@ -33,6 +35,11 @@ Done when:
 
 Not in scope: a listing option that prints the shortest unique tail. File it only if the cold-agent check shows agents get the arithmetic wrong.
 
+## Next
+
+Write the rule into both copies of the akm skill and the AGENTS.md override note, draft the proposed decision record, add the changelog entry and the cold-agent check row.
+
 ## Log
 
 - 2026-11-09: filed.
+- 2026-11-09 17:57-07:00: claimed (claude-sonnet-5-5-names).
