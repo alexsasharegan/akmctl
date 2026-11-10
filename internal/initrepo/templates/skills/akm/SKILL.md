@@ -44,6 +44,20 @@ Read the reference before the first use of a command.
 | Read or change repository settings       | `akmctl config`            | `references/config.md`  |
 | Check or refresh the AKM skills          | `akmctl skills`            | `references/skills.md`  |
 
+## Naming records in chat
+
+Ids are for files, commands, links and commit trailers. In what you say to the maintainer, name a record by its title: an id read aloud (by a person or a text-to-speech voice) costs more attention than the decision it belongs to. Stop at the first step that tells the items apart among those in your reply and the last few messages:
+
+1. The title alone, shortened ("the compatibility policy item"), when nothing else in view could be mistaken for it.
+2. A word that differs: name the part that separates two similar items ("the refactor that prepares for theming", "the theme additions").
+3. The date in the id, said as a date ("the one from October twelfth"). `akmctl when <id>` reads it.
+4. For items made the same day, only the end of the id and only as many characters as separate them ("the one ending in x j"). It is a handle for talking: never write it into a file or a commit.
+5. The whole id, when the maintainer asks for it or must type or paste it.
+
+Judge ambiguity against the items shown, not the whole repository: a list that is all about theming needs no more than "the refactor" and "the themes". Before you send, check that no two items shorten to the same phrase, and step down a level for those two only. When you file or retitle an item, put the words that tell it from its neighbors first, because speech reads left to right.
+
+A repository whose `AGENTS.md` asks for ids in chat overrides this section.
+
 ## Habits
 
 - Run `akmctl check` before a commit; fix errors, read warnings.

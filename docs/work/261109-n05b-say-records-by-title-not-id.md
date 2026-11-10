@@ -28,18 +28,19 @@ Ids stay in files, commands, links, commit trailers and pull request text; the r
 
 Done when:
 
-- [ ] Both copies of the `akm` skill state the rule (`.agents/skills/akm` and `internal/initrepo/templates/skills/akm`), and the repository's `AGENTS.md` says it may override.
-- [ ] A decision record (`proposed`, for the maintainer to accept) explains why the default changes for every user of the skill, and the glossary registers any new term.
+- [x] Both copies of the `akm` skill state the rule (`.agents/skills/akm` and `internal/initrepo/templates/skills/akm`), and the repository's `AGENTS.md` says it may override.
+- [x] A decision record (`proposed`, for the maintainer to accept) explains why the default changes for every user of the skill, and the glossary registers any new term.
 - [ ] A cold-agent check (`docs/cold-agent-check.md`) gives an agent a mixed list that contains two similar titles and two items made the same day, and the agent's reply names each one without a full id and without two items sharing a handle.
-- [ ] A `CHANGELOG.md` entry under `## Unreleased` says what changed and who is affected.
+- [x] A `CHANGELOG.md` entry under `## Unreleased` says what changed and who is affected.
 
 Not in scope: a listing option that prints the shortest unique tail. File it only if the cold-agent check shows agents get the arithmetic wrong.
 
 ## Next
 
-Write the rule into both copies of the akm skill and the AGENTS.md override note, draft the proposed decision record, add the changelog entry and the cold-agent check row.
+Rework the cold-agent check. Two runs with a small model (2026-11-09) did not show the rule holding: the first named items by title with no full id in the reply, but never met the ambiguous items; the second quoted the full id beside each title and reported that no item carried today's date, though the scratch copy had them. Tighten the skill and AGENTS.md wording, rerun with a task that forces the same-day case, then tick the third box and close.
 
 ## Log
 
 - 2026-11-09: filed.
 - 2026-11-09 17:57-07:00: claimed (claude-sonnet-5-5-names).
+- 2026-11-09 18:01-07:00: Skill section, decision record, glossary term, changelog entry and AGENTS.md line written. Cold-agent check not passed: run one named items by title but never faced the similar or same-day items; run two quoted full ids beside titles. Goal box 3 stays open.
