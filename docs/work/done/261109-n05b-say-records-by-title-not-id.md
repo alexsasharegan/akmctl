@@ -1,11 +1,10 @@
 ---
 id: "261109-n05b"
 title: Agents name records by title, not id, and resolve ambiguity in steps
-status: active
+status: done
 created: 2026-11-09
 updated: 2026-11-09
-claimed_by: claude-sonnet-5-5-names
-claimed_at: 2026-11-10T00:57
+closed: 2026-11-09
 ---
 
 # Agents name records by title, not id, and resolve ambiguity in steps
@@ -30,14 +29,16 @@ Done when:
 
 - [x] Both copies of the `akm` skill state the rule (`.agents/skills/akm` and `internal/initrepo/templates/skills/akm`), and the repository's `AGENTS.md` says it may override.
 - [x] A decision record (`proposed`, for the maintainer to accept) explains why the default changes for every user of the skill, and the glossary registers any new term.
-- [ ] A cold-agent check (`docs/cold-agent-check.md`) gives an agent a mixed list that contains two similar titles and two items made the same day, and the agent's reply names each one without a full id and without two items sharing a handle.
+- [x] A cold-agent check (`docs/cold-agent-check.md`) gives an agent a mixed list that contains two similar titles and two items made the same day, and the agent's reply names each one without a full id and without two items sharing a handle.
 - [x] A `CHANGELOG.md` entry under `## Unreleased` says what changed and who is affected.
 
 Not in scope: a listing option that prints the shortest unique tail. File it only if the cold-agent check shows agents get the arithmetic wrong.
 
 ## Next
 
-Rework the cold-agent check. Two runs with a small model (2026-11-09) did not show the rule holding: the first named items by title with no full id in the reply, but never met the ambiguous items; the second quoted the full id beside each title and reported that no item carried today's date, though the scratch copy had them. Tighten the skill and AGENTS.md wording, rerun with a task that forces the same-day case, then tick the third box and close.
+## Outcome
+
+The akm skill (both copies) and AGENTS.md tell an agent to name records by title in chat and to give an id only as a last step; ADR 261109-7c0s (proposed) records why, with the glossary term Handle and a changelog entry. A cold run with a larger model passed. Three cold runs with a small model did not: it still writes the full id before each title. Not covered: a title-first listing in the tool, which would fix that at the source.
 
 ## Log
 
@@ -45,3 +46,4 @@ Rework the cold-agent check. Two runs with a small model (2026-11-09) did not sh
 - 2026-11-09 17:57-07:00: claimed (claude-sonnet-5-5-names).
 - 2026-11-09 18:01-07:00: Skill section, decision record, glossary term, changelog entry and AGENTS.md line written. Cold-agent check not passed: run one named items by title but never faced the similar or same-day items; run two quoted full ids beside titles. Goal box 3 stays open.
 - 2026-11-09 18:03-07:00: Tightened the skill section and the AGENTS.md line (a flat 'never put an id in a reply', with a right and a wrong example). Third cold run with a small model still wrote the full id before every title, so the rule does not hold yet. Goal box 3 stays open.
+- 2026-11-09 18:12-07:00: Cold run 4 (2026-11-09, Sonnet, six records including two near-identical titles and four made the same day): no id in the reply, each record named by its title, nothing needed a handle. Small models (Haiku, three runs) still write the full id before a title; recorded in docs/cold-agent-check.md as open for small models. Tool option for a title-first listing is not filed; file it if small-model agents matter.
