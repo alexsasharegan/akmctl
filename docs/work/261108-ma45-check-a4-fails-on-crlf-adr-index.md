@@ -1,10 +1,10 @@
 ---
 id: "261108-ma45"
 title: check a4 fails on crlf adr index
-status: raw
+status: ready
 parent: 261108-2ncf
 created: 2026-11-08
-updated: 2026-11-08
+updated: 2026-11-16
 ---
 
 # check a4 fails on crlf adr index
