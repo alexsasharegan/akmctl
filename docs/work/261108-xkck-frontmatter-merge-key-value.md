@@ -1,11 +1,13 @@
 ---
 id: "261108-xkck"
 title: frontmatter merge key value
-status: ready
+status: active
 kind: bug
 created: 2026-11-08
 updated: 2026-11-16
 priority: 3
+claimed_by: claude-fable-5-2
+claimed_at: 2026-11-16T14:09
 ---
 
 # frontmatter merge key value
@@ -19,6 +21,11 @@ Done when:
 - [ ] The input `A: <<` no longer fails `FuzzAgainstOracle` (reader, oracle filter or spec changed, decision recorded).
 - [ ] The input is a seed of the fuzz target.
 
+## Next
+
+Refuse a plain << in internal/frontmatter (typePlain), as the subset refuses the other forms YAML libraries disagree on; add the fixtures (they seed the fuzz target) and the sentence in the standard.
+
 ## Log
 
 - 2026-11-08: filed.
+- 2026-11-16 07:09-07:00: claimed (claude-fable-5-2).
