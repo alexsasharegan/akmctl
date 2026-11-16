@@ -28,6 +28,7 @@ const overlay = doc.getElementById("overlay-root");
 // help
 press("?");
 assert.match(overlay.text, /keyboard/i, "? opens the shortcut help");
+assert.match(overlay.text, /one step only; a wizard move .* is not undone/, "the help states the limit of undo");
 press("Escape");
 assert.equal(overlay.kids.length, 0, "Esc closes it");
 
@@ -119,6 +120,13 @@ assert.equal(app.calls.at(-1).body.outcome, "It works.");
 assert.equal(app.calls.at(-1).body.dry_run, undefined);
 assert.equal(overlay.kids.length, 0, "the wizard closes");
 assert.match(toasts.text, /Closed .* as done/);
+
+// u after a wizard move says it is not covered, and writes nothing
+const afterClose = app.calls.length;
+press("u");
+await settle(3);
+assert.match(toasts.text, /went through the wizard, and undo does not cover those/);
+assert.equal(app.calls.length, afterClose, "nothing is written");
 
 // capture: c opens the form; a title makes a raw item
 const callsBefore = app.calls.length;

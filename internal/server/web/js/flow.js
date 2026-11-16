@@ -13,7 +13,7 @@ import { remember } from "./board.js";
 const IDENTITY_KEY = "akm-identity";
 
 let H = null; // { host, reload(), byId(), records(), focusView() }
-let last = null; // what `u` undoes: { kind: "move"|"capture", ... }
+let last = null; // what `u` undoes: { kind: "move"|"capture", ... }; { kind: "wizard" } is a move it cannot undo
 let claimsP = null;
 let busy = false;
 
@@ -111,6 +111,7 @@ export async function moveTo(id, to, extra = {}) {
       onDone: (res) => {
         if (res.identity && move.claims && to === "active") rememberIdentity(res.identity);
         toast(doneText(rec, to, res), { level: "success" });
+        last = { kind: "wizard", id, to };
         refresh(id);
       },
     });
@@ -161,11 +162,18 @@ function undoToast(msg, label = "Undo") {
   if (box) box.querySelector(".toast-body").append(el("button", { type: "button", class: "btn quiet toast-btn", onclick: () => (dismissToast(box), undo()) }, label + " ", el("kbd", { text: "u" })));
 }
 
-/** Undo the last safe move or capture. A capture is dropped with a reason: there is no delete. */
+/**
+ * Undo the last safe move or capture. A capture is dropped with a reason:
+ * there is no delete. The limit is one step and safe moves only (work item
+ * 261029-shz5): a move made through the wizard wrote several things, some of
+ * them not reversible from here (a closed file moved, a Log line, a new ADR),
+ * so `u` says so instead of undoing part of it.
+ */
 export async function undo() {
   if (busy || overlayOpen()) return;
   const u = last;
-  if (!u) return toast("Nothing to undo.");
+  if (!u) return toast("Nothing to undo. Undo covers the last move made at once (H, L or a drag) or the last capture.");
+  if (u.kind === "wizard") return toast("The move of " + u.id + " to " + u.to + " went through the wizard, and undo does not cover those. Edit the record, or revert its commit with git.", { ms: 12000 });
   for (const b of document.querySelectorAll("#toasts .toast-btn")) dismissToast(b.closest(".toast"));
   if (u.kind === "capture") {
     last = null;
@@ -272,7 +280,7 @@ export function flowActions(currentId) {
     { label: "Drop the focused item", keys: ["x"], run: on((id) => moveTo(id, "dropped")) },
     { label: "Block the focused item", keys: ["b"], run: on((id) => moveTo(id, "blocked")) },
     { label: "Capture a new raw item", keys: ["c"], run: capture },
-    { label: "Undo the last move or capture", keys: ["u"], run: undo },
+    { label: "Undo the last move made at once, or the last capture", keys: ["u"], run: undo },
     { label: "Set the name used for claims", keys: [], run: setIdentity },
   ];
 }
@@ -284,7 +292,7 @@ export const flowHelp = () => [
     ["d", "close as done (asks what is missing, then reviews)"],
     ["x", "drop (asks for the reason, then reviews)"],
     ["b", "block (asks what it waits on, then reviews)"],
-    ["u", "undo the last move; after a capture, drop it with a reason"],
+    ["u", "undo the last H, L or drag move, one step only; a wizard move (d, x, b, or one that asked a question) is not undone; after a capture, drop it with a reason"],
     ["c", "capture a new raw item"],
     [MOD + "+Enter", "next step in the wizard"],
     ["Enter", "write, on the review"],
