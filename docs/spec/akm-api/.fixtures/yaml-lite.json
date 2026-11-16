@@ -324,5 +324,22 @@
   "name": "multi-line quoted",
   "input": "a: \"x\n  y\"",
   "accept": false
+ },
+ {
+  "name": "merge key as a value",
+  "input": "a: <<",
+  "accept": false
+ },
+ {
+  "name": "merge key as a list item",
+  "input": "a: [x, <<]",
+  "accept": false
+ },
+ {
+  "name": "quoted merge key is text",
+  "input": "a: \"<<\"",
+  "accept": true,
+  "key": "a",
+  "value": "<<"
  }
 ]

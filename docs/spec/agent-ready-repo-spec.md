@@ -65,7 +65,7 @@ _Not supported, an error:_
 - the capitalized spellings `True`, `TRUE`, `False`, `FALSE`, `Null`, `NULL` (YAML 1.2 core reads them as booleans and null, and the subset keeps one spelling): write `true`, `false`, `null`, or quote them
 - empty list items, duplicate keys, and keys spelled `true`, `false`, `null` or `~` in any case (these are not string keys in YAML 1.2 core)
 
-_Stricter than YAML (valid YAML that is rejected anyway):_ a tab anywhere in the block, a byte-order mark, any backslash escape other than `\"` and `\\`, and any value that does not fit on one line; any control character or non-character code point (YAML's printable set only); a key longer than 255 characters; in an inline list, a plain item that contains `?` or starts with `:`, or that is only `-`, `?` or `:`; and every spelling of a number that some YAML library reads as one: `0x`, `0o` and `0b` prefixes in any case, and a string that becomes such a number once underscores are removed. Libraries disagree on these corners, so the subset keeps clear of them.
+_Stricter than YAML (valid YAML that is rejected anyway):_ a tab anywhere in the block, a byte-order mark, any backslash escape other than `\"` and `\\`, and any value that does not fit on one line; any control character or non-character code point (YAML's printable set only); a key longer than 255 characters; in an inline list, a plain item that contains `?` or starts with `:`, or that is only `-`, `?` or `:`; and every spelling of a number that some YAML library reads as one: `0x`, `0o` and `0b` prefixes in any case, and a string that becomes such a number once underscores are removed; and a plain scalar that is exactly `<<`, which libraries that know the YAML 1.1 merge key read as a merge tag even where a value stands (quote it: `"<<"`). Libraries disagree on these corners, so the subset keeps clear of them.
 
 _Other YAML parsers._ YAML 1.1 parsers, and some libraries when they decode into a generic value, read an unquoted date as a timestamp and `yes`, `no`, `on`, `off` as booleans. The tool does not. A test oracle must use YAML 1.2 core meanings and read date-shaped values as text (for example `go.yaml.in/yaml/v3`, comparing the node text of a timestamp-tagged scalar).
 
@@ -92,7 +92,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 
 **Editing.** To change a value, rename a key, add a key (at the end of the block) or remove one, the tool changes only the bytes of that entry. Everything else in the block, including order, comments, quoting and line endings, is byte-for-byte unchanged. Unknown keys are kept. Errors carry the file and the line number.
 
-**Fixtures.** The machine-readable set is `yaml-lite.json` (52 cases: input, accept or reject, and the expected value), shipped with the API fixtures (API spec, section 9). It is the conformance suite for every implementation. The table below is a human-readable subset:
+**Fixtures.** The machine-readable set is `yaml-lite.json` (55 cases: input, accept or reject, and the expected value), shipped with the API fixtures (API spec, section 9). It is the conformance suite for every implementation. The table below is a human-readable subset:
 
 | Input                                              | Result                                                                                       |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- |

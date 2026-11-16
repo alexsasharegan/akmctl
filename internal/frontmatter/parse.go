@@ -382,6 +382,11 @@ func typePlain(s string) (Value, string) {
 		return NewBool(true), ""
 	case "false":
 		return NewBool(false), ""
+	case "<<":
+		// YAML 1.2 core reads it as text, but libraries with the YAML 1.1 merge
+		// key read it as a merge tag even where a value stands, and fail (work
+		// item 261108-xkck, found by FuzzAgainstOracle).
+		return Value{}, "<< alone is the YAML merge key and is not supported as a value (quote it)"
 	case "True", "TRUE", "False", "FALSE", "Null", "NULL":
 		return Value{}, "capitalized " + s + " is not supported (write it lower case or quote it)"
 	}

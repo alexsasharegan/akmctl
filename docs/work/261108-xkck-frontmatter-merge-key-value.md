@@ -18,14 +18,24 @@ Found by a 2-second run of `go test ./internal/frontmatter -run "^$" -fuzz ^Fuzz
 
 Done when:
 
-- [ ] The input `A: <<` no longer fails `FuzzAgainstOracle` (reader, oracle filter or spec changed, decision recorded).
-- [ ] The input is a seed of the fuzz target.
+- [x] The input `A: <<` no longer fails `FuzzAgainstOracle` (reader, oracle filter or spec changed, decision recorded).
+- [x] The input is a seed of the fuzz target.
 
 ## Next
 
 Refuse a plain << in internal/frontmatter (typePlain), as the subset refuses the other forms YAML libraries disagree on; add the fixtures (they seed the fuzz target) and the sentence in the standard.
 
+## Outcome
+
+- `A: <<` no longer fails `FuzzAgainstOracle`: the reader refuses a plain scalar that is exactly `<<` (`typePlain` in `internal/frontmatter/parse.go`), with a message that says to quote it. A 20-second fuzz run found nothing.
+- The input is a seed: three new cases in `yaml-lite.json` (both copies), which the fuzz target loads.
+
+The standard lists it among the forms that are stricter than YAML. Decision: none (the pick is in the Log).
+
 ## Log
 
 - 2026-11-08: filed.
 - 2026-11-16 07:09-07:00: claimed (claude-fable-5-2).
+- 2026-11-16 07:10-07:00: ticked "The input `A: <<` no longer fails `FuzzAgainstOracle` (reader, oracle filter or spec changed, decision recorded).": typePlain refuses a plain <<; go test -fuzz FuzzAgainstOracle -fuzztime 20s: 115950 runs, no failure
+- 2026-11-16 07:10-07:00: ticked "The input is a seed of the fuzz target.": yaml-lite.json case 'merge key as a value' (input a: <<); the fuzz target seeds from the fixtures
+- 2026-11-16 07:10-07:00: pick: the reader changes, not the oracle filter or the meaning in the spec. YAML 1.2 core reads << as text, so the tool was right by the letter; but the subset already keeps clear of forms that libraries disagree on (number spellings, capitalized booleans), and a merge tag is such a form. A record that holds a bare << value becomes unreadable until it is quoted; none is known
