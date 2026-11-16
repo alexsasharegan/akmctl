@@ -1,0 +1,129 @@
+{
+  "name": "a closed work item: edit states",
+  "repo": "basic",
+  "request": {
+    "id": "261010-j9k0"
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "show",
+    "request": {
+      "id": "261010-j9k0"
+    },
+    "ok": true,
+    "record": {
+      "id": "261010-j9k0",
+      "type": "work",
+      "path": "docs/work/done/261010-j9k0-choose-a-licence.md",
+      "id_date": "2026-10-10",
+      "etag": "29721853e3d6b9c4",
+      "fields": {
+        "id": "261010-j9k0",
+        "title": "Choose a licence",
+        "summary": null,
+        "status": "done",
+        "kind": null,
+        "parent": null,
+        "blocked_by": null,
+        "priority": null,
+        "cycle": null,
+        "keep": null,
+        "created": "2026-10-10",
+        "updated": "2026-10-12",
+        "closed": "2026-10-12",
+        "authored_by": null,
+        "decisions": null
+      }
+    },
+    "sections": [
+      "goal",
+      "outcome"
+    ],
+    "edit": {
+      "fields": {
+        "id": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "title": {
+          "state": "no",
+          "reason": "the item is closed; a correction with a one-line reason changes it",
+          "correction": true
+        },
+        "summary": {
+          "state": "no",
+          "reason": "the item is closed; a correction with a one-line reason changes it",
+          "correction": true
+        },
+        "status": {
+          "state": "no",
+          "reason": "a closed item stays done or dropped"
+        },
+        "kind": {
+          "state": "no",
+          "reason": "the item is closed"
+        },
+        "parent": {
+          "state": "no",
+          "reason": "the item is closed"
+        },
+        "blocked_by": {
+          "state": "no",
+          "reason": "the item is closed"
+        },
+        "priority": {
+          "state": "no",
+          "reason": "the item is closed"
+        },
+        "cycle": {
+          "state": "no",
+          "reason": "the item is closed"
+        },
+        "keep": {
+          "state": "yes"
+        },
+        "created": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "updated": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "closed": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "authored_by": {
+          "state": "no",
+          "reason": "the item is closed"
+        },
+        "decisions": {
+          "state": "no",
+          "reason": "the item is closed"
+        }
+      },
+      "sections": {
+        "goal": {
+          "state": "no",
+          "reason": "the item is closed; a correction with a one-line reason changes it",
+          "correction": true
+        },
+        "outcome": {
+          "state": "no",
+          "reason": "the item is closed; a correction with a one-line reason changes it",
+          "correction": true
+        },
+        "next": {
+          "state": "no",
+          "reason": "a closed item has no next step"
+        },
+        "log": {
+          "state": "no",
+          "reason": "the item is closed; its Log is written by the tool"
+        }
+      }
+    },
+    "body": "\n# Choose a licence\n\n## Goal\nDo the thing.\n\n- [ ] It is done.\n\n## Outcome\nMIT, in `LICENSE`.\n"
+  }
+}

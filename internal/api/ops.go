@@ -529,6 +529,10 @@ func opShow(repo *record.Repo, q Request) (Obj, *Error) {
 		}
 	}
 	out := O("record", ro, "sections", names)
+	if r.Type == record.Work {
+		f, _ := ro.Get("fields")
+		out = append(out, KV{"edit", editObj(repo, r, f.(Obj), names)})
+	}
 	if sec, ok := q["section"]; ok {
 		name := strings.ToLower(strings.TrimSpace(sec.(string)))
 		t, found := text[name]
