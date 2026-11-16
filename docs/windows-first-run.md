@@ -71,7 +71,7 @@ Copy this into the message, with the failing command and its full output:
 
 Also say: which step, what you typed, what you expected, and whether the folder is on OneDrive, a network drive or a path with spaces (all are supported; they are worth knowing about).
 
-Known faults, so you do not have to report them again: 261108-mwtr (a write is refused while another program holds the file), 261108-ma45 (`check` reports A4 on a CRLF `docs\adr\README.md`), 261108-2z9m (new files are LF in a CRLF repository) and 261108-sfj3 (a link written with backslashes is not checked). The items are under 261108-2ncf.
+Known faults, so you do not have to report them again: 261108-mwtr (a write is refused while another program holds the file), 261108-2z9m (new files are LF in a CRLF repository) and 261108-sfj3 (a link written with backslashes is not checked). The items are under 261108-2ncf.
 
 ## For the maintainer
 

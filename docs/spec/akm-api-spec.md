@@ -185,7 +185,7 @@ Regenerate `docs/adr/README.md` (section 4 of the specification).
 | `dry_run`         | boolean | false   | Compute, do not write.     |
 | `include_content` | boolean | false   | Return the generated text. |
 
-Response: `path`, `changed` (the generated text differs from the file), `written` (the file was written), and `content` when asked. Side effect: writes the file unless `dry_run`.
+Response: `path`, `changed` (the generated text differs from the file; line endings are not compared, so a CRLF checkout of the same index is not changed), `written` (the file was written), and `content` when asked (always with LF). Side effect: writes the file unless `dry_run`, in the line endings the file had (CRLF if it had any, else LF).
 
 ### 4.8 `find`
 

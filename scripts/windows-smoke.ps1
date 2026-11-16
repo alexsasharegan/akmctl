@@ -209,13 +209,8 @@ function Run-Mode([string]$AutoCrlf) {
   if (Test-Path -LiteralPath (Join-Path $repo '.akm.lock')) { Fail 'a .akm.lock file is left behind' }
 
   $r = Akm $repo @('check')
-  if ($AutoCrlf -eq 'true' -and $env:OS -eq 'Windows_NT') {
-    # Known fault 261108-ma45: A4 compares the ADR index byte for byte, so a CRLF checkout fails.
-    if ($r.Code -eq 0) { Fail 'check passed on the CRLF checkout: known fault 261108-ma45 is fixed, remove the exception' }
-    elseif ($r.Out -match '1 errors' -and $r.Out -match 'A4 ') { Pass 'check reports only A4 on the CRLF checkout (known fault 261108-ma45)' }
-    else { Fail "check on the CRLF checkout:`n$($r.Out)" }
-  }
-  else { Expect 'check' $r 0 '0 errors' | Out-Null }
+  # A CRLF checkout of the ADR index passes A4 (work item 261108-ma45).
+  Expect 'check' $r 0 '0 errors' | Out-Null
   $r = Akm $repo @('ls', '--status', 'ready,active,blocked', '--format', 'ids')
   Expect 'ls open work' $r 0 $beta | Out-Null
 }

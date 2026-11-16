@@ -83,6 +83,7 @@ var nearMisses = []struct {
 	{"G3 just recipe and alias that exist", "G3", edits{"AGENTS.md": sub("`akmctl check`", "`just t`, `just test ./...` and `just --list`"), "justfile": put("set shell := [\"sh\", \"-c\"]\nalias t := test\n\n@test *args:\n    go test {{args}}\n")}},
 	{"G3 just with an import", "G3", edits{"AGENTS.md": sub("`akmctl check`", "`just lint`"), "justfile": put("import 'ci.just'\n")}},
 	{"G3 the word make in prose", "G3", edits{"AGENTS.md": sub("`akmctl check`", "`akmctl check`; make sure it passes"), "Makefile": put("test:\n\tgo test ./...\n")}},
+	{"A4 index checked out with CRLF", "A4", edits{"docs/adr/README.md": func(s string) string { return strings.ReplaceAll(s, "\n", "\r\n") }}},
 	{"L1 link in a code span", "L1", edits{"AGENTS.md": app("\nUse `[x](nope.md)` here.\n")}},
 	{"L2 wikilink in a code span", "L2", edits{"AGENTS.md": app("\nUse `[[Nowhere]]` here.\n")}},
 	{"S1 current manifest with an extra key", "S1", edits{"docs/.layout": app("stale_days: 45\n")}},

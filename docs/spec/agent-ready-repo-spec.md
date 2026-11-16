@@ -374,7 +374,7 @@ Sections: `## Context`, `## Considered Options` (at least two, including doing n
 - Rows sort by `id` (so by date) within a group.
 - The id column links to the file with a relative Markdown link, not a wikilink, so the index reads the same on a Git host and in Obsidian.
 - Layout: each group is a `##` heading, a blank line and a pipe table; an empty group is omitted. The header row, a separator row `| --- |` and the data rows are padded so that each column is as wide as its widest cell, measured in display width (East Asian wide characters and emoji count 2). A `|` in a cell is written `\|`. The file is the header comment, a blank line, then the groups, and ends with one newline. This is the form Prettier leaves unchanged. Display width follows Prettier's string-width rule: ASCII counts its length; East Asian wide and fullwidth characters count 2; an emoji sequence counts 2 (1 for a bare text-style emoji); control characters, combining marks U+0300 to U+036F and variation selectors count 0.
-- The file is also listed in `.prettierignore`, and rule A4 compares it byte for byte with the generated output.
+- The file is also listed in `.prettierignore`, and rule A4 compares it with the generated output, byte for byte apart from line endings: an index checked out with CRLF is the same index, and `akmctl index` keeps the line endings of the file it rewrites.
 - A merge conflict in the index is resolved by running `akmctl index`, never by hand. A repo MAY add a `.gitattributes` merge driver that does this.
 
 The open-work listing is the work equivalent. It is not committed: work records change too often, and a committed copy would conflict constantly. It is derived on demand with `akmctl ls --status ready,active,blocked` (header fields only).

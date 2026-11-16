@@ -478,8 +478,10 @@ func (c *checker) adrs() {
 	switch {
 	case err != nil && hasADR:
 		c.add("A4", "E", indexPath, 0, "", "the ADR index is missing; run akmctl index")
-	case err == nil && string(got) != want:
-		c.add("A4", "E", indexPath, firstDiffLine(string(got), want), "", "the ADR index differs from what akmctl index generates; run akmctl index")
+	case err == nil && index.LF(string(got)) != want:
+		// Line endings are not part of the comparison: a CRLF checkout of the
+		// index is the same index (work item 261108-ma45).
+		c.add("A4", "E", indexPath, firstDiffLine(index.LF(string(got)), want), "", "the ADR index differs from what akmctl index generates; run akmctl index")
 	}
 }
 

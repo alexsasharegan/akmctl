@@ -23,12 +23,20 @@ Expected: `check` accepts an index that differs from the generated one only in l
 
 Done when:
 
-- [ ] A test with a CRLF `README.md` passes `check` on any platform.
-- [ ] The Windows smoke harness drops its known-fault exception for this item.
+- [x] A test with a CRLF `README.md` passes `check` on any platform.
+- [x] The Windows smoke harness drops its known-fault exception for this item.
 
 ## Next
 
 Find rule A4 in internal/check, compare after normalizing CRLF, add the test; remove the known-fault exception in scripts/windows-smoke.ps1.
+
+## Outcome
+
+- A CRLF `docs/adr/README.md` passes `check` on any platform: A4 compares after reading CRLF as LF (`index.LF`); `TestIndexOnACRLFCheckout` and a near-miss case prove it.
+- `index` does not call such a file changed, and writes CRLF when it rewrites a CRLF file (`index.WithEndingsOf`), as the audit asked.
+- The smoke harness no longer excuses this fault. It has not run here (no `pwsh`): the Windows CI job is the check.
+
+The standard and the API spec say that line endings are not compared. Decision: none.
 
 ## Log
 
@@ -36,3 +44,6 @@ Find rule A4 in internal/check, compare after normalizing CRLF, add the test; re
 - 2026-11-08 13:16-07:00: filed by the Windows smoke harness run (PR 51)
 - 2026-11-08 13:52-07:00: the CRLF audit (261108-kbve) found the same cause in index: it rewrites a CRLF docs/adr/README.md to LF, so the fix should keep the file's endings
 - 2026-11-16 07:07-07:00: claimed (claude-fable-5-2).
+- 2026-11-16 07:08-07:00: ticked "A test with a CRLF `README.md` passes `check` on any platform.": TestIndexOnACRLFCheckout (internal/api) and the near miss 'A4 index checked out with CRLF' (internal/check)
+- 2026-11-16 07:08-07:00: ticked "The Windows smoke harness drops its known-fault exception for this item.": scripts/windows-smoke.ps1: the known-fault branch is gone, check must exit 0 with 0 errors on the CRLF run
+- 2026-11-16 07:08-07:00: not verified: the smoke harness on Windows. No pwsh here; the Windows job of the pull request runs it. index keeps CRLF when the file has any CRLF (a file with mixed endings becomes all CRLF)

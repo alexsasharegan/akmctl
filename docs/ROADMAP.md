@@ -9,7 +9,7 @@ One thread is in flight, Windows support. What is left in it waits on the mainta
   - [261108-7avk] The first Windows user runs `docs/windows-first-run.md`.
   - [261108-ct4s] The same user checks `init` and `akmctl ui` in Windows Terminal and PowerShell.
 
-Bugs the Windows work found are filed as `raw` items under the same parent and are triaged by whoever takes the Windows thread: 261108-2z9m (new files are LF in a CRLF repository), 261108-ma45 (`check` A4 fails on a CRLF index), 261108-mwtr (a write fails while an editor holds the record) and 261108-sfj3 (backslash link targets are ignored).
+Bugs the Windows work found are filed as `raw` items under the same parent and are triaged by whoever takes the Windows thread: 261108-2z9m (new files are LF in a CRLF repository), 261108-mwtr (a write fails while an editor holds the record) and 261108-sfj3 (backslash link targets are ignored).
 
 The rerun of the agent rails trial on other harnesses (261106-xrpr) waits for a first release.
 
