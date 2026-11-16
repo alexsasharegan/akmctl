@@ -19,7 +19,6 @@ The queue for an agent working unattended. Take the top item that is `ready`; no
 
 Without a decision:
 
-- [261101-3che] show reports edit states
 - [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
 - [261028-1k0e] Say which is which in the ADR index supersedes column (_pick_: separate columns or prefixed ids)
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs

@@ -2,29 +2,26 @@
 id: "261101-3che"
 title: show reports edit states
 summary: "A record read carries an edit state (yes, warn, no, with a reason) for each field and section, so the drawer draws controls from the tool's rules"
-status: active
+status: done
 kind: feature
 parent: "261031-gtw6"
 created: 2026-11-01
 updated: 2026-11-16
+closed: 2026-11-16
 decisions: ["[[261101-dxcn-closed-records-read-only-except-corrections|261101-dxcn]]"]
-claimed_by: claude-fable-5-2
-claimed_at: 2026-11-16T13:52
 ---
 
 # show reports edit states
 
 ## Goal
 
-The matrix in the Outcome of [261031-z0n8](done/261031-z0n8-spike-field-edit-rules-by-status.md) is data the tool serves, so the drawer ([261028-esyt](done/261028-esyt-ui-field-editing.md)) holds no copy of it.
+The matrix in the Outcome of [261031-z0n8](261031-z0n8-spike-field-edit-rules-by-status.md) is data the tool serves, so the drawer ([261028-esyt](261028-esyt-ui-field-editing.md)) holds no copy of it.
 
 - [x] `show` returns `edit`: for each field and section, `state` (`yes`, `warn`, `no`) and a short `reason` for `warn` and `no`.
 - [x] The states follow the matrix; a test walks every status and field against it.
 - [x] API spec, schema, fixtures (both copies), glossary, changelog.
 
 ## Next
-
-Add the edit member to opShow (internal/api/editstate.go) from the matrix in 261031-z0n8, with a test that walks every status and field; then the spec, schema, fixtures, glossary and changelog.
 
 ## Outcome
 
