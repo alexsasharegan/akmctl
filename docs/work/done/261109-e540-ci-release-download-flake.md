@@ -1,12 +1,11 @@
 ---
 id: "261109-e540"
 title: CI steps that download from GitHub fail on a 504 and block the PR run
-status: active
+status: done
 kind: bug
 created: 2026-11-09
 updated: 2026-11-16
-claimed_by: claude-fable-5-2
-claimed_at: 2026-11-16T14:01
+closed: 2026-11-16
 ---
 
 # CI steps that download from GitHub fail on a 504 and block the PR run
@@ -24,8 +23,6 @@ Done when:
 - [x] The step that checks a damaged download still fails on a real checksum mismatch.
 
 ## Next
-
-Add the retry to the three steps in .github/workflows/ci.yml.
 
 ## Outcome
 

@@ -20,7 +20,6 @@ The queue for an agent working unattended. Take the top item that is `ready`; no
 Without a decision:
 
 - [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
-- [261109-e540] CI steps that download from GitHub fail on a 504 and block the PR run (_pick_: warn or gate after the retries)
 
 With a pick, for 1.0.0:
 
