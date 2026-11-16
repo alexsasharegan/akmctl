@@ -2,13 +2,12 @@
 id: "261028-1k0e"
 title: Say which is which in the ADR index supersedes column
 summary: The index column 'supersedes / superseded_by' does not show which id is which; split or label it without breaking the Prettier-stable form.
-status: active
+status: done
 kind: chore
 priority: 1
 created: 2026-10-28
 updated: 2026-11-16
-claimed_by: claude-fable-5-2
-claimed_at: 2026-11-16T13:58
+closed: 2026-11-16
 ---
 
 # Say which is which in the ADR index supersedes column
@@ -24,8 +23,6 @@ Done when:
 - [x] The output stays byte-stable under the pinned Prettier, and rule A4 passes on a repository with a superseded record.
 
 ## Next
-
-Prefix each id in the last index column with its relation in internal/index, test it with a superseded record, and update the standard's index section.
 
 ## Outcome
 
