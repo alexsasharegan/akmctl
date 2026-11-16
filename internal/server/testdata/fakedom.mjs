@@ -169,6 +169,9 @@ export class FElement extends FNode {
     for (let n = this; n; n = n.parent) for (const fn of (n.listeners && n.listeners.get(type)) || []) fn(e);
     return e;
   }
+  get parentNode() {
+    return this.parent;
+  }
   contains(n) {
     for (let x = n; x; x = x.parent) if (x === this) return true;
     return false;

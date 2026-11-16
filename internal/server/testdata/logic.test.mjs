@@ -179,6 +179,10 @@ const withNew = M.buildOps({ ...mv, to: "done" }, { outcome: "o", decision: { mo
 assert.deepEqual(withNew.map((o) => o.kind), ["new", "set", "close"]);
 assert.deepEqual(withNew[0], { kind: "new", what: "adr", slug: "pick-x", title: "Pick X" });
 assert.deepEqual(M.resolveOp(withNew[1], "261028-abcd").changes.decisions, ["261028-abcd"]);
+// a new ADR is unlinked while the set that names it is still to be written (work item 261029-nkqv)
+assert.equal(M.unlinkedAdr(withNew, 1, "261028-abcd"), "261028-abcd", "new written, set pending");
+assert.equal(M.unlinkedAdr(withNew, 2, "261028-abcd"), "", "the link is written");
+assert.equal(M.unlinkedAdr(withNew, 0, null), "", "nothing was made yet");
 // the preview: every write in one list, the first with the etag, "$new" left for the server
 const pv = M.previewRequest([{ kind: "section", name: "Goal", text: "g", mode: "replace" }, ...withNew, { kind: "claim", as: "a" }], "261022-e5f6", { etag: "e1", takeover: true });
 assert.equal(pv.method, "POST");
