@@ -52,10 +52,12 @@ func Generate(repo *record.Repo) string {
 }
 
 func row(r *record.Record) []string {
+	// Each id carries its relation, so a row with one id says which it is
+	// (work item 261028-1k0e).
 	var links []string
-	for _, k := range []string{"supersedes", "superseded_by"} {
-		if v := record.RefID(r.Str(k)); v != "" {
-			links = append(links, v)
+	for _, k := range []struct{ field, words string }{{"supersedes", "supersedes"}, {"superseded_by", "superseded by"}} {
+		if v := record.RefID(r.Str(k.field)); v != "" {
+			links = append(links, k.words+" "+v)
 		}
 	}
 	return []string{
