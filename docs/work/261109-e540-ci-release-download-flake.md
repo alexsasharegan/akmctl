@@ -1,10 +1,12 @@
 ---
 id: "261109-e540"
 title: CI steps that download from GitHub fail on a 504 and block the PR run
-status: ready
+status: active
 kind: bug
 created: 2026-11-09
-updated: 2026-11-09
+updated: 2026-11-16
+claimed_by: claude-fable-5-2
+claimed_at: 2026-11-16T14:01
 ---
 
 # CI steps that download from GitHub fail on a 504 and block the PR run
@@ -29,3 +31,4 @@ Add the retry to the three steps in .github/workflows/ci.yml.
 
 - 2026-11-09: filed.
 - 2026-11-09 01:23-07:00: Filed after the 504s on 2026-11-09 (winget manifests, homebrew formula, windows zip install). Same commit passed on the push run.
+- 2026-11-16 07:01-07:00: claimed (claude-fable-5-2).
