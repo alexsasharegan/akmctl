@@ -1,10 +1,10 @@
 ---
 id: "261108-xkck"
 title: frontmatter merge key value
-status: raw
+status: ready
 kind: bug
 created: 2026-11-08
-updated: 2026-11-08
+updated: 2026-11-16
 priority: 3
 ---
 
