@@ -24,7 +24,6 @@ Without a decision:
 With a pick, for 1.0.0:
 
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback (criterion 2; _pick_: restore the earlier writes from the bytes held in memory, no journal; a `proposed` ADR if it changes a guarantee)
-- [261029-shz5] Undo covers only the last safe move or capture (criterion 2; _pick_: document the limit in the key help, or read git history as ADR 261106-60xv does)
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest (criterion 1; _pick_: the report-only phase first, which changes nothing, then the proposed steps)
 
 ## Later
