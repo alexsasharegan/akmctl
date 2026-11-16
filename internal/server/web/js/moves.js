@@ -167,6 +167,17 @@ export function resolveOp(op, newId) {
 }
 
 /**
+ * The id of a new ADR that is on disk but not linked yet (work item
+ * 261029-nkqv): the `new` was written, and the `set` that puts it into the
+ * item's `decisions` is among the writes still to make. "" when there is none.
+ */
+export function unlinkedAdr(ops, written, newId) {
+  if (!newId) return "";
+  const pending = ops.slice(written).some((op) => op.kind === "set" && op.changes.decisions && op.changes.decisions.includes(NEW_ADR));
+  return pending ? newId : "";
+}
+
+/**
  * The preview call for a move's ops (work item 261029-g8x2, ADR 261109-vgg7):
  * one POST that applies every write on a scratch copy and answers each write's
  * diff as it is after the earlier ones. The first write to the record carries

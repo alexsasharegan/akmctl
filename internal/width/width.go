@@ -10,7 +10,7 @@ package width
 
 import "sort"
 
-//go:generate go run gen/main.go data/EastAsianWidth.txt data/emoji-data.txt
+//go:generate go run gen/main.go data/EastAsianWidth.txt data/emoji-data.txt data/emoji-zwj-sequences.txt
 
 func inRanges(t [][2]rune, r rune) bool {
 	i := sort.Search(len(t), func(i int) bool { return t[i][1] >= r })
@@ -56,6 +56,8 @@ func emojiCluster(rs []rune, i int) (n, w int) {
 		return 0, 0
 	}
 	// element := base (skin tone | FE0F [20E3] | tag sequence)? ; elements join with a ZWJ
+	var endsBuf [maxZWJElements]int
+	ends := endsBuf[:0] // the index after each element of the ZWJ chain
 	j := i + 1
 	for {
 		switch {
@@ -75,16 +77,45 @@ func emojiCluster(rs []rune, i int) (n, w int) {
 				j = k + 1
 			}
 		}
-		if j+1 < len(rs) && rs[j] == 0x200D && inRanges(pictoRanges, rs[j+1]) {
+		ends = append(ends, j)
+		if j+1 < len(rs) && rs[j] == 0x200D && inRanges(pictoRanges, rs[j+1]) && len(ends) < maxZWJElements {
 			j += 2
 			continue
 		}
 		break
 	}
+	// Prettier joins a ZWJ chain only when it is a standard sequence (its emoji
+	// pattern lists them); in any other chain each emoji stands alone and each
+	// joiner counts 1. So take the longest prefix of the chain that is a
+	// standard sequence, or else the first element only (work item 261028-x1b4).
+	for n := len(ends); n >= 2; n-- {
+		if isZWJSequence(rs[i:ends[n-1]]) {
+			return ends[n-1] - i, 2
+		}
+	}
+	j = ends[0]
 	if j-i == 1 && !inRanges(emojiPresRanges, r) && !inRanges(wideRanges, r) {
 		return 1, 1 // a bare text-style emoji is narrow
 	}
 	return j - i, 2
+}
+
+// maxZWJElements is more than the longest standard sequence has (four); a
+// longer chain is cut there so that a hostile chain of millions costs nothing
+// extra, and the rest is measured from where the cut left off.
+const maxZWJElements = 8
+
+// isZWJSequence reports whether rs, without its variation selectors, is a
+// standard emoji ZWJ sequence.
+func isZWJSequence(rs []rune) bool {
+	var b [32]rune
+	key := b[:0]
+	for _, r := range rs {
+		if r != 0xFE0F {
+			key = append(key, r)
+		}
+	}
+	return zwjSequences[string(key)]
 }
 
 // String returns the display width of s.

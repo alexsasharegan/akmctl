@@ -42,6 +42,78 @@
       "next",
       "log"
     ],
+    "edit": {
+      "fields": {
+        "id": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "title": {
+          "state": "yes"
+        },
+        "summary": {
+          "state": "yes"
+        },
+        "status": {
+          "state": "yes"
+        },
+        "kind": {
+          "state": "warn",
+          "reason": "the item is under way; this describes it as it was before work began"
+        },
+        "parent": {
+          "state": "warn",
+          "reason": "the item is under way; this describes it as it was before work began"
+        },
+        "blocked_by": {
+          "state": "yes"
+        },
+        "priority": {
+          "state": "warn",
+          "reason": "the item is active; its priority ranked it before work began"
+        },
+        "cycle": {
+          "state": "yes"
+        },
+        "keep": {
+          "state": "yes"
+        },
+        "created": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "updated": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "closed": {
+          "state": "no",
+          "reason": "managed by the tool"
+        },
+        "authored_by": {
+          "state": "yes"
+        },
+        "decisions": {
+          "state": "yes"
+        }
+      },
+      "sections": {
+        "goal": {
+          "state": "warn",
+          "reason": "the item is active; changing the goal moves the goalposts, so add a log line that says why"
+        },
+        "next": {
+          "state": "yes"
+        },
+        "log": {
+          "state": "yes",
+          "append": true
+        },
+        "outcome": {
+          "state": "yes"
+        }
+      }
+    },
     "section": {
       "name": "next",
       "text": "Write the encoder test.\n\nSaved: 2026-10-27 18:00"

@@ -9,7 +9,7 @@ One thread is in flight, Windows support. What is left in it waits on the mainta
   - [261108-7avk] The first Windows user runs `docs/windows-first-run.md`.
   - [261108-ct4s] The same user checks `init` and `akmctl ui` in Windows Terminal and PowerShell.
 
-Bugs the Windows work found are filed as `raw` items under the same parent and are triaged by whoever takes the Windows thread: 261108-2z9m (new files are LF in a CRLF repository), 261108-ma45 (`check` A4 fails on a CRLF index), 261108-mwtr (a write fails while an editor holds the record) and 261108-sfj3 (backslash link targets are ignored).
+Bugs the Windows work found are filed as `raw` items under the same parent and are triaged by whoever takes the Windows thread: 261108-2z9m (new files are LF in a CRLF repository), 261108-mwtr (a write fails while an editor holds the record) and 261108-sfj3 (backslash link targets are ignored).
 
 The rerun of the agent rails trial on other harnesses (261106-xrpr) waits for a first release.
 
@@ -17,19 +17,9 @@ The rerun of the agent rails trial on other harnesses (261106-xrpr) waits for a 
 
 The queue for an agent working unattended. Take the top item that is `ready`; none needs the maintainer's decision first. Items marked _pick_ ask the agent to choose between small options and record the choice in the item's Log and the pull request; the maintainer reviews it at merge.
 
-Without a decision:
-
-- [261101-3che] show reports edit states
-- [261028-e7ej] Make rule G3 check more command forms than scripts/ paths
-- [261028-1k0e] Say which is which in the ADR index supersedes column (_pick_: separate columns or prefixed ids)
-- [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
-- [261109-e540] CI steps that download from GitHub fail on a 504 and block the PR run (_pick_: warn or gate after the retries)
-
 With a pick, for 1.0.0:
 
-- [261029-nkqv] A new ADR made by the done wizard can be orphaned (criterion 4; _pick_: say so and offer a retry, or write the link first)
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback (criterion 2; _pick_: restore the earlier writes from the bytes held in memory, no journal; a `proposed` ADR if it changes a guarantee)
-- [261029-shz5] Undo covers only the last safe move or capture (criterion 2; _pick_: document the limit in the key help, or read git history as ADR 261106-60xv does)
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest (criterion 1; _pick_: the report-only phase first, which changes nothing, then the proposed steps)
 
 ## Later

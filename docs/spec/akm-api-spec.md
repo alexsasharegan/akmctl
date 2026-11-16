@@ -132,6 +132,24 @@ Response: as `ls`, with `matches` on each record: an array of `{field, line, sni
 
 Response: `record` (with all fields the file has), `sections` (the file's `##` headings in order, lowercase), and either `body` (the whole body, if `section` is absent) or `section` (`{name, text}`, the text without its heading). A missing section is `not_found`. A work item that has children carries `progress` in `record`: counts computed from the `parent` links on every call and never stored (H4), `{children_done, children_dropped, children_total, descendants_done, descendants_dropped, descendants_total}`. `children_*` count the direct children; `descendants_*` count every item below, through any depth. A `dropped` child counts in `*_dropped` and not in `*_done`, so `done + dropped` equals the total once the work is finished. An item with no children has no `progress`.
 
+A work item also carries `edit`, what a client may offer to change, so that a client holds no copy of the rules: `{fields, sections}`, each an object keyed by name whose values are `{state, reason, correction, append}`. `state` is `yes` (editable), `warn` (editable; the client shows `reason` first, and the API never refuses on a warning) or `no` (read-only; `reason` says why). `reason` is present for `warn` and `no` only. `correction: true` goes with `no` on a closed item's `title`, `summary` and sections: a `set` or `section` that carries `correction` is accepted (section 4.11). `append: true` goes with `yes` on `log`: lines are added with `log`, never rewritten. `fields` has an entry for every key of `record.fields`; `sections` has one for every name in `sections` and for `goal`, `next`, `outcome` and `log` whether or not the file has them. The states by status (closed is `done` or `dropped`):
+
+| Field or section                                                  | raw, ready  | active      | blocked     | closed         |
+| ----------------------------------------------------------------- | ----------- | ----------- | ----------- | -------------- |
+| `title`, `summary`                                                | yes         | yes         | yes         | no, correction |
+| `kind`, `parent`                                                  | yes         | warn        | warn        | no             |
+| `priority`                                                        | yes         | warn        | yes         | no             |
+| `blocked_by`, `cycle`, `decisions`, `authored_by`                 | yes         | yes         | yes         | no             |
+| `keep`                                                            | yes         | yes         | yes         | yes            |
+| `status`                                                          | yes         | yes         | yes         | no             |
+| `id`, `created`, `updated`, `closed`, claim fields, any other key | no          | no          | no          | no             |
+| `goal`                                                            | yes         | warn        | yes         | no, correction |
+| `next`                                                            | yes         | yes         | yes         | no             |
+| `outcome`, any other section                                      | yes         | yes         | yes         | no, correction |
+| `log`                                                             | yes, append | yes, append | yes, append | no             |
+
+`status` is `yes` for the moves `set` makes among the open statuses; `close` finishes an item. An ADR has no `edit`. More members of a state, and `edit` on an ADR, are a MINOR addition.
+
 ### 4.5 `board`
 
 The Kanban grouping, as data. A client draws it; `akmctl board` draws it as text.
@@ -167,7 +185,7 @@ Regenerate `docs/adr/README.md` (section 4 of the specification).
 | `dry_run`         | boolean | false   | Compute, do not write.     |
 | `include_content` | boolean | false   | Return the generated text. |
 
-Response: `path`, `changed` (the generated text differs from the file), `written` (the file was written), and `content` when asked. Side effect: writes the file unless `dry_run`.
+Response: `path`, `changed` (the generated text differs from the file; line endings are not compared, so a CRLF checkout of the same index is not changed), `written` (the file was written), and `content` when asked (always with LF). Side effect: writes the file unless `dry_run`, in the line endings the file had (CRLF if it had any, else LF).
 
 ### 4.8 `find`
 

@@ -2,6 +2,25 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://akm.invalid/api/1.0/show.json",
   "$defs": {
+    "edit_state": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": ["yes", "warn", "no"]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "correction": {
+          "const": true
+        },
+        "append": {
+          "const": true
+        }
+      },
+      "required": ["state"],
+      "additionalProperties": false
+    },
     "request": {
       "type": "object",
       "properties": {
@@ -40,6 +59,25 @@
               "items": {
                 "type": "string"
               }
+            },
+            "edit": {
+              "type": "object",
+              "properties": {
+                "fields": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/$defs/edit_state"
+                  }
+                },
+                "sections": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/$defs/edit_state"
+                  }
+                }
+              },
+              "required": ["fields", "sections"],
+              "additionalProperties": false
             },
             "body": {
               "type": "string"

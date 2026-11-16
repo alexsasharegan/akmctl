@@ -24,6 +24,19 @@ var groups = []struct {
 
 var columns = []string{"id", "title", "date", "scope", "summary", "supersedes / superseded_by"}
 
+// LF returns s with every CRLF line ending as LF. The generator writes LF; a
+// checkout with core.autocrlf has CRLF, and the two are the same index.
+func LF(s string) string { return strings.ReplaceAll(s, "\r\n", "\n") }
+
+// WithEndingsOf returns generated (LF) text in the line endings of cur: CRLF
+// when cur has any, so that index keeps the endings of the file it rewrites.
+func WithEndingsOf(generated, cur string) string {
+	if strings.Contains(cur, "\r\n") {
+		return strings.ReplaceAll(generated, "\n", "\r\n")
+	}
+	return generated
+}
+
 // Generate returns the text of the index for the ADRs of repo.
 func Generate(repo *record.Repo) string {
 	var adrs []*record.Record
@@ -52,10 +65,12 @@ func Generate(repo *record.Repo) string {
 }
 
 func row(r *record.Record) []string {
+	// Each id carries its relation, so a row with one id says which it is
+	// (work item 261028-1k0e).
 	var links []string
-	for _, k := range []string{"supersedes", "superseded_by"} {
-		if v := record.RefID(r.Str(k)); v != "" {
-			links = append(links, v)
+	for _, k := range []struct{ field, words string }{{"supersedes", "supersedes"}, {"superseded_by", "superseded by"}} {
+		if v := record.RefID(r.Str(k.field)); v != "" {
+			links = append(links, k.words+" "+v)
 		}
 	}
 	return []string{

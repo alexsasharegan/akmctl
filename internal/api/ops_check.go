@@ -72,7 +72,9 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 	want := index.Generate(repo)
 	full := filepath.Join(repo.Root, filepath.FromSlash(repo.ADRIndexPath()))
 	cur, err := os.ReadFile(full)
-	changed := err != nil || string(cur) != want
+	// A CRLF index that says the same is not out of date, and a rewrite keeps
+	// its line endings (work item 261108-ma45).
+	changed := err != nil || index.LF(string(cur)) != want
 	written := false
 	if changed && !q.boolean("dry_run") {
 		unlock, lerr := fsx.LockRepo(repo.Root, repo.MetaDir())
@@ -80,7 +82,7 @@ func opIndex(repo *record.Repo, q Request) (Obj, *Error) {
 			return nil, unreadable(lerr)
 		}
 		defer unlock()
-		if err := fsx.WriteAtomic(full, []byte(want)); err != nil {
+		if err := fsx.WriteAtomic(full, []byte(index.WithEndingsOf(want, string(cur)))); err != nil {
 			return nil, &Error{Code: "unreadable", Message: "cannot write " + repo.ADRIndexPath() + ": " + err.Error()}
 		}
 		written = true

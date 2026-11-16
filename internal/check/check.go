@@ -2,6 +2,7 @@
 package check
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -477,8 +478,10 @@ func (c *checker) adrs() {
 	switch {
 	case err != nil && hasADR:
 		c.add("A4", "E", indexPath, 0, "", "the ADR index is missing; run akmctl index")
-	case err == nil && string(got) != want:
-		c.add("A4", "E", indexPath, firstDiffLine(string(got), want), "", "the ADR index differs from what akmctl index generates; run akmctl index")
+	case err == nil && index.LF(string(got)) != want:
+		// Line endings are not part of the comparison: a CRLF checkout of the
+		// index is the same index (work item 261108-ma45).
+		c.add("A4", "E", indexPath, firstDiffLine(index.LF(string(got)), want), "", "the ADR index differs from what akmctl index generates; run akmctl index")
 	}
 }
 
@@ -618,11 +621,17 @@ func (c *checker) agents() {
 var scriptPath = regexp.MustCompile("`((?:\\./)?scripts/[A-Za-z0-9_./-]+)`")
 
 // commandPaths is the part of G3 that can be checked without running anything:
-// scripts/... paths named in the Commands section must exist.
+// in the Commands section, a scripts/... path must exist, and a make, npm run
+// or just target must be defined in the file that would define it (work item
+// 261028-e7ej). A command it cannot resolve is skipped, never reported.
 func (c *checker) commandPaths(lines []string) {
 	in := false
+	var fence body.FenceTracker
+	var targets commandTargets
 	for i, l := range lines {
-		if strings.HasPrefix(l, "## ") {
+		l = strings.TrimRight(l, "\r")
+		fenced := fence.In(l)
+		if !fenced && strings.HasPrefix(l, "## ") {
 			in = strings.TrimSpace(l[3:]) == "Commands"
 			continue
 		}
@@ -634,7 +643,165 @@ func (c *checker) commandPaths(lines []string) {
 				c.add("G3", "W", "AGENTS.md", i+1, "", "command path %s does not exist", m[1])
 			}
 		}
+		spans := []string{l}
+		if fenced && strings.HasPrefix(strings.TrimSpace(l), "#") {
+			continue // a comment in a shell block is prose
+		}
+		if !fenced {
+			spans = spans[:0]
+			for _, m := range codeSpan.FindAllString(l, -1) {
+				spans = append(spans, strings.Trim(m, "`"))
+			}
+		}
+		for _, span := range spans {
+			for _, m := range targetCommand.FindAllStringSubmatch(span, -1) {
+				tool, name := m[1], m[2]
+				if m[3] != "" {
+					tool, name = "npm run", m[3]
+				}
+				if file, known := targets.missing(c.repo.Root, tool, name); known {
+					c.add("G3", "W", "AGENTS.md", i+1, "", "%s target %s is not defined in %s", tool, name, file)
+				}
+			}
+		}
 	}
+}
+
+// targetCommand finds `make <target>`, `just <recipe>` and `npm run <script>`
+// at the start of a command. The name must be followed by a space or the end,
+// so `make -C dir x`, `make VAR=1` and `just --list` do not match.
+var targetCommand = regexp.MustCompile(`(?:^|[;&|(]\s*|\s)(?:(make|just)\s+([A-Za-z0-9_][A-Za-z0-9_.:-]*)|npm\s+run(?:-script)?\s+(?:(?:-s|--silent)\s+)?([A-Za-z0-9_][A-Za-z0-9_.:-]*))(?:\s|$|[;&|)])`)
+
+// commandTargets reads, once each, the files that define make, npm and just
+// targets.
+type commandTargets struct {
+	loaded map[string]*targetSet
+}
+
+// targetSet is the targets one file defines. open is true when the file can
+// define more than the scan saw (an include, a pattern rule, an import), so a
+// name that is not in names cannot be called missing.
+type targetSet struct {
+	file  string
+	names map[string]bool
+	open  bool
+}
+
+// missing reports whether name is known not to be a target of tool: the
+// defining file exists, was read whole and does not define it. file is the
+// file's name for the message.
+func (t *commandTargets) missing(root, tool, name string) (file string, known bool) {
+	if t.loaded == nil {
+		t.loaded = map[string]*targetSet{}
+	}
+	set, ok := t.loaded[tool]
+	if !ok {
+		switch tool {
+		case "make":
+			set = makeTargets(root)
+		case "just":
+			set = justTargets(root)
+		default:
+			set = npmScripts(root)
+		}
+		t.loaded[tool] = set
+	}
+	if set == nil || set.open || set.names[name] {
+		return "", false
+	}
+	return set.file, true
+}
+
+func firstFile(root string, names ...string) (string, []byte) {
+	for _, n := range names {
+		if b, err := os.ReadFile(filepath.Join(root, n)); err == nil {
+			return n, b
+		}
+	}
+	return "", nil
+}
+
+// makeTargets reads the rule names of the Makefile at the root. It does not
+// expand variables: a file with an include, a pattern rule or a computed
+// target is open.
+func makeTargets(root string) *targetSet {
+	file, b := firstFile(root, "GNUmakefile", "makefile", "Makefile")
+	if file == "" {
+		return nil
+	}
+	set := &targetSet{file: file, names: map[string]bool{}}
+	for _, l := range strings.Split(string(b), "\n") {
+		l = strings.TrimRight(l, "\r")
+		if l == "" || l[0] == '\t' || l[0] == '#' {
+			continue
+		}
+		if w := strings.Fields(l); w[0] == "include" || w[0] == "-include" || w[0] == "sinclude" {
+			set.open = true
+			continue
+		}
+		i := strings.IndexByte(l, ':')
+		if i <= 0 || strings.HasPrefix(l[i:], ":=") || strings.HasPrefix(l[i:], "::=") {
+			continue
+		}
+		head := l[:i]
+		if strings.ContainsAny(head, "=") {
+			continue // an assignment whose value holds a colon
+		}
+		if strings.ContainsAny(head, "%$") {
+			set.open = true
+			continue
+		}
+		for _, n := range strings.Fields(head) {
+			set.names[n] = true
+		}
+	}
+	return set
+}
+
+var justRecipe = regexp.MustCompile(`^@?([A-Za-z_][A-Za-z0-9_-]*)(?:\s[^:=]*)?:(?:[^=]|$)`)
+var justAlias = regexp.MustCompile(`^alias\s+([A-Za-z_][A-Za-z0-9_-]*)\s*:=`)
+
+// justTargets reads the recipe and alias names of the justfile at the root. A
+// file with an import or a module is open.
+func justTargets(root string) *targetSet {
+	file, b := firstFile(root, "justfile", "Justfile", ".justfile")
+	if file == "" {
+		return nil
+	}
+	set := &targetSet{file: file, names: map[string]bool{}}
+	for _, l := range strings.Split(string(b), "\n") {
+		l = strings.TrimRight(l, "\r")
+		if w := strings.Fields(l); len(w) > 0 && l[0] != ' ' && l[0] != '\t' && (strings.TrimSuffix(w[0], "?") == "import" || strings.TrimSuffix(w[0], "?") == "mod") {
+			set.open = true
+			continue
+		}
+		if m := justAlias.FindStringSubmatch(l); m != nil {
+			set.names[m[1]] = true
+		} else if m := justRecipe.FindStringSubmatch(l); m != nil {
+			set.names[m[1]] = true
+		}
+	}
+	return set
+}
+
+// npmScripts reads the scripts of package.json at the root. A file that is
+// not JSON is skipped.
+func npmScripts(root string) *targetSet {
+	file, b := firstFile(root, "package.json")
+	if file == "" {
+		return nil
+	}
+	var pkg struct {
+		Scripts map[string]json.RawMessage `json:"scripts"`
+	}
+	if json.Unmarshal(b, &pkg) != nil {
+		return nil
+	}
+	set := &targetSet{file: file, names: map[string]bool{}}
+	for n := range pkg.Scripts {
+		set.names[n] = true
+	}
+	return set
 }
 
 func (c *checker) claims() {

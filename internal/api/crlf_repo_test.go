@@ -93,3 +93,46 @@ func TestWritesOnACRLFCheckout(t *testing.T) {
 		t.Errorf("a rewritten link holds a backslash:\n%q", s)
 	}
 }
+
+// TestIndexOnACRLFCheckout is work item 261108-ma45: a CRLF copy of the ADR
+// index is not out of date (check passes A4, index reports no change), and
+// when index does rewrite the file it keeps CRLF.
+func TestIndexOnACRLFCheckout(t *testing.T) {
+	t.Parallel()
+	root := crlfRepo(t)
+	resp := mustOK(t, root, "check", Request{})
+	fs, _ := resp.Get("findings")
+	for _, f := range fs.([]Obj) {
+		if rule, _ := f.Get("rule"); rule == "A4" {
+			t.Fatalf("A4 on a CRLF index: %v", f)
+		}
+	}
+	resp = mustOK(t, root, "index", Request{})
+	if c, _ := resp.Get("changed"); c != false {
+		t.Fatalf("index calls a CRLF index changed: %v", resp)
+	}
+	// make the index stale: a new title in one ADR
+	adr := filepath.Join(root, "docs/adr")
+	es, _ := os.ReadDir(adr)
+	for _, e := range es {
+		if e.Name() == "README.md" {
+			continue
+		}
+		p := filepath.Join(adr, e.Name())
+		b, _ := os.ReadFile(p)
+		i := bytes.Index(b, []byte("title: "))
+		os.WriteFile(p, append(append(append([]byte(nil), b[:i+7]...), []byte("Renamed ")...), b[i+7:]...), 0o644)
+		break
+	}
+	resp = mustOK(t, root, "index", Request{})
+	if w, _ := resp.Get("written"); w != true {
+		t.Fatalf("index did not rewrite a stale index: %v", resp)
+	}
+	b, _ := os.ReadFile(filepath.Join(adr, "README.md"))
+	if !bytes.Contains(b, []byte("Renamed ")) || bytes.Count(b, []byte("\n")) != bytes.Count(b, []byte("\r\n")) {
+		t.Fatalf("the rewritten index lost its CRLF or its change:\n%q", b)
+	}
+	if m := mixedEndings(t, root); len(m) != 0 {
+		t.Fatalf("mixed line endings in %v", m)
+	}
+}
