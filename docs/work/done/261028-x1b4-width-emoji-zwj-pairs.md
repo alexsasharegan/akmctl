@@ -2,13 +2,12 @@
 id: "261028-x1b4"
 title: Match Prettier's width on non-standard emoji ZWJ pairs
 summary: The width code differs from Prettier for emoji joined by a zero-width joiner when the pair is not a standard sequence; the ADR index could misalign.
-status: active
+status: done
 kind: bug
 priority: 1
 created: 2026-10-28
 updated: 2026-11-16
-claimed_by: claude-fable-5-2
-claimed_at: 2026-11-16T14:30
+closed: 2026-11-16
 ---
 
 # Match Prettier's width on non-standard emoji ZWJ pairs
@@ -24,8 +23,6 @@ Done when:
 - [x] A cell with such a pair in an ADR title passes `prettier --check` on the generated index.
 
 ## Next
-
-Add data/emoji-zwj-sequences.txt (Emoji 17.0) to the generator, join only standard sequences in emojiCluster, and compare with widths measured by the pinned Prettier.
 
 ## Outcome
 

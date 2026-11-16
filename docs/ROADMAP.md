@@ -17,10 +17,6 @@ The rerun of the agent rails trial on other harnesses (261106-xrpr) waits for a 
 
 The queue for an agent working unattended. Take the top item that is `ready`; none needs the maintainer's decision first. Items marked _pick_ ask the agent to choose between small options and record the choice in the item's Log and the pull request; the maintainer reviews it at merge.
 
-Without a decision:
-
-- [261028-x1b4] Match Prettier's width on non-standard emoji ZWJ pairs
-
 With a pick, for 1.0.0:
 
 - [261029-xtqj] Multi-write moves can stop half-way with no rollback (criterion 2; _pick_: restore the earlier writes from the bytes held in memory, no journal; a `proposed` ADR if it changes a guarantee)
