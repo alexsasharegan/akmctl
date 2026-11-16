@@ -1,19 +1,18 @@
 ---
 id: "261108-ma45"
 title: check a4 fails on crlf adr index
-status: active
+status: done
 parent: 261108-2ncf
 created: 2026-11-08
 updated: 2026-11-16
-claimed_by: claude-fable-5-2
-claimed_at: 2026-11-16T14:07
+closed: 2026-11-16
 ---
 
 # check a4 fails on crlf adr index
 
 ## Goal
 
-Found by the Windows smoke harness ([261108-hwcq](done/261108-hwcq-windows-powershell-harness.md)), part of [261108-2ncf](261108-2ncf-basic-windows-support.md).
+Found by the Windows smoke harness ([261108-hwcq](261108-hwcq-windows-powershell-harness.md)), part of [261108-2ncf](../261108-2ncf-basic-windows-support.md).
 
 Command: `akmctl check` in a repository checked out on Windows with `core.autocrlf=true`, so `docs/adr/README.md` has CRLF line endings.
 
@@ -27,8 +26,6 @@ Done when:
 - [x] The Windows smoke harness drops its known-fault exception for this item.
 
 ## Next
-
-Find rule A4 in internal/check, compare after normalizing CRLF, add the test; remove the known-fault exception in scripts/windows-smoke.ps1.
 
 ## Outcome
 
