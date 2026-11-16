@@ -1,10 +1,12 @@
 ---
 id: "261108-ma45"
 title: check a4 fails on crlf adr index
-status: ready
+status: active
 parent: 261108-2ncf
 created: 2026-11-08
 updated: 2026-11-16
+claimed_by: claude-fable-5-2
+claimed_at: 2026-11-16T14:07
 ---
 
 # check a4 fails on crlf adr index
@@ -33,3 +35,4 @@ Find rule A4 in internal/check, compare after normalizing CRLF, add the test; re
 - 2026-11-08: filed.
 - 2026-11-08 13:16-07:00: filed by the Windows smoke harness run (PR 51)
 - 2026-11-08 13:52-07:00: the CRLF audit (261108-kbve) found the same cause in index: it rewrites a CRLF docs/adr/README.md to LF, so the fix should keep the file's endings
+- 2026-11-16 07:07-07:00: claimed (claude-fable-5-2).
