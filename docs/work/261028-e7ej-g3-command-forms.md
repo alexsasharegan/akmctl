@@ -2,11 +2,13 @@
 id: "261028-e7ej"
 title: Make rule G3 check more command forms than scripts/ paths
 summary: G3 resolves only scripts/ paths named in AGENTS.md Commands; make and npm run targets and other forms go unchecked.
-status: ready
+status: active
 kind: feature
 priority: 1
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-11-16
+claimed_by: claude-fable-5-2
+claimed_at: 2026-11-16T13:56
 ---
 
 # Make rule G3 check more command forms than scripts/ paths
@@ -22,6 +24,11 @@ Done when:
 - [ ] A command it cannot resolve is skipped, not reported.
 - [ ] Fixtures cover each form.
 
+## Next
+
+Extend commandPaths in internal/check/check.go to resolve make, npm run and just targets; add rule and near-miss cases; name the forms in the standard's G3 row.
+
 ## Log
 
 - 2026-10-28: filed.
+- 2026-11-16 06:56-07:00: claimed (claude-fable-5-2).
