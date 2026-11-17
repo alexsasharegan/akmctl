@@ -178,11 +178,6 @@ assert.deepEqual(M.buildOps({ ...mv, to: "done", decisions: ["261012-p3q4"] }, {
 const withNew = M.buildOps({ ...mv, to: "done" }, { outcome: "o", decision: { mode: "new", title: " Pick X ", slug: "pick-x" } });
 assert.deepEqual(withNew.map((o) => o.kind), ["new", "set", "close"]);
 assert.deepEqual(withNew[0], { kind: "new", what: "adr", slug: "pick-x", title: "Pick X" });
-assert.deepEqual(M.resolveOp(withNew[1], "261028-abcd").changes.decisions, ["261028-abcd"]);
-// a new ADR is unlinked while the set that names it is still to be written (work item 261029-nkqv)
-assert.equal(M.unlinkedAdr(withNew, 1, "261028-abcd"), "261028-abcd", "new written, set pending");
-assert.equal(M.unlinkedAdr(withNew, 2, "261028-abcd"), "", "the link is written");
-assert.equal(M.unlinkedAdr(withNew, 0, null), "", "nothing was made yet");
 // the preview: every write in one list, the first with the etag, "$new" left for the server
 const pv = M.previewRequest([{ kind: "section", name: "Goal", text: "g", mode: "replace" }, ...withNew, { kind: "claim", as: "a" }], "261022-e5f6", { etag: "e1", takeover: true });
 assert.equal(pv.method, "POST");
@@ -193,6 +188,23 @@ assert.equal(pv.body.writes.filter((w) => w.if_match).length, 1, "only the first
 assert.deepEqual(pv.body.writes[1], { op: "new", kind: "adr", slug: "pick-x", title: "Pick X" });
 assert.deepEqual(pv.body.writes[2].changes.decisions, ["$new"]);
 assert.equal(pv.body.writes[2].id, "261022-e5f6");
+// the apply call carries the same list (work item 261029-xtqj)
+const ap = M.applyRequest([{ kind: "section", name: "Goal", text: "g", mode: "replace" }, ...withNew], "261022-e5f6", { etag: "e1" });
+assert.equal(ap.path, "apply");
+assert.deepEqual(ap.body.writes, M.previewRequest([{ kind: "section", name: "Goal", text: "g", mode: "replace" }, ...withNew], "261022-e5f6", { etag: "e1" }).body.writes);
+// one write goes to its own route with the etag in If-Match; several go to apply in one call
+{
+  const sent = [];
+  const fake = async (method, path, o) => (sent.push({ method, path, o }), path === "apply" ? { writes: o.body.writes.map((w) => ({ operation: w.op })) } : { record: { etag: "e2" } });
+  assert.deepEqual(await M.runOps(fake, [{ kind: "set", changes: { status: "ready" } }], "261022-e5f6", { etag: "e1" }), [{ record: { etag: "e2" } }]);
+  assert.deepEqual([sent[0].method, sent[0].path, sent[0].o.etag], ["PATCH", "records/261022-e5f6", "e1"]);
+  const made = await M.runOps(fake, [{ kind: "release" }, { kind: "set", changes: { status: "ready" } }], "261022-e5f6", { etag: "e1" });
+  assert.deepEqual(made.map((w) => w.operation), ["release", "set"]);
+  assert.equal(sent.length, 2, "two writes are one call");
+  assert.equal(sent[1].path, "apply");
+  assert.equal(sent[1].o.etag, undefined, "the etag goes in the first write, not in If-Match");
+  assert.equal(sent[1].o.body.writes[0].if_match, "e1");
+}
 assert.equal(pv.body.writes[4].takeover, true);
 assert.equal(M.previewable, undefined, "no write is left out of the preview any more");
 

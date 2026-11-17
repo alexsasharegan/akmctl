@@ -1,9 +1,10 @@
 // The move wizard: one question per step, only for what the record still
 // lacks, then a review of the exact diff of every write before any is made.
-// A write that finds the record changed shows the conflict and writes nothing more.
+// The writes are made as one step (`apply`): when one fails, or finds the record
+// changed, the server undoes the ones before it and nothing is written.
 import { el } from "./util.js";
 import { api, ApiError, describeError, state } from "./store.js";
-import { buildOps, requestFor, resolveOp, previewRequest, opLabel, validateStep, wizardKey, unlinkedAdr } from "./moves.js";
+import { buildOps, runOps, previewRequest, opLabel, validateStep, wizardKey } from "./moves.js";
 import { slugify } from "./capture.js";
 import { renderDiff } from "./review.js";
 
@@ -34,11 +35,8 @@ export function openWizard(deps, spec) {
     takeover: false,
     fatal: null,
     seq: 0,
-    written: 0,
+    left: null, // files a failed move could not put back (the rollback itself failed)
     ops: [],
-    etag: rec.etag, // the item's etag after the writes made so far
-    newId: null, // the id of the ADR a `new` write made
-    last: null,
   };
   const root = el("div", { class: "dialog wizard", role: "dialog", "aria-modal": "true", "aria-labelledby": "wz-t" });
   const cur = () => steps[W.at];
@@ -175,8 +173,7 @@ export function openWizard(deps, spec) {
             { class: "conflict", role: "alert" },
             el("p", { class: "eyebrow" }, el("span", { class: "g", "aria-hidden": "true", text: "⚠ " }), "Conflict"),
             el("h3", { text: "The record changed since you loaded it" }),
-            el("p", { text: W.written ? W.written + " of " + W.ops.length + " writes were made before the change was found; the rest were not made." : "It was edited outside the workbench. Nothing was written." }),
-            orphanNote(),
+            el("p", { text: "It was edited outside the workbench. Nothing was written." }),
             el("p", { text: "Reload the records to see its current text, then make the move again." }),
           ),
         ];
@@ -184,8 +181,7 @@ export function openWizard(deps, spec) {
         return [
           el("div", { class: "err", role: "alert", text: W.fatal }),
           W.canTakeover ? el("p", { class: "help", text: "You can take the claim over: it is recorded in the log." }) : null,
-          W.written ? el("p", { class: "help", text: W.written + " of " + W.ops.length + " writes were made before this. Retry makes the rest; nothing is written twice." }) : null,
-          orphanNote(),
+          W.left ? el("p", { class: "help", role: "status", text: "The move was stopped part-way and these files could not be put back: " + W.left.join(", ") + ". Look at them with git status and restore them with git." }) : W.wrote === false ? el("p", { class: "help", role: "status", text: "Nothing was written: a move is made whole or not at all." }) : null,
         ];
     }
     const parts = [el("p", { class: "muted", text: "This is exactly what each write will change. Nothing is written until you confirm." + (W.previews.length > 1 ? " Each diff is as it will apply after the writes before it." : "") })];
@@ -195,14 +191,6 @@ export function openWizard(deps, spec) {
       if (p.note) parts.push(el("p", { class: "note-card", text: p.note }));
     });
     return parts;
-  }
-
-  // A new ADR that was written while the write that links it was not (work
-  // item 261029-nkqv): say so, since nothing else points at the file.
-  function orphanNote() {
-    const id = unlinkedAdr(W.ops, W.written, W.newId);
-    if (!id) return null;
-    return el("p", { class: "help", role: "status" }, "The new ADR ", el("span", { class: "mono", text: id }), " was created, but this item does not link to it yet. Retry writes the link; or add " + id + " to the item's decisions yourself.");
   }
 
   function body() {
@@ -233,7 +221,6 @@ export function openWizard(deps, spec) {
     const canWrite = W.phase === "review";
     const foot = [el("button", { type: "button", class: "btn quiet", "data-act": "back" }, (W.at === 0 ? "Cancel " : "Back "), el("kbd", { text: "Esc" }))];
     if (last && W.phase === "conflict") foot.push(el("button", { type: "button", class: "btn primary", "data-act": "reload" }, "Reload the records ", el("kbd", { text: "Enter" })));
-    else if (last && W.phase === "error" && W.written && !W.canTakeover) foot.push(el("button", { type: "button", class: "btn primary", "data-act": "retry" }, "Retry the rest"));
     else if (last && W.canTakeover && W.phase === "error") foot.push(el("button", { type: "button", class: "btn primary", "data-act": "takeover" }, "Take over the claim"));
     else if (last) foot.push(el("button", { type: "button", class: "btn primary", "data-act": "write", disabled: canWrite ? null : true }, writeLabel + " ", el("kbd", { text: "Enter" })));
     else foot.push(el("button", { type: "button", class: "btn primary", "data-act": "next" }, "Next ", el("kbd", { text: nextKey(s) })));
@@ -316,42 +303,32 @@ export function openWizard(deps, spec) {
     }
     W.phase = "error";
     W.fatal = describeError(e);
+    // the server answered, so it either made nothing or says what it left
+    const d = (e instanceof ApiError && e.details) || {};
+    W.left = d.rolled_back === false ? (d.rollback_errors || []).map((x) => x.path) : null;
+    W.wrote = e instanceof ApiError && e.code !== "unreachable" ? false : undefined;
     W.canTakeover = e instanceof ApiError && e.code === "refused" && e.details && e.details.reason === "claimed";
   }
 
   // ---- writes ----
 
-  // write makes the writes in order. resume continues after a write that
-  // failed: the writes already made are not repeated, so a new ADR is made
-  // once and the write that links it can be tried again (work item 261029-nkqv).
-  async function write(resume) {
-    if (resume ? !(W.phase === "error" && W.written > 0) : W.phase !== "review") return;
-    if (!resume) {
-      W.written = 0;
-      W.etag = rec.etag;
-      W.newId = null;
-      W.last = null;
-    }
+  // write makes the writes as one step: every one of them, or none.
+  async function write() {
+    if (W.phase !== "review") return;
     W.phase = "writing";
     W.fatal = null;
     render();
+    let made;
     try {
-      for (const raw of W.ops.slice(W.written)) {
-        const op = resolveOp(raw, W.newId);
-        const q = requestFor(op, rec.id, { takeover: W.takeover });
-        const r = await api(q.method, q.path, { body: q.body, etag: op.kind === "new" ? undefined : W.etag });
-        if (op.kind === "new") W.newId = r.record.id;
-        else W.etag = r.record.etag;
-        W.last = r;
-        W.written++;
-      }
+      made = await runOps(api, W.ops, rec.id, { takeover: W.takeover, etag: rec.etag });
     } catch (e) {
       fail(e);
       render();
       return;
     }
+    const adr = made.find((w, n) => W.ops[n].kind === "new");
     deps.closeDialog();
-    spec.onDone({ ops: W.ops, record: W.last && W.last.record, newAdr: W.newId, identity: W.a.identity });
+    spec.onDone({ ops: W.ops, record: made[made.length - 1].record, newAdr: adr ? adr.record.id : null, identity: W.a.identity });
   }
 
   // ---- events ----
@@ -363,7 +340,6 @@ export function openWizard(deps, spec) {
     if (a === "back") back();
     else if (a === "next") next();
     else if (a === "write") write();
-    else if (a === "retry") write(true);
     else if (a === "reload") reload();
     else if (a === "takeover") {
       W.takeover = true;

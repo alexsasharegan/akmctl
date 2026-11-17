@@ -153,7 +153,7 @@ func openEdit(repo *record.Repo, q Request) (*edit, func(), *Error) {
 		}
 	} else {
 		var lerr error
-		if unlock, lerr = fsx.LockRepo(repo.Root, repo.MetaDir()); lerr != nil {
+		if unlock, lerr = lockRepo(repo); lerr != nil {
 			return nil, nil, unreadable(lerr)
 		}
 		if lerr := repo.Reload(); lerr != nil {
@@ -278,7 +278,7 @@ func opNew(repo *record.Repo, q Request) (Obj, *Error) {
 	if aerr != nil {
 		return nil, aerr
 	}
-	unlock, err := fsx.LockRepo(repo.Root, repo.MetaDir())
+	unlock, err := lockRepo(repo)
 	if err != nil {
 		return nil, unreadable(err)
 	}

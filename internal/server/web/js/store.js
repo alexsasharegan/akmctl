@@ -87,6 +87,10 @@ export async function api(method, path, opts = {}) {
     if (writing && data.record && data.record.id && data.record.etag && !(opts.body && opts.body.dry_run)) {
       for (const fn of writeHooks) fn(data.record);
     }
+    // an apply made several writes: each record it left is one of ours
+    if (writing && path === "apply" && Array.isArray(data.writes)) {
+      for (const w of data.writes) if (w.record && w.record.id && w.record.etag) for (const fn of writeHooks) fn(w.record);
+    }
     return data;
   } finally {
     if (writing) writesPending--;

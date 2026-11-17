@@ -317,6 +317,40 @@ func TestToken(t *testing.T) {
 }
 
 // A dry run writes nothing, so it needs no If-Match; a real write still does.
+// An apply keeps the rule of the write routes (the first write to a record needs
+// the etag), makes the writes as one step and undoes them when one fails (work
+// item 261029-xtqj).
+func TestApplyOverHTTP(t *testing.T) {
+	ts, root := setup(t)
+	file := filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md")
+	before, _ := os.ReadFile(file)
+	r := do(t, ts, "POST", "/api/v1/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New."}]}`, nil)
+	if r.status != 428 || reason(r) != "if_match_required" {
+		t.Fatalf("no if_match: %d %v", r.status, r.body)
+	}
+	et := etagOf(t, ts, "261022-e5f6")
+	// the second write fails: the first is undone
+	r = do(t, ts, "POST", "/api/v1/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New.","if_match":"`+et+`"},{"op":"set","id":"261022-e5f6","changes":{"status":"nope"}}]}`, nil)
+	if r.status != 400 || errCode(r) != "invalid_request" {
+		t.Fatalf("a failing sequence: %d %v", r.status, r.body)
+	}
+	d, _ := r.body["error"].(map[string]any)["details"].(map[string]any)
+	if d["write"] != float64(1) || d["rolled_back"] != true {
+		t.Fatalf("details %v", d)
+	}
+	if after, _ := os.ReadFile(file); string(after) != string(before) {
+		t.Fatal("the first write was not undone")
+	}
+	// the later write to the same record needs no etag of its own
+	r = do(t, ts, "POST", "/api/v1/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New.","if_match":"`+et+`"},{"op":"set","id":"261022-e5f6","changes":{"priority":3}}]}`, nil)
+	if ws, _ := r.body["writes"].([]any); r.status != 200 || len(ws) != 2 {
+		t.Fatalf("a sequence: %d %v", r.status, r.body)
+	}
+	if after, _ := os.ReadFile(file); !strings.Contains(string(after), "New.") || !strings.Contains(string(after), "priority: 3") {
+		t.Fatalf("the sequence was not written: %s", after)
+	}
+}
+
 func TestDryRunNeedsNoIfMatch(t *testing.T) {
 	ts, root := setup(t)
 	file := filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md")

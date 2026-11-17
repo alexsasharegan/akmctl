@@ -4,7 +4,7 @@
 import { el, ageDays, ageText, text } from "./util.js";
 import { api, ApiError, state, show, describeError } from "./store.js";
 import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl } from "./logic.js";
-import { neighbor, sectionsOf, planMove, buildOps, requestFor, validateStep } from "./moves.js";
+import { neighbor, sectionsOf, planMove, buildOps, requestFor, runOps, validateStep } from "./moves.js";
 import { openWizard } from "./wizard.js";
 import { openCapture } from "./capture.js";
 import { openDialog, closeOverlay, setDialogHints, toast, dismissToast, MOD, overlayOpen } from "./ui.js";
@@ -138,13 +138,10 @@ async function safeMove(rec, move) {
   }
   const ops = buildOps(move, { identity });
   let etag = rec.etag;
-  let r = null;
   try {
-    for (const op of ops) {
-      const q = requestFor(op, rec.id);
-      r = await api(q.method, q.path, { body: q.body, etag });
-      etag = r.record.etag;
-    }
+    // several writes (a release or a status change, then the claim) are one step
+    const made = await runOps(api, ops, rec.id, { etag });
+    etag = made[made.length - 1].record.etag;
   } catch (e) {
     if (e instanceof ApiError && e.code === "stale") toast(titleOf(rec) + " changed since it was loaded. Nothing was written; the records were reloaded.", { level: "error" });
     else toast(describeError(e), { level: "error" });
@@ -182,13 +179,10 @@ export async function undo() {
   busy = true;
   last = null;
   try {
-    let etag = u.etag;
-    if (u.claimed) {
-      const q = requestFor({ kind: "release" }, u.id);
-      etag = (await api(q.method, q.path, { etag })).record.etag;
-    }
-    const q = requestFor({ kind: "set", changes: { status: u.from } }, u.id);
-    const r = await api(q.method, q.path, { body: q.body, etag });
+    // the release and the status change are one step: both, or neither
+    const back = [...(u.claimed ? [{ kind: "release" }] : []), { kind: "set", changes: { status: u.from } }];
+    const made = await runOps(api, back, u.id, { etag: u.etag });
+    const r = made[made.length - 1];
     await refresh(u.id);
     toast("Moved " + u.id + " back to " + u.from + ". The updated date was not restored: it now reads " + (r.record.fields.updated || "today") + (u.claimed ? ", and the claim stays in the log" : "") + ".", { level: "success", ms: 12000 });
   } catch (e) {

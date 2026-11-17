@@ -19,7 +19,6 @@ The queue for an agent working unattended. Take the top item that is `ready`; no
 
 With a pick, for 1.0.0:
 
-- [261029-xtqj] Multi-write moves can stop half-way with no rollback (criterion 2; _pick_: restore the earlier writes from the bytes held in memory, no journal; a `proposed` ADR if it changes a guarantee)
 - [261029-tgfe] Give migrate a discovery phase for repositories with no manifest (criterion 1; _pick_: the report-only phase first, which changes nothing, then the proposed steps)
 
 ## Later
@@ -29,7 +28,7 @@ With a pick, for 1.0.0:
 Exit criteria (draft, for Alexander to edit). The layout, the API and the spec are declared stable at 1.0.0, and:
 
 1. **Adoption works.** An existing repository can be brought into AKM with `migrate`: discovery finds its records, the plan simulates every step, and apply reports what it leaves broken. Item: 261029-tgfe (the plan simulating every step, 261029-47m0, is done).
-2. **Writes are safe.** A write that changes several files cannot stop half-way, and the last operation can be undone. Items: 261029-xtqj, 261029-shz5. ADR 261106-60xv chose git as the move log and kept the journal as the spike 261106-wx2a; the design note on xtqj and shz5 about a journal is an alternative to that, not the plan.
+2. **Writes are safe.** A write that changes several files cannot stop half-way, and the last operation can be undone. Done: a sequence of writes goes through `apply`, which undoes the earlier writes when one fails (261029-xtqj, ADR 261116-2qyf, `proposed`), and the limit of undo is stated (261029-shz5). ADR 261106-60xv chose git as the move log and kept the journal as the spike 261106-wx2a; the design note on xtqj and shz5 about a journal is an alternative to that, not the plan.
 3. **Other layouts are first-class.** `check` can validate a repository against a layout other than the tool's own. Done: `check --target` accepts any layout the migration chain reaches (261028-a2wd).
 4. **The standard has no known gaps.** One copy of the API fixtures (done, 261029-x4ws), and the known rule defects (L2 done, 261029-z4gk; S2, orphaned ADRs from the done wizard, 261029-nkqv) are closed.
 5. **Compatibility is stated.** The spec says what a MINOR and a MAJOR change to the layout, the API and the extensions mean. Item: 261109-vxdr, which needs the maintainer.

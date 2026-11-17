@@ -1,0 +1,45 @@
+{
+  "name": "a dry_run inside a sequence is refused",
+  "repo": "claims",
+  "bindings": [
+    "api",
+    "http"
+  ],
+  "request": {
+    "writes": [
+      {
+        "op": "section",
+        "id": "261022-e5f6",
+        "name": "Goal",
+        "text": "x",
+        "dry_run": true,
+        "if_match": "6095f4c7f9a042cf"
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "apply",
+    "request": {
+      "writes": [
+        {
+          "dry_run": true,
+          "id": "261022-e5f6",
+          "if_match": "6095f4c7f9a042cf",
+          "name": "Goal",
+          "op": "section",
+          "text": "x"
+        }
+      ]
+    },
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "writes[0]: dry_run does not belong in apply; use preview to see a sequence before it is made",
+      "details": {
+        "write": 0,
+        "parameter": "writes"
+      }
+    }
+  }
+}

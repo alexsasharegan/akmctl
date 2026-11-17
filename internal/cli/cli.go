@@ -154,8 +154,8 @@ func Run(args []string, stdout, stderr io.Writer, cwd string) int {
 			continue
 		case "writes":
 			v, ok := value()
-			if !ok || op != "preview" {
-				fmt.Fprintln(stderr, "akmctl: --writes <file> belongs to preview")
+			if !ok || (op != "preview" && op != "apply") {
+				fmt.Fprintln(stderr, "akmctl: --writes <file> belongs to preview and apply")
 				return 2
 			}
 			ws, err := readWritesFile(v)
@@ -399,7 +399,7 @@ func readMigrationFile(p string) ([]any, error) {
 	return nil, fmt.Errorf("%s: a migration file holds an object or a list of objects", p)
 }
 
-// readWritesFile reads the writes of a preview: a JSON list of objects, each
+// readWritesFile reads the writes of a preview or an apply: a JSON list of objects, each
 // {"op": ..., ...parameters of that operation}.
 func readWritesFile(p string) ([]any, error) {
 	b, err := os.ReadFile(p)
@@ -467,6 +467,9 @@ func print(stdout, stderr io.Writer, format, op string, resp api.Obj, ok bool) {
 		code, _ := eo.Get("code")
 		msg, _ := eo.Get("message")
 		fmt.Fprintf(stderr, "akmctl: %v: %v\n", code, msg)
+		if d, ok := eo.Get("details"); ok {
+			sequenceFailure(stderr, op, d)
+		}
 		return
 	}
 	if format == "ids" {
@@ -477,6 +480,36 @@ func print(stdout, stderr io.Writer, format, op string, resp api.Obj, ok bool) {
 		return
 	}
 	text(stdout, op, resp)
+}
+
+// sequenceFailure says which write of a preview or an apply failed and, for an
+// apply, what became of the writes before it.
+func sequenceFailure(stderr io.Writer, op string, details any) {
+	d, ok := details.(api.Obj)
+	if !ok {
+		return
+	}
+	n, ok := d.Get("write")
+	if !ok {
+		return
+	}
+	i, _ := n.(int)
+	if op != "apply" {
+		fmt.Fprintf(stderr, "write %d failed\n", i+1)
+		return
+	}
+	if rb, _ := d.Get("rolled_back"); rb == true {
+		fmt.Fprintf(stderr, "write %d failed; the writes before it were undone and the repository is as it was\n", i+1)
+		return
+	}
+	fmt.Fprintf(stderr, "write %d failed, and these files could not be put back (run git status, then restore them with git):\n", i+1)
+	if fs, ok := d.Get("rollback_errors"); ok {
+		for _, f := range fs.([]api.Obj) {
+			p, _ := f.Get("path")
+			e, _ := f.Get("error")
+			fmt.Fprintf(stderr, "  %v: %v\n", p, e)
+		}
+	}
 }
 
 func recordsOf(resp api.Obj) []api.Obj {
@@ -582,6 +615,13 @@ func text(w io.Writer, op string, resp api.Obj) {
 		if s, ok := resp.Get("section"); ok {
 			t, _ := s.(api.Obj).Get("text")
 			fmt.Fprintf(w, "\n%v\n", t)
+		}
+	case "apply":
+		ws, _ := resp.Get("writes")
+		for n, x := range ws.([]api.Obj) {
+			inner, _ := x.Get("operation")
+			fmt.Fprintf(w, "write %d: %v\n", n+1, inner)
+			text(w, fmt.Sprint(inner), x)
 		}
 	case "preview":
 		ws, _ := resp.Get("writes")

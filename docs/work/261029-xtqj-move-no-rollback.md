@@ -25,9 +25,10 @@ Design note (2026-10-29): consider one local operation journal for this item and
 
 ## Next
 
-Add an apply operation (the real counterpart of preview): the writes of a move run in order under one repository lock, and a failure restores every changed file from the bytes read before the first write. Then the workbench wizard, the at-once move and undo call it instead of one request per write. Draft a proposed ADR for the operation first; read internal/api/ops_preview.go and internal/server/web/js/wizard.js.
+The apply operation, its CLI and HTTP bindings, fixtures, spec section 4.27, schema, skill reference, ADR 261116-2qyf (proposed) and the workbench switch are written and uncommitted-then-committed as a checkpoint. Left: run the full check (go vet, go test -race ./..., gofmt -l, /tmp/akmctl check, npm run format:check, npm run schemas), tick the Goal box, write the Outcome, list the ADR in decisions, close, akmctl commits --range origin/main..HEAD, push and open the pull request.
 
 ## Log
 
 - 2026-10-29: filed.
 - 2026-11-16 19:02-07:00: claimed (claude-fable-5-2-xtqj).
+- 2026-11-16 19:13-07:00: Built apply (one lock, restore from memory, no journal) and moved the wizard, safe moves and undo to it. Checked by hand in the workbench: a close with a new ADR whose file move was refused left git status clean and the wizard said nothing was written. go test ./... passed before the docs pass; the race run and the final full check are still to do.

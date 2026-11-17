@@ -1,0 +1,61 @@
+{
+  "name": "a write that fails undoes the writes before it",
+  "repo": "closelinks",
+  "bindings": [
+    "api",
+    "http"
+  ],
+  "request": {
+    "as_of": "2026-10-28T09:30",
+    "writes": [
+      {
+        "op": "close",
+        "id": "261020-a2b3",
+        "status": "done",
+        "outcome": "Shipped.",
+        "if_match": "fde65aa7859d7032"
+      },
+      {
+        "op": "set",
+        "id": "261001-zzzz",
+        "changes": {
+          "priority": 1
+        },
+        "if_match": "0000000000000000"
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "apply",
+    "request": {
+      "as_of": "2026-10-28T09:30",
+      "writes": [
+        {
+          "id": "261020-a2b3",
+          "if_match": "fde65aa7859d7032",
+          "op": "close",
+          "outcome": "Shipped.",
+          "status": "done"
+        },
+        {
+          "changes": {
+            "priority": 1
+          },
+          "id": "261001-zzzz",
+          "if_match": "0000000000000000",
+          "op": "set"
+        }
+      ]
+    },
+    "ok": false,
+    "error": {
+      "code": "not_found",
+      "message": "no record with id 261001-zzzz",
+      "details": {
+        "write": 1,
+        "rolled_back": true
+      }
+    }
+  }
+}

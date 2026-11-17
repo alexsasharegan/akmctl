@@ -309,6 +309,8 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 		op = "migrate"
 	case len(seg) == 1 && seg[0] == "preview" && m == "POST":
 		op = "preview"
+	case len(seg) == 1 && seg[0] == "apply" && m == "POST":
+		op = "apply"
 	case len(seg) == 2 && seg[0] == "records" && m == "GET":
 		op, id = "show", seg[1]
 	case len(seg) == 2 && seg[0] == "records" && m == "PATCH":
@@ -396,7 +398,37 @@ func (s *Server) route(r *http.Request, seg []string) (string, api.Request, bool
 			}
 		}
 	}
+	if op == "apply" {
+		if e := applyIfMatch(req); e != nil {
+			return "", nil, false, e
+		}
+	}
 	return op, req, true, nil
+}
+
+// applyIfMatch keeps the rule of the write routes for a sequence: the first
+// write to an existing record must carry the etag the client read. Later writes
+// to that record are chained by the operation, and a `new` has no record yet.
+func applyIfMatch(req api.Request) *api.Error {
+	ws, _ := req["writes"].([]any)
+	seen := map[string]bool{}
+	for i, x := range ws {
+		w, ok := x.(map[string]any)
+		if !ok {
+			return nil // the operation's own validation names it
+		}
+		op, _ := w["op"].(string)
+		id, _ := w["id"].(string)
+		if !needsIfMatch[op] || seen[id] {
+			continue
+		}
+		seen[id] = true
+		_, hasSecEtag := w["section_etag"]
+		if _, ok := w["if_match"]; !ok && !hasSecEtag {
+			return &api.Error{Code: "refused", Message: fmt.Sprintf("writes[%d]: the first write to a record needs if_match with the record's etag (read the record first)", i), Details: api.O("write", i, "reason", "if_match_required")}
+		}
+	}
+	return nil
 }
 
 func queryValue(kind string, vs []string) any {
