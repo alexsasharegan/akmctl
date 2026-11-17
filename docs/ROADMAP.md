@@ -2,6 +2,8 @@
 
 ## Now
 
+- [261117-n7v4] Align the tool, layout, spec and API versions at 0.4.0, ahead of the 0.4.0 release.
+
 One thread is in flight, Windows support. What is left in it waits on the maintainer or on the first Windows user:
 
 - [261108-2ncf] Basic Windows support (the parent; its installers, harness and audit are done)
