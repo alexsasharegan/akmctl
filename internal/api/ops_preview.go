@@ -19,24 +19,9 @@ const newPlaceholder = "$new"
 // repository and returns, for each, the response its dry run gives after the
 // earlier writes. It never writes to the repository itself.
 func opPreview(repo *record.Repo, info Info, q Request) (Obj, *Error) {
-	var writes []map[string]any
-	switch l := q["writes"].(type) {
-	case []any:
-		for _, x := range l {
-			writes = append(writes, x.(map[string]any)) // validate has checked the type
-		}
-	case []map[string]any:
-		writes = l
-	}
-	if len(writes) == 0 {
-		return nil, invalid("writes", "writes must hold at least one write")
-	}
-	// check every write before copying anything, so a mistake names its position
-	for i, w := range writes {
-		op, _ := w["op"].(string)
-		if !previewOps[op] {
-			return nil, atWrite(i, invalid("writes", "writes[%d]: op must be one of new, set, section, tick, remove, log, close, claim, release", i))
-		}
+	writes, werr := writeList(q)
+	if werr != nil {
+		return nil, werr
 	}
 	sc, cleanup := migrate.ScratchRepo(repo)
 	if sc == nil {
@@ -48,21 +33,7 @@ func opPreview(repo *record.Repo, info Info, q Request) (Obj, *Error) {
 	newID := ""
 	out := make([]Obj, 0, len(writes))
 	for i, w := range writes {
-		op, _ := w["op"].(string)
-		req := Request{}
-		for k, v := range w {
-			if k != "op" {
-				req[k] = substituteNew(v, newID)
-			}
-		}
-		if _, ok := specs[op]["as_of"]; ok && req["as_of"] == nil && q["as_of"] != nil {
-			req["as_of"] = q["as_of"]
-		}
-		if id, ok := req["id"].(string); ok && etags[id] != "" {
-			if _, has := specs[op]["if_match"]; has {
-				req["if_match"] = etags[id]
-			}
-		}
+		op, req := nextWrite(w, q, newID, etags)
 		if err := validate(op, req); err != nil {
 			return nil, atWrite(i, err)
 		}
@@ -103,6 +74,53 @@ func opPreview(repo *record.Repo, info Info, q Request) (Obj, *Error) {
 		}
 	}
 	return O("writes", out), nil
+}
+
+// writeList reads the writes of a preview or an apply and checks that each
+// names an operation a sequence can hold, before anything is copied or written,
+// so a mistake names its position.
+func writeList(q Request) ([]map[string]any, *Error) {
+	var writes []map[string]any
+	switch l := q["writes"].(type) {
+	case []any:
+		for _, x := range l {
+			writes = append(writes, x.(map[string]any)) // validate has checked the type
+		}
+	case []map[string]any:
+		writes = l
+	}
+	if len(writes) == 0 {
+		return nil, invalid("writes", "writes must hold at least one write")
+	}
+	for i, w := range writes {
+		op, _ := w["op"].(string)
+		if !previewOps[op] {
+			return nil, atWrite(i, invalid("writes", "writes[%d]: op must be one of new, set, section, tick, remove, log, close, claim, release", i))
+		}
+	}
+	return writes, nil
+}
+
+// nextWrite is the request of one write of a sequence: its parameters with the
+// placeholder replaced, the sequence's clock when it has none, and, for a later
+// write to a record, the etag the earlier write produced.
+func nextWrite(w map[string]any, q Request, newID string, etags map[string]string) (string, Request) {
+	op, _ := w["op"].(string)
+	req := Request{}
+	for k, v := range w {
+		if k != "op" {
+			req[k] = substituteNew(v, newID)
+		}
+	}
+	if _, ok := specs[op]["as_of"]; ok && req["as_of"] == nil && q["as_of"] != nil {
+		req["as_of"] = q["as_of"]
+	}
+	if id, ok := req["id"].(string); ok && etags[id] != "" {
+		if _, has := specs[op]["if_match"]; has {
+			req["if_match"] = etags[id]
+		}
+	}
+	return op, req
 }
 
 // atWrite adds the position of the write that failed to an error's details.

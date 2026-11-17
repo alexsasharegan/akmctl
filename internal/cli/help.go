@@ -27,6 +27,7 @@ var examples = map[string]string{
 	"ls":      "akmctl ls --status ready,active --fields title",
 	"migrate": "akmctl migrate --mode report",
 	"preview": "akmctl preview --writes writes.json",
+	"apply":   "akmctl apply --writes writes.json",
 	"new":     "akmctl new work fix-the-parser --parent 261101-m3pv --kind bug",
 	"release": "akmctl release 261101-m3pv",
 	"remove":  "akmctl remove 261101-m3pv 2",

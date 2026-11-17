@@ -1,0 +1,142 @@
+{
+  "name": "a sequence of writes is made in order under one lock",
+  "repo": "claims",
+  "bindings": [
+    "api",
+    "http"
+  ],
+  "request": {
+    "as_of": "2026-10-28T09:30",
+    "writes": [
+      {
+        "op": "section",
+        "id": "261022-e5f6",
+        "name": "Goal",
+        "text": "Document every exit code.",
+        "if_match": "6095f4c7f9a042cf"
+      },
+      {
+        "op": "claim",
+        "id": "261022-e5f6",
+        "as": "agent-1"
+      }
+    ]
+  },
+  "expected": {
+    "api_version": "1.0",
+    "operation": "apply",
+    "request": {
+      "as_of": "2026-10-28T09:30",
+      "writes": [
+        {
+          "id": "261022-e5f6",
+          "if_match": "6095f4c7f9a042cf",
+          "name": "Goal",
+          "op": "section",
+          "text": "Document every exit code."
+        },
+        {
+          "as": "agent-1",
+          "id": "261022-e5f6",
+          "op": "claim"
+        }
+      ]
+    },
+    "ok": true,
+    "writes": [
+      {
+        "api_version": "1.0",
+        "operation": "section",
+        "request": {
+          "as_of": "2026-10-28T09:30",
+          "id": "261022-e5f6",
+          "if_match": "6095f4c7f9a042cf",
+          "name": "Goal",
+          "text": "Document every exit code."
+        },
+        "ok": true,
+        "record": {
+          "id": "261022-e5f6",
+          "type": "work",
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "id_date": "2026-10-22",
+          "etag": "e0e919c19044cd71",
+          "fields": {
+            "id": "261022-e5f6",
+            "title": "Document the exit codes",
+            "summary": null,
+            "status": "ready",
+            "kind": null,
+            "parent": "261015-c4d5",
+            "blocked_by": null,
+            "priority": null,
+            "cycle": null,
+            "keep": null,
+            "created": "2026-10-22",
+            "updated": "2026-10-28",
+            "closed": null,
+            "authored_by": null,
+            "decisions": null,
+            "claimed_by": null,
+            "claimed_at": null
+          }
+        },
+        "section": {
+          "name": "goal",
+          "text": "Document every exit code."
+        },
+        "changed": true
+      },
+      {
+        "api_version": "1.0",
+        "operation": "claim",
+        "request": {
+          "as": "agent-1",
+          "as_of": "2026-10-28T09:30",
+          "id": "261022-e5f6",
+          "if_match": "e0e919c19044cd71"
+        },
+        "ok": true,
+        "record": {
+          "id": "261022-e5f6",
+          "type": "work",
+          "path": "docs/work/261022-e5f6-document-the-exit-codes.md",
+          "id_date": "2026-10-22",
+          "etag": "80b0b199fab8f76e",
+          "fields": {
+            "id": "261022-e5f6",
+            "title": "Document the exit codes",
+            "summary": null,
+            "status": "active",
+            "kind": null,
+            "parent": "261015-c4d5",
+            "blocked_by": null,
+            "priority": null,
+            "cycle": null,
+            "keep": null,
+            "created": "2026-10-22",
+            "updated": "2026-10-28",
+            "closed": null,
+            "authored_by": null,
+            "decisions": null,
+            "claimed_by": "agent-1",
+            "claimed_at": "2026-10-28T09:30"
+          }
+        },
+        "previous_holder": null,
+        "commit": {
+          "step": "claim",
+          "item": "261022-e5f6",
+          "detail": "claimed by agent-1",
+          "paths": [
+            "docs/work/261022-e5f6-document-the-exit-codes.md"
+          ],
+          "message": "261022-e5f6(claim): claimed by agent-1\n\nAKM-Step: claim\nAKM-Item: 261022-e5f6"
+        }
+      }
+    ]
+  },
+  "after": {
+    "docs/work/261022-e5f6-document-the-exit-codes.md": "---\nid: 261022-e5f6\ntitle: Document the exit codes\nstatus: active\nparent: 261015-c4d5\ncreated: 2026-10-22\nupdated: 2026-10-28\nclaimed_by: agent-1\nclaimed_at: 2026-10-28T09:30\n---\n\n# Document the exit codes\n\n## Goal\nDocument every exit code.\n\n## Next\nWrite the exit-code table.\n\n## Log\n- 2026-10-28 09:30+00:00: claimed (agent-1).\n"
+  }
+}

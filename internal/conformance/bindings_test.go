@@ -84,7 +84,7 @@ func routeOf(op string, req map[string]any) (route, string) {
 		return route{"GET", "/find", true, nil}, ""
 	case "new":
 		return route{"POST", "/records", false, nil}, ""
-	case "index", "bases", "init", "migrate":
+	case "index", "bases", "init", "migrate", "preview", "apply":
 		return route{"POST", "/" + op, false, nil}, ""
 	case "config":
 		if _, ok := req["value"]; ok {

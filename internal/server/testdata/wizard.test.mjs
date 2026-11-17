@@ -17,6 +17,16 @@ const app = await startApp({
       const diff = { path: rec.path, new_path: rec.path, hunks: [{ old_start: 1, old_lines: 1, new_start: 1, new_lines: 2, lines: [{ op: " ", text: "# t" }, { op: "+", text: "## Goal" }] }] };
       return json(200, { ok: true, writes: body.writes.map((w) => ({ ok: true, operation: w.op, record: rec, diff })) });
     }
+    if (u.endsWith("/apply")) {
+      // the whole move in one call: every write, or the error of the one that failed
+      if (failNext) {
+        const f = failNext;
+        failNext = null;
+        return json(f.status, { ok: false, error: f.error });
+      }
+      const rec = records.find((x) => x.id === body.writes.find((w) => w.id).id);
+      return json(200, { ok: true, writes: body.writes.map((w, n) => ({ ok: true, operation: w.op, record: { ...rec, etag: "w" + n, fields: { ...rec.fields, ...(w.changes || {}) } } })) });
+    }
     const id = decodeURIComponent((u.match(/records\/([^/]+)/) || [])[1] || "");
     const r = records.find((x) => x.id === id);
     if (failNext && !body.dry_run) {
@@ -121,9 +131,12 @@ await settle(10);
 assert.match(overlay.text, /Review/);
 press("Enter", { target: overlay.querySelector(".diff") || overlay });
 await settle(15);
-const writes = app.calls.slice(n).filter((c) => !c.body || !c.body.dry_run).map((c) => c.method + " " + c.url.replace("/api/v1/records/261101-bbbb", ""));
-assert.ok(writes.some((w) => /sections\/Goal/.test(w)) && writes.some((w) => /sections\/Next/.test(w)) && writes.some((w) => /\/claim$/.test(w)), "Goal, Next and the claim are written: " + writes.join(", "));
-assert.equal(app.calls.findLast((c) => /\/claim$/.test(c.url)).body.as, "claude-test");
+const applies = app.calls.slice(n).filter((c) => /\/apply$/.test(c.url));
+assert.equal(applies.length, 1, "the move is one apply call");
+assert.deepEqual(applies[0].body.writes.map((w) => w.op + (w.name ? " " + w.name : "")), ["section Goal", "section Next", "claim"], "Goal, Next and the claim, in order");
+assert.equal(applies[0].body.writes[2].as, "claude-test");
+assert.ok(applies[0].body.writes[0].if_match, "the first write carries the etag");
+assert.equal(app.calls.slice(n).filter((c) => !/\/(apply|preview)$/.test(c.url)).length, 0, "no write goes around the apply");
 assert.equal(overlay.kids.length, 0);
 assert.match(toasts.text, /Moved .* to active/);
 

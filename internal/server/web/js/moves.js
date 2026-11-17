@@ -1,5 +1,6 @@
 // Moves between lanes: what a move still needs, and the API calls that make it.
-// Pure: no DOM, no network, no clock. The wizard asks for what the standard
+// Pure: no DOM, no clock, and no network of its own (runOps is handed the API
+// call). The wizard asks for what the standard
 // requires (rules WK5 to WK7) and only for what the record lacks.
 import { LANES, CLOSED } from "./logic.js";
 
@@ -160,23 +161,6 @@ export function requestFor(op, id, o = {}) {
   throw new Error("unknown op " + op.kind);
 }
 
-/** Replace the "$new" placeholder in an op with the id of the ADR just made. */
-export function resolveOp(op, newId) {
-  if (op.kind === "set" && op.changes.decisions && newId) return { ...op, changes: { ...op.changes, decisions: op.changes.decisions.map((x) => (x === NEW_ADR ? newId : x)) } };
-  return op;
-}
-
-/**
- * The id of a new ADR that is on disk but not linked yet (work item
- * 261029-nkqv): the `new` was written, and the `set` that puts it into the
- * item's `decisions` is among the writes still to make. "" when there is none.
- */
-export function unlinkedAdr(ops, written, newId) {
-  if (!newId) return "";
-  const pending = ops.slice(written).some((op) => op.kind === "set" && op.changes.decisions && op.changes.decisions.includes(NEW_ADR));
-  return pending ? newId : "";
-}
-
 /**
  * The preview call for a move's ops (work item 261029-g8x2, ADR 261109-vgg7):
  * one POST that applies every write on a scratch copy and answers each write's
@@ -185,6 +169,34 @@ export function unlinkedAdr(ops, written, newId) {
  * "$new" as the id of the ADR made by the `new` before it.
  */
 export function previewRequest(ops, id, o = {}) {
+  return { method: "POST", path: "preview", body: { writes: writeList(ops, id, o) } };
+}
+
+/**
+ * The call that makes a move's ops as one step (work item 261029-xtqj, ADR
+ * 261116-2qyf): the same list as the preview, sent to `apply`. The server makes
+ * the writes in order under one lock and, when one fails, puts every file back
+ * as it was, so a move is made whole or not at all.
+ */
+export function applyRequest(ops, id, o = {}) {
+  return { method: "POST", path: "apply", body: { writes: writeList(ops, id, o) } };
+}
+
+/**
+ * Make a move's ops and return the response of each write, in order. One write
+ * goes to its own route with the etag in If-Match; several go to `apply`.
+ * `api` is the API call (store.js); o: { etag, takeover }.
+ */
+export async function runOps(api, ops, id, o = {}) {
+  if (ops.length === 1 && ops[0].kind !== "new") {
+    const q = requestFor(ops[0], id, o);
+    return [await api(q.method, q.path, { body: q.body, etag: o.etag })];
+  }
+  const q = applyRequest(ops, id, o);
+  return (await api(q.method, q.path, { body: q.body })).writes;
+}
+
+function writeList(ops, id, o) {
   let first = true;
   const writes = ops.map((op) => {
     const w = { op: op.kind };
@@ -207,7 +219,7 @@ export function previewRequest(ops, id, o = {}) {
     first = false;
     return w;
   });
-  return { method: "POST", path: "preview", body: { writes } };
+  return writes;
 }
 
 /** A line for the review: what an op does. */

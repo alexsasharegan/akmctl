@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akm.invalid/api/1.0/apply.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "writes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "op": {
+                "enum": [
+                  "new",
+                  "set",
+                  "section",
+                  "tick",
+                  "remove",
+                  "log",
+                  "close",
+                  "claim",
+                  "release"
+                ]
+              }
+            },
+            "required": ["op"]
+          }
+        },
+        "as_of": {
+          "$ref": "common.json#/$defs/date_or_timestamp"
+        }
+      },
+      "required": ["writes"],
+      "additionalProperties": false
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "api_version": {
+              "const": "1.0"
+            },
+            "operation": {
+              "const": "apply"
+            },
+            "request": {
+              "type": "object"
+            },
+            "ok": {
+              "const": true
+            },
+            "writes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "api_version": {
+                    "const": "1.0"
+                  },
+                  "operation": {
+                    "type": "string"
+                  },
+                  "request": {
+                    "type": "object"
+                  },
+                  "ok": {
+                    "const": true
+                  },
+                  "record": {
+                    "$ref": "common.json#/$defs/record"
+                  }
+                },
+                "required": [
+                  "api_version",
+                  "operation",
+                  "request",
+                  "ok",
+                  "record"
+                ]
+              }
+            }
+          },
+          "required": ["api_version", "operation", "request", "ok", "writes"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "common.json#/$defs/envelope_error"
+        }
+      ]
+    }
+  }
+}
