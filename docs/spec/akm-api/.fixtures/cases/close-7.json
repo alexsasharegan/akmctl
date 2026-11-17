@@ -7,7 +7,7 @@
     "outcome": "Not needed."
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "close",
     "request": {
       "id": "261015-c4d5",

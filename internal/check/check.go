@@ -25,7 +25,7 @@ import (
 var additiveFrom = map[string]string{"0.2.0": "0.3.0"}
 
 // LayoutVersion is the layout version this tool checks against.
-const LayoutVersion = "0.3.0"
+const LayoutVersion = "0.4.0"
 
 // Finding is one rule violation.
 type Finding struct {

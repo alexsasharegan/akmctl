@@ -135,7 +135,7 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request) {
 		s.uiConfig(w)
 		return
 	}
-	const base = "/api/v1/"
+	const base = "/api/v0/"
 	if !strings.HasPrefix(r.URL.Path, base) {
 		s.fail(w, "http", http.StatusNotFound, &api.Error{Code: "not_found", Message: "no such route"})
 		return

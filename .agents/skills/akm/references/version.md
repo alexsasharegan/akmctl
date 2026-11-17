@@ -4,7 +4,7 @@ Use it to learn the tool version, the API version and which extensions the repos
 
 ```
 $ akmctl version
-akmctl 0.0.0-dev+4ca0f0b (API 1.0)
+akmctl 0.0.0-dev+4ca0f0b (API 0.4)
 ```
 
 Use `--format json` for the full object: `layout`, `extensions`, folders, `reference_style`.

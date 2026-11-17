@@ -13,7 +13,7 @@ const e5f6Path = "docs/work/261022-e5f6-document-the-exit-codes.md"
 func TestCloseWritesClosedForDoneAndDropped(t *testing.T) {
 	t.Parallel()
 	for _, status := range []string{"done", "dropped"} {
-		root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
+		root := copyRepo(t, "basic", "extension.claims: 0.4.0\n")
 		mustOK(t, root, "claim", Request{"id": a2b3, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 		p := filepath.Join(root, "docs/work/261020-a2b3-add-json-output-to-ls.md")
 		b, _ := os.ReadFile(p)

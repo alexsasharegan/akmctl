@@ -5,7 +5,7 @@
     "name": "261022-e5f6-document-the-exit-codes"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "find",
     "request": {
       "name": "261022-e5f6-document-the-exit-codes"

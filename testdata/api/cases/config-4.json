@@ -7,7 +7,7 @@
     "dry_run": true
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "config",
     "request": {
       "key": "git_commits",

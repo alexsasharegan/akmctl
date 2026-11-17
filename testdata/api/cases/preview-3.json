@@ -21,7 +21,7 @@
     ]
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "preview",
     "request": {
       "as_of": "2026-10-28T09:30",
@@ -41,7 +41,7 @@
     "ok": true,
     "writes": [
       {
-        "api_version": "1.0",
+        "api_version": "0.4",
         "operation": "release",
         "request": {
           "as_of": "2026-10-28T09:30",
@@ -186,7 +186,7 @@
         }
       },
       {
-        "api_version": "1.0",
+        "api_version": "0.4",
         "operation": "close",
         "request": {
           "as_of": "2026-10-28T09:30",

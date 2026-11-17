@@ -135,7 +135,7 @@ func TestSkillsRetiredNameIsRemoved(t *testing.T) {
 	os.MkdirAll(oldDir, 0o755)
 	data := []byte("old\n")
 	os.WriteFile(filepath.Join(oldDir, "SKILL.md"), data, 0o644)
-	m := initrepo.Skill{Name: "akm-work-items", Files: []initrepo.File{{Path: "SKILL.md", Data: data}}}.Marker("0.3.0")
+	m := initrepo.Skill{Name: "akm-work-items", Files: []initrepo.File{{Path: "SKILL.md", Data: data}}}.Marker("0.4.0")
 	os.WriteFile(filepath.Join(oldDir, initrepo.MarkerName), m, 0o644)
 	mustOK(t, root, "skills", Request{"mode": "update", "confirm": true})
 	if _, err := os.Stat(oldDir); err == nil {

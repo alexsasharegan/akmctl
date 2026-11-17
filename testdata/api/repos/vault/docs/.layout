@@ -1,6 +1,6 @@
-layout: 0.3.0
-extension.adr-index: 0.3.0
-extension.work-items: 0.3.0
+layout: 0.4.0
+extension.adr-index: 0.4.0
+extension.work-items: 0.4.0
 work_dir: Notes/tasks
 adr_dir: Notes/adr
 roadmap: Notes/ROADMAP.md

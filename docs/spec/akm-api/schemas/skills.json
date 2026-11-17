@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akm.invalid/api/1.0/skills.json",
+  "$id": "https://akm.invalid/api/0.4/skills.json",
   "$defs": {
     "request": {
       "type": "object",
@@ -27,7 +27,7 @@
           "type": "object",
           "properties": {
             "api_version": {
-              "const": "1.0"
+              "const": "0.4"
             },
             "operation": {
               "const": "skills"

@@ -3,7 +3,7 @@
   "repo": "claims",
   "request": {},
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "version",
     "request": {},
     "ok": true,
@@ -12,17 +12,17 @@
       "version": "0.1.0"
     },
     "api_versions": [
-      "1.0"
+      "0.4"
     ],
     "layout_versions": [
-      "0.3.0"
+      "0.4.0"
     ],
     "extensions": [
       "claims"
     ],
     "repository": {
       "name": "claims",
-      "layout": "0.3.0",
+      "layout": "0.4.0",
       "extensions": [
         "adr-index",
         "claims",

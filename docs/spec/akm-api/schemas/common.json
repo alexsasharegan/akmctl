@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://akm.invalid/api/1.0/common.json",
+  "$id": "https://akm.invalid/api/0.4/common.json",
   "$defs": {
     "id": {
       "type": "string",
@@ -265,7 +265,7 @@
       "required": ["api_version", "operation", "request", "ok"],
       "properties": {
         "api_version": {
-          "const": "1.0"
+          "const": "0.4"
         },
         "operation": {
           "type": "string"
@@ -283,7 +283,7 @@
       "required": ["api_version", "operation", "request", "ok", "error"],
       "properties": {
         "api_version": {
-          "const": "1.0"
+          "const": "0.4"
         },
         "operation": {
           "type": "string"

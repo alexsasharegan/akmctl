@@ -7,7 +7,7 @@
     "text": "- rewritten"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "section",
     "request": {
       "id": "261020-a2b3",

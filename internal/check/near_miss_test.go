@@ -30,7 +30,7 @@ const (
 	m1n2 = "docs/work/261026-m1n2-explore-a-plugin-system.md"
 )
 
-const claimsOn = "extension.claims: 0.3.0\n"
+const claimsOn = "extension.claims: 0.4.0\n"
 
 // nearMisses are, for each rule, a repository that sits next to the case that
 // raises it in TestRules and must not raise it (work item 261108-qv1w, finding
@@ -92,7 +92,7 @@ var nearMisses = []struct {
 	{"S4 on with the skill in a work tree", "S4", edits{"docs/.layout": app("git_commits: true\n"), ".agents/skills/akm-commit/SKILL.md": put("---\nname: akm-commit\ndescription: x\n---\n"), ".git/HEAD": put("ref: refs/heads/main\n")}},
 	{"CL1 active item claimed", "CL1", edits{"docs/.layout": app(claimsOn), a2b3: sub("status: active", "status: active\nclaimed_by: agent-1\nclaimed_at: 2026-10-27T10:00"), c4d5: sub("status: active", "status: active\nclaimed_by: agent-2\nclaimed_at: 2026-10-27T10:00")}},
 	{"CL2 two holders, one item each", "CL2", edits{"docs/.layout": app(claimsOn), a2b3: sub("status: active", "status: active\nclaimed_by: agent-1\nclaimed_at: 2026-10-27T10:00"), c4d5: sub("status: active", "status: active\nclaimed_by: agent-2\nclaimed_at: 2026-10-27T10:00")}},
-	{"SF2 deny list that matches nothing", "SF2", edits{"docs/.layout": app("extension.safety: 0.3.0\n"), "docs/.akm-deny": put("Zorblax\n")}},
+	{"SF2 deny list that matches nothing", "SF2", edits{"docs/.layout": app("extension.safety: 0.4.0\n"), "docs/.akm-deny": put("Zorblax\n")}},
 }
 
 // coveredElsewhere are the rules whose near misses live in a test of their own.

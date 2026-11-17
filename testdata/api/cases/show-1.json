@@ -6,7 +6,7 @@
     "section": "next"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "show",
     "request": {
       "id": "261020-a2b3",

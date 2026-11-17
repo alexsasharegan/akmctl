@@ -6,7 +6,7 @@
     "name": "x"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "find",
     "request": {
       "id": "261022-e5f6",

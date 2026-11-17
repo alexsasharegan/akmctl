@@ -5,7 +5,7 @@
     "id": "261010-j9k0"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "show",
     "request": {
       "id": "261010-j9k0"
