@@ -1,11 +1,10 @@
 ---
 id: "261117-n7v4"
 title: Align the tool, layout, spec and API versions at 0.4.0
-status: active
+status: done
 created: 2026-11-17
 updated: 2026-11-17
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-17T07:38
+closed: 2026-11-17
 ---
 
 # Align the tool, layout, spec and API versions at 0.4.0
@@ -24,7 +23,9 @@ Done when:
 
 ## Next
 
-Open the pull request; the maintainer reviews the ADR and the API path change (`/api/v0`). The release item then cuts 0.4.0.
+## Outcome
+
+Merged in pull request 93. Tool, layout, specification, extensions and API share one version: layout 0.4.0, API 0.4, HTTP base /api/v0. The ADR on one version number before 1.0.0 stays proposed for the maintainer. No migration added for a 0.3.0 manifest (S1 warning, as after 0.3.0). Decision: ADR 261117-6qn7.
 
 ## Log
 
