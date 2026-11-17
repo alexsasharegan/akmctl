@@ -2,7 +2,7 @@
 
 ## Now
 
-- [261117-n7v4] Align the tool, layout, spec and API versions at 0.4.0, ahead of the 0.4.0 release.
+- [261117-bja4] Release v0.4.0: the changelog heading and the checks are prepared; the maintainer tags.
 
 One thread is in flight, Windows support. What is left in it waits on the maintainer or on the first Windows user:
 
