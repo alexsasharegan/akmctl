@@ -78,7 +78,7 @@ export const onWrite = (fn) => writeHooks.push(fn);
 /** How many writes of this page have not finished. */
 export const writesInFlight = () => writesPending;
 
-/** One call to /api/v1 (or another path starting with "/"). Resolves to the response object; rejects with ApiError. */
+/** One call to /api/v0 (or another path starting with "/"). Resolves to the response object; rejects with ApiError. */
 export async function api(method, path, opts = {}) {
   const writing = method !== "GET";
   if (writing) writesPending++;
@@ -98,7 +98,7 @@ export async function api(method, path, opts = {}) {
 }
 
 async function call(method, path, { query, body, etag, timeout } = {}) {
-  const url = path.startsWith("/") ? path : "/api/v1/" + path;
+  const url = path.startsWith("/") ? path : "/api/v0/" + path;
   const headers = { Authorization: "Bearer " + token };
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (etag) headers["If-Match"] = '"' + etag + '"';

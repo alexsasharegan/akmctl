@@ -5,7 +5,7 @@
     "key": "git_commits"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "config",
     "request": {
       "key": "git_commits"

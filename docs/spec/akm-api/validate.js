@@ -68,7 +68,7 @@ for (const f of fs.readdirSync(cd).sort()) {
       console.log(f, "git: each commit needs message, date and files");
     }
   }
-  const base = "https://akm.invalid/api/1.0/" + op + ".json";
+  const base = "https://akm.invalid/api/0.4/" + op + ".json";
   const vreq = ajv.compile({ $ref: base + "#/$defs/request" }),
     vres = ajv.compile({ $ref: base + "#/$defs/response" });
   const anys = [];

@@ -7,7 +7,7 @@ updated_at: 2026-10-28
 
 # AKM guide: a repository that remembers and runs on rails
 
-Version 0.3.0 (beta). Layout 0.3.0 adds the optional work item fields `closed`, `cycle` and `keep` (a MINOR change: items without them stay valid, and only the manifest versions need raising).
+Version 0.4.0 (beta). The tool, the layout, the specification and the API share one version number until 1.0.0 (ADR 261117-6qn7). Layout 0.3.0 added the optional work item fields `closed`, `cycle` and `keep` (a MINOR change: items without them stay valid, and only the manifest versions need raising).
 
 AKM (agent knowledge management) is an opinionated standard that gives a repository a memory and rails, so any agent can pick up where work stopped. This guide is for a maintainer, solo or on a team, who works with AI coding agents and wants to adopt it. It explains what AKM is, why it exists, how it works day to day, how to adopt it, and what is not proven. The rules themselves are in the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)); the tool's operations are in the API spec ([akm-api-spec](akm-api-spec.md)).
 
@@ -200,9 +200,9 @@ Rewrite `## Next` so a cold agent can resume: where the work stands, the single 
 
 ### An existing repo
 
-The 0.3.0 beta supports new repositories only. This section describes the planned path and is not yet supported.
+The 0.4.0 beta supports new repositories only. This section describes the planned path and is not yet supported.
 
-A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 0.3.0, because no layout before 0.2.0 was published: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
+A repo with no `docs/.layout` manifest is read as layout `0.0.0`, and no migration can take it to 0.4.0, because no layout before 0.2.0 was published: adopting AKM is a one-time conversion that an agent does with you. Give the agent the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)) and the repo, and ask it for a plan. Before anything is changed:
 
 - Make sure the working tree is clean and tag a backup.
 - Work on a branch and review every diff.
@@ -217,12 +217,12 @@ Once a repo has a manifest, `akmctl migrate` handles later layout versions: it r
 The files are the source of truth, so a bare agent can work:
 
 | Need | Without the tool |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Which decisions exist | Read `docs/adr/README.md` |
 | What work is active | `grep -l '^status: active' docs/work/*.md` |
 | What is blocked, and on whom | `grep -l '^status: blocked' docs/work/*.md`, then read `blocked_by` |
 | Where to resume an item | Read its `## Next` |
-| Mint an id | `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                  | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
+| Mint an id | `id="$(date +%y%m%d)-$(LC_ALL=C tr -dc '0-9a-hjkmnp-tv-z' </dev/urandom                                              | head -c 4)"`, then check `ls docs/work docs/work/done docs/adr \| grep "^$id-"` prints nothing |
 | Create a record | Copy the template, name the file `<id>-<slug>.md`, set `id` to the same id |
 | Close an item | Set `status`, write `## Outcome`, set `updated` and `closed` to today's date, `git mv` the file to `docs/work/done/` |
 | Find a record by id | `ls docs/work docs/work/done docs/adr \| grep '^<id>-'` |

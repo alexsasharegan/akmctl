@@ -7,7 +7,7 @@ updated_at: 2026-10-28
 
 # AKM specification
 
-Version 0.3.0 (beta). The layout and this specification follow the beta's version number while it is in beta. Layout 0.3.0 adds the optional work item fields `closed`, `cycle` and `keep` (section 4, "Frontmatter") and the rules WK13 to WK17; an item that has none of them stays valid.
+Version 0.4.0 (beta). The tool, the layout, this specification, the extensions and the API share one version number until 1.0.0 (ADR 261117-6qn7); 0.4.0 changes only the numbers. Layout 0.3.0 added the optional work item fields `closed`, `cycle` and `keep` (section 4, "Frontmatter") and the rules WK13 to WK17; an item that has none of them stays valid.
 
 AKM (agent knowledge management) is a standard for a repository that keeps its own memory: its decisions, its direction and its work in flight, as Markdown records with frontmatter, so that any person or agent can pick up where work stopped. This document specifies the files, the work-item schema, the ADR and roadmap formats, and the rules of the checks. It is written for any maintainer or team, solo or not. The tool that implements it is `akmctl`; its operations and JSON are in the API spec ([akm-api-spec](akm-api-spec.md)), and a guide for adopting the standard is in [akm-guide](akm-guide.md).
 
@@ -103,7 +103,7 @@ _What Obsidian does to a note it edits:_ it rewrites the whole block from a pars
 | `created: 2026-10-28`                              | accept: string (a date field)                                                                |
 | `created: "2026-10-28"`                            | accept: the same string                                                                      |
 | `claimed_at: 2026-10-28T14:30`                     | accept: string (a timestamp field)                                                           |
-| `layout: 0.3.0`                                    | accept: string                                                                               |
+| `layout: 0.4.0`                                    | accept: string                                                                               |
 | `layout: 1.2`                                      | reject: float (quote it)                                                                     |
 | `time: 12:30`                                      | accept: string (YAML 1.1 reads a base-60 integer)                                            |
 | `done: yes`                                        | accept: string (YAML 1.1 reads a boolean)                                                    |
@@ -496,7 +496,7 @@ Optional flat keys in the manifest (`docs/.layout`), in the manifest's format. T
 
 ### Extensions in this version
 
-A repo opts in by listing an extension in the manifest (for example `extension.claims: 0.3.0`).
+A repo opts in by listing an extension in the manifest (for example `extension.claims: 0.4.0`).
 
 - `claims`: section 3, rules CL1 and CL2, commands `claim` and `release`.
 - `safety`: rules SF1 to SF4 and the deny list `docs/.akm-deny`: one entry per line, a literal substring, or a regular expression when the line starts with `re:`; `#` lines and blank lines are ignored. Files scanned: records, `AGENTS.md` and `ROADMAP.md`. SF1 knows private-key headers, cloud access key ids, GitHub, Slack, payment-provider, Google and npm token formats, JSON Web Tokens, and `password`, `secret`, `api_key` and token assignments whose value is at least 8 characters with two kinds of character and is not an obvious placeholder (`changeme`, `example`, `${...}`, `<...>`, `xxxx`). SF3 flags a run of 32 or more base64 characters with upper case, lower case, a digit and at least 4.5 bits of entropy per character, skipping all-hex strings (hashes), values after `h1:` or `sha256-` style prefixes, and anything inside a URL. Findings print the file, line and rule and the kind of pattern, never the matched text. A pass means "no known pattern", not "safe". Measured on about 15,000 lines of ordinary notes, the rules raised no finding once hashes and URLs were skipped.
@@ -507,7 +507,7 @@ One tool, one repository, no template repository. The standard, the guide, the A
 
 - **The tool.** The Go binary and UI, `akmctl`. Released as **prebuilt binaries**, so installing needs no Go toolchain; building from source is possible. It has its own version.
 - **New repositories.** `akmctl init` writes the layout, the `AGENTS.md` and record templates, the skills with their instructions and the manifest into a new directory. It never overwrites an existing file. Its options are `--docs-dir <name>` (a single folder name, default `docs`: the folder that holds the records, the roadmap and the manifest; a name other than `docs` is written to the manifest as `work_dir`, `adr_dir` and `roadmap`), `--wikilinks` (writes `reference_style: wikilink`), `--git-commits` and `--git-init`. It writes a `.gitignore` only when the directory is, or becomes, a git work tree: it lists the lock file, and Obsidian's per-machine files (`.obsidian/workspace.json`, `.obsidian/workspaces.json`, `.trash/`) only when an `.obsidian/` folder already exists. The `AGENTS.md` it writes has no build, test, lint or run lines for the maintainer to fill in. It refuses to create a second manifest next to an existing one in another folder.
-- **Existing repositories.** `akmctl migrate` brings a repository to the layout (below). Adoption of an existing repository is the migration from layout `0.0.0`. In the 0.3.0 beta, `init` is the supported way in; `migrate` is documented but not yet supported for adoption.
+- **Existing repositories.** `akmctl migrate` brings a repository to the layout (below). Adoption of an existing repository is the migration from layout `0.0.0`. In the 0.4.0 beta, `init` is the supported way in; `migrate` is documented but not yet supported for adoption.
 
 ### Versions, manifest and reconciliation
 
@@ -516,9 +516,9 @@ A repo records which layout and which extensions it conforms to, so it can be re
 **Manifest.** `docs/.layout`, in the same simple key-value subset as frontmatter (H5), no nesting and no delimiter lines:
 
 ```text
-layout: 0.3.0
-extension.adr-index: 0.3.0
-extension.work-items: 0.3.0
+layout: 0.4.0
+extension.adr-index: 0.4.0
+extension.work-items: 0.4.0
 stale_days: 30
 ```
 

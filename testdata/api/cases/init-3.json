@@ -3,14 +3,14 @@
   "repo": "basic",
   "request": {},
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "init",
     "request": {},
     "ok": true,
     "docs_dir": "docs",
     "wikilinks": false,
     "dir": ".",
-    "layout": "0.3.0",
+    "layout": "0.4.0",
     "written": [
       ".agents/skills/akm-record-decision/.akm-skill.json",
       ".agents/skills/akm-record-decision/SKILL.md",

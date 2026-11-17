@@ -66,4 +66,4 @@ This repository holds the whole of AKM: the standard (`docs/spec/agent-ready-rep
 
 ## Versions
 
-The tool, the standard (layout) and the API are versioned independently: the tool is 0.x, the layout in the manifest is 0.3.0, the API is 1.0. The tool's version is stamped at build time from the git tag; there is no `VERSION` file.
+Until 1.0.0 the tool, the standard (layout), the extensions and the API share one version (ADR 261117-6qn7): the tool is 0.4.x, the layout in the manifest is 0.4.0 and the API is 0.4. They may separate after 1.0.0, under the compatibility policy. The tool's version is stamped at build time from the git tag; there is no `VERSION` file.

@@ -283,7 +283,7 @@ func TestClaimAndRelease(t *testing.T) {
 	t.Parallel()
 	root := copyRepo(t, "basic", "")
 	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-1"}, "refused", "extension_off")
-	root = copyRepo(t, "basic", "extension.claims: 0.3.0\n")
+	root = copyRepo(t, "basic", "extension.claims: 0.4.0\n")
 	wantCode(t, root, "claim", Request{"id": e5f6, "as": "agent-1"}, "refused", "rule")
 	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	resp := mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
@@ -327,7 +327,7 @@ func TestClaimAndRelease(t *testing.T) {
 // claim by the same identity) keeps one 'claimed' line in its log.
 func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
 	t.Parallel()
-	root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
+	root := copyRepo(t, "basic", "extension.claims: 0.4.0\n")
 	mustOK(t, root, "section", Request{"id": e5f6, "name": "Next", "text": "Write the table."})
 	mustOK(t, root, "claim", Request{"id": e5f6, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	mustOK(t, root, "set", Request{"id": e5f6, "changes": map[string]any{"status": "blocked", "blocked_by": []any{"waiting on review"}}, "as_of": "2026-10-28"})
@@ -343,7 +343,7 @@ func TestUnblockClaimedItemLogsOneClaim(t *testing.T) {
 
 func TestCloseClearsClaim(t *testing.T) {
 	t.Parallel()
-	root := copyRepo(t, "basic", "extension.claims: 0.3.0\n")
+	root := copyRepo(t, "basic", "extension.claims: 0.4.0\n")
 	mustOK(t, root, "claim", Request{"id": a2b3, "as": "agent-1", "as_of": "2026-10-28T09:30"})
 	p := filepath.Join(root, "docs/work/261020-a2b3-add-json-output-to-ls.md")
 	b, _ := os.ReadFile(p)

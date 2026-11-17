@@ -33,7 +33,7 @@ func TestBuiltBinary(t *testing.T) {
 		}
 		return string(out), code
 	}
-	if out, code := run("version"); code != 0 || !strings.HasPrefix(out, "akmctl ") || !strings.Contains(out, "(API 1.0)") {
+	if out, code := run("version"); code != 0 || !strings.HasPrefix(out, "akmctl ") || !strings.Contains(out, "(API 0.4)") {
 		t.Errorf("version: %d %q", code, out)
 	}
 	if out, code := run("help"); code != 0 || !strings.Contains(out, "usage:") {

@@ -84,20 +84,20 @@ func reason(r reply) string {
 
 func TestAuth(t *testing.T) {
 	ts, _ := setup(t)
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Authorization": "-"}); r.status != 401 || errCode(r) != "unauthorized" {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Authorization": "-"}); r.status != 401 || errCode(r) != "unauthorized" {
 		t.Fatalf("no token: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Authorization": "Bearer nope"}); r.status != 401 {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Authorization": "Bearer nope"}); r.status != 401 {
 		t.Fatalf("wrong token: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Authorization": "Basic " + token}); r.status != 401 {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Authorization": "Basic " + token}); r.status != 401 {
 		t.Fatalf("wrong scheme: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/version", "", nil); r.status != 200 || r.body["ok"] != true {
+	if r := do(t, ts, "GET", "/api/v0/version", "", nil); r.status != 200 || r.body["ok"] != true {
 		t.Fatalf("with token: %d %v", r.status, r.body)
 	}
 	// every route needs the token, reads included
-	for _, p := range []string{"/api/v1/records", "/api/v1/board", "/api/v1/check", "/api/v1/records/261022-e5f6", "/api/v1/nowhere"} {
+	for _, p := range []string{"/api/v0/records", "/api/v0/board", "/api/v0/check", "/api/v0/records/261022-e5f6", "/api/v0/nowhere"} {
 		if r := do(t, ts, "GET", p, "", map[string]string{"Authorization": "-"}); r.status != 401 {
 			t.Errorf("%s without a token: %d", p, r.status)
 		}
@@ -106,19 +106,19 @@ func TestAuth(t *testing.T) {
 
 func TestHostAndOrigin(t *testing.T) {
 	ts, _ := setup(t)
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Host": "evil.example:80"}); r.status != 403 {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Host": "evil.example:80"}); r.status != 403 {
 		t.Fatalf("bad host: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Origin": "http://evil.example"}); r.status != 403 {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Origin": "http://evil.example"}); r.status != 403 {
 		t.Fatalf("cross origin: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Origin": "https://" + strings.TrimPrefix(ts.URL, "http://")}); r.status != 403 {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Origin": "https://" + strings.TrimPrefix(ts.URL, "http://")}); r.status != 403 {
 		t.Fatalf("https origin: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/version", "", map[string]string{"Origin": ts.URL}); r.status != 200 {
+	if r := do(t, ts, "GET", "/api/v0/version", "", map[string]string{"Origin": ts.URL}); r.status != 200 {
 		t.Fatalf("same origin: %d", r.status)
 	}
-	r := do(t, ts, "OPTIONS", "/api/v1/records", "", map[string]string{"Authorization": "-", "Origin": "http://evil.example"})
+	r := do(t, ts, "OPTIONS", "/api/v0/records", "", map[string]string{"Authorization": "-", "Origin": "http://evil.example"})
 	if r.status == 200 || r.h.Get("Access-Control-Allow-Origin") != "" {
 		t.Fatalf("preflight answered: %d %v", r.status, r.h)
 	}
@@ -144,7 +144,7 @@ func TestPageNeedsNoTokenAndHoldsNoData(t *testing.T) {
 
 func TestReads(t *testing.T) {
 	ts, _ := setup(t)
-	r := do(t, ts, "GET", "/api/v1/records?type=work&status=ready,active&sort=roadmap,-priority&fields=title&limit=2&next=true", "", nil)
+	r := do(t, ts, "GET", "/api/v0/records?type=work&status=ready,active&sort=roadmap,-priority&fields=title&limit=2&next=true", "", nil)
 	if r.status != 200 || r.body["count"] != float64(2) || r.body["total"] != float64(3) {
 		t.Fatalf("%d %v", r.status, r.body)
 	}
@@ -152,44 +152,44 @@ func TestReads(t *testing.T) {
 	if req["next"] != true || req["limit"] != float64(2) {
 		t.Fatalf("request echo %v", req)
 	}
-	if r := do(t, ts, "GET", "/api/v1/records/261020-a2b3?section=next", "", nil); r.status != 200 || r.h.Get("ETag") == "" {
+	if r := do(t, ts, "GET", "/api/v0/records/261020-a2b3?section=next", "", nil); r.status != 200 || r.h.Get("ETag") == "" {
 		t.Fatalf("show: %d %v", r.status, r.h)
 	}
-	if r := do(t, ts, "GET", "/api/v1/records/261099-zzzz", "", nil); r.status != 404 || errCode(r) != "not_found" {
+	if r := do(t, ts, "GET", "/api/v0/records/261099-zzzz", "", nil); r.status != 404 || errCode(r) != "not_found" {
 		t.Fatalf("missing: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/records?bogus=1", "", nil); r.status != 400 {
+	if r := do(t, ts, "GET", "/api/v0/records?bogus=1", "", nil); r.status != 400 {
 		t.Fatalf("unknown param: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/find/261022-e5f6", "", nil); r.status != 200 {
+	if r := do(t, ts, "GET", "/api/v0/find/261022-e5f6", "", nil); r.status != 200 {
 		t.Fatalf("find: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/when/261022-e5f6?as_of=2026-10-28", "", nil); r.status != 200 || r.body["age_days"] != float64(6) {
+	if r := do(t, ts, "GET", "/api/v0/when/261022-e5f6?as_of=2026-10-28", "", nil); r.status != 200 || r.body["age_days"] != float64(6) {
 		t.Fatalf("when: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "GET", "/api/v1/check?as_of=2026-10-28", "", nil); r.status != 200 || r.body["clean"] == nil {
+	if r := do(t, ts, "GET", "/api/v0/check?as_of=2026-10-28", "", nil); r.status != 200 || r.body["clean"] == nil {
 		t.Fatalf("check: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/board", "", nil); r.status != 200 {
+	if r := do(t, ts, "GET", "/api/v0/board", "", nil); r.status != 200 {
 		t.Fatalf("board: %d", r.status)
 	}
-	if r := do(t, ts, "GET", "/api/v1/nowhere", "", nil); r.status != 404 {
+	if r := do(t, ts, "GET", "/api/v0/nowhere", "", nil); r.status != 404 {
 		t.Fatalf("route: %d", r.status)
 	}
-	if r := do(t, ts, "DELETE", "/api/v1/records", "", nil); r.status != 404 {
+	if r := do(t, ts, "DELETE", "/api/v0/records", "", nil); r.status != 404 {
 		t.Fatalf("method: %d", r.status)
 	}
 }
 
 func etagOf(t *testing.T, ts *httptest.Server, id string) string {
 	t.Helper()
-	r := do(t, ts, "GET", "/api/v1/records/"+id, "", nil)
+	r := do(t, ts, "GET", "/api/v0/records/"+id, "", nil)
 	return strings.Trim(r.h.Get("ETag"), `"`)
 }
 
 func TestWritesNeedIfMatch(t *testing.T) {
 	ts, root := setup(t)
-	path := "/api/v1/records/261022-e5f6"
+	path := "/api/v0/records/261022-e5f6"
 	r := do(t, ts, "PATCH", path, `{"changes":{"priority":3}}`, nil)
 	if r.status != 428 || errCode(r) != "refused" || reason(r) != "if_match_required" {
 		t.Fatalf("no If-Match: %d %v", r.status, r.body)
@@ -217,7 +217,7 @@ func TestWritesNeedIfMatch(t *testing.T) {
 
 func TestWriteRoutes(t *testing.T) {
 	ts, _ := setup(t)
-	r := do(t, ts, "POST", "/api/v1/records", `{"kind":"work","slug":"from-http","title":"From HTTP","as_of":"2026-10-28"}`, nil)
+	r := do(t, ts, "POST", "/api/v0/records", `{"kind":"work","slug":"from-http","title":"From HTTP","as_of":"2026-10-28"}`, nil)
 	if r.status != 201 || r.body["ok"] != true {
 		t.Fatalf("new: %d %v", r.status, r.body)
 	}
@@ -225,61 +225,61 @@ func TestWriteRoutes(t *testing.T) {
 	id := rec["id"].(string)
 	// claim, release
 	et := strings.Trim(r.h.Get("ETag"), `"`)
-	r = do(t, ts, "PATCH", "/api/v1/records/"+id, `{"changes":{"status":"ready"}}`, map[string]string{"If-Match": et})
+	r = do(t, ts, "PATCH", "/api/v0/records/"+id, `{"changes":{"status":"ready"}}`, map[string]string{"If-Match": et})
 	if r.status != 200 {
 		t.Fatal(r.body)
 	}
 	et = strings.Trim(r.h.Get("ETag"), `"`)
-	r = do(t, ts, "PUT", "/api/v1/records/"+id+"/sections/Next", `{"text":"Try it."}`, map[string]string{"If-Match": et})
+	r = do(t, ts, "PUT", "/api/v0/records/"+id+"/sections/Next", `{"text":"Try it."}`, map[string]string{"If-Match": et})
 	if r.status != 200 {
 		t.Fatal(r.body)
 	}
 	et = strings.Trim(r.h.Get("ETag"), `"`)
-	r = do(t, ts, "POST", "/api/v1/records/"+id+"/claim", `{"as":"http-agent","as_of":"2026-10-28T10:00"}`, map[string]string{"If-Match": et})
+	r = do(t, ts, "POST", "/api/v0/records/"+id+"/claim", `{"as":"http-agent","as_of":"2026-10-28T10:00"}`, map[string]string{"If-Match": et})
 	if r.status != 200 {
 		t.Fatalf("claim: %d %v", r.status, r.body)
 	}
 	et = strings.Trim(r.h.Get("ETag"), `"`)
-	r = do(t, ts, "POST", "/api/v1/records/"+id+"/close", `{"status":"done"}`, map[string]string{"If-Match": et})
+	r = do(t, ts, "POST", "/api/v0/records/"+id+"/close", `{"status":"done"}`, map[string]string{"If-Match": et})
 	if r.status != 409 || reason(r) != "empty_outcome" {
 		t.Fatalf("close: %d %v", r.status, r.body)
 	}
-	r = do(t, ts, "DELETE", "/api/v1/records/"+id+"/claim", "", map[string]string{"If-Match": et})
+	r = do(t, ts, "DELETE", "/api/v0/records/"+id+"/claim", "", map[string]string{"If-Match": et})
 	if r.status != 200 {
 		t.Fatalf("release: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "DELETE", "/api/v1/records/"+id+"/claim", "", nil); r.status != 428 {
+	if r := do(t, ts, "DELETE", "/api/v0/records/"+id+"/claim", "", nil); r.status != 428 {
 		t.Fatalf("release without If-Match: %d", r.status)
 	}
-	if r := do(t, ts, "POST", "/api/v1/migrate", `{"mode":"report"}`, nil); r.status != 200 || r.body["state"] != "current" {
+	if r := do(t, ts, "POST", "/api/v0/migrate", `{"mode":"report"}`, nil); r.status != 200 || r.body["state"] != "current" {
 		t.Fatalf("migrate: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "POST", "/api/v1/migrate", `{"mode":"apply_safe"}`, nil); r.status != 409 || reason(r) != "no_backup_ack" {
+	if r := do(t, ts, "POST", "/api/v0/migrate", `{"mode":"apply_safe"}`, nil); r.status != 409 || reason(r) != "no_backup_ack" {
 		t.Fatalf("migrate apply: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "POST", "/api/v1/index", `{"dry_run":true}`, nil); r.status != 200 {
+	if r := do(t, ts, "POST", "/api/v0/index", `{"dry_run":true}`, nil); r.status != 200 {
 		t.Fatalf("index: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "POST", "/api/v1/bases", `{"dry_run":true}`, nil); r.status != 200 || r.body["written"] != false {
+	if r := do(t, ts, "POST", "/api/v0/bases", `{"dry_run":true}`, nil); r.status != 200 || r.body["written"] != false {
 		t.Fatalf("bases dry run: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "POST", "/api/v1/bases", `{}`, nil); r.status != 200 || r.body["written"] != true {
+	if r := do(t, ts, "POST", "/api/v0/bases", `{}`, nil); r.status != 200 || r.body["written"] != true {
 		t.Fatalf("bases: %d %v", r.status, r.body)
 	}
-	if r := do(t, ts, "POST", "/api/v1/bases", `{}`, nil); r.status != 409 || reason(r) != "exists" {
+	if r := do(t, ts, "POST", "/api/v0/bases", `{}`, nil); r.status != 409 || reason(r) != "exists" {
 		t.Fatalf("bases again must be refused: %d %v", r.status, r.body)
 	}
 }
 
 func TestBadWrites(t *testing.T) {
 	ts, _ := setup(t)
-	if r := do(t, ts, "POST", "/api/v1/records", `{"kind":"work","slug":"x"}`, map[string]string{"Content-Type": "text/plain"}); r.status != 400 {
+	if r := do(t, ts, "POST", "/api/v0/records", `{"kind":"work","slug":"x"}`, map[string]string{"Content-Type": "text/plain"}); r.status != 400 {
 		t.Fatalf("content type: %d", r.status)
 	}
-	if r := do(t, ts, "POST", "/api/v1/records", `not json`, nil); r.status != 400 {
+	if r := do(t, ts, "POST", "/api/v0/records", `not json`, nil); r.status != 400 {
 		t.Fatalf("bad json: %d", r.status)
 	}
-	if r := do(t, ts, "PATCH", "/api/v1/records/261022-e5f6", `{"id":"261020-a2b3","changes":{"priority":1}}`, map[string]string{"If-Match": "0000000000000000"}); r.status != 400 {
+	if r := do(t, ts, "PATCH", "/api/v0/records/261022-e5f6", `{"id":"261020-a2b3","changes":{"priority":1}}`, map[string]string{"If-Match": "0000000000000000"}); r.status != 400 {
 		t.Fatalf("id mismatch: %d", r.status)
 	}
 }
@@ -324,13 +324,13 @@ func TestApplyOverHTTP(t *testing.T) {
 	ts, root := setup(t)
 	file := filepath.Join(root, "docs/work/261022-e5f6-document-the-exit-codes.md")
 	before, _ := os.ReadFile(file)
-	r := do(t, ts, "POST", "/api/v1/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New."}]}`, nil)
+	r := do(t, ts, "POST", "/api/v0/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New."}]}`, nil)
 	if r.status != 428 || reason(r) != "if_match_required" {
 		t.Fatalf("no if_match: %d %v", r.status, r.body)
 	}
 	et := etagOf(t, ts, "261022-e5f6")
 	// the second write fails: the first is undone
-	r = do(t, ts, "POST", "/api/v1/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New.","if_match":"`+et+`"},{"op":"set","id":"261022-e5f6","changes":{"status":"nope"}}]}`, nil)
+	r = do(t, ts, "POST", "/api/v0/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New.","if_match":"`+et+`"},{"op":"set","id":"261022-e5f6","changes":{"status":"nope"}}]}`, nil)
 	if r.status != 400 || errCode(r) != "invalid_request" {
 		t.Fatalf("a failing sequence: %d %v", r.status, r.body)
 	}
@@ -342,7 +342,7 @@ func TestApplyOverHTTP(t *testing.T) {
 		t.Fatal("the first write was not undone")
 	}
 	// the later write to the same record needs no etag of its own
-	r = do(t, ts, "POST", "/api/v1/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New.","if_match":"`+et+`"},{"op":"set","id":"261022-e5f6","changes":{"priority":3}}]}`, nil)
+	r = do(t, ts, "POST", "/api/v0/apply", `{"writes":[{"op":"section","id":"261022-e5f6","name":"Goal","text":"New.","if_match":"`+et+`"},{"op":"set","id":"261022-e5f6","changes":{"priority":3}}]}`, nil)
 	if ws, _ := r.body["writes"].([]any); r.status != 200 || len(ws) != 2 {
 		t.Fatalf("a sequence: %d %v", r.status, r.body)
 	}
@@ -357,11 +357,11 @@ func TestDryRunNeedsNoIfMatch(t *testing.T) {
 	before, _ := os.ReadFile(file)
 	et := etagOf(t, ts, "261022-e5f6")
 	routes := []struct{ method, path, body string }{
-		{"PATCH", "/api/v1/records/261022-e5f6", `{"changes":{"priority":3},"dry_run":true}`},
-		{"PUT", "/api/v1/records/261022-e5f6/sections/Goal", `{"text":"New.","dry_run":true}`},
-		{"POST", "/api/v1/records/261022-e5f6/close", `{"status":"dropped","outcome":"No.","dry_run":true}`},
-		{"POST", "/api/v1/records/261022-e5f6/claim", `{"as":"a","dry_run":true}`},
-		{"DELETE", "/api/v1/records/261020-a2b3/claim", `{"dry_run":true}`},
+		{"PATCH", "/api/v0/records/261022-e5f6", `{"changes":{"priority":3},"dry_run":true}`},
+		{"PUT", "/api/v0/records/261022-e5f6/sections/Goal", `{"text":"New.","dry_run":true}`},
+		{"POST", "/api/v0/records/261022-e5f6/close", `{"status":"dropped","outcome":"No.","dry_run":true}`},
+		{"POST", "/api/v0/records/261022-e5f6/claim", `{"as":"a","dry_run":true}`},
+		{"DELETE", "/api/v0/records/261020-a2b3/claim", `{"dry_run":true}`},
 	}
 	for _, rt := range routes {
 		r := do(t, ts, rt.method, rt.path, rt.body, nil)
@@ -390,7 +390,7 @@ func TestDryRunNeedsNoIfMatch(t *testing.T) {
 		t.Fatal("a dry run or a refused write changed the file")
 	}
 	// a stale If-Match still fails a dry run
-	r := do(t, ts, "PATCH", "/api/v1/records/261022-e5f6", `{"changes":{"priority":3},"dry_run":true}`, map[string]string{"If-Match": `"0000000000000000"`})
+	r := do(t, ts, "PATCH", "/api/v0/records/261022-e5f6", `{"changes":{"priority":3},"dry_run":true}`, map[string]string{"If-Match": `"0000000000000000"`})
 	if r.status != 412 {
 		t.Fatalf("stale dry run: %d", r.status)
 	}
@@ -398,7 +398,7 @@ func TestDryRunNeedsNoIfMatch(t *testing.T) {
 
 func TestSectionRoute(t *testing.T) {
 	ts, root := setup(t)
-	path := "/api/v1/records/261022-e5f6/sections/Goal"
+	path := "/api/v0/records/261022-e5f6/sections/Goal"
 	et := etagOf(t, ts, "261022-e5f6")
 	if r := do(t, ts, "PUT", path, `{"text":"New goal."}`, nil); r.status != 428 {
 		t.Fatalf("no If-Match: %d", r.status)
@@ -429,13 +429,13 @@ func TestSectionRoute(t *testing.T) {
 	if r := do(t, ts, "POST", path, `{"text":"x"}`, nil); r.status != 404 {
 		t.Fatalf("wrong method: %d", r.status)
 	}
-	if r := do(t, ts, "PUT", "/api/v1/records/261010-j9k0/sections/Goal", `{"text":"x","dry_run":true}`, nil); r.status != 409 || reason(r) != "closed" {
+	if r := do(t, ts, "PUT", "/api/v0/records/261010-j9k0/sections/Goal", `{"text":"x","dry_run":true}`, nil); r.status != 409 || reason(r) != "closed" {
 		t.Fatalf("closed: %d %v", r.status, r.body)
 	}
 	// the version route reports the repository
-	v := do(t, ts, "GET", "/api/v1/version", "", nil)
+	v := do(t, ts, "GET", "/api/v0/version", "", nil)
 	repo, _ := v.body["repository"].(map[string]any)
-	if repo["layout"] != "0.3.0" || repo["reference_style"] != "id" {
+	if repo["layout"] != "0.4.0" || repo["reference_style"] != "id" {
 		t.Fatalf("version: %v", v.body)
 	}
 }
@@ -584,13 +584,13 @@ func TestUIConfig(t *testing.T) {
 
 func TestTickAndLogRoutes(t *testing.T) {
 	ts, root := setup(t)
-	tick := "/api/v1/records/261022-e5f6/sections/Goal/items/1"
+	tick := "/api/v0/records/261022-e5f6/sections/Goal/items/1"
 	et := etagOf(t, ts, "261022-e5f6")
 	hdr := map[string]string{"If-Match": `"` + et + `"`}
 	if r := do(t, ts, "PUT", tick, `{}`, nil); r.status != 428 {
 		t.Fatalf("no If-Match: %d", r.status)
 	}
-	if r := do(t, ts, "PUT", "/api/v1/records/261022-e5f6/sections/Goal/items/x", `{}`, hdr); r.status != 400 {
+	if r := do(t, ts, "PUT", "/api/v0/records/261022-e5f6/sections/Goal/items/x", `{}`, hdr); r.status != 400 {
 		t.Fatalf("item not a number: %d", r.status)
 	}
 	if r := do(t, ts, "PUT", tick, `{"item":2}`, hdr); r.status != 400 {
@@ -615,7 +615,7 @@ func TestTickAndLogRoutes(t *testing.T) {
 	if r := do(t, ts, "PUT", tick, `{"done":false,"section_etag":"0000000000000000"}`, nil); r.status != 412 {
 		t.Fatalf("stale section: %d", r.status)
 	}
-	l := do(t, ts, "POST", "/api/v1/records/261022-e5f6/log", `{"text":"hello","as_of":"2026-10-29"}`, map[string]string{"If-Match": `"` + etagOf(t, ts, "261022-e5f6") + `"`})
+	l := do(t, ts, "POST", "/api/v0/records/261022-e5f6/log", `{"text":"hello","as_of":"2026-10-29"}`, map[string]string{"If-Match": `"` + etagOf(t, ts, "261022-e5f6") + `"`})
 	if l.status != 200 {
 		t.Fatalf("log: %d %v", l.status, l.body)
 	}
@@ -623,7 +623,7 @@ func TestTickAndLogRoutes(t *testing.T) {
 	if !strings.Contains(string(b), "- 2026-10-29: hello\n") {
 		t.Fatal(string(b))
 	}
-	if r := do(t, ts, "POST", "/api/v1/records/261022-e5f6/log", `{"text":"x"}`, nil); r.status != 428 {
+	if r := do(t, ts, "POST", "/api/v0/records/261022-e5f6/log", `{"text":"x"}`, nil); r.status != 428 {
 		t.Fatalf("log no If-Match: %d", r.status)
 	}
 }

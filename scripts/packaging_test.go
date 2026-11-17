@@ -167,7 +167,7 @@ func TestInstallLatest(t *testing.T) {
 	logged := func() string { b, _ := os.ReadFile(log); return string(b) }
 
 	// an older or dirty build is replaced by the newest green commit, by its full hash
-	out, err := runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-aaaaaaaaaaaa+dirty (API 1.0)"))
+	out, err := runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-aaaaaaaaaaaa+dirty (API 0.4)"))
 	if err != nil || !strings.HasPrefix(logged(), "direct -mod=mod install github.com/alexsasharegan/akmctl/cmd/akmctl@"+sha2) {
 		t.Fatalf("install: %v\n%s\nlog: %s", err, out, logged())
 	}
@@ -177,13 +177,13 @@ func TestInstallLatest(t *testing.T) {
 
 	// the same commit is left alone
 	os.Remove(log)
-	out, err = runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-222222222222 (API 1.0)"))
+	out, err = runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-222222222222 (API 0.4)"))
 	if err != nil || !strings.Contains(out, "up to date at 222222222222") || logged() != "" {
 		t.Errorf("up to date: %v\n%s\nlog: %s", err, out, logged())
 	}
 
 	// --dry-run changes nothing
-	out, err = runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-aaaaaaaaaaaa (API 1.0)"), "--dry-run")
+	out, err = runInstallLatest(t, dir, log, append(env, "FAKE_VERSION=akmctl 0.3.4-0.20261108000000-aaaaaaaaaaaa (API 0.4)"), "--dry-run")
 	if err != nil || !strings.Contains(out, "would install") || logged() != "" {
 		t.Errorf("dry run: %v\n%s\nlog: %s", err, out, logged())
 	}

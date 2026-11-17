@@ -8,7 +8,7 @@
     "confirm": true
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "remove",
     "request": {
       "id": "261022-e5f6",

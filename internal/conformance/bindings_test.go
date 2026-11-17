@@ -159,7 +159,7 @@ func runHTTP(t *testing.T, root, op string, req map[string]any, noIfMatch bool) 
 	defer ts.Close()
 	s.Hosts = []string{strings.TrimPrefix(ts.URL, "http://")}
 	do := func(method, path string, body []byte, hdr map[string]string) (int, []byte) {
-		rq, err := http.NewRequest(method, ts.URL+"/api/v1"+path, bytes.NewReader(body))
+		rq, err := http.NewRequest(method, ts.URL+"/api/v0"+path, bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}

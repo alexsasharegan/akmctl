@@ -6,7 +6,7 @@
     "migrations": [
       {
         "from": "0.0.0",
-        "to": "0.3.0",
+        "to": "0.4.0",
         "steps": [
           {
             "id": "created",
@@ -77,14 +77,14 @@
     ]
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "migrate",
     "request": {
       "mode": "plan",
       "migrations": [
         {
           "from": "0.0.0",
-          "to": "0.3.0",
+          "to": "0.4.0",
           "steps": [
             {
               "id": "created",
@@ -157,7 +157,7 @@
     "ok": true,
     "mode": "plan",
     "from": "0.0.0",
-    "to": "0.3.0",
+    "to": "0.4.0",
     "state": "behind",
     "steps": [
       {

@@ -3,7 +3,7 @@
   "repo": "basic",
   "request": {},
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "commits",
     "request": {},
     "ok": false,

@@ -5,7 +5,7 @@
     "path": "views/mine.base"
   },
   "expected": {
-    "api_version": "1.0",
+    "api_version": "0.4",
     "operation": "bases",
     "request": {
       "path": "views/mine.base"

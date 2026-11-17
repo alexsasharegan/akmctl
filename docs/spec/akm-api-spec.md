@@ -8,7 +8,7 @@ authored_by: agent
 
 # AKM API specification
 
-Version 1.0.
+Version 0.4. It shares one version number with the tool, the layout and the specification until 1.0.0 (ADR 261117-6qn7).
 
 A transport-neutral contract for reading, checking and changing the records of an AKM repository (ADRs, work items, the roadmap), so that more than one implementation can be written against it. The records and rules are defined in the specification ([agent-ready-repo-spec](agent-ready-repo-spec.md)); this document defines the operations over them, the JSON that comes back, and two bindings (CLI and HTTP). The reference implementation is `akmctl`. The schemas are in `akm-api/schemas/` and the conformance fixtures in `akm-api/.fixtures/`.
 
@@ -33,14 +33,14 @@ Every response is one JSON object:
 
 | Field              | Type    | Meaning                                                                                     |
 | ------------------ | ------- | ------------------------------------------------------------------------------------------- |
-| `api_version`      | string  | `"1.0"`: the version of this spec the response conforms to.                                 |
+| `api_version`      | string  | `"0.4"`: the version of this spec the response conforms to.                                 |
 | `operation`        | string  | The operation name.                                                                         |
 | `request`          | object  | The request exactly as given, with no defaults added. The defaults are in this spec.        |
 | `ok`               | boolean | `true` if the operation ran. A `check` that finds errors is still `ok: true` (see `clean`). |
 | _operation fields_ |         | Defined per operation in section 4. Present only when `ok` is `true`.                       |
 | `error`            | object  | Present only when `ok` is `false`: `code`, `message`, optional `details`.                   |
 
-Error codes (the closed set for 1.0):
+Error codes (the closed set for 0.4):
 
 | Code              | Meaning                                                                                                                                                                                                                                                               | Exit | HTTP                             |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
@@ -531,7 +531,7 @@ The undo covers a failure the operation sees. It keeps no journal: after a crash
 
 **Security (all MUST):**
 
-- Bind to `127.0.0.1` or `::1` only; there is no option to bind elsewhere in 1.0.
+- Bind to `127.0.0.1` or `::1` only; there is no option to bind elsewhere in 0.4.
 - Every request carries `Authorization: Bearer <token>`. The token is random (at least 128 bits), chosen at start and kept in memory only. `akmctl ui` prints it once on stderr inside the URL it opens, as a fragment (`http://127.0.0.1:PORT/#token=...`). A URL fragment is never sent to the server, so the page itself holds no token and no data: it is served without authentication, reads the token from the fragment, removes it from the address bar and sends it as the bearer header. A missing or wrong token is `unauthorized` (401), with no other detail.
 - The server checks `Host` against its own loopback address and port, and rejects any request with an `Origin` header that is not the same origin (a defense against DNS rebinding and cross-site requests).
 - No CORS headers are sent, and a preflight is not answered.
@@ -540,7 +540,7 @@ The undo covers a failure the operation sees. It keeps no journal: after a crash
 - A write route needs `Content-Type: application/json`.
 - A write to an existing record (`set`, `section`, `tick`, `log`, `close`, `claim`, `release`) MUST carry `If-Match` (or `if_match` in the body); `tick` and `log` may carry `section_etag` instead. Without it the server answers `refused` with `details.reason: "if_match_required"` and status `428`. A client that has no etag reads the record first (the response carries it). This is the compare-and-swap of section 7, and it is required here because the UI holds records for a long time. A request with `dry_run: true` is exempt: it writes nothing, so it needs no `If-Match`; when it carries one, the server checks it and answers `stale` if it differs.
 
-**Routes** (base `/api/v1`; the version is in the path; the response `api_version` is `1.0`):
+**Routes** (base `/api/v0`; the version is in the path; the response `api_version` is `0.4`):
 
 | Method and path                               | Operation          | Parameters                                                                                                                      |
 | --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -594,14 +594,14 @@ The undo covers a failure the operation sees. It keeps no journal: after a crash
 ## 8. Versions
 
 - `api_version` is `MAJOR.MINOR`. A MINOR change adds an operation, an optional request parameter, a response field, an error `details` key or an enum value in a response; it never changes the meaning of what exists. A MAJOR change removes or renames something, adds a required parameter, or changes a type or meaning.
-- The HTTP path carries the MAJOR (`/api/v1`). A tool that serves two MAJOR versions serves both paths. The CLI default is the tool's newest version; `--api-version 1` pins a MAJOR.
+- The HTTP path carries the MAJOR (`/api/v0`). A tool that serves two MAJOR versions serves both paths. The CLI default is the tool's newest version; `--api-version 0` pins a MAJOR.
 - A client MUST ignore response fields it does not know and MUST tolerate enum values it does not know in response fields (`class`, `state`).
 - The API version is separate from the layout version and the extension versions (specification, section 7). `version` reports all of them.
-- The schemas carry `$id` URIs of the form `https://akm.invalid/api/1.0/<name>.json` as stable identifiers only. They are not served; `.invalid` is a reserved top-level domain, so no real host is implied.
+- The schemas carry `$id` URIs of the form `https://akm.invalid/api/0.4/<name>.json` as stable identifiers only. They are not served; `.invalid` is a reserved top-level domain, so no real host is implied.
 
 ## 9. Conformance
 
-An implementation conforms to API 1.0 if, for every case in the fixtures it claims, its response equals the expected response (after the normalization below), and every response it produces validates against the schemas.
+An implementation conforms to API 0.4 if, for every case in the fixtures it claims, its response equals the expected response (after the normalization below), and every response it produces validates against the schemas.
 
 - **Layout of the fixtures.** `akm-api/.fixtures/` holds `repos/<name>/` (`basic`, a clean repository; `broken`, the same with three errors; `claims`, with the claims extension on and one claimed item; `closable`, with an item that has an Outcome; `vault`, the clean repository with its folders moved by the manifest under a folder whose names have spaces; `legacy`, a repository with no layout history and notes without ids; `commits`, the clean repository with `git_commits: true` and no skill; `conflict`, the clean repository with a file where the skill directory would go; `obsidian`, the clean repository as an Obsidian vault, with an `.obsidian` folder at its root and a `views/mine.base` file), `cases/<operation>-<n>.json` (140 cases: reads, `check`, `index`, `migrate`, `version` and the writes, including dry runs) and `make_fixtures.py`, a frozen reference for how the sample repositories were built (it no longer regenerates every case; cases are edited by hand); it is not an implementation. Each case is `{name, repo, request, expected}`; a case with `git_work_tree: true` runs in a copy that is made a git work tree first (an empty `.git` directory). `repo` is the name of a directory in `repos/`; a runner that copies it to run a case names the copy the same, because `version` reports the name. `request` is the request object; the runner passes it through the binding under test. `expected` is the full response.
 - **Normalization.** Compared as JSON values, so key order and whitespace do not matter. Arrays are compared in order. `api_version` is compared; `request` is the request as given.
@@ -615,7 +615,7 @@ An implementation conforms to API 1.0 if, for every case in the fixtures it clai
 - **Schemas.** `akm-api/schemas/` holds `common.json` (shared definitions) and one file per operation, in JSON Schema 2020-12. `akm-api/validate.js` validates every case's request and response against them (a matcher is replaced by a value the schema accepts first) (`npm install ajv@8`, then `node akm-api/validate.js akm-api`; the deliberate `invalid_request` request is skipped). This checks the schemas and the fixtures, not an implementation.
 - **Dot-folder.** The fixtures are in a folder whose name starts with a dot, which Obsidian hides, so a vault that holds this document does not index the sample records as notes. In an implementation's repository the folder can be ordinary.
 
-## 10. Not in 1.0
+## 10. Not in 0.4
 
 - **Fixtures for `commits` and `history`.** The operations read git history, which a fixture directory cannot hold (a nested `.git` is not committed). An implementation tests it against repositories it builds with `git`: the tool's own messages are clean, and each rule is broken once; for `history`, the moves come back in order with the right `from` and `to`.
 - **Exact fixtures for `new`.** Ids are random; `new` is tested for shape only.
@@ -623,7 +623,7 @@ An implementation conforms to API 1.0 if, for every case in the fixtures it clai
 - **`search` ranking.** Ordered by match count, then id; a real index may want field weights.
 - **Pagination by cursor.** `limit` and `offset` are enough for a repository of hundreds of records.
 - **Event stream.** None; the UI polls. A MINOR version can add one if polling is a problem.
-- **`renumber`.** Not in 1.0. When added it is a write operation with `dry_run` defaulting to true.
+- **`renumber`.** Not in 0.4. When added it is a write operation with `dry_run` defaulting to true.
 - **Extension operations beyond `claims`.** The `safety` extension adds rules and findings, no new operation.
 - **Error `details` keys.** `paths` (`ambiguous`), `reason` (`refused`), `rule` (`refused` with reason `rule`) and `etag` (`stale`: the file's current etag, so a client can retry or show the conflict) are defined; more are a MINOR addition.
 - **Lock file.** `.akm.lock` is in the specification's layout, in the manifest folder; a template lists it in `.gitignore`.

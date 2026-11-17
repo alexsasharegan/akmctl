@@ -7,7 +7,7 @@ import (
 	"github.com/alexsasharegan/akmctl/internal/migrate"
 )
 
-// twoStepRegistry is a chain 0.1.0 -> 0.2.0 -> 0.3.0: the first step fixes WK3
+// twoStepRegistry is a chain 0.1.0 -> 0.2.0 -> 0.4.0: the first step fixes WK3
 // (created_at), the second WK7 (the Result heading).
 func twoStepRegistry(t *testing.T) {
 	t.Helper()
@@ -16,7 +16,7 @@ func twoStepRegistry(t *testing.T) {
 		{From: "0.1.0", To: "0.2.0", Steps: []migrate.Step{
 			{ID: "rename-created", Kind: "rename_field", Class: "auto", Scope: "work", From: "created_at", To: "created", Fixes: []string{"WK3"}},
 		}},
-		{From: "0.2.0", To: "0.3.0", Steps: []migrate.Step{
+		{From: "0.2.0", To: "0.4.0", Steps: []migrate.Step{
 			{ID: "rename-result", Kind: "rename_heading", Class: "auto", Scope: "work", From: "Result", To: "Outcome", Fixes: []string{"WK7"}},
 		}},
 	}
@@ -50,9 +50,9 @@ func TestCheckTargetAcceptsAnyLayoutTheChainReaches(t *testing.T) {
 	}
 
 	// the end of the chain: both steps apply
-	end := checkClasses(t, root, "0.3.0")
+	end := checkClasses(t, root, "0.4.0")
 	if end["WK3"] != "auto" || end["WK7"] != "auto" {
-		t.Fatalf("target 0.3.0: %v", end)
+		t.Fatalf("target 0.4.0: %v", end)
 	}
 
 	// the repository's own layout: an empty chain, nothing is auto
@@ -70,7 +70,7 @@ func TestCheckTargetRefusesALayoutTheChainDoesNotReach(t *testing.T) {
 		if err == nil || err.Code != "invalid_request" {
 			t.Fatalf("target %s: got %v, want invalid_request", target, err)
 		}
-		for _, want := range []string{target, "0.1.0", "0.2.0", "0.3.0"} {
+		for _, want := range []string{target, "0.1.0", "0.2.0", "0.4.0"} {
 			if !strings.Contains(err.Message, want) {
 				t.Errorf("target %s: message %q lacks %s", target, err.Message, want)
 			}

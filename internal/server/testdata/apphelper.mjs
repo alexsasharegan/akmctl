@@ -29,12 +29,12 @@ export async function startApp({ hash = "#token=tok123", onWrite, claims = false
     const ok = (body) => ({ ok: true, status: 200, statusText: "OK", json: async () => ({ ok: true, ...body }) });
     if (auth !== "Bearer tok123") return { ok: false, status: 401, statusText: "Unauthorized", json: async () => ({ ok: false, error: { code: "unauthorized", message: "no valid token" } }) };
     if (u.pathname === "/ui/config") return ok({ root: "/home/me/demo", identity });
-    if (u.pathname === "/api/v1/version") return ok({ work_dir: "docs/work", adr_dir: "docs/adr", repository: { extensions: claims ? ["claims"] : [] } });
-    if (u.pathname === "/api/v1/records") {
+    if (u.pathname === "/api/v0/version") return ok({ work_dir: "docs/work", adr_dir: "docs/adr", repository: { extensions: claims ? ["claims"] : [] } });
+    if (u.pathname === "/api/v0/records") {
       const type = u.searchParams.get("type");
       return ok({ records: records.filter((r) => !type || r.type === type) });
     }
-    const one = u.pathname.match(/^\/api\/v1\/records\/([^/]+)$/);
+    const one = u.pathname.match(/^\/api\/v0\/records\/([^/]+)$/);
     if (one) {
       const r = records.find((x) => x.id === decodeURIComponent(one[1]));
       if (!r) return { ok: false, status: 404, statusText: "Not Found", json: async () => ({ ok: false, error: { code: "not_found", message: "no such record" } }) };

@@ -80,7 +80,7 @@ function Ui-Case([string]$Name, [string[]]$Extra) {
     else { Pass "ui $Name served the page ($($r.Content.Length) bytes)" }
     # The API refuses a request without the token.
     try {
-      $a = Invoke-WebRequest -UseBasicParsing -Uri ($page.TrimEnd('/') + '/api/v1/version') -Method Post -Body '{}' -ContentType 'application/json' -TimeoutSec 20
+      $a = Invoke-WebRequest -UseBasicParsing -Uri ($page.TrimEnd('/') + '/api/v0/version') -Method Post -Body '{}' -ContentType 'application/json' -TimeoutSec 20
       Write-Host "     api without a token: status $($a.StatusCode)"
       if ($a.StatusCode -eq 200) { Fail "ui $Name answered an API call without the token" }
     }
