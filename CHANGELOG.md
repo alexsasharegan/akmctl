@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A roadmap line may now be a wikilink with an id alias, `- [[261027-m3qz-fix-login|261027-m3qz]] text`, in place of `- [261027-m3qz] text`. The loader (and so `ls --sort roadmap`) and `check` rule RM1 read both forms; the id of a wikilink is the leading id of its target. Before, `check` rejected the wikilink form, so a repository with `reference_style: wikilink` could not link its roadmap in Obsidian. Affects a repository that adopts the wikilink form: it needs this tool. Provisional: the decision is a `proposed` ADR (261119-k5je). Work item 261119-ddjm, GitHub issue 96.
+
 ## 0.4.0 - 2026-11-17
 
 - **API version 0.4 (was 1.0); one version number before 1.0.0.** The tool, the layout, the specification and guide, the extensions and the API now share one version until 1.0.0 (ADR 261117-6qn7, work item 261117-n7v4). Clients: `api_version` is `"0.4"` in every response, the HTTP routes move from `/api/v1` to `/api/v0`, `--api-version 0` pins the version (`--api-version 1` is refused), and the schema `$id` URIs read `api/0.4`; the shape of every request and response is unchanged. Repositories: the layout and the extensions are 0.4.0, with no change to any record. A repository on 0.3.0 gets the S1 warning (no migration path, as after the 0.3.0 bump); raise the versions in `docs/.layout` by hand. The fixtures and schemas carry the new values.
