@@ -1,8 +1,8 @@
 // The board: four lanes of work items (raw, ready, active, blocked), each with
 // its own scroll, driven by the keyboard. Focus is a card id that survives a
 // reload and a visit to another view.
-import { el, ageText, ageDays, text } from "./util.js";
-import { lanes, locate, firstLoc, step, field, priorityOf, blockedBy, staleness } from "./logic.js";
+import { el, ageText, ageDays, text, childChip } from "./util.js";
+import { lanes, locate, firstLoc, step, field, priorityOf, blockedBy, staleness, childCounts } from "./logic.js";
 
 const FOCUS_KEY = "akm-board-focus";
 
@@ -29,8 +29,8 @@ export function remember(id) {
   }
 }
 
-/** The card for a work item. */
-export function cardNode(r, byId, today) {
+/** The card for a work item. `counts` is childCounts(records), made once for the board. */
+export function cardNode(r, byId, today, counts) {
   const pri = priorityOf(r);
   const { days, stale } = staleness(r, today);
   const parent = field(r, "parent");
@@ -56,6 +56,7 @@ export function cardNode(r, byId, today) {
       { class: "card-head" },
       el("span", { class: "card-id", text: r.id }),
       pri > 0 ? el("span", { class: "chip pri", title: "priority " + pri, text: "P" + pri }) : null,
+      counts && counts.has(r.id) ? childChip(counts.get(r.id)) : null,
       field(r, "kind") ? el("span", { class: "chip kind", text: field(r, "kind") }) : null,
     ),
     el("div", { class: "card-title", text: text(field(r, "title")) || "(no title)" }),
@@ -72,6 +73,7 @@ export function mountBoard(host, ctx) {
   const ls = lanes(ctx.records());
   const byId = ctx.byId();
   const today = ctx.today();
+  const counts = childCounts(ctx.records());
   let loc = (remembered && locate(ls, remembered)) || firstLoc(ls);
   let pendingG = 0;
 
@@ -80,7 +82,7 @@ export function mountBoard(host, ctx) {
     const body = el("div", { class: "col-body", role: "list", "aria-labelledby": "lane-" + lane.status });
     if (!lane.records.length) body.append(el("div", { class: "empty-col", text: "Nothing in " + lane.status + "." }));
     for (const r of lane.records) {
-      const c = cardNode(r, byId, today);
+      const c = cardNode(r, byId, today, counts);
       c.setAttribute("role", "listitem");
       body.append(c);
     }

@@ -3,3 +3,5 @@
 /docs/.akm.lock
 /node_modules/
 .tmp/
+/.evidence/
+.DS_Store

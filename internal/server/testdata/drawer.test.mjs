@@ -4,7 +4,22 @@ import assert from "node:assert/strict";
 import { startApp, settle } from "./apphelper.mjs";
 
 const reply = (record, extra = {}) => ({ ok: true, status: 200, statusText: "OK", json: async () => ({ ok: true, record, ...extra }) });
-const app = await startApp({ claims: true, identity: "me", onWrite: (u, init, records) => reply({ ...records[1], etag: "w1" }) });
+// a test sets `hold` to keep a write pending, and answers it later
+let hold = null;
+let staleNext = false;
+const app = await startApp({
+  claims: true,
+  identity: "me",
+  tweak: (records) => Object.assign(records[1].fields, { kind: "bug", parent: "261101-aaaa" }),
+  onWrite: (u, init, records) => {
+    if (hold) return hold();
+    if (staleNext) {
+      staleNext = false;
+      return { ok: false, status: 412, statusText: "Precondition Failed", json: async () => ({ ok: false, error: { code: "stale", message: "changed" } }) };
+    }
+    return reply({ ...records[1], etag: "w1" });
+  },
+});
 const { doc } = app;
 const drawer = doc.getElementById("drawer");
 const toasts = doc.getElementById("toasts");
@@ -12,6 +27,37 @@ const toasts = doc.getElementById("toasts");
 location.hash = "#/record/261101-bbbb";
 await settle();
 assert.match(drawer.text, /Claim as me/, "a ready item can be claimed");
+assert.match(doc.getElementById("hintbar").text, /RECORD.*ggtopGbottom/, "the hint bar lists gg and G while the drawer is open");
+
+// the body comes first: the summary line is in the header, the body sections come before the closed Fields section
+{
+  const head = drawer.querySelector("header.dlg-head");
+  const sum = head.querySelector(".dlg-sum");
+  assert.ok(sum, "the header has a summary line");
+  assert.match(sum.text, /status\s*ready/, "the summary line shows the status");
+  assert.match(sum.text, /priority\s*2/, "and the priority when it is set");
+  assert.match(sum.text, /kind\s*bug/, "and the kind");
+  const parent = sum.querySelector("a");
+  assert.ok(parent && parent.getAttribute("href") === "#/record/261101-aaaa" && parent.text === "261101-aaaa", "and the parent as a link to that record");
+  assert.doesNotMatch(sum.text, /claim/i, "the summary line leaves the claim to the claim line");
+  const fields = drawer.querySelector("details.fields-sec");
+  assert.ok(fields, "the field table sits in a Fields section");
+  assert.equal(fields.querySelector("summary").text, "Fields");
+  assert.ok(fields.querySelector("table.fm"), "the Fields section holds the field table");
+  assert.ok(fields.querySelector("details.fm-legend"), "and the value types legend");
+  assert.equal(!!fields.open, false, "the Fields section starts closed");
+  const kids = drawer.querySelector(".dlg-body").children;
+  assert.equal(kids.at(-1), fields, "the Fields section is last");
+  assert.ok(kids.indexOf(drawer.querySelector("details.sec")) < kids.indexOf(fields), "the first body section comes before the Fields section");
+  assert.ok(kids.indexOf(drawer.querySelector(".claim-slot")) < kids.indexOf(drawer.querySelector("details.sec")), "the claim line comes before the body");
+}
+
+// the one extra click: the reader opens Fields to edit (the redraws below must keep it open)
+const fieldsBox = () => drawer.querySelector("details.fields-sec");
+fieldsBox().open = true;
+const bodyBox = drawer.querySelector("details.sec");
+const bodyWasOpen = !!bodyBox.open;
+bodyBox.open = !bodyWasOpen;
 
 // edit a field: Edit, change, Save
 const rowOf = (name) => drawer.querySelector('tr[data-field="' + name + '"]');
@@ -27,6 +73,8 @@ let w = app.calls.at(-1);
 assert.equal(w.method, "PATCH");
 assert.deepEqual(w.body.changes, { priority: 3 });
 assert.match(w.headers["If-Match"], /"e2"/);
+assert.equal(!!fieldsBox().open, true, "an open Fields section survives the redraw after a save");
+assert.equal(!!drawer.querySelector("details.sec").open, !bodyWasOpen, "a body section the reader toggled keeps its state through the redraw");
 
 // Cancel puts the value back and writes nothing
 await settle();
@@ -82,6 +130,19 @@ rowOf("parent").querySelector("button.primary").dispatch("click");
 await settle(10);
 assert.deepEqual(app.calls.at(-1).body.changes, { parent: "261101-aaaa" });
 
+// a stale write is told inline in the row, with a Reload button, and the open Fields section is not redrawn under the writer
+editBtn("priority").dispatch("click");
+rowOf("priority").querySelector("input").value = "5";
+staleNext = true;
+rowOf("priority").querySelector("button.primary").dispatch("click");
+await settle(10);
+assert.match(rowOf("priority").querySelector(".fm-msg.err").text, /changed since you opened it, so nothing was written/, "a stale write says so inline");
+assert.ok(rowOf("priority").querySelectorAll("button").some((b) => b.text === "Reload"), "and offers Reload");
+assert.equal(!!fieldsBox().open, true, "Fields stays open after a stale write");
+rowOf("priority").querySelectorAll("button").find((b) => b.text === "Reload").dispatch("click");
+await settle(10);
+assert.equal(drawer.querySelector(".fm-msg"), null, "Reload redraws the record");
+
 // the id is locked
 assert.match(rowOf("id").text, /locked/);
 
@@ -94,6 +155,136 @@ assert.equal(w.method, "POST");
 assert.match(w.url, /records\/261101-bbbb\/claim$/);
 assert.equal(w.body.as, "me");
 assert.match(toasts.text, /Claimed 261101-bbbb/);
+
+// gg and G scroll the drawer to the top and the bottom (the board's keys and 900 ms window)
+{
+  const tall = () => {
+    drawer.scrollHeight = 2000;
+    drawer.clientHeight = 500;
+    drawer.scrollTop = 700;
+  };
+  const key = (k, props) => app.press(k, { target: doc.body, ...props });
+  const realNow = Date.now;
+  let t = 1_000_000;
+  Date.now = () => t;
+  try {
+    tall();
+    key("G");
+    assert.equal(drawer.scrollTop, 1500, "G scrolls to the bottom");
+
+    tall();
+    key("g");
+    assert.equal(drawer.scrollTop, 700, "one g does nothing");
+    t += 899;
+    key("g");
+    assert.equal(drawer.scrollTop, 0, "gg within 900 ms scrolls to the top");
+
+    tall();
+    t += 5000;
+    key("g");
+    t += 900;
+    key("g");
+    assert.equal(drawer.scrollTop, 700, "a second g after 900 ms is a first g");
+    t += 100;
+    key("g");
+    assert.equal(drawer.scrollTop, 0, "and the one after it completes gg");
+
+    tall();
+    t += 5000;
+    key("g");
+    key("x");
+    key("g");
+    assert.equal(drawer.scrollTop, 700, "another key between the two g presses cancels the first");
+
+    tall();
+    t += 5000;
+    key("g");
+    key("g", { ctrlKey: true });
+    key("g", { metaKey: true });
+    key("g", { altKey: true });
+    assert.equal(drawer.scrollTop, 700, "g with ctrl, meta or alt is ignored");
+    key("G", { ctrlKey: true });
+    key("G", { metaKey: true });
+    key("G", { altKey: true });
+    assert.equal(drawer.scrollTop, 700, "G with ctrl, meta or alt is ignored");
+  } finally {
+    Date.now = realNow;
+  }
+}
+
+// the help lists both keys in its Record group
+app.press("?");
+assert.match(doc.getElementById("overlay-root").text, /scroll to the top[\s\S]*scroll to the bottom/, "the help lists gg and G for the record");
+
+// a save in flight: the buttons are off and labeled, a second submit sends nothing,
+// and a failed save turns them on again (261119-4xg5)
+{
+  const fail = (status, code, message) => ({ ok: false, status, statusText: message, json: async () => ({ ok: false, error: { code, message } }) });
+  const pend = (answer) => {
+    let release;
+    const gate = new Promise((r) => (release = r));
+    hold = () => gate.then(() => answer);
+    return release;
+  };
+  const rowBtn = (name, text) => rowOf(name).querySelectorAll("button").find((b) => b.text === text);
+  const off = (b) => b.hasAttribute("disabled");
+
+  location.hash = "#/record/261101-aaaa";
+  await settle();
+
+  for (const [what, answer, message] of [
+    ["an error", fail(500, "internal", "disk full"), /disk full/],
+    ["a stale answer", fail(412, "stale", "changed"), /This record changed since you opened it/],
+  ]) {
+    const release = pend(answer);
+    editBtn("priority").dispatch("click");
+    const field = rowOf("priority").querySelector("input");
+    field.value = "4";
+    const save = rowBtn("priority", "Save");
+    const cancel = rowBtn("priority", "Cancel");
+    const before = app.calls.length;
+    save.dispatch("click");
+    await settle(3);
+    assert.equal(app.calls.length, before + 1, what + ": the first press sends one request");
+    assert.ok(off(save) && off(cancel), what + ": Save and Cancel are disabled while the save is pending");
+    assert.equal(save.text, "Saving", what + ": the Save label says Saving, so the state is not only a color");
+    assert.equal(save.getAttribute("aria-busy"), "true", what + ": Save is marked busy");
+    save.dispatch("click");
+    field.dispatch("keydown", { key: "Enter" });
+    await settle(3);
+    assert.equal(app.calls.length, before + 1, what + ": a second press and Enter send nothing");
+
+    release();
+    await settle(5);
+    assert.equal(app.calls.length, before + 1, what + ": still one request");
+    assert.ok(!off(save) && !off(cancel), what + ": the buttons are enabled again");
+    assert.equal(save.text, "Save", what + ": the label is Save again");
+    assert.equal(save.getAttribute("aria-busy"), null, what + ": Save is not busy");
+    assert.match(rowOf("priority").querySelector(".fm-msg.err").text, message, what + ": the message is shown");
+    cancel.dispatch("click");
+  }
+
+  // the toggle is guarded the same way
+  const release = pend(fail(500, "internal", "disk full"));
+  const tog = rowOf("keep").querySelector("button");
+  const before = app.calls.length;
+  tog.dispatch("click");
+  await settle(3);
+  assert.equal(app.calls.length, before + 1, "the toggle sends one request");
+  assert.ok(off(tog), "the toggle is disabled while its save is pending");
+  assert.equal(tog.text, "Saving");
+  tog.dispatch("click");
+  await settle(3);
+  assert.equal(app.calls.length, before + 1, "a second press on the toggle sends nothing");
+  release();
+  await settle(5);
+  assert.ok(!off(tog), "the toggle is enabled again after a failed save");
+  assert.equal(tog.text, "Turn on");
+  assert.match(rowOf("keep").querySelector(".fm-msg.err").text, /disk full/);
+
+  // a save that works redraws as before
+  hold = null;
+}
 
 console.log("drawer ok");
 process.exit(0);

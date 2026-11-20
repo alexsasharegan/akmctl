@@ -1,13 +1,20 @@
 // The record drawer: the fields of one record, what points at it, and its
 // sections read from the API one at a time. Body text is shown as text.
-import { el, text } from "./util.js";
-import { field, isId, isOpenWork, childrenOf, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
+import { el, text, childChip } from "./util.js";
+import { field, isId, isOpenWork, childrenOf, childCounts, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
 import { show, findNote, describeError, state } from "./store.js";
 import { claimControls } from "./flow.js";
 import { fieldTable } from "./fields.js";
 
 // Sections that start collapsed (everything else starts open).
 const COLLAPSED = new Set(["log"]);
+
+// The key the Fields section is kept under in `keep`. A body section is kept by its
+// name, so this cannot clash with a `## Fields` heading of a record.
+const FIELDS_KEY = "@fields";
+
+/** The name a collapsible block is kept under across a redraw. */
+const blockKey = (d) => d.dataset.key || d.querySelector("summary").textContent;
 
 // While refresh() draws the drawer again: what the reader had, by section name
 // ({ open: Map name to bool, text: Map name to shown text }), so nothing jumps.
@@ -61,6 +68,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
   let current = null;
   let seq = 0;
   let returnFocus = null;
+  let pendingG = 0; // time of a first g, for gg
   const scrim = el("div", { class: "scrim drawer-scrim", hidden: true, onclick: () => ctx.close() });
   drawerEl.before(scrim);
 
@@ -89,6 +97,40 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     return box;
   }
 
+  /** The one line under the path: the key fields, so the table need not be open to read them. The claim stays in the claim line. */
+  function summaryLine(r, byId, kidsCount) {
+    const f = r.fields;
+    const chips = [];
+    const add = (label, nodes) => chips.push(el("span", { class: "chip" }, el("span", { class: "chip-k", text: label }), " ", nodes));
+    if (f.status) add("status", text(f.status));
+    if (f.kind) add("kind", text(f.kind));
+    if (f.parent) add("parent", valueNodes(f.parent, byId));
+    if (f.priority !== null && f.priority !== undefined && f.priority !== "") add("priority", String(f.priority));
+    // the child count points at the Children list, which is drawn only when there are children
+    if (kidsCount) chips.push(childChip(kidsCount, showChildren));
+    return chips.length ? el("p", { class: "dlg-sum", "aria-label": "Key fields" }, chips) : null;
+  }
+
+  /** Scroll the Children list into view and put focus on its heading. */
+  function showChildren() {
+    const h = drawerEl.querySelector("#drawer-kids");
+    if (!h) return;
+    h.scrollIntoView({ block: "start" });
+    // the sticky header covers the top of the scroll area: bring the heading below it
+    const head = drawerEl.querySelector(".dlg-head");
+    const under = head.getBoundingClientRect().bottom - h.getBoundingClientRect().top;
+    if (under > 0) drawerEl.scrollTop -= under + 8;
+    h.focus({ preventScroll: true });
+  }
+
+  /** The Fields section: the value types legend and the field table, closed until it is opened. */
+  function fieldsBlock(table) {
+    const open = keep && keep.open.has(FIELDS_KEY) && keep.open.get(FIELDS_KEY);
+    const box = el("details", { class: "fields-sec", "data-key": FIELDS_KEY }, el("summary", { text: "Fields" }), table);
+    if (open) box.open = true;
+    return box;
+  }
+
   function render(r, sections, mySeq) {
     const byId = ctx.byId();
     const dl = fieldTable(r, {
@@ -99,6 +141,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       reload: () => self && self.refresh(true),
     });
     const kids = r.type === "work" ? childrenOf(ctx.records(), r.id) : [];
+    const kidsCount = r.type === "work" ? childCounts(ctx.records()).get(r.id) : null;
     const parts = [
       el(
         "header",
@@ -109,11 +152,12 @@ export function createDrawer(drawerEl, viewEl, ctx) {
           el("p", { class: "eyebrow" }, r.type === "adr" ? "ADR " : "Work item ", el("span", { class: "mono", text: r.id })),
           el("h2", { id: "drawer-t", tabindex: "-1", text: text(field(r, "title")) || r.id }),
           el("p", { class: "sub mono", text: r.path }),
+          summaryLine(r, byId, kidsCount),
         ),
         obsidianUrl(state.config, r.path) ? el("a", { class: "btn quiet", id: "drawer-obsidian", href: obsidianUrl(state.config, r.path) }, "Open in Obsidian ", el("kbd", { text: "o" })) : null,
         el("button", { type: "button", class: "btn quiet", id: "drawer-close", onclick: () => ctx.close() }, "Close ", el("kbd", { text: "Esc" })),
       ),
-      el("div", { class: "dlg-body" }, dl),
+      el("div", { class: "dlg-body" }),
     ];
     const body = parts[1];
     const claimSlot = el("div", { class: "claim-slot" });
@@ -121,7 +165,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     claimControls(r, () => self && self.refresh()).then((n) => n && claimSlot.append(n)).catch(() => {});
     if (kids.length) {
       body.append(
-        el("h3", { class: "sec-h", text: "Children (" + kids.length + ")" }),
+        el("h3", { class: "sec-h", id: "drawer-kids", tabindex: "-1", text: "Children (" + kids.length + ")" }),
         el(
           "ul",
           { class: "kids" },
@@ -131,6 +175,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     }
     for (const name of sections) body.append(sectionBlock(r.id, name, mySeq));
     if (!sections.length) body.append(el("p", { class: "muted", text: "This record has no ## sections." }));
+    body.append(fieldsBlock(dl));
     drawerEl.replaceChildren(...parts);
     drawerEl.setAttribute("aria-labelledby", "drawer-t");
   }
@@ -147,8 +192,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     isOpen: () => current !== null,
     id: () => current,
     async open(id) {
-      const mySeq = ++seq;
-      if (current === null) returnFocus = document.activeElement;
+      const mySeq = ++seq;      if (current === null) returnFocus = document.activeElement;
       current = id;
       reveal();
       drawerEl.replaceChildren(el("p", { class: "muted pad", text: "Loading " + id + "…" }));
@@ -176,10 +220,11 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       const id = current;
       const mySeq = ++seq;
       const top = drawerEl.scrollTop;
-      const secs = [...drawerEl.querySelectorAll("details.sec")];
-      const name = (d) => d.querySelector("summary").textContent;
+      const blocks = "details.sec, details.fields-sec";
+      const secs = [...drawerEl.querySelectorAll(blocks)];
+      const name = blockKey;
       const a = document.activeElement;
-      const focusKey = a && drawerEl.contains(a) ? (a.matches("summary") ? "sec:" + name(a.parentNode) : a.id) : "";
+      const focusKey = a && drawerEl.contains(a) ? (a.matches("summary") && a.parentNode.matches(blocks) ? "sec:" + name(a.parentNode) : a.id) : "";
       let data;
       try {
         data = await show(id);
@@ -190,14 +235,14 @@ export function createDrawer(drawerEl, viewEl, ctx) {
         return; // otherwise keep what is shown; the next change tries again
       }
       if (mySeq !== seq || current !== id) return;
-      keep = { open: new Map(secs.map((d) => [name(d), d.open])), text: new Map(secs.map((d) => [name(d), d.querySelector(".body").textContent])) };
+      keep = { open: new Map(secs.map((d) => [name(d), d.open])), text: new Map(secs.filter((d) => d.querySelector(".body")).map((d) => [name(d), d.querySelector(".body").textContent])) };
       try {
         render(data.record, data.sections || [], mySeq);
       } finally {
         keep = null;
       }
       drawerEl.scrollTop = top;
-      const target = focusKey.startsWith("sec:") ? [...drawerEl.querySelectorAll("details.sec")].find((d) => "sec:" + name(d) === focusKey)?.querySelector("summary") : focusKey && drawerEl.querySelector("#" + CSS.escape(focusKey));
+      const target = focusKey.startsWith("sec:") ? [...drawerEl.querySelectorAll(blocks)].find((d) => "sec:" + name(d) === focusKey)?.querySelector("summary") : focusKey && drawerEl.querySelector("#" + CSS.escape(focusKey));
       if (target) target.focus({ preventScroll: true });
     },
     /** Hide the drawer and give focus back to where it came from. */
@@ -213,8 +258,23 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       returnFocus = null;
       return back;
     },
-    /** Keys while the drawer is open: Esc closes, j and k scroll. */
+    /** Keys while the drawer is open: Esc closes, j and k scroll, gg and G go to the top and the bottom. */
     keys(e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return false;
+      if (e.key === "g") {
+        // the board's rule (js/board.js): the second g must come within 900 ms
+        const now = Date.now();
+        if (now - pendingG < 900) {
+          pendingG = 0;
+          drawerEl.scrollTo(0, 0);
+        } else pendingG = now;
+        return true;
+      }
+      pendingG = 0;
+      if (e.key === "G") {
+        drawerEl.scrollTo(0, drawerEl.scrollHeight);
+        return true;
+      }
       if (e.key === "Escape") {
         ctx.close();
         return true;

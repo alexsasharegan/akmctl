@@ -112,6 +112,29 @@ assert.deepEqual(L.closedRows([work("261001-aaaa", { updated: "2026-10-01" }), w
 assert.deepEqual(L.adrRows(recs).map((r) => r.id), ["261006-ffff"]);
 assert.deepEqual(L.childrenOf(recs, "261001-aaaa").map((r) => r.id), ["261002-bbbb"]);
 
+// child counts: one pass, dropped children left out of both numbers
+{
+  const kid = (id, status, parent, f) => work(id, { status, parent, ...f });
+  assert.equal(L.childCounts([]).size, 0, "no records, no counts");
+  assert.equal(L.childCounts([work("261001-aaaa", {})]).size, 0, "no children, no entry");
+  const allDropped = L.childCounts([work("261001-aaaa", {}), kid("261002-bbbb", "dropped", "261001-aaaa"), kid("261003-cccc", "dropped", "261001-aaaa")]);
+  assert.equal(allDropped.has("261001-aaaa"), false, "a parent whose children are all dropped has no entry");
+  const mixed = L.childCounts([
+    work("261001-aaaa", {}),
+    kid("261002-bbbb", "done", "261001-aaaa"),
+    kid("261003-cccc", "done", "261001-aaaa"),
+    kid("261004-dddd", "ready", "261001-aaaa"),
+    kid("261005-eeee", "dropped", "261001-aaaa"),
+    kid("261006-ffff", "active", "261001-aaaa"),
+    kid("261007-gggg", "done", "261002-bbbb", { kind: "chore" }),
+    adr("261029-0001", { parent: "261001-aaaa" }),
+  ]);
+  assert.deepEqual(mixed.get("261001-aaaa"), { done: 2, total: 4 }, "dropped is in neither number; an ADR is not a child");
+  assert.deepEqual(mixed.get("261002-bbbb"), { done: 1, total: 1 }, "a child is a parent in its turn");
+  assert.equal(mixed.has("261003-cccc"), false);
+  assert.deepEqual(L.childCounts([kid("261002-bbbb", "ready", "261001-aaaa")]).get("261001-aaaa"), { done: 0, total: 1 }, "a ready child counts in the total only");
+}
+
 // check
 const findings = [{ severity: "W", rule: "a" }, { severity: "E", rule: "b" }, { severity: "W", rule: "c" }, { severity: "E", rule: "d" }];
 assert.deepEqual(L.orderFindings(findings).map((x) => x.rule), ["b", "d", "a", "c"]);
