@@ -2,7 +2,7 @@
 id: "261119-k5je"
 title: Roadmap lines accept a wikilink in place of the bracketed id
 summary: A roadmap line may be a wikilink with an id alias, so Obsidian shows a link; check and the loader read both forms and the bracketed id stays valid
-status: proposed
+status: accepted
 date: 2026-11-19
 ---
 
