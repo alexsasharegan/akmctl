@@ -1,11 +1,12 @@
 ---
 id: "261119-7wtj"
 title: drawer keeps board interactive
-status: raw
+status: dropped
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
+closed: 2026-11-19
 summary: "Do not make the board inert behind the drawer: a click on a visible card opens that record in the drawer"
 ---
 
@@ -20,6 +21,10 @@ Done when:
 - [ ] On a wide screen a click on a visible card opens that record in the drawer, Back returns to the previous record, and Esc closes the drawer and restores focus to the card.
 - [ ] In the full-width sheet the board stays inert and the focus stays inside the drawer.
 - [ ] The workbench page tests cover both modes.
+
+## Outcome
+
+Dropped: Alexander tried the live board and the scrim in the workbench and chose the scrim, with the board inert and focus kept inside the drawer. See the spike 261031-18t8.
 
 ## Log
 
