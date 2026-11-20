@@ -167,8 +167,8 @@ body[data-view=board] #view{overflow-x:auto;overflow-y:hidden}
 .dlg-sum .chip-k{color:var(--text-2);margin-right:.35em}
 /* the Fields section (js/detail.js): closed until opened; looks like a body section */
 .fields-sec{border:1px solid var(--line);border-radius:var(--r-md)}
-.fields-sec summary{cursor:pointer;padding:var(--s-2) var(--s-3);font:700 var(--fs-xs) var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--text-2)}
-.fields-sec[open] summary{border-bottom:1px solid var(--line)}
+.fields-sec>summary{cursor:pointer;padding:var(--s-2) var(--s-3);font:700 var(--fs-xs) var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--text-2)}
+.fields-sec[open]>summary{border-bottom:1px solid var(--line)}
 .fields-sec .fm-wrap{padding:var(--s-3)}
 .pad{padding:var(--dlg-pad)}
 .fields{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s-1) var(--s-4);font-size:var(--fs-sm)}
@@ -335,6 +335,7 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .fm-msg.warn{color:var(--warn-fg);background:var(--warn-bg);border-radius:var(--r-sm);padding:var(--s-1) var(--s-2)}
 .fm-msg.err{color:var(--err-fg);background:var(--err-bg);border:1px solid var(--err-fg);border-radius:var(--r-sm);padding:var(--s-1) var(--s-2);font-weight:600}
 .fm-legend{font-size:var(--fs-sm);color:var(--text-2)}
+.fm-legend summary{cursor:pointer;padding:var(--s-1) 0}
 .fm-legend ul{list-style:none;margin:var(--s-1) 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wsteps{list-style:none;display:flex;flex-direction:column;gap:2px;font-size:var(--fs-sm);color:var(--text-2);flex:none}
