@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Workbench: Monaspace Radon, the accent face, is now set upright. The card detail line and the "Raw" word in the capture modal heading lose their italics; the wordmark is unchanged. Affects people who use the workbench. Work item 261119-5680.
+
 - Workbench: `Y` copies the absolute path of the focused card or table row, or of the open record, as `y` copies the id: the repository root the page gets from `/ui/config`, joined with the record's path, with backslashes for a Windows root. No API change. Work item 261119-3aeq, GitHub issue 97.
 
 - Workbench: `y` copies the id of the focused card or table row, or of the open record, to the clipboard and shows a toast ("Copied <id>."; a refused clipboard says so). It works on the board, the tables, the ADR list, the check findings and the open record, and is in the keyboard help, the hint bar and the palette. It uses the Clipboard API with a hidden-textarea fallback. Work item 261119-3f87, GitHub issue 97.

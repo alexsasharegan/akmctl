@@ -22,3 +22,4 @@ Remove italic from the two Radon rules in app.css, add the changelog entry, run 
 
 - 2026-11-19: filed.
 - 2026-11-19 20:20-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-19: removed italic from `.card-detail` and `.raw-word` in `app.css`; the wordmark was already upright. Tests with `-race`, records check and format check pass. Not checked by eye in the browser.
