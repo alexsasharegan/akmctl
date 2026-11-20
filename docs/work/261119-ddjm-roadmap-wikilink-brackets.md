@@ -26,9 +26,10 @@ Done when:
 
 ## Next
 
-Draft the proposed ADR, then make the loader and check read a wikilink roadmap line.
+Maintainer reviews the proposed ADR in the pull request; accept it (merge) or send it back. Then the two workbench yank items, the id first.
 
 ## Log
 
 - 2026-11-19: filed.
 - 2026-11-19 18:55-07:00: claimed (claude-sonnet-5-5).
+- 2026-11-19 18:57-07:00: Traced: the tool never writes roadmap lines. The loader (record.roadmapLine) and rule RM1 accepted only [id], and the spec said roadmap lines use the bare id, so a wikilink line failed check. Provisional fix (maintainer has not accepted it): record.RoadmapEntry reads [id], [[target]] and [[target|id]] for both; proposed ADR 261119-k5je; spec sections 0 and 5, RM1, guide, glossary and changelog updated; tests in record and check. Left out: skills and init templates do not describe roadmap lines, so no change there. RM4 warns that this item is not on the roadmap; the order is the maintainer's.

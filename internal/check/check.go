@@ -539,8 +539,6 @@ func (c *checker) ids() {
 	}
 }
 
-var roadmapEntry = regexp.MustCompile(`^- \[([^\]]*)\]`)
-
 func (c *checker) roadmap() {
 	path := c.repo.RoadmapPath()
 	b, err := os.ReadFile(filepath.Join(c.repo.Root, filepath.FromSlash(path)))
@@ -559,11 +557,10 @@ func (c *checker) roadmap() {
 			}
 			continue
 		}
-		m := roadmapEntry.FindStringSubmatch(l)
-		if m == nil {
+		id, ok := record.RoadmapEntry(l)
+		if !ok {
 			continue
 		}
-		id := m[1]
 		r := c.ref(id)
 		if r == nil || r.Type != record.Work {
 			c.add("RM1", "E", path, n, "", "roadmap entry %s does not resolve to a work item", id)

@@ -424,7 +424,30 @@ func (r *Repo) Extension(name string) bool {
 	return ok
 }
 
-var roadmapLine = regexp.MustCompile(`^- \[(\d{6}-[0-9a-hjkmnp-tv-z]{4})\]`)
+var (
+	roadmapLine = regexp.MustCompile(`^- (?:\[\[([^\]\n|#]*)(?:#[^\]\n|]*)?(?:\|[^\]\n]*)?\]\]|\[([^\]]*)\])`)
+	leadingID   = regexp.MustCompile(`^(\d{6}-[0-9a-hjkmnp-tv-z]{4})(?:-|$)`)
+)
+
+// RoadmapEntry reads the reference a roadmap line starts with and reduces it
+// to the id. A line is `- [id]` or a wikilink, `- [[target]]` or
+// `- [[target|id]]`; the id of a wikilink is the leading id of its target, as in
+// frontmatter (RefID), and the alias is not read. ok is false when the line is
+// not an entry. The text is returned as written when it holds no id, so the
+// caller can name it in a rule.
+func RoadmapEntry(line string) (ref string, ok bool) {
+	m := roadmapLine.FindStringSubmatch(line)
+	if m == nil {
+		return "", false
+	}
+	if m[2] != "" || m[1] == "" {
+		return m[2], true
+	}
+	if id := leadingID.FindStringSubmatch(m[1]); id != nil {
+		return id[1], true
+	}
+	return m[1], true
+}
 
 func (r *Repo) loadRoadmap() {
 	b, err := os.ReadFile(filepath.Join(r.Root, filepath.FromSlash(r.RoadmapPath())))
@@ -438,12 +461,12 @@ func (r *Repo) loadRoadmap() {
 			section = strings.TrimSpace(l[3:])
 			continue
 		}
-		if m := roadmapLine.FindStringSubmatch(l); m != nil {
+		if id, ok := RoadmapEntry(l); ok && ValidID(id) {
 			switch section {
 			case "Now", "Next", "Later":
-				r.Roadmap = append(r.Roadmap, m[1])
+				r.Roadmap = append(r.Roadmap, id)
 			case "Dropped":
-				r.Dropped = append(r.Dropped, m[1])
+				r.Dropped = append(r.Dropped, id)
 			}
 		}
 	}

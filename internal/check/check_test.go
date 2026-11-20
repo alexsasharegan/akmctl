@@ -168,6 +168,31 @@ func TestRules(t *testing.T) {
 	}
 }
 
+func TestRoadmapWikilinkEntries(t *testing.T) {
+	rm := "docs/ROADMAP.md"
+	for name, edit := range map[string]func(string) string{
+		"alias":    sub("- [261015-c4d5] Machine", "- [[261015-c4d5-machine-readable-listings|261015-c4d5]] Machine"),
+		"no alias": sub("- [261015-c4d5] Machine", "- [[261015-c4d5-machine-readable-listings]] Machine"),
+	} {
+		r := repoWith(t, map[string]func(string) string{rm: edit})
+		if len(r.Roadmap) != 2 || r.Roadmap[0] != "261015-c4d5" {
+			t.Errorf("%s: roadmap %v", name, r.Roadmap)
+		}
+		if res := Run(r, Options{AsOf: asOf}); len(res.Findings) != 0 {
+			t.Errorf("%s: %+v", name, res.Findings)
+		}
+	}
+	for name, edit := range map[string]func(string) string{
+		"unknown id": sub("- [261015-c4d5] Machine", "- [[261099-bbbb-ghost|261099-bbbb]] Machine"),
+		"no id":      sub("- [261015-c4d5] Machine", "- [[Some note]] Machine"),
+	} {
+		res := Run(repoWith(t, map[string]func(string) string{rm: edit}), Options{AsOf: asOf})
+		if rules(res)["RM1"] != 1 {
+			t.Errorf("%s: %+v", name, res.Findings)
+		}
+	}
+}
+
 func TestLinksThatResolve(t *testing.T) {
 	res := Run(repoWith(t, map[string]func(string) string{
 		"AGENTS.md": func(s string) string {

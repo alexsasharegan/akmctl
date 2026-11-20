@@ -16,6 +16,28 @@ func TestRefID(t *testing.T) {
 	}
 }
 
+func TestRoadmapEntry(t *testing.T) {
+	for line, want := range map[string]string{
+		"- [261027-m3qz] Add JSON output":                         "261027-m3qz",
+		"- [[261027-m3qz-fix-login|261027-m3qz]] Add JSON output": "261027-m3qz",
+		"- [[261027-m3qz-fix-login]] Add JSON output":             "261027-m3qz",
+		"- [[261027-m3qz]]":                                       "261027-m3qz",
+		"- [[261027-m3qz-fix-login#Goal|261027-m3qz]]":            "261027-m3qz",
+		"- [[Some note]]":                                         "Some note",
+		"- [legal review]":                                        "legal review",
+	} {
+		got, ok := RoadmapEntry(line)
+		if !ok || got != want {
+			t.Errorf("RoadmapEntry(%q) = %q, %v; want %q", line, got, ok, want)
+		}
+	}
+	for _, line := range []string{"", "text", "* [261027-m3qz]", "- 261027-m3qz", "  - [261027-m3qz]"} {
+		if got, ok := RoadmapEntry(line); ok {
+			t.Errorf("RoadmapEntry(%q) = %q, want no entry", line, got)
+		}
+	}
+}
+
 func TestLoad(t *testing.T) {
 	r, err := Load("../../testdata/api/repos/basic")
 	if err != nil {

@@ -139,7 +139,7 @@ One file per decision in `docs/adr/`, with frontmatter (`id`, `title`, `summary`
 
 ### The roadmap
 
-`docs/ROADMAP.md` holds only ordered lists, in the sections Now, Next, Later and Dropped, one line per item: `- [261027-m3qz] Add JSON output`. Order is priority. A Dropped line gives a reason.
+`docs/ROADMAP.md` holds only ordered lists, in the sections Now, Next, Later and Dropped, one line per item: `- [261027-m3qz] Add JSON output`. With `reference_style: wikilink` write the id as a wikilink with an id alias, `- [[261027-m3qz-add-json-output|261027-m3qz]] Add JSON output`, so Obsidian shows a link; `check` reads both forms. Order is priority. A Dropped line gives a reason.
 
 ### `AGENTS.md`
 
