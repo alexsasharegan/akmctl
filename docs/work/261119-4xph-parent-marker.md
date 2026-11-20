@@ -1,12 +1,14 @@
 ---
 id: "261119-4xph"
 title: parent marker
-status: ready
+status: active
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
 summary: A chip on the board card and the drawer summary line shows how many child items are done
+claimed_by: claude-sonnet-5-5-parent-marker
+claimed_at: 2026-11-20T06:30
 ---
 
 # parent marker
@@ -30,3 +32,4 @@ Add childCounts to logic.js, use it in board.js and detail.js, add tests, CSS, c
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 23:30-07:00: claimed (claude-sonnet-5-5-parent-marker).
