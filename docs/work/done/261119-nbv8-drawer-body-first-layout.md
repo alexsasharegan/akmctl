@@ -1,14 +1,13 @@
 ---
 id: "261119-nbv8"
 title: drawer body first layout
-status: active
+status: done
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
+closed: 2026-11-19
 summary: Show the body sections first in the drawer and fold the 12-row field table under a one-line summary
-claimed_by: claude-sonnet-5-5-drawer-bodyfirst
-claimed_at: 2026-11-20T05:46
 ---
 
 # drawer body first layout
@@ -25,7 +24,9 @@ Done when:
 
 ## Next
 
-Verify, commit, then close with an Outcome. If resuming: everything is built; run gofmt, vet, race tests, check and prettier.
+## Outcome
+
+The drawer is body first: a summary line under the path, a sticky header, the body sections, and last a collapsed Fields section with the value types legend and the field table (js/detail.js, app.css).\n\n- Box 1 (Goal visible without scrolling, table one click away): drawer.test.mjs asserts the summary line, that the first body section comes before the Fields section and that Fields is last and closed on first draw; in Chromium at 1440 by 900 on 261029-tgfe, in light and dark, the Goal body ends at y=658 of 900 and one click on Fields opens the table.\n- Box 2 (editing and the stale write): drawer.test.mjs edits priority, kind, summary and parent through the opened Fields section, and sends a stale 412 to see the inline message and the Reload button; Fields stays open through the redraw after a save. In Chromium, Edit opens the editor.\n- Box 3 (header stays in view): drawer.test.mjs checks the summary line and buttons live in the header; in Chromium, scrolled to the bottom, the header sits at the top of the drawer (1 px inside the border) in light and dark. The fake DOM has no layout, so position:sticky is proven in the browser only.\n\nNot changed: a claim reloads the drawer through open() (app.js reload), which resets the open state of every block, Fields included; a redraw through refresh() keeps it.\n\nDecision: none.
 
 ## Log
 
