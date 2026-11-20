@@ -19,15 +19,18 @@ The spike 261031-18t8 settled the drawer's shape after Alexander tried it in the
 
 Done when:
 
-- [ ] The drawer opens centered at the size above, with the scrim and the inert board, and Esc and a click on the scrim close it.
-- [ ] Under about 700 px it is a full-screen sheet.
+- [x] The drawer opens centered at the size above, with the scrim and the inert board, and Esc and a click on the scrim close it.
+- [x] Under about 700 px it is a full-screen sheet.
 - [ ] Checked at 1440, 1024 and 390 px wide, light and dark, with screenshots on the pull request.
 
 ## Next
 
-Rewrite the .drawer rule in internal/server/web/app.css as a centered sheet (replacing the right-pinned one and the slide animation), add the narrow full-screen sheet, then the changelog entry and the glossary line, then the screenshots at 1440, 1024 and 390 wide, light and dark.
+Attach the six screenshots in .evidence/drawer-centered to the pull request, tick the last box, then close the item. Known and not in this item: at 390 px the header squeezes the title (item 4em1).
 
 ## Log
 
 - 2026-11-19: filed.
 - 2026-11-19 21:59-07:00: claimed (claude-sonnet-5-5-drawer-build).
+- 2026-11-19 22:01-07:00: ticked "The drawer opens centered at the size above, with the scrim and the inert board, and Esc and a click on the scrim close it.": browser check on the built layer at 1440x900: drawer 1000 px wide at x 220-1220, y 36-864; Esc and a scrim click close it, a click inside does not; board inert while open
+- 2026-11-19 22:01-07:00: ticked "Under about 700 px it is a full-screen sheet.": .evidence/drawer-centered/centered-narrow-light.png and -dark.png: 390 px wide, the drawer fills the screen with no radius or border
+- 2026-11-19 22:01-07:00: Rewrote .drawer as a centered sheet with a narrow full-screen rule and a rise animation (replacing slide); changelog and glossary updated; go test -race ./..., go vet and gofmt clean; six screenshots in .evidence/drawer-centered. Left: attach the screenshots to the pull request.

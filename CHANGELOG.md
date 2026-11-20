@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Workbench: the record drawer now opens centered over the board, up to 1000 px wide with a margin at the sides and above and below, with rounded corners, and rises in instead of sliding in from the right; under 700 px wide it is a full-screen sheet. The scrim and the inert board behind it are unchanged: nothing behind the drawer can be clicked and focus stays inside it. Before, it was a 600 px panel pinned to the right edge. No API change. Affects people who use the workbench. Work item 261119-xzzp, from the drawer layout spike 261031-18t8.
+
 - Workbench: Monaspace Radon, the accent face, is now set upright. The card detail line and the "Raw" word in the capture modal heading lose their italics; the wordmark is unchanged. Affects people who use the workbench. Work item 261119-5680.
 
 - Workbench: `Y` copies the absolute path of the focused card or table row, or of the open record, as `y` copies the id: the repository root the page gets from `/ui/config`, joined with the record's path, with backslashes for a Windows root. No API change. Work item 261119-3aeq, GitHub issue 97.

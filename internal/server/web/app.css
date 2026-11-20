@@ -156,7 +156,8 @@ body[data-view=board] #view{overflow-x:auto;overflow-y:hidden}
 .dlg-body{padding:var(--dlg-pad);overflow:auto;min-height:0;display:flex;flex-direction:column;gap:var(--s-4)}
 
 /* record drawer */
-.drawer{position:fixed;z-index:15;top:0;right:0;bottom:0;width:min(600px,100vw);display:flex;flex-direction:column;background:var(--surface);color:var(--text);border-left:1px solid var(--line-strong);box-shadow:var(--sh-2);overflow:auto}
+.drawer{position:fixed;z-index:15;top:4vh;bottom:4vh;left:0;right:0;margin-inline:auto;width:min(1000px,calc(100vw - 32px));display:flex;flex-direction:column;background:var(--surface);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--r-lg);box-shadow:var(--sh-2);overflow:auto}
+@media (max-width:700px){.drawer{top:0;bottom:0;width:100vw;border-width:0;border-radius:0}}
 .drawer .dlg-body{overflow:visible}
 .pad{padding:var(--dlg-pad)}
 .fields{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--s-1) var(--s-4);font-size:var(--fs-sm)}
@@ -222,8 +223,8 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 @media (prefers-reduced-motion:no-preference){
   .dialog{animation:pop var(--dur) var(--ease)}
   @keyframes pop{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%)}}
-  .drawer:not([hidden]){animation:slide var(--dur) var(--ease)}
-  @keyframes slide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  .drawer:not([hidden]){animation:rise var(--dur) var(--ease)}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   .toast{animation:fade var(--dur) var(--ease)}
   @keyframes fade{from{opacity:0}to{opacity:1}}
   .card,.nav-item,.btn,.pal-row,.tab{transition:background-color var(--dur-fast) var(--ease),box-shadow var(--dur) var(--ease)}
