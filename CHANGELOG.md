@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fix: in the workbench, the open record's header no longer squeezes its title to one or two characters per line on a narrow screen. Under 700 px wide the title block, "Open in Obsidian" and Close stack as rows, so the title keeps the full width. Wider screens are unchanged. CSS only; no API change. Affects people who use the workbench on a phone or a narrow window. Work item 261119-4em1, from the drawer layout spike 261031-18t8.
+- Fix: in the workbench, the open record's header no longer squeezes its title to one or two characters per line on a narrow screen. Under 700 px wide the title block, "Open in Obsidian" and Close stack as rows, so the title keeps the full width. On any width, the "Open in Obsidian" link and Close stay on one line each instead of wrapping. CSS only; no API change. Affects people who use the workbench on a phone or a narrow window. Work item 261119-4em1, from the drawer layout spike 261031-18t8.
 
 - Workbench: in the open record, `gg` scrolls the drawer to the top and `G` (Shift+G) to the bottom, with the board's rule: the second `g` must come within 900 ms, a slow one starts over, and any other key between the two cancels the first. Keys with Ctrl, Cmd or Alt are left alone. Both keys are in the hint bar for a record and in the keyboard help under Record. Affects people who use the workbench. Work item 261119-za8w.
 
