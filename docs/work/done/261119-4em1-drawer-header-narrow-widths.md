@@ -1,14 +1,13 @@
 ---
 id: "261119-4em1"
 title: drawer header narrow widths
-status: active
+status: done
 kind: bug
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
+closed: 2026-11-19
 summary: The drawer header squeezes the title to one or two characters per line at phone widths
-claimed_by: claude-sonnet-5-5-drawer-header
-claimed_at: 2026-11-20T05:07
 ---
 
 # drawer header narrow widths
@@ -23,7 +22,14 @@ Done when:
 
 ## Next
 
-Alexander inspects the running tip, then close this item and the two earlier layer items whose last box was a screenshot he waived.
+## Outcome
+
+1. At 390 px wide, light and dark, the title reads on whole words and the buttons sit on their own rows: checked in the built tip and by Alexander in the running build. At desktop width the Open in Obsidian link no longer wraps (66 px tall before, 42 px after).
+2. The screenshot done-when box was removed at Alexander's request (see the Log): he inspected the running build himself and decided screenshots need not go on the pull request.
+
+Not part of this item: the field table below the header is also cramped at 390 px (the value column is squeezed); it is not filed as an item.
+
+Decision: none.
 
 ## Log
 
