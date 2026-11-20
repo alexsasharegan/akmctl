@@ -3,3 +3,4 @@
 /docs/.akm.lock
 /node_modules/
 .tmp/
+/.evidence/
