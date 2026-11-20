@@ -37,6 +37,27 @@ export function childrenOf(records, id) {
   return records.filter((r) => isWork(r) && field(r, "parent") === id);
 }
 
+/**
+ * The child counts of every parent in one pass: a Map from a parent's id to
+ * { done, total }. A child is a work item whose parent is that id, in any
+ * status; dropped children are left out of both numbers, and a parent whose
+ * children are all dropped has no entry.
+ */
+export function childCounts(records) {
+  const m = new Map();
+  for (const r of records) {
+    if (!isWork(r)) continue;
+    const parent = field(r, "parent");
+    const status = field(r, "status");
+    if (!parent || status === "dropped") continue;
+    let c = m.get(parent);
+    if (!c) m.set(parent, (c = { done: 0, total: 0 }));
+    c.total++;
+    if (status === "done") c.done++;
+  }
+  return m;
+}
+
 // ---- board ----
 
 /** The four lanes with their work items, in the order the records came in. */

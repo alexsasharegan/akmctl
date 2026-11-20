@@ -1,7 +1,7 @@
 // The record drawer: the fields of one record, what points at it, and its
 // sections read from the API one at a time. Body text is shown as text.
-import { el, text } from "./util.js";
-import { field, isId, isOpenWork, childrenOf, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
+import { el, text, childChip } from "./util.js";
+import { field, isId, isOpenWork, childrenOf, childCounts, obsidianUrl, wikilinkParts, wikilinkLabel } from "./logic.js";
 import { show, findNote, describeError, state } from "./store.js";
 import { claimControls } from "./flow.js";
 import { fieldTable } from "./fields.js";
@@ -98,7 +98,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
   }
 
   /** The one line under the path: the key fields, so the table need not be open to read them. The claim stays in the claim line. */
-  function summaryLine(r, byId) {
+  function summaryLine(r, byId, kidsCount) {
     const f = r.fields;
     const chips = [];
     const add = (label, nodes) => chips.push(el("span", { class: "chip" }, el("span", { class: "chip-k", text: label }), " ", nodes));
@@ -106,7 +106,21 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     if (f.kind) add("kind", text(f.kind));
     if (f.parent) add("parent", valueNodes(f.parent, byId));
     if (f.priority !== null && f.priority !== undefined && f.priority !== "") add("priority", String(f.priority));
+    // the child count points at the Children list, which is drawn only when there are children
+    if (kidsCount) chips.push(childChip(kidsCount, showChildren));
     return chips.length ? el("p", { class: "dlg-sum", "aria-label": "Key fields" }, chips) : null;
+  }
+
+  /** Scroll the Children list into view and put focus on its heading. */
+  function showChildren() {
+    const h = drawerEl.querySelector("#drawer-kids");
+    if (!h) return;
+    h.scrollIntoView({ block: "start" });
+    // the sticky header covers the top of the scroll area: bring the heading below it
+    const head = drawerEl.querySelector(".dlg-head");
+    const under = head.getBoundingClientRect().bottom - h.getBoundingClientRect().top;
+    if (under > 0) drawerEl.scrollTop -= under + 8;
+    h.focus({ preventScroll: true });
   }
 
   /** The Fields section: the value types legend and the field table, closed until it is opened. */
@@ -127,6 +141,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       reload: () => self && self.refresh(true),
     });
     const kids = r.type === "work" ? childrenOf(ctx.records(), r.id) : [];
+    const kidsCount = r.type === "work" ? childCounts(ctx.records()).get(r.id) : null;
     const parts = [
       el(
         "header",
@@ -137,7 +152,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
           el("p", { class: "eyebrow" }, r.type === "adr" ? "ADR " : "Work item ", el("span", { class: "mono", text: r.id })),
           el("h2", { id: "drawer-t", tabindex: "-1", text: text(field(r, "title")) || r.id }),
           el("p", { class: "sub mono", text: r.path }),
-          summaryLine(r, byId),
+          summaryLine(r, byId, kidsCount),
         ),
         obsidianUrl(state.config, r.path) ? el("a", { class: "btn quiet", id: "drawer-obsidian", href: obsidianUrl(state.config, r.path) }, "Open in Obsidian ", el("kbd", { text: "o" })) : null,
         el("button", { type: "button", class: "btn quiet", id: "drawer-close", onclick: () => ctx.close() }, "Close ", el("kbd", { text: "Esc" })),
@@ -150,7 +165,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
     claimControls(r, () => self && self.refresh()).then((n) => n && claimSlot.append(n)).catch(() => {});
     if (kids.length) {
       body.append(
-        el("h3", { class: "sec-h", text: "Children (" + kids.length + ")" }),
+        el("h3", { class: "sec-h", id: "drawer-kids", tabindex: "-1", text: "Children (" + kids.length + ")" }),
         el(
           "ul",
           { class: "kids" },

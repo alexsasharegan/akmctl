@@ -15,6 +15,22 @@ export function el(tag, props, ...kids) {
   return n;
 }
 
+/**
+ * The child-count chip, "↳ 3/5": the glyph, then done over total. The look is
+ * the plain chip; the words are in the title and in a visually hidden span so a
+ * screen reader hears "3 of 5 child items done" and not the arrow. With
+ * `onclick` it is a button (the drawer scrolls to the Children list).
+ */
+export function childChip(c, onclick) {
+  const words = c.done + " of " + c.total + " child " + (c.total === 1 ? "item" : "items") + " done";
+  return el(
+    onclick ? "button" : "span",
+    { class: "chip kids-chip", type: onclick ? "button" : null, title: words, onclick },
+    el("span", { "aria-hidden": "true", text: "↳ " + c.done + "/" + c.total }),
+    el("span", { class: "sr-only", text: words }),
+  );
+}
+
 export function append(node, kids) {
   for (const kid of kids.flat(Infinity)) {
     if (kid === null || kid === undefined || kid === false) continue;
