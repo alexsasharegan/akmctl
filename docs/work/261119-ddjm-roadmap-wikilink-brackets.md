@@ -1,7 +1,7 @@
 ---
 id: "261119-ddjm"
 title: Roadmap wraps ids in single brackets when wikilinks is true
-status: raw
+status: ready
 kind: bug
 created: 2026-11-19
 updated: 2026-11-19
