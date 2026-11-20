@@ -1,7 +1,7 @@
 ---
 id: "261119-4xg5"
 title: drawer save in flight
-status: raw
+status: ready
 kind: bug
 parent: 261031-gtw6
 created: 2026-11-19
@@ -20,6 +20,10 @@ Done when:
 - [ ] while a save is pending the buttons are disabled and a second press or Enter sends no second request
 - [ ] a failed or stale save enables them again and shows its message as now
 - [ ] the disabled state looks disabled in light and dark (check in a browser; there is a .btn rule to extend in app.css)
+
+## Next
+
+Disable the buttons while a save is pending in fields.js (row, save), add the disabled look in app.css, test in drawer.test.mjs, check in a browser.
 
 ## Log
 
