@@ -30,9 +30,10 @@ Done when:
 
 ## Next
 
-Read the workbench drawer code and styles, then build the three width options (half, two-thirds, centered) as throwaway pages in the workbench styles and screenshot them.
+Finish the spike: (1) probe a non-modal drawer (board not inert, scrim click-through) and check whether card click and focus behave; (2) check the back stack and the keyboard model against detail.js and app.js; (3) decide where the screenshots live in the repo; (4) write the Outcome with a recommended layout and the read, edit, saving, conflict and error states; (5) file follow-up items. Read the 2026-11-20 Log line first.
 
 ## Log
 
 - 2026-10-31: filed.
 - 2026-11-19 20:16-07:00: claimed (claude-sonnet-5-5-drawer-spike).
+- 2026-11-19 20:33-07:00: Read the drawer (internal/server/web/js/detail.js, app.css .drawer). It is already modal: fixed 600px on the right, a scrim, the board inert, a record deep link at #/record/<id>, Esc closes. Built five variants as injected CSS over the live workbench (baseline, half, two-thirds, centered, resizable) and shot each at 1440, 1024 and 390 wide, light and dark. Findings so far: the 12-row field table fills the first screen and pushes the Goal, Next and Log below the fold at every width; at 390 wide the header row (title, Open in Obsidian, Close) squeezes the title to one or two characters per line; a fixed min-width over 390 overflows, so every width needs min(100vw, ...). Shots are in the session scratchpad, not yet in the repo.
