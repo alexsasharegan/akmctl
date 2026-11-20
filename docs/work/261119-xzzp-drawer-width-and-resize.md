@@ -1,12 +1,14 @@
 ---
 id: "261119-xzzp"
 title: drawer centered with a scrim
-status: raw
+status: active
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
 summary: Show the record drawer centered over the board with a scrim, up to 1000 px wide, a full-screen sheet when narrow
+claimed_by: claude-sonnet-5-5-drawer-build
+claimed_at: 2026-11-20T04:59
 ---
 
 # drawer centered with a scrim
@@ -21,6 +23,11 @@ Done when:
 - [ ] Under about 700 px it is a full-screen sheet.
 - [ ] Checked at 1440, 1024 and 390 px wide, light and dark, with screenshots on the pull request.
 
+## Next
+
+Rewrite the .drawer rule in internal/server/web/app.css as a centered sheet (replacing the right-pinned one and the slide animation), add the narrow full-screen sheet, then the changelog entry and the glossary line, then the screenshots at 1440, 1024 and 390 wide, light and dark.
+
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 21:59-07:00: claimed (claude-sonnet-5-5-drawer-build).
