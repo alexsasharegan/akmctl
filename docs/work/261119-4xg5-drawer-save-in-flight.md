@@ -1,12 +1,14 @@
 ---
 id: "261119-4xg5"
 title: drawer save in flight
-status: ready
+status: active
 kind: bug
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
 summary: The drawer Save and toggle buttons stay clickable while a save is in flight, so a second press is refused as stale
+claimed_by: claude-sonnet-5-5-drawer-save
+claimed_at: 2026-11-20T05:48
 ---
 
 # drawer save in flight
@@ -28,3 +30,4 @@ Disable the buttons while a save is pending in fields.js (row, save), add the di
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 22:48-07:00: claimed (claude-sonnet-5-5-drawer-save).
