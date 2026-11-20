@@ -1,14 +1,13 @@
 ---
 id: "261119-4xg5"
 title: drawer save in flight
-status: active
+status: done
 kind: bug
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
+closed: 2026-11-19
 summary: The drawer Save and toggle buttons stay clickable while a save is in flight, so a second press is refused as stale
-claimed_by: claude-sonnet-5-5-drawer-save
-claimed_at: 2026-11-20T05:46
 ---
 
 # drawer save in flight
@@ -25,7 +24,17 @@ Done when:
 
 ## Next
 
-Close the item with its Outcome.
+## Outcome
+
+Done: the drawer's Save, Cancel and Turn on or off buttons are disabled while a field save is pending (fields.js, row() and save()), and a second submit sends nothing.
+
+- Box 1 (pending save disables the buttons, a second press or Enter sends nothing): internal/server/testdata/drawer.test.mjs, the new block at the end. It holds the PATCH with a promise, asserts Save and Cancel are disabled, Save reads Saving with aria-busy, and a second click and an Enter keydown add no call to app.calls; the toggle is covered the same way. It fails with fields.js reverted (go test ./internal/server -run TestDOMModulesUnderNode) and passes with it. In Chrome one PATCH was sent for a click, a forced click and Enter.
+- Box 2 (failed or stale save enables them again, message as now): the same test, for an error answer and a stale answer: buttons enabled, label Save again, aria-busy gone, the message shown (the stale one is the usual text).
+- Box 3 (looks disabled in light and dark): checked in Chrome with Playwright in both color schemes; the .evidence/light-saving.png and dark-saving.png screenshots show the faded, dashed-border, Saving button and a faded dashed Cancel. The rule is in app.css next to .btn[disabled].
+
+Verified: gofmt -l prints nothing, go vet and go test -race ./... pass, akmctl check shows 0 errors, prettier passes on CHANGELOG.md and docs.
+
+Decision: none.
 
 ## Log
 
