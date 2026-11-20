@@ -1,10 +1,12 @@
 ---
 id: "261119-3aeq"
 title: "Workbench: yank a record's absolute path to the clipboard"
-status: ready
+status: active
 kind: feature
 created: 2026-11-19
 updated: 2026-11-19
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-20T02:32
 ---
 
 # Workbench: yank a record's absolute path to the clipboard
@@ -20,3 +22,4 @@ Join the workbench config root and the record path, add Y beside y.
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 19:32-07:00: claimed (claude-sonnet-5-5).
