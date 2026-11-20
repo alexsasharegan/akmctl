@@ -1,7 +1,7 @@
 ---
 id: "261119-4xph"
 title: parent marker
-status: raw
+status: ready
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
@@ -22,6 +22,10 @@ Done when:
 - [ ] The drawer summary line shows the chip after the priority chip, as a keyboard-operable link to the Children list.
 - [ ] Checked in a real browser, light and dark, on a record with many children and on the board, with no header wrap at the narrowest column.
 - [ ] CHANGELOG Unreleased entry and glossary term "Child count".
+
+## Next
+
+Add childCounts to logic.js, use it in board.js and detail.js, add tests, CSS, changelog, glossary.
 
 ## Log
 
