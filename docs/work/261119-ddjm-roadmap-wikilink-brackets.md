@@ -1,10 +1,12 @@
 ---
 id: "261119-ddjm"
 title: Roadmap wraps ids in single brackets when wikilinks is true
-status: ready
+status: active
 kind: bug
 created: 2026-11-19
 updated: 2026-11-19
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-20T01:55
 ---
 
 # Roadmap wraps ids in single brackets when wikilinks is true
@@ -22,6 +24,11 @@ Done when:
 - [ ] A fixture or test covers both forms, in the loader, `check` and `ls --sort roadmap`.
 - [ ] A `proposed` ADR records the choice, and the changelog has an entry.
 
+## Next
+
+Draft the proposed ADR, then make the loader and check read a wikilink roadmap line.
+
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 18:55-07:00: claimed (claude-sonnet-5-5).
