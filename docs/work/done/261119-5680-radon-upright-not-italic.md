@@ -1,11 +1,10 @@
 ---
 id: "261119-5680"
 title: radon upright not italic
-status: active
+status: done
 created: 2026-11-19
 updated: 2026-11-19
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-20T03:20
+closed: 2026-11-19
 ---
 
 # radon upright not italic
@@ -16,7 +15,9 @@ The workbench sets Monaspace Radon, the accent face, in italics in two places: t
 
 ## Next
 
-Remove italic from the two Radon rules in app.css, add the changelog entry, run the checks, open the pull request.
+## Outcome
+
+Radon is upright in the workbench: the card detail line and the Raw heading word lose their italics; the wordmark is unchanged.
 
 ## Log
 
