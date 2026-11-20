@@ -1,12 +1,11 @@
 ---
 id: "261119-3f87"
 title: "Workbench: yank a record's id to the clipboard"
-status: active
+status: done
 kind: feature
 created: 2026-11-19
 updated: 2026-11-19
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-20T02:28
+closed: 2026-11-19
 ---
 
 # Workbench: yank a record's id to the clipboard
@@ -17,7 +16,9 @@ In the workbench (`akmctl ui`) the `y` key copies the id of the focused or open 
 
 ## Next
 
-Open the workbench in a real browser and press y on the board, a table row and an open record; then close the item after the pull request merges. The path key (Y) is its own item.
+## Outcome
+
+In the workbench, y copies the id of the focused card or table row, or of the open record, with a toast; a refused clipboard says so. The Clipboard API is used with a hidden-textarea fallback. Tested under the fake DOM and by the maintainer in a real browser. Merged in pull request 100. GitHub issue 97.
 
 ## Log
 

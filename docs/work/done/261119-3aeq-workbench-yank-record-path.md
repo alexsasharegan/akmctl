@@ -1,12 +1,11 @@
 ---
 id: "261119-3aeq"
 title: "Workbench: yank a record's absolute path to the clipboard"
-status: active
+status: done
 kind: feature
 created: 2026-11-19
 updated: 2026-11-19
-claimed_by: claude-sonnet-5-5
-claimed_at: 2026-11-20T02:32
+closed: 2026-11-19
 ---
 
 # Workbench: yank a record's absolute path to the clipboard
@@ -17,7 +16,9 @@ In the workbench (`akmctl ui`) `Y` copies the absolute path of the focused or op
 
 ## Next
 
-Try Y in a real browser; close the item after the pull request merges.
+## Outcome
+
+In the workbench, Y copies the absolute path of the focused or open record: the root from /ui/config joined with the record path. No API change was needed. Tested under the fake DOM and by the maintainer in a real browser. Merged in pull request 101. GitHub issue 97.
 
 ## Log
 
