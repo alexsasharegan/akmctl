@@ -1,10 +1,12 @@
 ---
 id: "261119-3f87"
 title: "Workbench: yank a record's id to the clipboard"
-status: ready
+status: active
 kind: feature
 created: 2026-11-19
 updated: 2026-11-19
+claimed_by: claude-sonnet-5-5
+claimed_at: 2026-11-20T02:28
 ---
 
 # Workbench: yank a record's id to the clipboard
@@ -20,3 +22,4 @@ Read the workbench key handling and toast code, then add y.
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 19:28-07:00: claimed (claude-sonnet-5-5).
