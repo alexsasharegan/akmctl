@@ -31,23 +31,23 @@ Done when:
 
 ## Outcome
 
-Recommendation: keep the drawer as a sheet over the board, open it at about 58 percent of the viewport, and put the body before the field table.
+Recommendation (as settled by Alexander after trying it in the workbench, 2026-11-19): a centered drawer over the board with a scrim, opened at up to 1000 px wide and about 92 percent of the viewport height, with the body before the field table.
 
-Width. Half and two-thirds both read well at 1440 px and keep the board visible. Centered reads like a dialog and hides most of the board. A resizable panel (drag the left edge, remember the width) covers both, so it is the choice, with a default of about 58 percent and a floor of 480 px. Every width is capped with min(100vw, ...): a fixed minimum above 390 px overflows a phone. Under about 700 px the drawer is a full-width sheet. At 1024 px the half width is cramped by the field table, which the layout change below fixes.
+Width and placement. Half and two-thirds, pinned right, both read well at 1440 px. Centered was tried against them in the live workbench and chosen: it reads as a sheet over the board, which is what the drawer is. It is up to 1000 px wide with 16 px of margin at the sides and 4 percent of the height above and below, with rounded corners, and it rises in instead of sliding. Under about 700 px it is a full-screen sheet. Every width is capped with min(100vw, ...): a fixed minimum above 390 px overflows a phone.
 
 Layout inside. The 12-row field table fills the first screen at every width, so the Goal, Next and Log sit below the fold. Header: id, title, a one-line summary of the key fields (status, kind, parent, priority, claim), the actions. Then the body sections, with the log and outcome last. The full field table goes in a collapsed section that opens for editing. The header and actions stay in view while the body scrolls. Read and edit stay one surface, as they are now (the inline editors in fields.js).
 
 Navigation. The record route is already a hash (#/record/id), so a link opens the drawer and browser Back is the back stack: the probe clicked a card, then a linked record, and Back returned to the previous one. Esc closes the drawer and returns focus to the card it came from. No new routing is needed.
 
-Board behind the drawer. Today the board is inert and covered by a scrim, so nothing behind it can be clicked. The probe (board not inert, transparent click-through scrim) let a click on a visible card switch the drawer to that record, with Back and Esc behaving as above. Use that on wide screens and keep the modal behavior (inert board, focus inside the drawer) in the full-width sheet.
+Board behind the drawer. It stays covered by a scrim and inert: nothing behind the drawer is clickable and focus stays inside it. A non-modal drawer was probed (a click on a visible card switched the drawer to that record) and tried in the workbench with a toggle, and Alexander chose the scrim. The "keeps the board interactive" follow-up is dropped.
 
-Keyboard and focus. Esc closes, j and k scroll, and focus moves to the title on open. These stay. Add: a focus trap only in the full-width sheet, and a visible saving state (see below).
+Keyboard and focus. Esc closes, j and k scroll, and focus moves to the title on open. These stay. Add: gg to the top and G to the bottom, with the board's keys and its 900 ms window (js/board.js), and a visible saving state (see below). The scrim already keeps focus inside the drawer.
 
 States the design must handle: loading (a Loading line, exists); read (exists); edit (the fm-edit rows; the live refresh is suppressed while one is open, exists); saving (no visible state today: add a disabled control and a busy label); conflict (the stale-write message inline, exists, text in fields.js STALE_TEXT); error (a role=alert block, exists); removed (This record was removed, exists).
 
-Bug found: at 390 px wide the header squeezes the title to one or two characters per line.
+Bugs found: at 390 px wide the header squeezes the title to one or two characters per line; and the field table's name cell is display:flex on a th, which breaks the table layout (a wide gap, dividers that stop short, Edit out of line with its value).
 
-Follow-ups, all children of the redesign project: the header at narrow widths (261119-4em1), the width and resize (261119-xzzp), the board kept interactive (261119-7wtj), and the body-first layout (261119-nbv8). The existing drawer items (261029-ctzc, 261029-paw7, 261028-esyt) are done and need no change; the body-first item reworks the field table they built.
+Follow-ups, all children of the redesign project: the header at narrow widths (261119-4em1), the centered drawer and its width (261119-xzzp), the body-first layout and the table fix (261119-nbv8), and the gg and G keys. The board-interactive item (261119-7wtj) is dropped. The throwaway trial that produced the decision is not committed. The existing drawer items (261029-ctzc, 261029-paw7, 261028-esyt) are done and need no change; the body-first item reworks the field table they built.
 
 Evidence: 30 screenshots (five variants, three widths, light and dark) and the scripts that took them are in .evidence/drawer-layout/ in the worktree, which Git ignores; they go on the pull request, not in the repository.
 
@@ -61,3 +61,4 @@ Decision: none (the follow-up items carry the choices; none is hard to reverse).
 - 2026-11-19 20:39-07:00: ticked "Each width option is built as a throwaway page in the workbench's own styles and checked in the browser at three viewport sizes, light and dark, with screenshots.": 30 screenshots and the scripts in .evidence/drawer-layout/ (gitignored; attached to the pull request)
 - 2026-11-19 20:39-07:00: ticked "A recommended layout and navigation model is in `## Outcome`, with the states the design must handle (read, edit, saving, conflict, error); follow-up items are filed, including changes to the existing drawer items.": Outcome; follow-ups 261119-4em1, 261119-xzzp, 261119-7wtj, 261119-nbv8
 - 2026-11-19 20:39-07:00: Probed a non-modal drawer, read the back stack and keyboard model, wrote the Outcome and filed four follow-ups.
+- 2026-11-19 20:50-07:00: corrected outcome: Alexander tried centered with a scrim in the live workbench and chose it; the first recommendation (right-pinned, board kept live) is replaced.
