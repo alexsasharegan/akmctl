@@ -34,3 +34,4 @@ Attach the four screenshots in .evidence/drawer-table-fix to the pull request, t
 - 2026-11-19 22:01-07:00: claimed (claude-sonnet-5-5-drawer-table).
 - 2026-11-19 22:02-07:00: ticked "Editing a field still works (the existing drawer tests pass).": go test -race ./internal/server/... passes, including the drawer tests that edit fields
 - 2026-11-19 22:02-07:00: Applied the four CSS changes; before and after screenshots of record 261108-wg98 (the record the defect was seen on) are in .evidence/drawer-table-fix; go vet, gofmt and go test -race ./internal/server pass. Left: attach the screenshots to the pull request.
+- 2026-11-19 22:18-07:00: Follow-up from Alexander inspecting the tip: the locked label now ends on the same right edge as Edit (negative right margin on the button, which keeps its hover area), and not set is Radon with no italic, as the merged upright-Radon change (261119-5680) does elsewhere. The diff-hunk italic in the check view was left alone.

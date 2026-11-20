@@ -307,10 +307,10 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .fm-value{overflow-wrap:anywhere}
 .fm-val[data-type=date],.fm-val[data-type=number],.fm-val[data-type=id]{font-family:var(--mono)}
 .fm-flag{font-weight:700}
-.fm-empty{color:var(--text-2);font-style:italic}
+.fm-empty{color:var(--text-2);font-family:var(--font-note)}
 .fm-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
 .fm-act{white-space:nowrap;text-align:right!important;width:1%}
-.fm-act .btn{margin-left:var(--s-1);padding-block:0}
+.fm-act .btn{margin-left:var(--s-1);margin-right:calc(-1 * (var(--s-4) + 1px));padding-block:0}
 .fm-locked{color:var(--text-2);font:var(--fs-xs) var(--mono)}
 .fm-edit{display:flex;flex-direction:column;gap:var(--s-1)}
 .fm-edit input[type=text]{width:100%;font:var(--fs-base) var(--font);color:var(--text);background:var(--input-bg);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:var(--s-2) var(--s-3)}
