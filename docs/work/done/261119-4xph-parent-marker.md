@@ -1,14 +1,13 @@
 ---
 id: "261119-4xph"
 title: parent marker
-status: active
+status: done
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
+closed: 2026-11-19
 summary: A chip on the board card and the drawer summary line shows how many child items are done
-claimed_by: claude-sonnet-5-5-parent-marker
-claimed_at: 2026-11-20T06:30
 ---
 
 # parent marker
@@ -27,7 +26,17 @@ Done when:
 
 ## Next
 
-Verified; close the item with an Outcome that names the proof for each box.
+## Outcome
+
+1. One helper: `childCounts` in internal/server/web/js/logic.js counts every parent's children in one pass; board.js (`mountBoard`, once per mount) and detail.js (once per render) both use it. Proof: the child counts block in internal/server/testdata/logic.test.mjs (none, all dropped, mixed done, ready, dropped, ADR ignored); it fails without the change (`L.childCounts is not a function`).
+2. Board card: testdata/kids.test.mjs checks "↳ 3/5" with the title "3 of 5 child items done" and the same words in a hidden span, no chip on a card without children or with only dropped children, a chore parent shows "↳ 1/1" (singular title) between the priority and kind chips, and the kind chip class stays "chip kind". It fails with the web sources reverted.
+3. Drawer: the same file checks the chip in the summary line after the priority, as a button that moves focus to the Children heading; it fails with detail.js reverted.
+4. Real browser: Chromium via Playwright, light and dark, 390, 700, 900 and 1440 px, on the board and on the drawer of the project with 24 live children ("↳ 22/24"). The chip is not dashed, weight 400. The drawer chip scrolls the Children heading below the sticky header (found and fixed during the check). At 1440 px no card header wraps. In columns of 174 px and narrower, card headers already wrapped without the chip (id, priority and kind); the chip, which never splits, adds a line on some cards at 174 px and on one at 156 px.
+5. CHANGELOG.md Unreleased entry and the glossary term "Child count" (and the Summary line row).
+
+Verified: gofmt -l prints nothing, go vet clean, go test -race ./... passes, akmctl check 0 errors (5 warnings about other items), prettier check passes.
+
+Decision: none.
 
 ## Log
 
