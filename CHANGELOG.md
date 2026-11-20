@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: in the workbench, the open record's header no longer squeezes its title to one or two characters per line on a narrow screen. Under 700 px wide the title block, "Open in Obsidian" and Close stack as rows, so the title keeps the full width. Wider screens are unchanged. CSS only; no API change. Affects people who use the workbench on a phone or a narrow window. Work item 261119-4em1, from the drawer layout spike 261031-18t8.
+
 - Workbench: in the open record, `gg` scrolls the drawer to the top and `G` (Shift+G) to the bottom, with the board's rule: the second `g` must come within 900 ms, a slow one starts over, and any other key between the two cancels the first. Keys with Ctrl, Cmd or Alt are left alone. Both keys are in the hint bar for a record and in the keyboard help under Record. Affects people who use the workbench. Work item 261119-za8w.
 
 - Fix: the workbench drawer's field table no longer drifts apart. The name cell was `display:flex` on a table header cell, which stopped it acting as a cell, so on a record with several fields the name column grew wide, the row dividers under the names stopped short of the value rows, and the Edit links sat lower than their values. The names now stay a narrow column, the dividers run the full width, and each row's name, value and Edit line up on their first line. The locked label now ends on the same right edge as the Edit links (the links' padding no longer pushes their text inward), and the not-set marker is set in Radon, upright, like the rest of the accent face. CSS only; no API change. Affects people who use the workbench. Work item 261119-pk23, from the drawer layout spike 261031-18t8.
