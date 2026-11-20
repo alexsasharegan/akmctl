@@ -1,7 +1,7 @@
 ---
 id: "261119-nbv8"
 title: drawer body first layout
-status: raw
+status: ready
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
@@ -20,6 +20,10 @@ Done when:
 - [ ] At 1440 by 900, the Goal is visible without scrolling and the field table is one click away.
 - [ ] Editing a field still works from the collapsed table, and the stale-write message still shows inline.
 - [ ] The header and its actions stay in view while the body scrolls.
+
+## Next
+
+Build the body-first drawer in js/detail.js: summary line under the path, sticky header, body sections before a collapsed Fields section holding the Value types legend and the field table. Then tests in drawer.test.mjs, CSS, a browser check at 1440 by 900 in light and dark, the changelog and glossary.
 
 ## Log
 
