@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: in the workbench, the open record's field table now locks while a save is in flight. Pressing Save (or the Turn on or Turn off button) disables Save, Cancel and the toggle, relabels the Save button "Saving" and marks it busy, with a faded, dashed look that does not rest on color alone; a second press or Enter sends nothing. Before, a second press sent the same change with the same etag, and the server refused it as stale ("This record changed since you opened it") for the person's own save. If the save fails or comes back stale the buttons turn on again and the message shows as before; on success the drawer redraws as before. Affects people who edit a field in the workbench; no API change. Work item 261119-4xg5.
+
 - Fix: in the workbench, the open record's header no longer squeezes its title to one or two characters per line on a narrow screen. Under 700 px wide the title block, "Open in Obsidian" and Close stack as rows, so the title keeps the full width. On any width, the "Open in Obsidian" link and Close stay on one line each instead of wrapping. CSS only; no API change. Affects people who use the workbench on a phone or a narrow window. Work item 261119-4em1, from the drawer layout spike 261031-18t8.
 
 - Workbench: in the open record, `gg` scrolls the drawer to the top and `G` (Shift+G) to the bottom, with the board's rule: the second `g` must come within 900 ms, a slow one starts over, and any other key between the two cancels the first. Keys with Ctrl, Cmd or Alt are left alone. Both keys are in the hint bar for a record and in the keyboard help under Record. Affects people who use the workbench. Work item 261119-za8w.

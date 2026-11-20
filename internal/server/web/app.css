@@ -239,6 +239,11 @@ mark{background:var(--mark-bg);color:inherit;border-radius:2px;font-weight:700}
 .btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .btn.primary:hover{background:var(--accent);filter:brightness(1.1)}
 .btn[disabled]{opacity:.55;cursor:default}
+.btn[disabled],.btn[aria-busy="true"]{border-style:dashed;cursor:progress}
+.btn[disabled]:not([aria-busy]){cursor:not-allowed}
+.btn[disabled]:hover{background:var(--surface)}
+.btn.primary[disabled]:hover{background:var(--accent);filter:none}
+.btn.quiet[disabled]:hover{background:transparent}
 .btn.primary kbd,.toast .btn kbd{color:var(--kbd-fg)}
 .dlg-foot{display:flex;justify-content:flex-end;gap:var(--s-3);padding:var(--s-4) var(--dlg-pad);border-top:1px solid var(--line);background:var(--bg);flex:none}
 .dialog.wizard{--dlg-w:860px}

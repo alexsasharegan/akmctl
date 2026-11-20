@@ -175,7 +175,7 @@ function row(r, name, status, deps) {
     if (es.state === "no") {
       act.append(el("span", { class: "fm-locked", title: es.why, text: "locked" }), el("span", { class: "sr-only", text: ": " + es.why }));
     } else if (EDITORS[name] === "toggle") {
-      act.append(el("button", { type: "button", class: "btn quiet", "aria-pressed": String(Boolean(v)), "aria-label": name + (v ? " is on; turn off" : " is off; turn on"), onclick: () => save(name, !v) }, v ? "Turn off" : "Turn on"));
+      act.append(el("button", { type: "button", class: "btn quiet", "data-idle": v ? "Turn off" : "Turn on", "aria-pressed": String(Boolean(v)), "aria-label": name + (v ? " is on; turn off" : " is off; turn on"), onclick: () => save(name, !v) }, v ? "Turn off" : "Turn on"));
     } else {
       act.append(el("button", { type: "button", class: "btn quiet", "aria-label": "Edit " + name, onclick: edit }, "Edit"));
     }
@@ -184,15 +184,33 @@ function row(r, name, status, deps) {
     cell.querySelector(".fm-msg")?.remove();
     if (text) cell.append(el("p", { class: "fm-msg " + cls, role: cls === "err" ? "alert" : null, text }));
   };
+  // true while a save is pending: the buttons are off and a second submit sends nothing
+  let busy = false;
+  const setBusy = (on) => {
+    busy = on;
+    for (const b of act.querySelectorAll("button")) {
+      if (on) b.setAttribute("disabled", "");
+      else b.removeAttribute("disabled");
+      const idle = b.getAttribute("data-idle");
+      if (idle) {
+        b.textContent = on ? "Saving" : idle;
+        if (on) b.setAttribute("aria-busy", "true");
+        else b.removeAttribute("aria-busy");
+      }
+    }
+  };
   async function save(field, raw) {
+    if (busy) return;
     const ctx = { ids: deps.records().map((x) => x.id), self: r.id };
     const built = buildChanges(field, raw, ctx);
     if (built.error) return message(built.error, "err");
     message("", "");
+    setBusy(true);
     try {
       await api("PATCH", "records/" + encodeURIComponent(r.id), { body: { changes: built.changes }, etag: r.etag });
       deps.reload();
     } catch (e) {
+      setBusy(false);
       if (e && e.code === "stale") {
         message(STALE_TEXT, "err");
         cell.append(el("button", { type: "button", class: "btn", onclick: () => deps.reload() }, "Reload"));
@@ -204,7 +222,7 @@ function row(r, name, status, deps) {
     cell.replaceChildren(control.node);
     if (es.state === "warn") cell.append(el("p", { class: "fm-msg warn", text: "Careful: " + es.why + "." }));
     act.replaceChildren(
-      el("button", { type: "button", class: "btn primary", onclick: () => save(name, control.get()) }, "Save"),
+      el("button", { type: "button", class: "btn primary", "data-idle": "Save", onclick: () => save(name, control.get()) }, "Save"),
       el("button", { type: "button", class: "btn quiet", onclick: show }, "Cancel"),
     );
     control.focus();

@@ -8,7 +8,7 @@ created: 2026-11-19
 updated: 2026-11-19
 summary: The drawer Save and toggle buttons stay clickable while a save is in flight, so a second press is refused as stale
 claimed_by: claude-sonnet-5-5-drawer-save
-claimed_at: 2026-11-20T05:48
+claimed_at: 2026-11-20T05:46
 ---
 
 # drawer save in flight
@@ -19,15 +19,19 @@ In the record drawer's field table (internal/server/web/js/fields.js, row() and 
 
 Done when:
 
-- [ ] while a save is pending the buttons are disabled and a second press or Enter sends no second request
-- [ ] a failed or stale save enables them again and shows its message as now
-- [ ] the disabled state looks disabled in light and dark (check in a browser; there is a .btn rule to extend in app.css)
+- [x] while a save is pending the buttons are disabled and a second press or Enter sends no second request
+- [x] a failed or stale save enables them again and shows its message as now
+- [x] the disabled state looks disabled in light and dark (check in a browser; there is a .btn rule to extend in app.css)
 
 ## Next
 
-Disable the buttons while a save is pending in fields.js (row, save), add the disabled look in app.css, test in drawer.test.mjs, check in a browser.
+Close the item with its Outcome.
 
 ## Log
 
 - 2026-11-19: filed.
-- 2026-11-19 22:48-07:00: claimed (claude-sonnet-5-5-drawer-save).
+- 2026-11-19 22:46-07:00: claimed (claude-sonnet-5-5-drawer-save).
+- 2026-11-19 22:47-07:00: ticked "while a save is pending the buttons are disabled and a second press or Enter sends no second request": internal/server/testdata/drawer.test.mjs: a pending save disables Save and Cancel and a second click and Enter add no call to app.calls; fails without the change
+- 2026-11-19 22:47-07:00: ticked "a failed or stale save enables them again and shows its message as now": drawer.test.mjs: after an error answer and a stale answer the buttons are enabled, labeled Save again, and the message shows
+- 2026-11-19 22:47-07:00: ticked "the disabled state looks disabled in light and dark (check in a browser; there is a .btn rule to extend in app.css)": browser check in Chrome light and dark: .evidence/{light,dark}-saving.png show faded, dashed, labeled Saving; one PATCH sent for click, forced click and Enter
+- 2026-11-19 22:47-07:00: Disabled Save, Cancel and the toggle while a save is pending (fields.js row and save), added the dashed disabled look in app.css, tests in drawer.test.mjs, checked in Chrome in light and dark.

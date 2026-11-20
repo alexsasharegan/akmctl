@@ -4,7 +4,9 @@ import assert from "node:assert/strict";
 import { startApp, settle } from "./apphelper.mjs";
 
 const reply = (record, extra = {}) => ({ ok: true, status: 200, statusText: "OK", json: async () => ({ ok: true, record, ...extra }) });
-const app = await startApp({ claims: true, identity: "me", onWrite: (u, init, records) => reply({ ...records[1], etag: "w1" }) });
+// a test sets `hold` to keep a write pending, and answers it later
+let hold = null;
+const app = await startApp({ claims: true, identity: "me", onWrite: (u, init, records) => (hold ? hold() : reply({ ...records[1], etag: "w1" })) });
 const { doc } = app;
 const drawer = doc.getElementById("drawer");
 const toasts = doc.getElementById("toasts");
@@ -155,6 +157,76 @@ assert.match(toasts.text, /Claimed 261101-bbbb/);
 // the help lists both keys in its Record group
 app.press("?");
 assert.match(doc.getElementById("overlay-root").text, /scroll to the top[\s\S]*scroll to the bottom/, "the help lists gg and G for the record");
+
+// a save in flight: the buttons are off and labeled, a second submit sends nothing,
+// and a failed save turns them on again (261119-4xg5)
+{
+  const fail = (status, code, message) => ({ ok: false, status, statusText: message, json: async () => ({ ok: false, error: { code, message } }) });
+  const pend = (answer) => {
+    let release;
+    const gate = new Promise((r) => (release = r));
+    hold = () => gate.then(() => answer);
+    return release;
+  };
+  const rowBtn = (name, text) => rowOf(name).querySelectorAll("button").find((b) => b.text === text);
+  const off = (b) => b.hasAttribute("disabled");
+
+  location.hash = "#/record/261101-aaaa";
+  await settle();
+
+  for (const [what, answer, message] of [
+    ["an error", fail(500, "internal", "disk full"), /disk full/],
+    ["a stale answer", fail(412, "stale", "changed"), /This record changed since you opened it/],
+  ]) {
+    const release = pend(answer);
+    editBtn("priority").dispatch("click");
+    const field = rowOf("priority").querySelector("input");
+    field.value = "4";
+    const save = rowBtn("priority", "Save");
+    const cancel = rowBtn("priority", "Cancel");
+    const before = app.calls.length;
+    save.dispatch("click");
+    await settle(3);
+    assert.equal(app.calls.length, before + 1, what + ": the first press sends one request");
+    assert.ok(off(save) && off(cancel), what + ": Save and Cancel are disabled while the save is pending");
+    assert.equal(save.text, "Saving", what + ": the Save label says Saving, so the state is not only a color");
+    assert.equal(save.getAttribute("aria-busy"), "true", what + ": Save is marked busy");
+    save.dispatch("click");
+    field.dispatch("keydown", { key: "Enter" });
+    await settle(3);
+    assert.equal(app.calls.length, before + 1, what + ": a second press and Enter send nothing");
+
+    release();
+    await settle(5);
+    assert.equal(app.calls.length, before + 1, what + ": still one request");
+    assert.ok(!off(save) && !off(cancel), what + ": the buttons are enabled again");
+    assert.equal(save.text, "Save", what + ": the label is Save again");
+    assert.equal(save.getAttribute("aria-busy"), null, what + ": Save is not busy");
+    assert.match(rowOf("priority").querySelector(".fm-msg.err").text, message, what + ": the message is shown");
+    cancel.dispatch("click");
+  }
+
+  // the toggle is guarded the same way
+  const release = pend(fail(500, "internal", "disk full"));
+  const tog = rowOf("keep").querySelector("button");
+  const before = app.calls.length;
+  tog.dispatch("click");
+  await settle(3);
+  assert.equal(app.calls.length, before + 1, "the toggle sends one request");
+  assert.ok(off(tog), "the toggle is disabled while its save is pending");
+  assert.equal(tog.text, "Saving");
+  tog.dispatch("click");
+  await settle(3);
+  assert.equal(app.calls.length, before + 1, "a second press on the toggle sends nothing");
+  release();
+  await settle(5);
+  assert.ok(!off(tog), "the toggle is enabled again after a failed save");
+  assert.equal(tog.text, "Turn on");
+  assert.match(rowOf("keep").querySelector(".fm-msg.err").text, /disk full/);
+
+  // a save that works redraws as before
+  hold = null;
+}
 
 console.log("drawer ok");
 process.exit(0);
