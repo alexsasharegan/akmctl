@@ -164,7 +164,7 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open"],
-  ["y", "copy id"],
+  ["y Y", "copy id, path"],
   ["/", "search"],
   ["?", "help"],
 ];

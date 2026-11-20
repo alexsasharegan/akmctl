@@ -15,7 +15,7 @@ import { mountTables } from "./js/tables.js";
 import { mountAdrs } from "./js/adrs.js";
 import { mountCheck } from "./js/check.js";
 import { createDrawer } from "./js/detail.js";
-import { initFlow, flowKeys, flowActions, flowHelp, copyHelp, yank } from "./js/flow.js";
+import { initFlow, flowKeys, flowActions, flowHelp, copyHelp, yank, yankPath } from "./js/flow.js";
 
 initToken();
 
@@ -292,6 +292,10 @@ function onKey(e) {
     yank(focusedId());
     return true;
   }
+  if (e.key === "Y" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    yankPath(focusedId());
+    return true;
+  }
   if (flowKeys(e, currentId())) return true;
   if (e.key === "r") {
     reload(true);
@@ -344,6 +348,7 @@ const actions = () => [
   { label: "Go to Check", keys: ["4"], run: () => go({ name: "check" }) },
   ...flowActions(currentId),
   { label: "Copy the id of the focused record", keys: ["y"], run: () => yank(focusedId()) },
+  { label: "Copy the absolute path of the focused record", keys: ["Y"], run: () => yankPath(focusedId()) },
   { label: "Show all projects", keys: [], run: () => project !== null && chooseProject(null) },
   { label: "Reload the records", keys: ["r"], run: () => reload(true) },
   { label: "Switch light and dark", keys: ["t"], run: toggleTheme },

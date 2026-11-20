@@ -116,6 +116,21 @@ assert.ok(app.records.some((r) => r.id === copied), "y copies the id of the focu
 press("1");
 await settle(5);
 
+// Y copies the absolute path: the repository root the page was given, then the record's path
+copied = null;
+press("Y");
+await settle(3);
+assert.equal(copied, "/home/me/demo/docs/work/261101-aaaa.md", "Y copies the focused card's absolute path");
+assert.match(toasts.text, /Copied \/home\/me\/demo\/docs\/work\/261101-aaaa\.md/);
+refuse = true;
+copied = null;
+press("Y");
+await settle(3);
+assert.equal(copied, null);
+assert.match(toasts.text, /Could not copy the path/, "a refused clipboard is said, not hidden");
+refuse = false;
+assert.equal(app.calls.length, 2, "copying writes nothing");
+
 // a gated move: d on the active card asks for an outcome, then reviews, then writes
 press("l");
 press("l");
