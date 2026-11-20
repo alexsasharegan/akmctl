@@ -251,12 +251,21 @@ export function routeHref(route) {
  * the file, so the repository root need not be the vault root.
  */
 export function obsidianUrl(cfg, path) {
+  const abs = absolutePath(cfg, path);
+  return abs ? "obsidian://open?path=" + encodeURIComponent(abs) : "";
+}
+
+/**
+ * The absolute path of a record: the repository root from the page's config joined with the
+ * record's path (relative, with "/"). A Windows root (backslashes only) gets backslashes.
+ * Empty when the root or the path is unknown.
+ */
+export function absolutePath(cfg, path) {
   const root = cfg && cfg.root ? String(cfg.root) : "";
   if (!root || !path) return "";
   const rel = String(path).replace(/^\/+/, "");
   const sep = root.includes("\\") && !root.includes("/") ? "\\" : "/";
-  const abs = root.replace(/[\\/]+$/, "") + sep + rel.split("/").join(sep);
-  return "obsidian://open?path=" + encodeURIComponent(abs);
+  return root.replace(/[\\/]+$/, "") + sep + rel.split("/").join(sep);
 }
 
 /**

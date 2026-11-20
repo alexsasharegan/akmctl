@@ -369,6 +369,12 @@ const none = { has: () => false };
 assert.equal(L.obsidianUrl({ root: "/Users/a b/repo" }, "docs/work/x.md"), "obsidian://open?path=%2FUsers%2Fa%20b%2Frepo%2Fdocs%2Fwork%2Fx.md");
 assert.equal(L.obsidianUrl({ root: "/r/" }, "docs/é ü.md"), "obsidian://open?path=%2Fr%2Fdocs%2F%C3%A9%20%C3%BC.md");
 assert.equal(L.obsidianUrl({ root: "" }, "a.md"), "");
+assert.equal(L.absolutePath({ root: "/r/" }, "docs/work/x.md"), "/r/docs/work/x.md");
+assert.equal(L.absolutePath({ root: "C:\\Users\\a\\repo" }, "docs/work/x.md"), "C:\\Users\\a\\repo\\docs\\work\\x.md");
+assert.equal(L.absolutePath({ root: "/Users/a b/repo" }, "/docs/é.md"), "/Users/a b/repo/docs/é.md");
+assert.equal(L.absolutePath({ root: "" }, "a.md"), "");
+assert.equal(L.absolutePath(null, "a.md"), "");
+assert.equal(L.absolutePath({ root: "/r" }, ""), "");
 {
   const base = { from: "blocked", to: "ready", claims: true, sections: { goal: "g", next: "n" }, blockedBy: ["x"], decisions: [] };
   assert.deepEqual(M.planMove(base).steps, ["unblock"]);

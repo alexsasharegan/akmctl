@@ -10,7 +10,7 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open record"],
-  ["y", "copy id"],
+  ["y Y", "copy id, path"],
   ["r", "run again"],
   ["?", "help"],
 ];

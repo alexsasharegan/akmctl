@@ -3,7 +3,7 @@
 // wizard and the review (wizard.js). Nothing here builds HTML.
 import { el, ageDays, ageText, text } from "./util.js";
 import { api, ApiError, state, show, describeError } from "./store.js";
-import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl } from "./logic.js";
+import { field, blockedBy, CLOSED, isOpenWork, obsidianUrl, absolutePath } from "./logic.js";
 import { neighbor, sectionsOf, planMove, buildOps, requestFor, runOps, validateStep } from "./moves.js";
 import { openWizard } from "./wizard.js";
 import { openCapture } from "./capture.js";
@@ -232,6 +232,16 @@ export async function yank(id) {
   else toast("Could not copy " + id + "; the browser refused the clipboard.", { level: "error" });
 }
 
+/** Copy a record's absolute path to the clipboard and say so (Y). */
+export async function yankPath(id) {
+  if (!id) return toast("Focus a record first.", { level: "warning" });
+  const r = H.byId().get(id);
+  const abs = r ? absolutePath(state.config, r.path) : "";
+  if (!abs) return toast("The repository's location is not known, so there is no absolute path to copy.", { level: "error" });
+  if (await copyText(abs)) toast("Copied " + abs);
+  else toast("Could not copy the path; the browser refused the clipboard.", { level: "error" });
+}
+
 export function flowKeys(e, id) {
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   switch (e.key) {
@@ -288,7 +298,13 @@ export function flowActions(currentId) {
 }
 
 /** The help section for the copy key. */
-export const copyHelp = () => ["Copy", [["y", "copy the id of the focused or open record to the clipboard"]]];
+export const copyHelp = () => [
+  "Copy",
+  [
+    ["y", "copy the id of the focused or open record to the clipboard"],
+    ["Y", "copy its absolute path"],
+  ],
+];
 
 export const flowHelp = () => [
   "Moves",
