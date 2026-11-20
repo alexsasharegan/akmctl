@@ -22,13 +22,15 @@ Fix in app.css: leave the th a table cell, stack its two spans as blocks, align 
 Done when:
 
 - [ ] The name column is narrow, the row dividers run the full width, and Edit lines up with its value, in light and dark, on a record with a claim (before and after screenshots on the pull request).
-- [ ] Editing a field still works (the existing drawer tests pass).
+- [x] Editing a field still works (the existing drawer tests pass).
 
 ## Next
 
-Apply the four CSS changes in app.css, rebuild, take the after screenshots of record 261108-wg98 (before ones are in .evidence/drawer-table-fix), add the changelog entry, run the tests.
+Attach the four screenshots in .evidence/drawer-table-fix to the pull request, tick the first box, then close the item.
 
 ## Log
 
 - 2026-11-19: filed.
 - 2026-11-19 22:01-07:00: claimed (claude-sonnet-5-5-drawer-table).
+- 2026-11-19 22:02-07:00: ticked "Editing a field still works (the existing drawer tests pass).": go test -race ./internal/server/... passes, including the drawer tests that edit fields
+- 2026-11-19 22:02-07:00: Applied the four CSS changes; before and after screenshots of record 261108-wg98 (the record the defect was seen on) are in .evidence/drawer-table-fix; go vet, gofmt and go test -race ./internal/server pass. Left: attach the screenshots to the pull request.

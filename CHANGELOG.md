@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: the workbench drawer's field table no longer drifts apart. The name cell was `display:flex` on a table header cell, which stopped it acting as a cell, so on a record with several fields the name column grew wide, the row dividers under the names stopped short of the value rows, and the Edit links sat lower than their values. The names now stay a narrow column, the dividers run the full width, and each row's name, value and Edit line up on their first line. CSS only; no API change. Affects people who use the workbench. Work item 261119-pk23, from the drawer layout spike 261031-18t8.
+
 - Workbench: the record drawer now opens centered over the board, up to 1000 px wide with a margin at the sides and above and below, with rounded corners, and rises in instead of sliding in from the right, and the space under the last section is kept when the drawer is scrolled to the bottom; under 700 px wide it is a full-screen sheet. The scrim and the inert board behind it are unchanged: nothing behind the drawer can be clicked and focus stays inside it. Before, it was a 600 px panel pinned to the right edge. No API change. Affects people who use the workbench. Work item 261119-xzzp, from the drawer layout spike 261031-18t8.
 
 - Workbench: Monaspace Radon, the accent face, is now set upright. The card detail line and the "Raw" word in the capture modal heading lose their italics; the wordmark is unchanged. Affects people who use the workbench. Work item 261119-5680.
