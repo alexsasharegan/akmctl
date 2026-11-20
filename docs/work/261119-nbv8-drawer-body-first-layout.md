@@ -1,12 +1,14 @@
 ---
 id: "261119-nbv8"
 title: drawer body first layout
-status: ready
+status: active
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
 summary: Show the body sections first in the drawer and fold the 12-row field table under a one-line summary
+claimed_by: claude-sonnet-5-5-drawer-bodyfirst
+claimed_at: 2026-11-20T05:46
 ---
 
 # drawer body first layout
@@ -28,3 +30,4 @@ Build the body-first drawer in js/detail.js: summary line under the path, sticky
 ## Log
 
 - 2026-11-19: filed.
+- 2026-11-19 22:46-07:00: claimed (claude-sonnet-5-5-drawer-bodyfirst).
