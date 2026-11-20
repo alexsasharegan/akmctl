@@ -10,6 +10,7 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open record"],
+  ["y", "copy id"],
   ["r", "run again"],
   ["?", "help"],
 ];
@@ -81,6 +82,7 @@ export function mountCheck(host, ctx) {
 
   return {
     keys: (e) => nav.keys(e),
+    focused: () => nav.focused(),
     focus: () => nav.focus(),
     destroy() {
       alive = false;

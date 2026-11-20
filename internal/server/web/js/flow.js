@@ -9,6 +9,7 @@ import { openWizard } from "./wizard.js";
 import { openCapture } from "./capture.js";
 import { openDialog, closeOverlay, setDialogHints, toast, dismissToast, MOD, overlayOpen } from "./ui.js";
 import { remember } from "./board.js";
+import { copyText } from "./clipboard.js";
 
 const IDENTITY_KEY = "akm-identity";
 
@@ -224,6 +225,13 @@ export function openInObsidian(id) {
   return true;
 }
 
+/** Copy a record's id to the clipboard and say so (y). */
+export async function yank(id) {
+  if (!id) return toast("Focus a record first.", { level: "warning" });
+  if (await copyText(id)) toast("Copied " + id + ".");
+  else toast("Could not copy " + id + "; the browser refused the clipboard.", { level: "error" });
+}
+
 export function flowKeys(e, id) {
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   switch (e.key) {
@@ -278,6 +286,9 @@ export function flowActions(currentId) {
     { label: "Set the name used for claims", keys: [], run: setIdentity },
   ];
 }
+
+/** The help section for the copy key. */
+export const copyHelp = () => ["Copy", [["y", "copy the id of the focused or open record to the clipboard"]]];
 
 export const flowHelp = () => [
   "Moves",

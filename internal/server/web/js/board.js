@@ -185,6 +185,7 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open"],
+  ["y", "copy id"],
   ["H L", "move card"],
   ["d x b", "done drop block"],
   ["c", "capture"],

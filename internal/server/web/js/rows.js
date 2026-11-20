@@ -34,6 +34,8 @@ export function rowNav(wrap, opts) {
       sync();
     },
     index: () => at,
+    /** The id of the focused row, or null (a row without a data-id has none). */
+    focused: () => (rows[at] && rows[at].dataset.id) || null,
     count: () => rows.length,
     focus() {
       sync();

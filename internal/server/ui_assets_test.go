@@ -16,7 +16,7 @@ import (
 
 // The embedded client: every file the page loads is listed here, so a new
 // asset is a deliberate change that is served and tested.
-var clientModules = []string{"adrs.js", "anim.js", "board.js", "boot.js", "capture.js", "check.js", "controls.js", "detail.js", "effects.js", "fields.js", "flow.js", "live.js", "logic.js", "moves.js", "picker.js", "project.js", "replay.js", "review.js", "rows.js", "store.js", "tables.js", "theme.js", "toasts.js", "ui.js", "util.js", "wizard.js"}
+var clientModules = []string{"adrs.js", "anim.js", "board.js", "boot.js", "capture.js", "check.js", "clipboard.js", "controls.js", "detail.js", "effects.js", "fields.js", "flow.js", "live.js", "logic.js", "moves.js", "picker.js", "project.js", "replay.js", "review.js", "rows.js", "store.js", "tables.js", "theme.js", "toasts.js", "ui.js", "util.js", "wizard.js"}
 
 func TestClientAssetList(t *testing.T) {
 	entries, err := fs.ReadDir(web, "web/js")

@@ -8,6 +8,7 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open"],
+  ["y", "copy id"],
   ["/", "search"],
   ["?", "help"],
 ];
@@ -57,6 +58,7 @@ export function mountAdrs(host, ctx) {
   ctx.setPage(describe());
   return {
     keys: (e) => nav.keys(e),
+    focused: () => nav.focused(),
     focus: () => nav.focus(),
     destroy: () => host.replaceChildren(),
   };
