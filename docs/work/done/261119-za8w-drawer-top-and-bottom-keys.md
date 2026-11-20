@@ -1,14 +1,13 @@
 ---
 id: "261119-za8w"
 title: drawer top and bottom keys
-status: active
+status: done
 kind: feature
 parent: 261031-gtw6
 created: 2026-11-19
 updated: 2026-11-19
+closed: 2026-11-19
 summary: Add gg and G to the record drawer to scroll to the top and the bottom
-claimed_by: claude-sonnet-5-5-drawer-keys
-claimed_at: 2026-11-20T04:59
 ---
 
 # drawer top and bottom keys
@@ -25,7 +24,9 @@ Done when:
 
 ## Next
 
-Verified; close the item.
+## Outcome
+
+G scrolls the open drawer to the bottom and gg within 900 ms to the top; a single g, a slow second g, an interleaved key and a modifier key do nothing: internal/server/testdata/drawer.test.mjs (run by TestDOMModulesUnderNode; fails on the old detail.js). Hint bar and the Record help group list both keys: app.js, checked in drawer.test.mjs. Decision: none.
 
 ## Log
 
