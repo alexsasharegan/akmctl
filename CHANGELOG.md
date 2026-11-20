@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Workbench: `y` copies the id of the focused card or table row, or of the open record, to the clipboard and shows a toast ("Copied <id>."; a refused clipboard says so). It works on the board, the tables, the ADR list, the check findings and the open record, and is in the keyboard help, the hint bar and the palette. It uses the Clipboard API with a hidden-textarea fallback. Work item 261119-3f87, GitHub issue 97. The absolute path (`Y`) is the next item.
+
 - A roadmap line may now be a wikilink with an id alias, `- [[261027-m3qz-fix-login|261027-m3qz]] text`, in place of `- [261027-m3qz] text`. The loader (and so `ls --sort roadmap`) and `check` rule RM1 read both forms; the id of a wikilink is the leading id of its target. Before, `check` rejected the wikilink form, so a repository with `reference_style: wikilink` could not link its roadmap in Obsidian. Affects a repository that adopts the wikilink form: it needs this tool. Provisional: the decision is a `proposed` ADR (261119-k5je). Work item 261119-ddjm, GitHub issue 96.
 
 ## 0.4.0 - 2026-11-17

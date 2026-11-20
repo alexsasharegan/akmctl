@@ -15,7 +15,7 @@ import { mountTables } from "./js/tables.js";
 import { mountAdrs } from "./js/adrs.js";
 import { mountCheck } from "./js/check.js";
 import { createDrawer } from "./js/detail.js";
-import { initFlow, flowKeys, flowActions, flowHelp } from "./js/flow.js";
+import { initFlow, flowKeys, flowActions, flowHelp, copyHelp, yank } from "./js/flow.js";
 
 initToken();
 
@@ -288,6 +288,10 @@ const NAV_KEYS = { 1: { name: "board" }, 2: { name: "tables" }, 3: { name: "adrs
 function onKey(e) {
   if (drawer.isOpen() && drawer.keys(e)) return true;
   if (!drawer.isOpen() && view && view.keys(e)) return true;
+  if (e.key === "y" && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    yank(focusedId());
+    return true;
+  }
   if (flowKeys(e, currentId())) return true;
   if (e.key === "r") {
     reload(true);
@@ -303,6 +307,9 @@ function onKey(e) {
 
 /** The record a move key acts on: the open record, else the focused card of the board. */
 const currentId = () => (drawer.isOpen() ? drawer.id() : view && view.current ? view.current() : null);
+
+/** The record a copy key acts on: the open record, else the focused card or row of the view. */
+const focusedId = () => (drawer.isOpen() ? drawer.id() : view && view.focused ? view.focused() : view && view.current ? view.current() : null);
 
 /** The opt-in animations (work item 261101-4n0v): a move theme, a confetti cannon on done, a preview. */
 const animationActions = () => {
@@ -336,6 +343,7 @@ const actions = () => [
   { label: "Go to ADRs", keys: ["3"], run: () => go({ name: "adrs" }) },
   { label: "Go to Check", keys: ["4"], run: () => go({ name: "check" }) },
   ...flowActions(currentId),
+  { label: "Copy the id of the focused record", keys: ["y"], run: () => yank(focusedId()) },
   { label: "Show all projects", keys: [], run: () => project !== null && chooseProject(null) },
   { label: "Reload the records", keys: ["r"], run: () => reload(true) },
   { label: "Switch light and dark", keys: ["t"], run: toggleTheme },
@@ -366,6 +374,7 @@ const help = () => [
     ],
   ],
   flowHelp(),
+  copyHelp(),
   [
     "Record",
     [

@@ -149,6 +149,7 @@ export function mountTables(host, ctx, slug) {
       }
       return nav.keys(e);
     },
+    focused: () => nav.focused(),
     focus: () => nav.focus(),
     destroy() {
       alive = false;
@@ -163,6 +164,7 @@ const HINTS = [
   ["g g", "first"],
   ["G", "last"],
   ["Enter", "open"],
+  ["y", "copy id"],
   ["/", "search"],
   ["?", "help"],
 ];

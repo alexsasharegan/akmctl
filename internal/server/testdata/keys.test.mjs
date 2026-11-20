@@ -87,6 +87,35 @@ press("u");
 await settle(3);
 assert.match(toasts.text, /Nothing to undo/);
 
+// y copies the id of the focused card, and of the focused row in a table
+let copied = null;
+let refuse = false;
+Object.defineProperty(globalThis, "navigator", {
+  configurable: true,
+  value: { clipboard: { writeText: async (t) => { if (refuse) throw new Error("denied"); copied = t; } } },
+});
+press("y");
+await settle(3);
+assert.equal(copied, "261101-aaaa", "y copies the focused card's id");
+assert.match(toasts.text, /Copied 261101-aaaa/);
+assert.equal(app.calls.length, 2, "a copy writes nothing");
+refuse = true;
+copied = null;
+press("y");
+await settle(3);
+assert.equal(copied, null);
+assert.match(toasts.text, /Could not copy 261101-aaaa/, "a refused clipboard is said, not hidden");
+refuse = false;
+press("2");
+await settle(5);
+press("j");
+copied = null;
+press("y");
+await settle(3);
+assert.ok(app.records.some((r) => r.id === copied), "y copies the id of the focused table row: " + copied);
+press("1");
+await settle(5);
+
 // a gated move: d on the active card asks for an outcome, then reviews, then writes
 press("l");
 press("l");
