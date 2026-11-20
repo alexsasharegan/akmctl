@@ -2,11 +2,13 @@
 id: "261031-18t8"
 title: spike drawer layout
 summary: "Spike: the drawer as a first-class surface at half, two-thirds or centered width, without leaving the board"
-status: raw
+status: active
 kind: spike
 parent: "261031-gtw6"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-19
+claimed_by: claude-sonnet-5-5-drawer-spike
+claimed_at: 2026-11-20T03:16
 ---
 
 # spike drawer layout
@@ -26,6 +28,11 @@ Done when:
 - [ ] Each width option is built as a throwaway page in the workbench's own styles and checked in the browser at three viewport sizes, light and dark, with screenshots.
 - [ ] A recommended layout and navigation model is in `## Outcome`, with the states the design must handle (read, edit, saving, conflict, error); follow-up items are filed, including changes to the existing drawer items.
 
+## Next
+
+Read the workbench drawer code and styles, then build the three width options (half, two-thirds, centered) as throwaway pages in the workbench styles and screenshot them.
+
 ## Log
 
 - 2026-10-31: filed.
+- 2026-11-19 20:16-07:00: claimed (claude-sonnet-5-5-drawer-spike).
