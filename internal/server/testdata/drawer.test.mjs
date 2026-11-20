@@ -6,7 +6,20 @@ import { startApp, settle } from "./apphelper.mjs";
 const reply = (record, extra = {}) => ({ ok: true, status: 200, statusText: "OK", json: async () => ({ ok: true, record, ...extra }) });
 // a test sets `hold` to keep a write pending, and answers it later
 let hold = null;
-const app = await startApp({ claims: true, identity: "me", onWrite: (u, init, records) => (hold ? hold() : reply({ ...records[1], etag: "w1" })) });
+let staleNext = false;
+const app = await startApp({
+  claims: true,
+  identity: "me",
+  tweak: (records) => Object.assign(records[1].fields, { kind: "bug", parent: "261101-aaaa" }),
+  onWrite: (u, init, records) => {
+    if (hold) return hold();
+    if (staleNext) {
+      staleNext = false;
+      return { ok: false, status: 412, statusText: "Precondition Failed", json: async () => ({ ok: false, error: { code: "stale", message: "changed" } }) };
+    }
+    return reply({ ...records[1], etag: "w1" });
+  },
+});
 const { doc } = app;
 const drawer = doc.getElementById("drawer");
 const toasts = doc.getElementById("toasts");
@@ -15,6 +28,36 @@ location.hash = "#/record/261101-bbbb";
 await settle();
 assert.match(drawer.text, /Claim as me/, "a ready item can be claimed");
 assert.match(doc.getElementById("hintbar").text, /RECORD.*ggtopGbottom/, "the hint bar lists gg and G while the drawer is open");
+
+// the body comes first: the summary line is in the header, the body sections come before the closed Fields section
+{
+  const head = drawer.querySelector("header.dlg-head");
+  const sum = head.querySelector(".dlg-sum");
+  assert.ok(sum, "the header has a summary line");
+  assert.match(sum.text, /status\s*ready/, "the summary line shows the status");
+  assert.match(sum.text, /priority\s*2/, "and the priority when it is set");
+  assert.match(sum.text, /kind\s*bug/, "and the kind");
+  const parent = sum.querySelector("a");
+  assert.ok(parent && parent.getAttribute("href") === "#/record/261101-aaaa" && parent.text === "261101-aaaa", "and the parent as a link to that record");
+  assert.doesNotMatch(sum.text, /claim/i, "the summary line leaves the claim to the claim line");
+  const fields = drawer.querySelector("details.fields-sec");
+  assert.ok(fields, "the field table sits in a Fields section");
+  assert.equal(fields.querySelector("summary").text, "Fields");
+  assert.ok(fields.querySelector("table.fm"), "the Fields section holds the field table");
+  assert.ok(fields.querySelector("details.fm-legend"), "and the value types legend");
+  assert.equal(!!fields.open, false, "the Fields section starts closed");
+  const kids = drawer.querySelector(".dlg-body").children;
+  assert.equal(kids.at(-1), fields, "the Fields section is last");
+  assert.ok(kids.indexOf(drawer.querySelector("details.sec")) < kids.indexOf(fields), "the first body section comes before the Fields section");
+  assert.ok(kids.indexOf(drawer.querySelector(".claim-slot")) < kids.indexOf(drawer.querySelector("details.sec")), "the claim line comes before the body");
+}
+
+// the one extra click: the reader opens Fields to edit (the redraws below must keep it open)
+const fieldsBox = () => drawer.querySelector("details.fields-sec");
+fieldsBox().open = true;
+const bodyBox = drawer.querySelector("details.sec");
+const bodyWasOpen = !!bodyBox.open;
+bodyBox.open = !bodyWasOpen;
 
 // edit a field: Edit, change, Save
 const rowOf = (name) => drawer.querySelector('tr[data-field="' + name + '"]');
@@ -30,6 +73,8 @@ let w = app.calls.at(-1);
 assert.equal(w.method, "PATCH");
 assert.deepEqual(w.body.changes, { priority: 3 });
 assert.match(w.headers["If-Match"], /"e2"/);
+assert.equal(!!fieldsBox().open, true, "an open Fields section survives the redraw after a save");
+assert.equal(!!drawer.querySelector("details.sec").open, !bodyWasOpen, "a body section the reader toggled keeps its state through the redraw");
 
 // Cancel puts the value back and writes nothing
 await settle();
@@ -84,6 +129,19 @@ hit.dispatch("click");
 rowOf("parent").querySelector("button.primary").dispatch("click");
 await settle(10);
 assert.deepEqual(app.calls.at(-1).body.changes, { parent: "261101-aaaa" });
+
+// a stale write is told inline in the row, with a Reload button, and the open Fields section is not redrawn under the writer
+editBtn("priority").dispatch("click");
+rowOf("priority").querySelector("input").value = "5";
+staleNext = true;
+rowOf("priority").querySelector("button.primary").dispatch("click");
+await settle(10);
+assert.match(rowOf("priority").querySelector(".fm-msg.err").text, /changed since you opened it, so nothing was written/, "a stale write says so inline");
+assert.ok(rowOf("priority").querySelectorAll("button").some((b) => b.text === "Reload"), "and offers Reload");
+assert.equal(!!fieldsBox().open, true, "Fields stays open after a stale write");
+rowOf("priority").querySelectorAll("button").find((b) => b.text === "Reload").dispatch("click");
+await settle(10);
+assert.equal(drawer.querySelector(".fm-msg"), null, "Reload redraws the record");
 
 // the id is locked
 assert.match(rowOf("id").text, /locked/);
