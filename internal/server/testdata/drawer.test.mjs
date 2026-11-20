@@ -12,6 +12,7 @@ const toasts = doc.getElementById("toasts");
 location.hash = "#/record/261101-bbbb";
 await settle();
 assert.match(drawer.text, /Claim as me/, "a ready item can be claimed");
+assert.match(doc.getElementById("hintbar").text, /RECORD.*ggtopGbottom/, "the hint bar lists gg and G while the drawer is open");
 
 // edit a field: Edit, change, Save
 const rowOf = (name) => drawer.querySelector('tr[data-field="' + name + '"]');
@@ -94,6 +95,66 @@ assert.equal(w.method, "POST");
 assert.match(w.url, /records\/261101-bbbb\/claim$/);
 assert.equal(w.body.as, "me");
 assert.match(toasts.text, /Claimed 261101-bbbb/);
+
+// gg and G scroll the drawer to the top and the bottom (the board's keys and 900 ms window)
+{
+  const tall = () => {
+    drawer.scrollHeight = 2000;
+    drawer.clientHeight = 500;
+    drawer.scrollTop = 700;
+  };
+  const key = (k, props) => app.press(k, { target: doc.body, ...props });
+  const realNow = Date.now;
+  let t = 1_000_000;
+  Date.now = () => t;
+  try {
+    tall();
+    key("G");
+    assert.equal(drawer.scrollTop, 1500, "G scrolls to the bottom");
+
+    tall();
+    key("g");
+    assert.equal(drawer.scrollTop, 700, "one g does nothing");
+    t += 899;
+    key("g");
+    assert.equal(drawer.scrollTop, 0, "gg within 900 ms scrolls to the top");
+
+    tall();
+    t += 5000;
+    key("g");
+    t += 900;
+    key("g");
+    assert.equal(drawer.scrollTop, 700, "a second g after 900 ms is a first g");
+    t += 100;
+    key("g");
+    assert.equal(drawer.scrollTop, 0, "and the one after it completes gg");
+
+    tall();
+    t += 5000;
+    key("g");
+    key("x");
+    key("g");
+    assert.equal(drawer.scrollTop, 700, "another key between the two g presses cancels the first");
+
+    tall();
+    t += 5000;
+    key("g");
+    key("g", { ctrlKey: true });
+    key("g", { metaKey: true });
+    key("g", { altKey: true });
+    assert.equal(drawer.scrollTop, 700, "g with ctrl, meta or alt is ignored");
+    key("G", { ctrlKey: true });
+    key("G", { metaKey: true });
+    key("G", { altKey: true });
+    assert.equal(drawer.scrollTop, 700, "G with ctrl, meta or alt is ignored");
+  } finally {
+    Date.now = realNow;
+  }
+}
+
+// the help lists both keys in its Record group
+app.press("?");
+assert.match(doc.getElementById("overlay-root").text, /scroll to the top[\s\S]*scroll to the bottom/, "the help lists gg and G for the record");
 
 console.log("drawer ok");
 process.exit(0);

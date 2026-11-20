@@ -61,6 +61,7 @@ export function createDrawer(drawerEl, viewEl, ctx) {
   let current = null;
   let seq = 0;
   let returnFocus = null;
+  let pendingG = 0; // time of a first g, for gg
   const scrim = el("div", { class: "scrim drawer-scrim", hidden: true, onclick: () => ctx.close() });
   drawerEl.before(scrim);
 
@@ -213,8 +214,23 @@ export function createDrawer(drawerEl, viewEl, ctx) {
       returnFocus = null;
       return back;
     },
-    /** Keys while the drawer is open: Esc closes, j and k scroll. */
+    /** Keys while the drawer is open: Esc closes, j and k scroll, gg and G go to the top and the bottom. */
     keys(e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return false;
+      if (e.key === "g") {
+        // the board's rule (js/board.js): the second g must come within 900 ms
+        const now = Date.now();
+        if (now - pendingG < 900) {
+          pendingG = 0;
+          drawerEl.scrollTo(0, 0);
+        } else pendingG = now;
+        return true;
+      }
+      pendingG = 0;
+      if (e.key === "G") {
+        drawerEl.scrollTo(0, drawerEl.scrollHeight);
+        return true;
+      }
       if (e.key === "Escape") {
         ctx.close();
         return true;

@@ -19,15 +19,19 @@ The drawer scrolls with j and k. Add gg to the top and G (Shift+G) to the bottom
 
 Done when:
 
-- [ ] G scrolls the open drawer to the bottom and gg, pressed twice within 900 ms, to the top; one slow g does nothing.
-- [ ] The help overlay and the hint bar list both keys for the drawer.
-- [ ] A workbench page test covers both.
+- [x] G scrolls the open drawer to the bottom and gg, pressed twice within 900 ms, to the top; one slow g does nothing.
+- [x] The help overlay and the hint bar list both keys for the drawer.
+- [x] A workbench page test covers both.
 
 ## Next
 
-Add gg and G to createDrawer().keys in js/detail.js (reuse the trial in the scratchpad), list them in the hint bar and the Record help group in app.js, add a drawer keys test in internal/server/testdata, a CHANGELOG entry, then verify and close.
+Verified; close the item.
 
 ## Log
 
 - 2026-11-19: filed.
 - 2026-11-19 21:59-07:00: claimed (claude-sonnet-5-5-drawer-keys).
+- 2026-11-19 22:00-07:00: ticked "G scrolls the open drawer to the bottom and gg, pressed twice within 900 ms, to the top; one slow g does nothing.": internal/server/testdata/drawer.test.mjs: G, gg within 900 ms, one g, a slow second g, a key between, and modifier keys
+- 2026-11-19 22:00-07:00: ticked "The help overlay and the hint bar list both keys for the drawer.": internal/server/testdata/drawer.test.mjs checks the hint bar and the Record help group; app.js
+- 2026-11-19 22:00-07:00: ticked "A workbench page test covers both.": internal/server/testdata/drawer.test.mjs (run by TestDOMModulesUnderNode)
+- 2026-11-19 22:00-07:00: Added gg and G to the drawer keys (js/detail.js), listed them in the hint bar and the Record help group (app.js), tests in drawer.test.mjs, fakedom scrollTo and scrollBy

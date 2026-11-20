@@ -98,6 +98,9 @@ export class FElement extends FNode {
     this.style = { setProperty(k, v) { this[k] = v; }, removeProperty(k) { delete this[k]; } };
     this.hidden = false;
     this.focused = false;
+    this.scrollTop = 0;
+    this.scrollHeight = 0;
+    this.clientHeight = 0;
   }
   get className() {
     return this.attrs.get("class") || "";
@@ -184,6 +187,13 @@ export class FElement extends FNode {
     this.focused = false;
   }
   scrollIntoView() {}
+  /** Scroll vertically, kept between the top and the end as a browser does. */
+  scrollTo(_x, y) {
+    this.scrollTop = Math.max(0, Math.min(y, this.scrollHeight - this.clientHeight));
+  }
+  scrollBy(_x, dy) {
+    this.scrollTo(0, this.scrollTop + dy);
+  }
   getBoundingClientRect() {
     return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
   }

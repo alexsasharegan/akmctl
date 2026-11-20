@@ -122,7 +122,7 @@ function route(focus) {
   setTitle(r);
   if (r.name === "record") {
     if (!view) mountBase(base, false);
-    setPage({ mode: "RECORD", hints: [["Esc", "close"], ["j k", "scroll"], ["1 2 3 4", "views"], ["?", "help"]], where: r.id });
+    setPage({ mode: "RECORD", hints: [["Esc", "close"], ["j k", "scroll"], ["g g", "top"], ["G", "bottom"], ["1 2 3 4", "views"], ["?", "help"]], where: r.id });
     drawer.open(r.id);
     return;
   }
@@ -384,6 +384,8 @@ const help = () => [
     "Record",
     [
       ["j k", "scroll"],
+      ["g g", "scroll to the top"],
+      ["G", "scroll to the bottom"],
       ["Esc", "close"],
       ["d x b H L", "move it, as on the board"],
     ],
